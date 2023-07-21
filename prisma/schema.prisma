@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model charateristics {
+  id         Int       @id
+  product_id Int?
+  name       String?   @db.VarChar(255)
+  value      String?   @db.VarChar(255)
+  created_at DateTime  @default(now()) @db.Timestamp(0)
+  products   products? @relation(fields: [product_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "charateristics_ibfk_1")
+
+  @@index([product_id], map: "product_id")
+}
+
+model departments {
+  id          Int        @id
+  store_id    Int?
+  name        String?    @db.VarChar(255)
+  description String?    @db.VarChar(255)
+  created_at  DateTime   @default(now()) @db.Timestamp(0)
+  stores      stores?    @relation(fields: [store_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "departments_ibfk_1")
+  products    products[]
+
+  @@index([store_id], map: "store_id")
+}
+
+model products {
+  id                       Int                  @id
+  department_id            Int?
+  name                     String?              @db.VarChar(255)
+  description              String?              @db.VarChar(255)
+  units_quantity           Int?
+  buy_price                Float?
+  seller_profit_percentage Float?               @db.Float
+  created_at               DateTime             @default(now()) @db.Timestamp(0)
+  charateristics           charateristics[]
+  departments              departments?         @relation(fields: [department_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_ibfk_1")
+  products_sell            products_sell[]
+  sell_price_history       sell_price_history[]
+
+  @@index([department_id], map: "department_id")
+}
+
+model products_sell {
+  id                      Int       @id
+  product_id              Int?
+  units_quantity          Int?
+  unit_buy_price          Float?
+  total_price             Float?
+  payment_method          String?   @db.VarChar(255)
+  units_returned_quantity Int?
+  units_returned_at       DateTime  @default(now()) @db.Timestamp(0)
+  created_at              DateTime  @default(dbgenerated("('0000-00-00 00:00:00')")) @db.Timestamp(0)
+  products                products? @relation(fields: [product_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_sell_ibfk_1")
+
+  @@index([product_id], map: "product_id")
+}
+
+model roles {
+  id          Int      @id
+  name        String?  @db.VarChar(255)
+  description String?  @db.VarChar(255)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+  users       users[]
+}
+
+model sell_price_history {
+  id         Int       @id
+  product_id Int?
+  buy_price  Float?
+  created_at DateTime  @default(now()) @db.Timestamp(0)
+  products   products? @relation(fields: [product_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sell_price_history_ibfk_1")
+
+  @@index([product_id], map: "product_id")
+}
+
+model stores {
+  id                                 Int           @id
+  owner_user_id                      Int?
+  name                               String?       @db.VarChar(255)
+  description                        String?       @db.VarChar(255)
+  slogan                             String?       @db.VarChar(255)
+  address                            String?       @db.VarChar(255)
+  seller_user_id                     Int?
+  created_at                         DateTime      @default(now()) @db.Timestamp(0)
+  departments                        departments[]
+  users_stores_owner_user_idTousers  users?        @relation("stores_owner_user_idTousers", fields: [owner_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "stores_ibfk_1")
+  users_stores_seller_user_idTousers users?        @relation("stores_seller_user_idTousers", fields: [seller_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "stores_ibfk_2")
+
+  @@index([owner_user_id], map: "owner_user_id")
+  @@index([seller_user_id], map: "seller_user_id")
+}
+
+model users {
+  id                                  Int      @id
+  username                            String?  @db.VarChar(255)
+  role_id                             Int?
+  name                                String?  @db.VarChar(255)
+  mail                                String?  @db.VarChar(255)
+  phone                               String?  @db.VarChar(255)
+  created_at                          DateTime @default(now()) @db.Timestamp(0)
+  stores_stores_owner_user_idTousers  stores[] @relation("stores_owner_user_idTousers")
+  stores_stores_seller_user_idTousers stores[] @relation("stores_seller_user_idTousers")
+  roles                               roles?   @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
+
+  @@index([role_id], map: "role_id")
+}
