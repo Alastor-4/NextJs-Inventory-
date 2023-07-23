@@ -1,6 +1,9 @@
 {
   "name": "com.inventory.online",
   "version": "0.1.0",
+  "prisma": {
+    "seed": "ts-node prisma/sedeers/seed.ts"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",
