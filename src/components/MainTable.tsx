@@ -3,8 +3,12 @@
 import React from "react";
 import {
     AppBar,
+    Box,
     Card,
-    CardContent, Checkbox,
+    CardContent,
+    Checkbox,
+    Divider,
+    IconButton,
     Table,
     TableBody,
     TableCell,
@@ -14,27 +18,10 @@ import {
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
+import {AddOutlined, DeleteOutline, EditOutlined, RemoveOutlined} from "@mui/icons-material";
 
 
 export default function MainTable({title, headCells, items}) {
-    const CustomToolbar = () => (
-        <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar>
-                <Typography
-                    variant="h5"
-                    noWrap
-                    sx={{
-                        fontWeight: 700,
-                        letterSpacing: ".2rem",
-                        color: "white",
-                    }}
-                >
-                    {title}
-                </Typography>
-            </Toolbar>
-        </AppBar>
-    )
-
     //table selected item
     const [selected, setSelected] = React.useState(null)
     const handleSelectItem = (item) => {
@@ -44,6 +31,48 @@ export default function MainTable({title, headCells, items}) {
             setSelected(item)
         }
     }
+
+    const CustomToolbar = () => (
+        <AppBar position={"static"} variant={"elevation"} color={"primary"}>
+            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
+                <Box>
+                    <Typography
+                        variant="h6"
+                        noWrap
+                        sx={{
+                            fontWeight: 700,
+                            letterSpacing: ".2rem",
+                            color: "white",
+                        }}
+                    >
+                        {title}
+                    </Typography>
+                </Box>
+
+                <Box sx={{display: "flex"}}>
+                    {
+                        selected && (
+                            <Box sx={{display: "flex"}}>
+                                <IconButton color={"inherit"}>
+                                    <EditOutlined fontSize={"small"}/>
+                                </IconButton>
+
+                                <IconButton color={"inherit"}>
+                                    <DeleteOutline fontSize={"small"}/>
+                                </IconButton>
+
+                                <Divider orientation="vertical" variant="middle" flexItem sx={{borderRight: "2px solid white", mx: "5px"}}/>
+                            </Box>
+                        )
+                    }
+
+                    <IconButton color={"inherit"}>
+                        <AddOutlined/>
+                    </IconButton>
+                </Box>
+            </Toolbar>
+        </AppBar>
+    )
 
     const TableHeader = ({headCellsParam}) => {
         return (
