@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest, URLPattern } from 'next/server'
+import { NextApiRequest } from 'next'
 import {prisma} from "db";
 
 // Get all user roles
@@ -27,8 +28,9 @@ export async function PUT(request: Request) {
 }
 
 // Delete user role
-export async function DELETE(request: Request) {
-    const {roleId} = request.json()
+export async function DELETE(req: Request) {
+    //ToDo: catch roleId param from params
+    const roleId = 11
 
     const deletedRole = await prisma.roles.delete({where: {id: roleId}})
 

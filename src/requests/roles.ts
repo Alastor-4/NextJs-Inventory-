@@ -36,7 +36,7 @@ const roles = {
 
     delete: async function (id) {
         try {
-            const response = await apiRequest.delete(url, {data: {roleId: id}})
+            const response = await apiRequest.delete(url, {params: {roleId: id}})
             if (response.status === 200) return true
         } catch (e) {
             //ToDo: notify error here

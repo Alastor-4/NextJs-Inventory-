@@ -18,13 +18,21 @@ import {
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
-import {AddOutlined, DeleteOutline, EditOutlined, RemoveOutlined} from "@mui/icons-material";
-import useSWR from "swr";
+import {AddOutlined, DeleteOutline, EditOutlined} from "@mui/icons-material";
+import roles from "@/requests/roles"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function RolesMainTable() {
-    const { data, error, isLoading } = useSWR("role/api", fetcher)
+    const [data, setData] = React.useState(null)
+
+    //ToDo: use global isLoading
+    const isLoading = false
+
+    //get initial data
+    React.useEffect(() => {
+        fetcher("/role/api").then((data) => setData(data))
+    }, [])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -36,8 +44,12 @@ export default function RolesMainTable() {
         }
     }
 
-    function handleRemove() {
-        console.log("remove", selected.id)
+    async function handleRemove() {
+        const response = await roles.delete(selected.id)
+        if (response) {
+            const updatedRoles = await roles.allRoles()
+            if (updatedRoles) setData(updatedRoles)
+        }
     }
 
     const CustomToolbar = () => (
@@ -70,7 +82,7 @@ export default function RolesMainTable() {
                                                     <EditOutlined fontSize={"small"}/>
                                                 </IconButton>
 
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                                <IconButton color={"inherit"} onClick={() => handleRemove(selected.id)}>
                                                     <DeleteOutline fontSize={"small"}/>
                                                 </IconButton>
 
