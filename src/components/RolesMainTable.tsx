@@ -6,7 +6,7 @@ import {
     Box,
     Card,
     CardContent,
-    Checkbox,
+    Checkbox, CircularProgress,
     Divider,
     IconButton,
     Table,
@@ -59,24 +59,33 @@ export default function RolesMainTable() {
 
                 <Box sx={{display: "flex"}}>
                     {
-                        selected && (
-                            <Box sx={{display: "flex"}}>
-                                <IconButton color={"inherit"}>
-                                    <EditOutlined fontSize={"small"}/>
-                                </IconButton>
+                        isLoading
+                            ? <CircularProgress size={24} color={"inherit"}/>
+                            : (
+                                <>
+                                    {
+                                        selected && (
+                                            <Box sx={{display: "flex"}}>
+                                                <IconButton color={"inherit"}>
+                                                    <EditOutlined fontSize={"small"}/>
+                                                </IconButton>
 
-                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                    <DeleteOutline fontSize={"small"}/>
-                                </IconButton>
+                                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                                    <DeleteOutline fontSize={"small"}/>
+                                                </IconButton>
 
-                                <Divider orientation="vertical" variant="middle" flexItem sx={{borderRight: "2px solid white", mx: "5px"}}/>
-                            </Box>
-                        )
+                                                <Divider orientation="vertical" variant="middle" flexItem
+                                                         sx={{borderRight: "2px solid white", mx: "5px"}}/>
+                                            </Box>
+                                        )
+                                    }
+
+                                    <IconButton color={"inherit"}>
+                                        <AddOutlined/>
+                                    </IconButton>
+                                </>
+                            )
                     }
-
-                    <IconButton color={"inherit"}>
-                        <AddOutlined/>
-                    </IconButton>
                 </Box>
             </Toolbar>
         </AppBar>
