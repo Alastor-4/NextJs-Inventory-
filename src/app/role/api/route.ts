@@ -5,7 +5,7 @@ import {prisma} from "db";
 export async function GET() {
     const roles = await prisma.roles.findMany()
 
-    return NextResponse.json({roles})
+    return NextResponse.json(roles)
 }
 
 // Create new user roles
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     const newRole = await prisma.roles.create({data: {name, description}})
 
-    return NextResponse.json({newRole})
+    return NextResponse.json(newRole)
 }
 
 // Update user role
@@ -23,7 +23,7 @@ export async function PUT(request: Request) {
 
     const updatedRole = await prisma.roles.update({data: {name, description}, where: {id: roleId}})
 
-    return NextResponse.json({updatedRole})
+    return NextResponse.json(updatedRole)
 }
 
 // Delete user role
@@ -32,5 +32,5 @@ export async function DELETE(request: Request) {
 
     const deletedRole = await prisma.roles.delete({where: {id: roleId}})
 
-    return NextResponse.json({deletedRole})
+    return NextResponse.json(deletedRole)
 }

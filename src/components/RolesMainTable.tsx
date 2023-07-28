@@ -19,9 +19,13 @@ import {
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
 import {AddOutlined, DeleteOutline, EditOutlined, RemoveOutlined} from "@mui/icons-material";
+import useSWR from "swr";
 
+const fetcher = (url) => fetch(url).then((res) => res.json())
 
-export default function MainTable({title, headCells, items}) {
+export default function RolesMainTable() {
+    const { data, error, isLoading } = useSWR("role/api", fetcher)
+
     //table selected item
     const [selected, setSelected] = React.useState(null)
     const handleSelectItem = (item) => {
@@ -30,6 +34,10 @@ export default function MainTable({title, headCells, items}) {
         } else {
             setSelected(item)
         }
+    }
+
+    function handleRemove() {
+        console.log("remove", selected.id)
     }
 
     const CustomToolbar = () => (
@@ -45,7 +53,7 @@ export default function MainTable({title, headCells, items}) {
                             color: "white",
                         }}
                     >
-                        {title}
+                        Listado de roles
                     </Typography>
                 </Box>
 
@@ -57,7 +65,7 @@ export default function MainTable({title, headCells, items}) {
                                     <EditOutlined fontSize={"small"}/>
                                 </IconButton>
 
-                                <IconButton color={"inherit"}>
+                                <IconButton color={"inherit"} onClick={handleRemove}>
                                     <DeleteOutline fontSize={"small"}/>
                                 </IconButton>
 
@@ -74,7 +82,20 @@ export default function MainTable({title, headCells, items}) {
         </AppBar>
     )
 
-    const TableHeader = ({headCellsParam}) => {
+    const TableHeader = () => {
+        const headCells = [
+            {
+                id: "name",
+                label: "Nombre",
+                align: "left"
+            },
+            {
+                id: "description",
+                label: "Descripción",
+                align: "left"
+            },
+        ]
+
         return (
             <TableHead>
                 <TableRow>
@@ -85,7 +106,7 @@ export default function MainTable({title, headCells, items}) {
                     >
 
                     </TableCell>
-                    {headCellsParam.map(headCell => (
+                    {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
                             align={"left"}
@@ -99,10 +120,10 @@ export default function MainTable({title, headCells, items}) {
         )
     }
 
-    const TableContent = ({itemsParam, headCellsParam}) => {
+    const TableContent = () => {
         return (
             <TableBody>
-                {itemsParam.map(row => (
+                {data.map(row => (
                     <TableRow
                         key={row.id}
                         hover
@@ -112,14 +133,12 @@ export default function MainTable({title, headCells, items}) {
                         <TableCell>
                             <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
                         </TableCell>
-
-                        {
-                            headCellsParam.map(headCell => (
-                                <TableCell key={headCell.id}>
-                                    {row[headCell.id]}
-                                </TableCell>
-                            ))
-                        }
+                        <TableCell>
+                            {row.name}
+                        </TableCell>
+                        <TableCell>
+                            {row.description}
+                        </TableCell>
                     </TableRow>
                 ))}
             </TableBody>
@@ -132,11 +151,12 @@ export default function MainTable({title, headCells, items}) {
 
             <CardContent>
                 {
-                    items.length > 0 && headCells.length > 0
+                    data?.length > 0
                         ? (
                             <Table sx={{width: "100%"}} size={"small"}>
-                                <TableHeader headCellsParam={headCells}/>
-                                <TableContent itemsParam={items} headCellsParam={headCells}/>
+                                <TableHeader/>
+
+                                <TableContent/>
                             </Table>
                         ) : (
                             <TableNoData/>
