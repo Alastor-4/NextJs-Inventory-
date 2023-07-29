@@ -20,6 +20,8 @@ import {
 import {TableNoData} from "@/components/TableNoData";
 import {AddOutlined, DeleteOutline, EditOutlined} from "@mui/icons-material";
 import roles from "@/requests/roles"
+import {router} from "next/client";
+import Link from "next/link";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -52,6 +54,10 @@ export default function RolesMainTable() {
         }
     }
 
+    async function handleCreate() {
+        await router.push("/role/create")
+    }
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
@@ -82,7 +88,7 @@ export default function RolesMainTable() {
                                                     <EditOutlined fontSize={"small"}/>
                                                 </IconButton>
 
-                                                <IconButton color={"inherit"} onClick={() => handleRemove(selected.id)}>
+                                                <IconButton color={"inherit"} onClick={handleRemove}>
                                                     <DeleteOutline fontSize={"small"}/>
                                                 </IconButton>
 
@@ -92,9 +98,11 @@ export default function RolesMainTable() {
                                         )
                                     }
 
-                                    <IconButton color={"inherit"}>
-                                        <AddOutlined/>
-                                    </IconButton>
+                                    <Link href={"/role/create"}>
+                                        <IconButton color={"inherit"}>
+                                            <AddOutlined/>
+                                        </IconButton>
+                                    </Link>
                                 </>
                             )
                     }
