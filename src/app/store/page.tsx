@@ -1,9 +1,11 @@
+import {prisma} from "db";
 
-export default function Page() {
+export default async function Page() {
+    const response = await prisma.roles.findMany()
 
     return (
         <main>
-            store list here
+            stores
         </main>
     )
 }
