@@ -1,4 +1,4 @@
-import RolesForm from "@/components/RolesForm";
+import RolesForm from "@/components/role/RolesForm";
 
 export default function Page() {
     return (

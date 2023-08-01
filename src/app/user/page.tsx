@@ -1,9 +1,9 @@
+import UsersMainTable from "@/components/user/UsersMainTable";
 
 export default function Page() {
-
     return (
         <main>
-            user list here
+            <UsersMainTable/>
         </main>
     )
 }
