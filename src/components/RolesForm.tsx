@@ -1,10 +1,16 @@
 "use client"
 
-import {AppBar, Box, Card, Grid, Toolbar, Typography} from "@mui/material";
+import {AppBar, Box, Button, Card, Grid, TextField, Toolbar, Typography} from "@mui/material";
 import React from "react";
+import {useFormik} from "formik";
+import * as Yup from "yup"
+import { useRouter } from 'next/navigation';
+import roles from "@/requests/roles";
 
 export default function RolesForm(props) {
     const {updateItem} = props
+
+    const router = useRouter()
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -26,17 +32,90 @@ export default function RolesForm(props) {
         </AppBar>
     )
 
+    const initialValues = {
+        name: updateItem ? updateItem.name : "",
+        description: updateItem ? updateItem.description : "",
+    }
+
+    const validationSchema = Yup.object({
+        name: Yup.string().required("field required"),
+        description: Yup.string().required("field required"),
+    })
+
+    const handleSubmit = async (values) => {
+        const response = await roles.create({name: values.name, description: values.description})
+
+        if (response.status === 200) {
+            router.push("/role")
+        } else {
+            //ToDo: catch validation errors
+        }
+    }
+
+    const formik = useFormik({
+        initialValues: initialValues,
+        validationSchema: validationSchema,
+        onSubmit: handleSubmit,
+    })
+
     return (
         <Card variant={"outlined"}>
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    <CustomToolbar/>
-                </Grid>
+            <form onSubmit={formik.handleSubmit}>
+                <Grid container rowSpacing={2}>
+                    <Grid item xs={12}>
+                        <CustomToolbar/>
+                    </Grid>
 
-                <Grid item xs={12}>
-                    form
+                    <Grid container item rowSpacing={4} sx={{padding: "25px"}}>
+                        <Grid item xs={12}>
+                            <TextField
+                                name={"Nombre"}
+                                label="Nombre"
+                                size={"small"}
+                                fullWidth
+                                {...formik.getFieldProps("name")}
+                                error={formik.errors.name && formik.touched.name}
+                                helperText={(formik.errors.name && formik.touched.name) && formik.errors.name}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                            <TextField
+                                name={"description"}
+                                label="Descripción"
+                                size={"small"}
+                                fullWidth
+                                {...formik.getFieldProps("description")}
+                                error={formik.errors.description && formik.touched.description}
+                                helperText={(formik.errors.description && formik.touched.description) && formik.errors.description}
+                            />
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item justifyContent={"flex-end"} sx={{paddingRight: "25px"}}>
+                        <Button
+                            color={"secondary"}
+                            variant={"outlined"}
+                            size={"small"}
+                            sx={{m: 1}}
+                            onClick={() => router.push("/role")}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            type={"submit"}
+                            color={"primary"}
+                            variant={"outlined"}
+                            size={"small"}
+                            sx={{m: 1}}
+                            disabled={!formik.isValid}
+                        >
+                            {updateItem ? "Update" : "Create"}
+                        </Button>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </form>
         </Card>
     )
 }

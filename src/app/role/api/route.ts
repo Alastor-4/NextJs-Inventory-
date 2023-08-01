@@ -1,17 +1,16 @@
-import { NextResponse, NextRequest, URLPattern } from 'next/server'
-import { NextApiRequest } from 'next'
+import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
 // Get all user roles
-export async function GET() {
+export async function GET(req, res) {
     const roles = await prisma.roles.findMany()
 
     return NextResponse.json(roles)
 }
 
 // Create new user roles
-export async function POST(request: Request) {
-    const {name, description} = request.json()
+export async function POST(req, res) {
+    const {name, description} = await req.json()
 
     const newRole = await prisma.roles.create({data: {name, description}})
 
@@ -19,8 +18,8 @@ export async function POST(request: Request) {
 }
 
 // Update user role
-export async function PUT(request: Request) {
-    const {roleId, name, description} = request.json()
+export async function PUT(req, res) {
+    const {roleId, name, description} = await req.json()
 
     const updatedRole = await prisma.roles.update({data: {name, description}, where: {id: roleId}})
 
@@ -28,11 +27,15 @@ export async function PUT(request: Request) {
 }
 
 // Delete user role
-export async function DELETE(req: Request) {
-    //ToDo: catch roleId param from params
-    const roleId = 11
+export async function DELETE(req, res) {
+    const {searchParams} = new URL(req.url)
+    const roleId = searchParams.get("roleId")
 
-    const deletedRole = await prisma.roles.delete({where: {id: roleId}})
+    if (roleId) {
+        const deletedRole = await prisma.roles.delete({where: {id: parseInt(roleId)}})
 
-    return NextResponse.json(deletedRole)
+        return NextResponse.json(deletedRole)
+    }
+
+    return res.status(500).json({message: "La acción de eliminar ha fallado"})
 }
