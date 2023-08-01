@@ -20,13 +20,15 @@ import {
 import {TableNoData} from "@/components/TableNoData";
 import {AddOutlined, DeleteOutline, EditOutlined} from "@mui/icons-material";
 import roles from "@/requests/roles"
-import {router} from "next/client";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function RolesMainTable() {
     const [data, setData] = React.useState(null)
+
+    const router = useRouter()
 
     //ToDo: use global isLoading
     const isLoading = false
@@ -54,8 +56,8 @@ export default function RolesMainTable() {
         }
     }
 
-    async function handleCreate() {
-        await router.push("/role/create")
+    async function handleUpdate() {
+        await router.push(`/role/update/${selected.id}`)
     }
 
     const CustomToolbar = () => (
@@ -84,7 +86,7 @@ export default function RolesMainTable() {
                                     {
                                         selected && (
                                             <Box sx={{display: "flex"}}>
-                                                <IconButton color={"inherit"}>
+                                                <IconButton color={"inherit"} onClick={handleUpdate}>
                                                     <EditOutlined fontSize={"small"}/>
                                                 </IconButton>
 

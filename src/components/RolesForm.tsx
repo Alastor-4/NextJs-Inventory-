@@ -4,13 +4,24 @@ import {AppBar, Box, Button, Card, Grid, TextField, Toolbar, Typography} from "@
 import React from "react";
 import {useFormik} from "formik";
 import * as Yup from "yup"
-import { useRouter } from 'next/navigation';
+import {useParams, useRouter} from 'next/navigation';
 import roles from "@/requests/roles";
 
 export default function RolesForm(props) {
-    const {updateItem} = props
+    const [updateItem, setUpdateItem] = React.useState()
 
+    const params = useParams()
     const router = useRouter()
+    
+    React.useEffect(() => {
+        async function fetchRole(id) {
+            const rol = await roles.roleDetails(id)
+            setUpdateItem(rol)
+        }
+        if (params?.id !== undefined) {
+            fetchRole(params.id)
+        } 
+    }, [params?.id, setUpdateItem])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -43,7 +54,13 @@ export default function RolesForm(props) {
     })
 
     const handleSubmit = async (values) => {
-        const response = await roles.create({name: values.name, description: values.description})
+        let response
+
+        if (updateItem) {
+            response = await roles.update({id: updateItem.id, name: values.name, description: values.description})
+        } else {
+            response = await roles.create({name: values.name, description: values.description})
+        }
 
         if (response.status === 200) {
             router.push("/role")
@@ -56,6 +73,7 @@ export default function RolesForm(props) {
         initialValues: initialValues,
         validationSchema: validationSchema,
         onSubmit: handleSubmit,
+        enableReinitialize: true,
     })
 
     return (
