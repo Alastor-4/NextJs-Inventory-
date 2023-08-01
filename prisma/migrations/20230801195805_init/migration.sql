@@ -125,6 +125,7 @@ CREATE TABLE `users` (
     `name` VARCHAR(255) NULL,
     `mail` VARCHAR(255) NOT NULL,
     `phone` VARCHAR(255) NULL,
+    `is_active` BOOLEAN NULL DEFAULT true,
     `created_at` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 
     UNIQUE INDEX `username`(`username`),
