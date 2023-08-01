@@ -126,6 +126,7 @@ CREATE TABLE `users` (
     `mail` VARCHAR(255) NOT NULL,
     `phone` VARCHAR(255) NULL,
     `is_active` BOOLEAN NULL DEFAULT true,
+    `is_verified` BOOLEAN NULL DEFAULT false,
     `created_at` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 
     UNIQUE INDEX `username`(`username`),

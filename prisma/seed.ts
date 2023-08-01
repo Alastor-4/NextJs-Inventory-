@@ -18,6 +18,7 @@ async function main() {
             name: "Dayan Gomez Abad",
             mail: "dgabad91@gamil.com",
             phone: "51698662",
+            is_verified: true,
         },
     })
 
