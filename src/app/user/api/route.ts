@@ -11,10 +11,10 @@ export async function GET(req, res) {
 // Verify user
 export async function PUT(req, res) {
     const {searchParams} = new URL(req.url)
-    const roleId = searchParams.get("roleId")
+    const userId = searchParams.get("userId")
 
-    if (roleId) {
-        const updatedRole = await prisma.users.update({data: {is_verified: true}, where: {id: parseInt(roleId)}})
+    if (userId) {
+        const updatedRole = await prisma.users.update({data: {is_verified: true}, where: {id: parseInt(userId)}})
 
         return NextResponse.json(updatedRole)
     }
@@ -25,11 +25,11 @@ export async function PUT(req, res) {
 // activate/deactivate user
 export async function PATCH(req, res) {
     const {searchParams} = new URL(req.url)
-    const roleId = searchParams.get("roleId")
+    const userId = searchParams.get("userId")
     const {isActive} = await req.json()
 
-    if (roleId) {
-        const updatedRole = await prisma.users.update({data: {is_active: isActive}, where: {id: parseInt(roleId)}})
+    if (userId) {
+        const updatedRole = await prisma.users.update({data: {is_active: isActive}, where: {id: parseInt(userId)}})
 
         return NextResponse.json(updatedRole)
     }
@@ -40,10 +40,10 @@ export async function PATCH(req, res) {
 // Delete user
 export async function DELETE(req, res) {
     const {searchParams} = new URL(req.url)
-    const roleId = searchParams.get("roleId")
+    const userId = searchParams.get("userId")
 
-    if (roleId) {
-        const deletedRole = await prisma.roles.delete({where: {id: parseInt(roleId)}})
+    if (userId) {
+        const deletedRole = await prisma.roles.delete({where: {id: parseInt(userId)}})
 
         return NextResponse.json(deletedRole)
     }

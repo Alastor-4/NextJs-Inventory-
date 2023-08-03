@@ -1,6 +1,7 @@
 import apiRequest from "@/api"
 
 const url = "/user/api"
+const updateUrl = "/user/update/api"
 
 const roles = {
     allUsers: async function () {
@@ -14,9 +15,20 @@ const roles = {
         return false
     },
 
+    userDetails: async function (id) {
+        try {
+            const response = await apiRequest.get(updateUrl, {params: {userId: id}})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
     verifyUser: async function (id) {
         try {
-            const response = await apiRequest.put(url, {params: {roleId: id}})
+            const response = await apiRequest.put(url, {params: {userId: id}})
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -27,7 +39,7 @@ const roles = {
 
     toggleActivateUser: async function (id, isActive) {
         try {
-            const response = await apiRequest.patch(url, {isActive: isActive}, {params: {roleId: id}})
+            const response = await apiRequest.patch(url, {isActive: isActive}, {params: {userId: id}})
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -36,19 +48,10 @@ const roles = {
         return false
     },
 
-    create: async function ({name, description}) {
+    changeRol: async function (id, roleId) {
         try {
-            return await apiRequest.post(url, {name, description})
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
-
-    update: async function ({id, name, description}) {
-        try {
-            return await apiRequest.put(url, {roleId: id, name, description})
+            const response = await apiRequest.patch(updateUrl, {roleId: roleId}, {params: {userId: id}})
+            return response.data
         } catch (e) {
             //ToDo: notify error here
         }
@@ -58,7 +61,7 @@ const roles = {
 
     delete: async function (id) {
         try {
-            const response = await apiRequest.delete(url, {params: {roleId: id}})
+            const response = await apiRequest.delete(url, {params: {userId: id}})
             if (response.status === 200) return true
         } catch (e) {
             //ToDo: notify error here

@@ -78,7 +78,7 @@ export default function UsersMainTable(props) {
     };
 
     function ChangeRoleDialog(props) {
-        const {open, setOpen, selected} = props
+        const {open, setOpen, selected, setData, setSelected} = props
 
         const [selectedRole, setSelectedRole] = React.useState<number | string>('');
 
@@ -90,7 +90,21 @@ export default function UsersMainTable(props) {
             setOpen(false);
         };
 
-        const handleApplyRole = () => console.log(selectedRole)
+        const handleApplyRole = async () => {
+            const response = await users.changeRol(selected.id, selectedRole.id)
+            if (response) {
+                const updatedUser = await users.userDetails(response.id)
+
+                if (updatedUser) {
+                    let newData = [...data]
+                    const updatedItemIndex = newData.findIndex(item => item.id === updatedUser.id)
+                    newData.splice(updatedItemIndex, 1, updatedUser)
+                    setData(newData)
+                    setSelected(null)
+                    setOpen(false)
+                }
+            }
+        }
 
         return (
             <Dialog open={open} onClose={handleClose}>
@@ -102,7 +116,7 @@ export default function UsersMainTable(props) {
                             <InputLabel id="dialog-select-label">Rol</InputLabel>
                             <Select
                                 labelId="dialog-select-label"
-                                id="dialog-select"
+                                id="dialog-select-label"
                                 value={selectedRole}
                                 onChange={handleChange}
                                 input={<OutlinedInput label="Rol" fullWidth/>}
@@ -169,7 +183,7 @@ export default function UsersMainTable(props) {
                             color: "white",
                         }}
                     >
-                        Listado de roles
+                        Listado de usuarios
                     </Typography>
                 </Box>
 
@@ -292,7 +306,7 @@ export default function UsersMainTable(props) {
                     return "success"
 
                 default:
-                    return "disabled"
+                    return "info"
             }
         }
 
@@ -368,7 +382,13 @@ export default function UsersMainTable(props) {
 
     return (
         <>
-            <ChangeRoleDialog open={openDialog} setOpen={setOpenDialog} selected={selected}/>
+            <ChangeRoleDialog
+                open={openDialog}
+                setOpen={setOpenDialog}
+                setData={setData}
+                selected={selected}
+                setSelected={setSelected}
+            />
             <Card variant={"outlined"}>
                 <CustomToolbar/>
 
