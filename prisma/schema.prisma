@@ -122,16 +122,18 @@ model stores {
 }
 
 model users {
-  id         Int          @id @default(autoincrement())
-  username   String       @unique(map: "username") @db.VarChar(255)
-  role_id    Int?
-  name       String?      @db.VarChar(255)
-  mail       String       @unique(map: "mail") @db.VarChar(255)
-  phone      String?      @unique(map: "phone") @db.VarChar(255)
-  created_at DateTime     @default(now()) @db.Timestamp(0)
-  stores     stores[]
-  roles      roles?       @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
-  warehouses warehouses[]
+  id          Int          @id @default(autoincrement())
+  username    String       @unique(map: "username") @db.VarChar(255)
+  role_id     Int?
+  name        String?      @db.VarChar(255)
+  mail        String       @unique(map: "mail") @db.VarChar(255)
+  phone       String?      @unique(map: "phone") @db.VarChar(255)
+  is_active   Boolean?     @default(true)
+  is_verified Boolean?     @default(false)
+  created_at  DateTime     @default(now()) @db.Timestamp(0)
+  stores      stores[]
+  roles       roles?       @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
+  warehouses  warehouses[]
 
   @@index([role_id], map: "role_id")
 }

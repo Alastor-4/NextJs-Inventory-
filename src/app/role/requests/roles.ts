@@ -1,11 +1,23 @@
 import apiRequest from "@/api"
 
 const url = "/role/api"
+const updateUrl = "/role/update/api"
 
 const roles = {
     allRoles: async function () {
         try {
             const response = await apiRequest.get(url)
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    roleDetails: async function (id) {
+        try {
+            const response = await apiRequest.get(updateUrl, {params: {roleId: id}})
             return response.data
         } catch (e) {
             //ToDo: notify error here
