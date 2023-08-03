@@ -21,8 +21,15 @@ import {
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
-import {AddOutlined, DeleteOutline, EditOutlined, PersonOutlined} from "@mui/icons-material";
-import roles from "@/requests/roles"
+import {
+    AddOutlined,
+    DeleteOutline,
+    Done,
+    EditOutlined, PauseOutlined,
+    PersonOutlined, StartOutlined, StopOutlined,
+    ThumbsUpDownOutlined, TurnedIn, TurnedInNot
+} from "@mui/icons-material";
+import users from "@/requests/users"
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 
@@ -52,15 +59,34 @@ export default function UsersMainTable() {
     }
 
     async function handleRemove() {
-        const response = await roles.delete(selected.id)
+        const response = await users.delete(selected.id)
         if (response) {
-            const updatedRoles = await roles.allRoles()
-            if (updatedRoles) setData(updatedRoles)
+            const updatedUsers = await users.allUsers()
+            if (updatedUsers) setData(updatedUsers)
         }
     }
 
-    async function handleUpdate() {
-        await router.push(`/role/update/${selected.id}`)
+    async function handleVerify() {
+        const response = await users.verifyUser(selected.id)
+        if (response) {
+            let newData = [...data]
+            const updatedItemIndex = newData.findIndex(item => item.id === response.id)
+            newData[updatedItemIndex].is_verified = !newData[updatedItemIndex].is_verified
+            setData(newData)
+            setSelected(null)
+        }
+    }
+
+    async function handleToggleActive() {
+        const isActive = !selected.is_active
+        const response = await users.toggleActivateUser(selected.id, isActive)
+        if (response) {
+            let newData = [...data]
+            const updatedItemIndex = newData.findIndex(item => item.id === response.id)
+            newData[updatedItemIndex].is_active = !newData[updatedItemIndex].is_active
+            setData(newData)
+            setSelected(null)
+        }
     }
 
     const CustomToolbar = () => (
@@ -89,16 +115,29 @@ export default function UsersMainTable() {
                                     {
                                         selected && (
                                             <Box sx={{display: "flex"}}>
-                                                <IconButton color={"inherit"} onClick={handleUpdate}>
-                                                    <EditOutlined fontSize={"small"}/>
-                                                </IconButton>
+                                                {
+                                                    !selected.is_verified
+                                                    && (
+                                                        <IconButton color={"inherit"} onClick={handleVerify}>
+                                                            <Done fontSize={"small"}/>
+                                                        </IconButton>
+                                                    )
+                                                }
 
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"}/>
+                                                <IconButton color={"inherit"} onClick={handleToggleActive}>
+                                                    {
+                                                        selected.is_active
+                                                            ?  <PauseOutlined fontSize={"small"}/>
+                                                            :  <StartOutlined fontSize={"small"}/>
+                                                    }
                                                 </IconButton>
 
                                                 <Divider orientation="vertical" variant="middle" flexItem
                                                          sx={{borderRight: "2px solid white", mx: "5px"}}/>
+
+                                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                                    <DeleteOutline fontSize={"small"}/>
+                                                </IconButton>
                                             </Box>
                                         )
                                     }
@@ -130,11 +169,6 @@ export default function UsersMainTable() {
             {
                 id: "phone",
                 label: "Teléfono",
-                align: "left"
-            },
-            {
-                id: "is_active",
-                label: "Activo",
                 align: "left"
             },
         ]
@@ -192,6 +226,7 @@ export default function UsersMainTable() {
                         hover
                         tabIndex={-1}
                         onClick={() => handleSelectItem(row)}
+                        selected={selected && (row.id === selected.id)}
                     >
                         <TableCell>
                             <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
@@ -206,7 +241,28 @@ export default function UsersMainTable() {
                                     <PersonOutlined fontSize={"small"} color={getColorByRole(row.roles.name)}/>
                                 </Badge>
                             </Tooltip>
-                            {` ${row.username}`}
+                            {
+                                row.is_verified
+                                    ? (<Box sx={{
+                                        display: "inline-flex",
+                                        p: "3px",
+                                        my: "8px"
+                                    }}>
+                                        {row.username}
+                                    </Box>)
+                                    : (<Tooltip title={"Usuario no verificado"}>
+                                        <Box sx={{
+                                            display: "inline-flex",
+                                            p: "3px",
+                                            my: "8px",
+                                            background: "red",
+                                            color: "white",
+                                            borderRadius: "3px"
+                                        }}>
+                                            {row.username}
+                                        </Box>
+                                    </Tooltip>)
+                            }
                         </TableCell>
                         <TableCell>
                             {row.name}
@@ -216,14 +272,6 @@ export default function UsersMainTable() {
                         </TableCell>
                         <TableCell>
                             {row.phone}
-                        </TableCell>
-                        <TableCell>
-                            <Chip
-                                variant="outlined"
-                                size="small"
-                                color={row.is_verified ? "success" : "error"}
-                                label={row.is_verified ? "Si" : "No"}
-                            />
                         </TableCell>
                     </TableRow>
                 ))}

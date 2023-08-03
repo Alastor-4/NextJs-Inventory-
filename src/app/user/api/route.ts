@@ -8,22 +8,33 @@ export async function GET(req, res) {
     return NextResponse.json(users)
 }
 
-// Create new user
-export async function POST(req, res) {
-    const {name, description} = await req.json()
+// Verify user
+export async function PUT(req, res) {
+    const {searchParams} = new URL(req.url)
+    const roleId = searchParams.get("roleId")
 
-    const newRole = await prisma.roles.create({data: {name, description}})
+    if (roleId) {
+        const updatedRole = await prisma.users.update({data: {is_verified: true}, where: {id: parseInt(roleId)}})
 
-    return NextResponse.json(newRole)
+        return NextResponse.json(updatedRole)
+    }
+
+    return new Response('La acción de verificar ha fallado', {status: 500})
 }
 
-// Update user
-export async function PUT(req, res) {
-    const {roleId, name, description} = await req.json()
+// activate/deactivate user
+export async function PATCH(req, res) {
+    const {searchParams} = new URL(req.url)
+    const roleId = searchParams.get("roleId")
+    const {isActive} = await req.json()
 
-    const updatedRole = await prisma.roles.update({data: {name, description}, where: {id: roleId}})
+    if (roleId) {
+        const updatedRole = await prisma.users.update({data: {is_active: isActive}, where: {id: parseInt(roleId)}})
 
-    return NextResponse.json(updatedRole)
+        return NextResponse.json(updatedRole)
+    }
+
+    return new Response('La acción de activar/desactivar ha fallado', {status: 500})
 }
 
 // Delete user
@@ -37,5 +48,5 @@ export async function DELETE(req, res) {
         return NextResponse.json(deletedRole)
     }
 
-    return res.status(500).json({message: "La acción de eliminar ha fallado"})
+    return new Response('La acción de eliminar ha fallado', {status: 500})
 }
