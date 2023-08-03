@@ -1,9 +1,11 @@
 import UsersMainTable from "@/components/user/UsersMainTable";
+import {prisma} from "db";
 
-export default function Page() {
+export default async function Page() {
+    const roles = await prisma.roles.findMany()
     return (
         <main>
-            <UsersMainTable/>
+            <UsersMainTable roles={roles}/>
         </main>
     )
 }

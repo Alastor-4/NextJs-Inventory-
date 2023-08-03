@@ -4,13 +4,23 @@ import React from "react";
 import {
     AppBar,
     Badge,
-    Box,
+    Box, Button,
     Card,
     CardContent,
-    Checkbox, Chip,
+    Checkbox,
+    Chip,
     CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     Divider,
+    FormControl,
     IconButton,
+    InputLabel,
+    MenuItem,
+    OutlinedInput,
+    Select,
     Table,
     TableBody,
     TableCell,
@@ -22,20 +32,22 @@ import {
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
 import {
-    AddOutlined,
+    ChangeCircleOutlined,
     DeleteOutline,
     Done,
-    EditOutlined, PauseOutlined,
-    PersonOutlined, StartOutlined, StopOutlined,
-    ThumbsUpDownOutlined, TurnedIn, TurnedInNot
+    PauseOutlined,
+    PersonOutlined,
+    StartOutlined,
 } from "@mui/icons-material";
 import users from "@/requests/users"
-import Link from "next/link";
 import {useRouter} from "next/navigation";
+import roles from "@/requests/roles";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
-export default function UsersMainTable() {
+export default function UsersMainTable(props) {
+    const { roles } = props
+
     const [data, setData] = React.useState(null)
 
     const router = useRouter()
@@ -56,6 +68,61 @@ export default function UsersMainTable() {
         } else {
             setSelected(item)
         }
+    }
+
+    //change role dialog
+    const [openDialog, setOpenDialog] = React.useState(false);
+
+    const handleClickOpenDialog = () => {
+        setOpenDialog(true);
+    };
+
+    function ChangeRoleDialog(props) {
+        const {open, setOpen, selected} = props
+
+        const [selectedRole, setSelectedRole] = React.useState<number | string>('');
+
+        const handleChange = (event: SelectChangeEvent<typeof selectedRole>) => {
+            setSelectedRole(event.target.value || '');
+        };
+
+        const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
+            setOpen(false);
+        };
+
+        const handleApplyRole = () => console.log(selectedRole)
+
+        return (
+            <Dialog open={open} onClose={handleClose}>
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
+                <DialogTitle>Cambiar role a "{selected ? selected.username : "" }"</DialogTitle>
+                <DialogContent>
+                    <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                        <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
+                            <InputLabel id="dialog-select-label">Rol</InputLabel>
+                            <Select
+                                labelId="dialog-select-label"
+                                id="dialog-select"
+                                value={selectedRole}
+                                onChange={handleChange}
+                                input={<OutlinedInput label="Rol" fullWidth/>}
+                                fullWidth
+                            >
+                                {
+                                    roles.map(item => (
+                                        <MenuItem key={item.id} value={item}>{item.name}</MenuItem>
+                                    ))
+                                }
+                            </Select>
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button color={"primary"} disabled={!selectedRole} onClick={handleApplyRole}>Cambiar</Button>
+                </DialogActions>
+            </Dialog>
+        );
     }
 
     async function handleRemove() {
@@ -135,6 +202,13 @@ export default function UsersMainTable() {
                                                 <Divider orientation="vertical" variant="middle" flexItem
                                                          sx={{borderRight: "2px solid white", mx: "5px"}}/>
 
+                                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
+                                                    <ChangeCircleOutlined fontSize={"small"}/>
+                                                </IconButton>
+
+                                                <Divider orientation="vertical" variant="middle" flexItem
+                                                         sx={{borderRight: "2px solid white", mx: "5px"}}/>
+
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
                                                     <DeleteOutline fontSize={"small"}/>
                                                 </IconButton>
@@ -169,6 +243,11 @@ export default function UsersMainTable() {
             {
                 id: "phone",
                 label: "Teléfono",
+                align: "left"
+            },
+            {
+                id: "role_id",
+                label: "Role",
                 align: "left"
             },
         ]
@@ -238,7 +317,7 @@ export default function UsersMainTable() {
                                     variant={"dot"}
                                     anchorOrigin={{vertical: "bottom", horizontal: "right"}}
                                 >
-                                    <PersonOutlined fontSize={"small"} color={getColorByRole(row.roles.name)}/>
+                                    <PersonOutlined fontSize={"small"}/>
                                 </Badge>
                             </Tooltip>
                             {
@@ -273,6 +352,14 @@ export default function UsersMainTable() {
                         <TableCell>
                             {row.phone}
                         </TableCell>
+                        <TableCell>
+                            <Chip
+                                size={"small"}
+                                label={row.roles.name}
+                                color={getColorByRole(row.roles.name)}
+                                sx={{border: "1px solid lightGreen"}}
+                            />
+                        </TableCell>
                     </TableRow>
                 ))}
             </TableBody>
@@ -280,23 +367,26 @@ export default function UsersMainTable() {
     }
 
     return (
-        <Card variant={"outlined"}>
-            <CustomToolbar/>
+        <>
+            <ChangeRoleDialog open={openDialog} setOpen={setOpenDialog} selected={selected}/>
+            <Card variant={"outlined"}>
+                <CustomToolbar/>
 
-            <CardContent>
-                {
-                    data?.length > 0
-                        ? (
-                            <Table sx={{width: "100%"}} size={"small"}>
-                                <TableHeader/>
+                <CardContent>
+                    {
+                        data?.length > 0
+                            ? (
+                                <Table sx={{width: "100%"}} size={"small"}>
+                                    <TableHeader/>
 
-                                <TableContent/>
-                            </Table>
-                        ) : (
-                            <TableNoData/>
-                        )
-                }
-            </CardContent>
-        </Card>
+                                    <TableContent/>
+                                </Table>
+                            ) : (
+                                <TableNoData/>
+                            )
+                    }
+                </CardContent>
+            </Card>
+        </>
     )
 }
