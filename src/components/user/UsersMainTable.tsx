@@ -32,6 +32,7 @@ import {
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
 import {
+    ArrowLeft,
     ChangeCircleOutlined,
     DeleteOutline,
     Done,
@@ -170,10 +171,17 @@ export default function UsersMainTable(props) {
         }
     }
 
+    function handleNavigateBack() {
+        router.back()
+    }
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
-                <Box>
+                <Box sx={{display: "flex", alignItems: "center"}}>
+                    <IconButton color={"inherit"} sx={{mr: "10px"}} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"}/>
+                    </IconButton>
                     <Typography
                         variant="h6"
                         noWrap

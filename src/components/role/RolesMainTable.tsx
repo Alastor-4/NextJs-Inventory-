@@ -18,7 +18,7 @@ import {
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
-import {AddOutlined, DeleteOutline, EditOutlined} from "@mui/icons-material";
+import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-material";
 import roles from "@/requests/roles"
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -60,10 +60,17 @@ export default function RolesMainTable() {
         await router.push(`/role/update/${selected.id}`)
     }
 
+    function handleNavigateBack() {
+        router.back()
+    }
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
-                <Box>
+                <Box sx={{display: "flex", alignItems: "center"}}>
+                    <IconButton color={"inherit"} sx={{mr: "10px"}} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"}/>
+                    </IconButton>
                     <Typography
                         variant="h6"
                         noWrap
