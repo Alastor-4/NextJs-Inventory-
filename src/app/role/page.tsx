@@ -1,4 +1,4 @@
-import RolesMainTable from "@/components/role/RolesMainTable";
+import RolesMainTable from "@/app/role/components/RolesMainTable";
 
 export default function Page() {
     return (

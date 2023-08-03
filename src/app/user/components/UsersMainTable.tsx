@@ -42,7 +42,7 @@ import {
 } from "@mui/icons-material";
 import users from "@/requests/users"
 import {useRouter} from "next/navigation";
-import roles from "@/requests/roles";
+import roles from "@/app/role/requests/roles";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 

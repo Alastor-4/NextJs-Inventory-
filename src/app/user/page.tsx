@@ -1,4 +1,4 @@
-import UsersMainTable from "@/components/user/UsersMainTable";
+import UsersMainTable from "@/app/user/components/UsersMainTable";
 import {prisma} from "db";
 
 export default async function Page() {

@@ -5,9 +5,9 @@ import React from "react";
 import {useFormik} from "formik";
 import * as Yup from "yup"
 import {useParams, useRouter} from 'next/navigation';
-import roles from "@/requests/roles";
+import roles from "@/app/role/requests/roles";
 
-export default function UserForm(props) {
+export default function RolesForm(props) {
     const [updateItem, setUpdateItem] = React.useState()
 
     const params = useParams()

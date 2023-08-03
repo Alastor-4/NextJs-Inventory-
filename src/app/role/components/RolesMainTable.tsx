@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
 import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-material";
-import roles from "@/requests/roles"
+import roles from "@/app/role/requests/roles"
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 
