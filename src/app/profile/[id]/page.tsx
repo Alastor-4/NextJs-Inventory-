@@ -1,8 +1,15 @@
+import {prisma} from "db";
+import UserProfileMain from "@/app/profile/components/UserProfileMain";
 
-export default function Page() {
+async function fetchUserData(id) {
+    return await prisma.users.findUnique({where: {id: parseInt(id)}, include: {warehouses: true, stores: true, roles: true}})
+}
+export default async function Page({params}) {
+    const userDetails = await fetchUserData(params.id)
+    console.log(userDetails)
     return (
         <main>
-            profile
+            <UserProfileMain userDetails={userDetails}/>
         </main>
     )
 }
