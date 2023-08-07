@@ -20,10 +20,12 @@ import * as Yup from 'yup';
 
 import loginPageStyles from "@/assets/styles/loginPageStyles"
 
-import logo from "@/assets/images/logo200.png"
+import {useRouter} from "next/navigation";
 
 export default function Login() {
     const [showSignUpForm, setShowSignUpForm] = React.useState(false)
+
+    const router = useRouter()
 
     const LoginForm = () => {
         const initialValues = {
@@ -47,7 +49,7 @@ export default function Login() {
             initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={(values, { setFieldError }) => {
-                //make login here
+                //login function
             }}
         >
             {
@@ -111,6 +113,7 @@ export default function Login() {
                                         variant={"contained"}
                                         size={"large"}
                                         sx={{width: "100%"}}
+                                        onClick={() => router.push("/profile/2")}
                                     >
                                         Login
                                     </Button>
