@@ -22,7 +22,7 @@ import {useRouter} from "next/navigation";
 import Link from "next/link";
 
 export default function UserProfileMain(props) {
-   const {userDetails} = props
+   const {userDetails, userProducts, workForUsers} = props
 
     const router = useRouter()
 
@@ -119,7 +119,16 @@ export default function UserProfileMain(props) {
             <CardHeader title={"Productos"}/>
 
             <CardContent>
-                {userDetails.stores.length} tienda(s)
+                <Link href={`/profile/${userDetails.id}/product`}>
+                    <Grid container rowSpacing={2} item xs={12}>
+                        <Grid container item xs={"auto"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"}/>
+                        </Grid>
+                        <Grid item xs={true}>
+                            {userProducts.length} producto(s)
+                        </Grid>
+                    </Grid>
+                </Link>
             </CardContent>
         </Card>
     )
@@ -129,7 +138,16 @@ export default function UserProfileMain(props) {
             <CardHeader title={"Usuarios"}/>
 
             <CardContent>
-                {userDetails.stores.length} tienda(s)
+                <Link href={`/profile/${userDetails.id}/user`}>
+                    <Grid container rowSpacing={2} item xs={12}>
+                        <Grid container item xs={"auto"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"}/>
+                        </Grid>
+                        <Grid item xs={true}>
+                            {workForUsers.length} trabajadores(s)
+                        </Grid>
+                    </Grid>
+                </Link>
             </CardContent>
         </Card>
     )
