@@ -15,10 +15,11 @@ import {
     Typography
 } from "@mui/material";
 import {
-    ArrowLeft,
+    ArrowLeft, ChevronRightOutlined,
 } from "@mui/icons-material";
 import {useRouter} from "next/navigation";
  import userProfileStyles from "@/assets/styles/userProfileStyles"
+import Link from "next/link";
 
 export default function UserProfileMain(props) {
    const {userDetails} = props
@@ -72,7 +73,20 @@ export default function UserProfileMain(props) {
             <CardHeader title={"Almacenes"}/>
 
             <CardContent>
-                {userDetails.warehouses.length} almacén(es)
+                <Grid container>
+                    {userDetails.warehouses.map(item => (
+                        <Link href={`/profile/warehouse/${item.id}`} key={item.id}>
+                            <Grid container rowSpacing={2} item xs={12}>
+                                <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"}/>
+                                </Grid>
+                                <Grid item xs={true}>
+                                    {item.name}
+                                </Grid>
+                            </Grid>
+                        </Link>
+                    ))}
+                </Grid>
             </CardContent>
         </Card>
     )
@@ -82,7 +96,20 @@ export default function UserProfileMain(props) {
             <CardHeader title={"Tiendas"}/>
 
             <CardContent>
-                {userDetails.stores.length} tienda(s)
+                <Grid container>
+                    {userDetails.stores.map(item => (
+                        <Link href={`/profile/store/${item.id}`} key={item.id}>
+                            <Grid container rowSpacing={2} item xs={12}>
+                                <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"}/>
+                                </Grid>
+                                <Grid item xs={true}>
+                                    {item.name}
+                                </Grid>
+                            </Grid>
+                        </Link>
+                    ))}
+                </Grid>
             </CardContent>
         </Card>
     )

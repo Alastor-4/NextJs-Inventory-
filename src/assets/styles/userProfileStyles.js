@@ -12,12 +12,15 @@ const userProfileStyles = {
     },
 
     cardButton: {
-        cursor: "pointer",
         width: "200px",
 
         "&:hover": {
             boxShadow: 4,
             border: "1px solid black"
+        },
+
+        "> a": {
+            textDecoration: "none"
         }
     },
 
