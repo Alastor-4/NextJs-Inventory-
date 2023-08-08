@@ -75,7 +75,7 @@ export default function UserProfileMain(props) {
             <CardContent>
                 <Grid container>
                     {userDetails.warehouses.map(item => (
-                        <Link href={`/profile/warehouse/${item.id}`} key={item.id}>
+                        <Link href={`/profile/${userDetails.id}/warehouse/${item.id}`} key={item.id}>
                             <Grid container rowSpacing={2} item xs={12}>
                                 <Grid container item xs={"auto"} alignItems={"center"}>
                                     <ChevronRightOutlined fontSize={"small"}/>
