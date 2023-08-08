@@ -3,45 +3,22 @@
 import React from "react";
 import {
     AppBar,
-    Badge,
-    Box, Button,
+    Box,
     Card,
-    CardContent, CardHeader,
-    Checkbox,
+    CardContent,
+    CardHeader,
     Chip,
-    CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     Divider,
-    FormControl, Grid,
+    Grid,
     IconButton,
-    InputLabel,
-    MenuItem,
-    OutlinedInput,
-    Select,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
     Toolbar,
-    Tooltip,
     Typography
 } from "@mui/material";
-import {TableNoData} from "@/components/TableNoData";
 import {
     ArrowLeft,
-    ChangeCircleOutlined,
-    DeleteOutline,
-    Done,
-    PauseOutlined,
-    PersonOutlined,
-    StartOutlined,
 } from "@mui/icons-material";
 import {useRouter} from "next/navigation";
- import infoDisplayStyles from "@/assets/styles/infoDisplayStyles"
+ import userProfileStyles from "@/assets/styles/userProfileStyles"
 
 export default function UserProfileMain(props) {
    const {userDetails} = props
@@ -91,7 +68,7 @@ export default function UserProfileMain(props) {
     }
 
     const WarehouseButton = () => (
-        <Card variant={"outlined"}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <CardHeader title={"Almacenes"}/>
 
             <CardContent>
@@ -101,7 +78,7 @@ export default function UserProfileMain(props) {
     )
 
     const StoreButton = () => (
-        <Card variant={"outlined"}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <CardHeader title={"Tiendas"}/>
 
             <CardContent>
@@ -111,7 +88,7 @@ export default function UserProfileMain(props) {
     )
 
     const ProductButton = () => (
-        <Card variant={"outlined"}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <CardHeader title={"Productos"}/>
 
             <CardContent>
@@ -121,7 +98,7 @@ export default function UserProfileMain(props) {
     )
 
     const UsersButton = () => (
-        <Card variant={"outlined"}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <CardHeader title={"Usuarios"}/>
 
             <CardContent>
@@ -139,8 +116,8 @@ export default function UserProfileMain(props) {
                     <Grid container rowSpacing={3}>
                         <Grid container item rowSpacing={3}>
                             <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={infoDisplayStyles.leftFlex}>Nombre:</Grid>
-                                <Grid item sx={infoDisplayStyles.rightFlex}>
+                                <Grid item sx={userProfileStyles.leftFlex}>Nombre:</Grid>
+                                <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails.name}
                                     {
                                         userDetails?.roles?.name && (
@@ -156,22 +133,22 @@ export default function UserProfileMain(props) {
                             </Grid>
 
                             <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={infoDisplayStyles.leftFlex}>Usuario:</Grid>
-                                <Grid item sx={infoDisplayStyles.rightFlex}>
+                                <Grid item sx={userProfileStyles.leftFlex}>Usuario:</Grid>
+                                <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails.username}
                                 </Grid>
                             </Grid>
 
                             <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={infoDisplayStyles.leftFlex}>Correo:</Grid>
-                                <Grid item sx={infoDisplayStyles.rightFlex}>
+                                <Grid item sx={userProfileStyles.leftFlex}>Correo:</Grid>
+                                <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails.mail}
                                 </Grid>
                             </Grid>
 
                             <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={infoDisplayStyles.leftFlex}>Teléfono:</Grid>
-                                <Grid item sx={infoDisplayStyles.rightFlex}>
+                                <Grid item sx={userProfileStyles.leftFlex}>Teléfono:</Grid>
+                                <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails.phone}
                                 </Grid>
                             </Grid>

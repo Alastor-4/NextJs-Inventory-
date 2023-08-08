@@ -6,7 +6,6 @@ async function fetchUserData(id) {
 }
 export default async function Page({params}) {
     const userDetails = await fetchUserData(params.id)
-    console.log(userDetails)
     return (
         <main>
             <UserProfileMain userDetails={userDetails}/>
