@@ -333,7 +333,7 @@ export default function UsersMainTable(props) {
                             <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
                         </TableCell>
                         <TableCell>
-                            <Tooltip title={`Usuario ${row.is_active ? 'activo' : 'inactivo'} (${row.roles.name})`}>
+                            <Tooltip title={`Usuario ${row.is_active ? 'activo' : 'inactivo'} (${row.roles?.name ?? "user"})`}>
                                 <Badge
                                     color={row.is_active === true ? "success" : "error"}
                                     variant={"dot"}
@@ -375,12 +375,16 @@ export default function UsersMainTable(props) {
                             {row.phone}
                         </TableCell>
                         <TableCell>
-                            <Chip
-                                size={"small"}
-                                label={row.roles.name}
-                                color={getColorByRole(row.roles.name)}
-                                sx={{border: "1px solid lightGreen"}}
-                            />
+                            {
+                                row.roles ? (
+                                    <Chip
+                                        size={"small"}
+                                        label={row.roles.name}
+                                        color={getColorByRole(row.roles.name)}
+                                        sx={{border: "1px solid lightGreen"}}
+                                    />
+                                ) : "-"
+                            }
                         </TableCell>
                     </TableRow>
                 ))}

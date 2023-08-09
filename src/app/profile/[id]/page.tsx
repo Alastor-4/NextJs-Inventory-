@@ -2,14 +2,17 @@ import {prisma} from "db";
 import UserProfileMain from "@/app/profile/components/UserProfileMain";
 
 async function fetchUserData(id) {
-    return await prisma.users.findUnique({where: {id: parseInt(id)}, include: {warehouses: true, stores: true, roles: true}})
+    const promise1 = prisma.users.findUnique({where: {id: parseInt(id)}, include: {warehouses: true, stores: true, roles: true}})
+    const promise2 = prisma.products.findMany({where: {id: parseInt(id)}})
+    const promise3 = prisma.users.findMany({where: {work_for_user_id: parseInt(id)}})
+
+    return Promise.all([promise1, promise2, promise3])
 }
 export default async function Page({params}) {
-    const userDetails = await fetchUserData(params.id)
-    console.log(userDetails)
+    const response = await fetchUserData(params.id)
     return (
         <main>
-            <UserProfileMain userDetails={userDetails}/>
+            <UserProfileMain userDetails={response[0]} userProducts={response[1]} workForUsers={response[2]}/>
         </main>
     )
 }

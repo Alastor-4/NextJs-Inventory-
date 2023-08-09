@@ -42,6 +42,39 @@ async function main() {
             },
         ],
     })
+
+    await prisma.departments.createMany({
+        data: [
+            {
+                name: 'Zapatos de niño',
+                description: 'Todo tipo de zapatos para niños y niñas',
+            },
+            {
+                name: 'Zapatos de mujer',
+                description: 'Zapatillas y sandalias para mujeres',
+            },
+            {
+                name: 'Zapatos de hombre',
+                description: 'Zapatillas y chancletas para hombres',
+            },
+            {
+                name: 'Ropa de mujer',
+                description: 'Pantalones, pesqueras, blusas, vestidos y licras de mujer',
+            },
+            {
+                name: 'Ropa de hombre',
+                description: 'Pantalones, pesqueras, camisas y shorts de hombre',
+            },
+            {
+                name: 'Talabartería',
+                description: 'Cintos, carteras, riñoneras y mochilas',
+            },
+            {
+                name: 'Bisutería',
+                description: 'Artículos varios de bisutería',
+            },
+        ],
+    })
 }
 
 main()

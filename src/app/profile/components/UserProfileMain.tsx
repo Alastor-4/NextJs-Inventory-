@@ -3,48 +3,26 @@
 import React from "react";
 import {
     AppBar,
-    Badge,
-    Box, Button,
+    Box,
     Card,
-    CardContent, CardHeader,
-    Checkbox,
+    CardContent,
+    CardHeader,
     Chip,
-    CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
     Divider,
-    FormControl, Grid,
+    Grid,
     IconButton,
-    InputLabel,
-    MenuItem,
-    OutlinedInput,
-    Select,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
     Toolbar,
-    Tooltip,
     Typography
 } from "@mui/material";
-import {TableNoData} from "@/components/TableNoData";
 import {
-    ArrowLeft,
-    ChangeCircleOutlined,
-    DeleteOutline,
-    Done,
-    PauseOutlined,
-    PersonOutlined,
-    StartOutlined,
+    ArrowLeft, ChevronRightOutlined,
 } from "@mui/icons-material";
 import {useRouter} from "next/navigation";
- import infoDisplayStyles from "@/assets/styles/infoDisplayStyles"
+ import userProfileStyles from "@/assets/styles/userProfileStyles"
+import Link from "next/link";
 
 export default function UserProfileMain(props) {
-   const {userDetails} = props
+   const {userDetails, userProducts, workForUsers} = props
 
     const router = useRouter()
 
@@ -91,41 +69,85 @@ export default function UserProfileMain(props) {
     }
 
     const WarehouseButton = () => (
-        <Card variant={"outlined"}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <CardHeader title={"Almacenes"}/>
 
             <CardContent>
-                {userDetails.warehouses.length} almacén(es)
+                <Grid container>
+                    {userDetails.warehouses.map(item => (
+                        <Link href={`/profile/${userDetails.id}/warehouse/${item.id}`} key={item.id}>
+                            <Grid container rowSpacing={2} item xs={12}>
+                                <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"}/>
+                                </Grid>
+                                <Grid item xs={true}>
+                                    {item.name}
+                                </Grid>
+                            </Grid>
+                        </Link>
+                    ))}
+                </Grid>
             </CardContent>
         </Card>
     )
 
     const StoreButton = () => (
-        <Card variant={"outlined"}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <CardHeader title={"Tiendas"}/>
 
             <CardContent>
-                {userDetails.stores.length} tienda(s)
+                <Grid container>
+                    {userDetails.stores.map(item => (
+                        <Link href={`/profile/store/${item.id}`} key={item.id}>
+                            <Grid container rowSpacing={2} item xs={12}>
+                                <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"}/>
+                                </Grid>
+                                <Grid item xs={true}>
+                                    {item.name}
+                                </Grid>
+                            </Grid>
+                        </Link>
+                    ))}
+                </Grid>
             </CardContent>
         </Card>
     )
 
     const ProductButton = () => (
-        <Card variant={"outlined"}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <CardHeader title={"Productos"}/>
 
             <CardContent>
-                {userDetails.stores.length} tienda(s)
+                <Link href={`/profile/${userDetails.id}/product`}>
+                    <Grid container rowSpacing={2} item xs={12}>
+                        <Grid container item xs={"auto"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"}/>
+                        </Grid>
+                        <Grid item xs={true}>
+                            {userProducts.length} producto(s)
+                        </Grid>
+                    </Grid>
+                </Link>
             </CardContent>
         </Card>
     )
 
     const UsersButton = () => (
-        <Card variant={"outlined"}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <CardHeader title={"Usuarios"}/>
 
             <CardContent>
-                {userDetails.stores.length} tienda(s)
+                <Link href={`/profile/${userDetails.id}/user`}>
+                    <Grid container rowSpacing={2} item xs={12}>
+                        <Grid container item xs={"auto"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"}/>
+                        </Grid>
+                        <Grid item xs={true}>
+                            {workForUsers.length} trabajadores(s)
+                        </Grid>
+                    </Grid>
+                </Link>
             </CardContent>
         </Card>
     )
@@ -139,8 +161,8 @@ export default function UserProfileMain(props) {
                     <Grid container rowSpacing={3}>
                         <Grid container item rowSpacing={3}>
                             <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={infoDisplayStyles.leftFlex}>Nombre:</Grid>
-                                <Grid item sx={infoDisplayStyles.rightFlex}>
+                                <Grid item sx={userProfileStyles.leftFlex}>Nombre:</Grid>
+                                <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails.name}
                                     {
                                         userDetails?.roles?.name && (
@@ -156,22 +178,22 @@ export default function UserProfileMain(props) {
                             </Grid>
 
                             <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={infoDisplayStyles.leftFlex}>Usuario:</Grid>
-                                <Grid item sx={infoDisplayStyles.rightFlex}>
+                                <Grid item sx={userProfileStyles.leftFlex}>Usuario:</Grid>
+                                <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails.username}
                                 </Grid>
                             </Grid>
 
                             <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={infoDisplayStyles.leftFlex}>Correo:</Grid>
-                                <Grid item sx={infoDisplayStyles.rightFlex}>
+                                <Grid item sx={userProfileStyles.leftFlex}>Correo:</Grid>
+                                <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails.mail}
                                 </Grid>
                             </Grid>
 
                             <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={infoDisplayStyles.leftFlex}>Teléfono:</Grid>
-                                <Grid item sx={infoDisplayStyles.rightFlex}>
+                                <Grid item sx={userProfileStyles.leftFlex}>Teléfono:</Grid>
+                                <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails.phone}
                                 </Grid>
                             </Grid>

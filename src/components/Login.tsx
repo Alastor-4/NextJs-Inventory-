@@ -113,7 +113,7 @@ export default function Login() {
                                         variant={"contained"}
                                         size={"large"}
                                         sx={{width: "100%"}}
-                                        onClick={() => router.push("/profile/5")}
+                                        onClick={() => router.push("/profile/2")}
                                     >
                                         Login
                                     </Button>
