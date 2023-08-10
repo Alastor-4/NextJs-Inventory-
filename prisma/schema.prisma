@@ -47,6 +47,7 @@ model products {
   owner_id       Int?
   name           String?          @db.VarChar(255)
   description    String?          @db.VarChar(255)
+  image          String?          @db.VarChar(255)
   buy_price      Float?
   created_at     DateTime         @default(now()) @db.Timestamp(0)
   charateristics charateristics[]
