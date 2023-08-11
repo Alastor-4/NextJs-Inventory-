@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
 // Get all user products
-export async function GET(req, res) {
-    const {searchParams} = new URL(req.url)
-    const userId = searchParams.get("userId")
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+    const userId = params.id
 
-    const products = await prisma.products.findMany({where: {owner_id: userId}})
+    const products = await prisma.products.findMany({where: {owner_id: parseInt(userId)}, include: {departments: true, charateristics: true}})
 
     return NextResponse.json(products)
 }
@@ -32,7 +31,7 @@ export async function PUT(req, res) {
 // Delete user role
 export async function DELETE(req, res) {
     const {searchParams} = new URL(req.url)
-    const productId = searchParams.get("roleId")
+    const productId = searchParams.get("productId")
 
     if (productId) {
         const deletedProduct = await prisma.products.delete({where: {id: parseInt(productId)}})
