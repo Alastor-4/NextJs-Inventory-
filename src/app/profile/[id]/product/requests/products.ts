@@ -1,7 +1,7 @@
 import apiRequest from "@/api"
 
-const url = (userId) => `/profile/${userId}/api`
-const updateUrl = (userId) => `/profile/${userId}/update/api`
+const url = (userId) => `/profile/${userId}/product/api`
+const updateUrl = (userId) => `/profile/${userId}/product/update/api`
 
 const products = {
     allUserProducts: async function (userId) {
@@ -26,9 +26,9 @@ const products = {
         return false
     },
 
-    create: async function ({userId, name, description, departmentId, buyPrice}) {
+    create: async function ({userId, name, description, departmentId, buyPrice, image, characteristics}) {
         try {
-            return await apiRequest.post(url(userId), {userId, name, description, departmentId, buyPrice})
+            return await apiRequest.post(url(userId), {userId, name, description, departmentId, buyPrice, image, characteristics})
         } catch (e) {
             //ToDo: notify error here
         }

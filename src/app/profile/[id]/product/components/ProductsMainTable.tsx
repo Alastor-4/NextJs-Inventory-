@@ -109,7 +109,7 @@ export default function ProductsMainTable() {
                                         )
                                     }
 
-                                    <Link href={"/warehouse/create"}>
+                                    <Link href={`/profile/${params.id}/product/create`}>
                                         <IconButton color={"inherit"}>
                                             <AddOutlined/>
                                         </IconButton>

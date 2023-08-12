@@ -12,9 +12,28 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 // Create new user product
 export async function POST(req, res) {
-    const {userId, name, description, departmentId, buyPrice} = await req.json()
+    const {userId, name, description, departmentId, buyPrice, image, characteristics} = await req.json()
 
-    const newProduct = await prisma.products.create({data: {owner_id: userId, name, description, department_id: departmentId, buy_price: buyPrice}})
+    const newProduct = await prisma.products.create(
+        {
+            data: {
+                owner_id: parseInt(userId),
+                name,
+                description,
+                department_id: parseInt(departmentId),
+                buy_price: parseFloat(buyPrice),
+                image,
+                charateristics: {
+                    createMany: {
+                        data: characteristics
+                    }
+                }
+            },
+            include: {
+                charateristics: true
+            }
+        }
+    )
 
     return NextResponse.json(newProduct)
 }
@@ -23,7 +42,7 @@ export async function POST(req, res) {
 export async function PUT(req, res) {
     const {productId, name, description, departmentId, buyPrice} = await req.json()
 
-    const updatedProduct = await prisma.products.update({data: {name, description, department_id: departmentId, buy_price: buyPrice}, where: {id: productId}})
+    const updatedProduct = await prisma.products.update({data: {name, description, department_id: parseInt(departmentId), buy_price: parseFloat(buyPrice)}, where: {id: parseInt(productId)}})
 
     return NextResponse.json(updatedProduct)
 }
