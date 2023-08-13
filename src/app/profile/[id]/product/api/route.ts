@@ -5,7 +5,7 @@ import {prisma} from "db";
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const userId = params.id
 
-    const products = await prisma.products.findMany({where: {owner_id: parseInt(userId)}, include: {departments: true, charateristics: true}})
+    const products = await prisma.products.findMany({where: {owner_id: parseInt(userId)}, include: {departments: true, characteristics: true}})
 
     return NextResponse.json(products)
 }
@@ -31,13 +31,13 @@ export async function POST(req: Request, res) {
         image,
     }
 
-    if (characteristics) insertItem.charateristics = {createMany: {data: JSON.parse(characteristics)}}
+    if (characteristics) insertItem.characteristics = {createMany: {data: JSON.parse(characteristics)}}
 
     const newProduct = await prisma.products.create(
         {
             data: insertItem,
             include: {
-                charateristics: !!characteristics
+                characteristics: !!characteristics
             }
         }
     )

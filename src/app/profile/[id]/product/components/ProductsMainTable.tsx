@@ -18,8 +18,7 @@ import {
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
-import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined, TagOutlined} from "@mui/icons-material";
-import warehouses from "@/app/warehouse/requests/warehouses"
+import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-material";
 import Link from "next/link";
 import {useParams, useRouter} from "next/navigation";
 import image from "next/image"
@@ -217,8 +216,8 @@ export default function ProductsMainTable() {
                             {row.buy_price ?? "-"}
                         </TableCell>
                         <TableCell>
-                            {row.charateristics.length > 0
-                                ? row.charateristics.map(item => (
+                            {row.characteristics.length > 0
+                                ? row.characteristics.map(item => (
                                     <Grid
                                         key={item.id}
                                         sx={{

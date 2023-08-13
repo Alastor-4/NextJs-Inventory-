@@ -67,7 +67,7 @@ export default function ProductsForm(props) {
         buyPrice: updateItem?.buy_price ? updateItem.buy_price : "",
         image: updateItem ? updateItem.image : "",
         department: updateItem?.departments?.id ? updateItem.departments.id : "",
-        characteristics: updateItem?.charateristics?.id ? updateItem.charateristics.id : [],
+        characteristics: updateItem?.characteristics?.id ? updateItem.characteristics.id : [],
         characteristicName: "",
         characteristicValue: "",
     }
