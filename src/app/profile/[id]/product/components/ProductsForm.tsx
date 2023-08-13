@@ -86,20 +86,20 @@ export default function ProductsForm(props) {
     const handleSubmit = async (values) => {
         let response
 
+        let data = new FormData()
+
         if (updateItem) {
             response = await products.update({id: updateItem.id, name: values.name, description: values.description})
         } else {
-            response = await products.create(
-                {
-                    name: values.name,
-                    description: values.description,
-                    buyPrice: values.buyPrice,
-                    departmentId: values.department.id,
-                    userId: userId,
-                    image: "",
-                    characteristics: values.characteristics
-                }
-            )
+            data.set("name", values.name)
+            data.set("description", values.description)
+            data.set("buyPrice", values.buyPrice)
+            data.set("departmentId", values.department.id)
+            data.set("userId", userId)
+            data.set("characteristics", JSON.stringify(values.characteristics))
+            data.set("image", values.image)
+
+            response = await products.create(userId, data)
         }
 
         if (response.status === 200) {
@@ -290,6 +290,16 @@ export default function ProductsForm(props) {
                                 )
                             }
 
+                            <Grid item xs={12}>
+                                <TextField
+                                    type={"file"}
+                                    name={"image"}
+                                    size={"small"}
+                                    {...formik.getFieldProps("image")}
+                                    error={formik.errors.image && formik.touched.image}
+                                    helperText={(formik.errors.image && formik.touched.image) && formik.errors.image}
+                                />
+                            </Grid>
                         </Grid>
                     </Grid>
 

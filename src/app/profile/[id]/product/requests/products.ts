@@ -1,4 +1,5 @@
 import apiRequest from "@/api"
+import {headers} from "next/headers";
 
 const url = (userId) => `/profile/${userId}/product/api`
 const updateUrl = (userId) => `/profile/${userId}/product/update/api`
@@ -26,9 +27,9 @@ const products = {
         return false
     },
 
-    create: async function ({userId, name, description, departmentId, buyPrice, image, characteristics}) {
+    create: async function (userId, data) {
         try {
-            return await apiRequest.post(url(userId), {userId, name, description, departmentId, buyPrice, image, characteristics})
+            return await apiRequest.post(url(userId), data, {headers: { "Content-Type": "multipart/form-data" }})
         } catch (e) {
             //ToDo: notify error here
         }

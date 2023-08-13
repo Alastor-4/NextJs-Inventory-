@@ -23,6 +23,7 @@ import warehouses from "@/app/warehouse/requests/warehouses"
 import Link from "next/link";
 import {useParams, useRouter} from "next/navigation";
 import image from "next/image"
+import products from "@/app/profile/[id]/product/requests/products";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -51,9 +52,9 @@ export default function ProductsMainTable() {
     }
 
     async function handleRemove() {
-        const response = await warehouses.delete(selected.id)
+        const response = await products.delete(params.id, selected.id)
         if (response) {
-            const updatedWarehouses = await warehouses.allWarehouses()
+            const updatedWarehouses = await products.allUserProducts(params.id)
             if (updatedWarehouses) setData(updatedWarehouses)
         }
     }
@@ -204,13 +205,13 @@ export default function ProductsMainTable() {
                             }
                         </TableCell>
                         <TableCell>
-                            {row.departments.name}
+                            {row?.departments?.name ?? "-"}
                         </TableCell>
                         <TableCell>
                             {row.name}
                         </TableCell>
                         <TableCell>
-                            {row.description}
+                            {row.description ?? "-"}
                         </TableCell>
                         <TableCell>
                             {row.buy_price ?? "-"}

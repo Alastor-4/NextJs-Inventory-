@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import {prisma} from "db";
 
 // Get all user products
@@ -11,26 +11,33 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // Create new user product
-export async function POST(req, res) {
-    const {userId, name, description, departmentId, buyPrice, image, characteristics} = await req.json()
+export async function POST(req: Request, res) {
+    const data = await req.formData()
+
+    const userId = data.get('userId')
+    const name = data.get('name')
+    const description = data.get('description')
+    const departmentId = data.get('departmentId')
+    const buyPrice = data.get('buyPrice')
+    const characteristics = data.get('characteristics')
+    const image = ''
+
+    let insertItem = {
+        owner_id: userId ? parseInt(userId) : null,
+        name,
+        description: description ? description : null,
+        department_id: departmentId ? parseInt(departmentId) : null,
+        buy_price: buyPrice ? parseFloat(buyPrice) : null,
+        image,
+    }
+
+    if (characteristics) insertItem.charateristics = {createMany: {data: JSON.parse(characteristics)}}
 
     const newProduct = await prisma.products.create(
         {
-            data: {
-                owner_id: parseInt(userId),
-                name,
-                description,
-                department_id: parseInt(departmentId),
-                buy_price: parseFloat(buyPrice),
-                image,
-                charateristics: {
-                    createMany: {
-                        data: characteristics
-                    }
-                }
-            },
+            data: insertItem,
             include: {
-                charateristics: true
+                charateristics: !!characteristics
             }
         }
     )
