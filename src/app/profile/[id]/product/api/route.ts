@@ -20,7 +20,8 @@ export async function POST(req: Request, res) {
     const departmentId = data.get('departmentId')
     const buyPrice = data.get('buyPrice')
     const characteristics = data.get('characteristics')
-    const images = ''
+    const images = data.get('images')
+    console.log(images)
 
     let dataItem = {
         owner_id: userId ? parseInt(userId) : null,
