@@ -22,7 +22,7 @@ import {useRouter} from "next/navigation";
 import Link from "next/link";
 
 export default function UserProfileMain(props) {
-   const {userDetails, userProducts, workForUsers} = props
+   const {userDetails, userProductsCount, workForUsersCount} = props
 
     const router = useRouter()
 
@@ -125,7 +125,7 @@ export default function UserProfileMain(props) {
                             <ChevronRightOutlined fontSize={"small"}/>
                         </Grid>
                         <Grid item xs={true}>
-                            {userProducts.length} producto(s)
+                            {userProductsCount} producto(s)
                         </Grid>
                     </Grid>
                 </Link>
@@ -144,7 +144,7 @@ export default function UserProfileMain(props) {
                             <ChevronRightOutlined fontSize={"small"}/>
                         </Grid>
                         <Grid item xs={true}>
-                            {workForUsers.length} trabajadores(s)
+                            {workForUsersCount} trabajadores(s)
                         </Grid>
                     </Grid>
                 </Link>

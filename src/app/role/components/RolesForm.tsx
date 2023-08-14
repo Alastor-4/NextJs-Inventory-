@@ -49,8 +49,8 @@ export default function RolesForm(props) {
     }
 
     const validationSchema = Yup.object({
-        name: Yup.string().required("field required"),
-        description: Yup.string().required("field required"),
+        name: Yup.string().required("campo requerido"),
+        description: Yup.string().required("campo requerido"),
     })
 
     const handleSubmit = async (values) => {

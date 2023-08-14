@@ -59,10 +59,10 @@ export default function WarehousesForm(props) {
     }
 
     const validationSchema = Yup.object({
-        owner: Yup.object().required("field required"),
-        name: Yup.string().required("field required"),
-        description: Yup.string().required("field required"),
-        address: Yup.string().required("field required"),
+        owner: Yup.object().required("campo requerido"),
+        name: Yup.string().required("campo requerido"),
+        description: Yup.string().required("campo requerido"),
+        address: Yup.string().required("campo requerido"),
     })
 
     const handleSubmit = async (values) => {

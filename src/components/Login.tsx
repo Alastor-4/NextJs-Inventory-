@@ -35,9 +35,9 @@ export default function Login() {
 
         const validationSchema = Yup.object({
             username: Yup.string()
-                .required('field required'),
+                .required('campo requerido'),
             password: Yup.string()
-                .required('field required')
+                .required('campo requerido')
         })
 
         const [showPassword, setShowPassword] = React.useState(false);
@@ -136,16 +136,16 @@ export default function Login() {
 
         const validationSchema = Yup.object({
             username: Yup.string()
-                .required('field required')
+                .required('campo requerido')
                 .min(6, 'username most contain 6 characters at least'),
             email: Yup.string()
-                .required('field required')
+                .required('campo requerido')
                 .email('email address is not valid'),
             password1: Yup.string()
-                .required('field required')
+                .required('campo requerido')
                 .min(8, 'most contain 8 characters at least'),
             password2: Yup.string()
-                .required('field required')
+                .required('campo requerido')
                 .when("password1", {
                     is: val => ((val && val.length > 0)),
                     then: Yup.string().oneOf(
