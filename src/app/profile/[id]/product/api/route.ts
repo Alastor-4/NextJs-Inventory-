@@ -20,27 +20,32 @@ export async function POST(req: Request, res) {
     const departmentId = data.get('departmentId')
     const buyPrice = data.get('buyPrice')
     const characteristics = data.get('characteristics')
-    const image = ''
+    const images = ''
 
-    let insertItem = {
+    let dataItem = {
         owner_id: userId ? parseInt(userId) : null,
         name,
         description: description ? description : null,
         department_id: departmentId ? parseInt(departmentId) : null,
         buy_price: buyPrice ? parseFloat(buyPrice) : null,
-        image,
     }
 
-    if (characteristics) insertItem.characteristics = {createMany: {data: JSON.parse(characteristics)}}
+    let createObj
 
-    const newProduct = await prisma.products.create(
-        {
-            data: insertItem,
+    if (characteristics) {
+        dataItem.characteristics = {createMany: {data: JSON.parse(characteristics)}}
+
+        createObj = {
+            data: dataItem,
             include: {
-                characteristics: !!characteristics
+                characteristics: true
             }
         }
-    )
+    } else {
+        createObj = {data: dataItem}
+    }
+
+    const newProduct = await prisma.products.create(createObj)
 
     return NextResponse.json(newProduct)
 }

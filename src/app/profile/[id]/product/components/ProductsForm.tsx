@@ -94,8 +94,12 @@ export default function ProductsForm(props) {
         data.set("buyPrice", values.buyPrice)
         data.set("departmentId", values.department.id)
         data.set("userId", userId)
-        data.set("characteristics", JSON.stringify(values.characteristics))
-        data.set("images", values.images)
+
+        if (values.characteristics.length)
+            data.set("characteristics", JSON.stringify(values.characteristics))
+
+        if (values.images.length)
+            data.set("images", values.images)
 
         if (updateItem) {
             response = await products.update({id: updateItem.id, name: values.name, description: values.description})
