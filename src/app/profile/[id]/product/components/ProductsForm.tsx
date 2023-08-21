@@ -20,6 +20,7 @@ import {useParams, useRouter} from 'next/navigation';
 import products from "@/app/profile/[id]/product/requests/products";
 import {AddOutlined, Cancel, Close, DeleteOutline, Done} from "@mui/icons-material";
 import {useDropzone} from "react-dropzone";
+import {useUploadThing} from "@/app/api/uploadthing/utils";
 
 export default function ProductsForm(props) {
     const {userId, departments} = props
@@ -85,27 +86,43 @@ export default function ProductsForm(props) {
         characteristicValue: Yup.string().nullable(),
     })
 
-    const handleSubmit = async (values) => {
-        let response
+    const { startUpload } = useUploadThing("imageUploader", {
+        onClientUploadComplete: (res) => {
+            return res
+        },
+        onUploadError: () => {
+           return false
+        },
+    });
 
-        let data = new FormData()
-        data.set("name", values.name)
-        data.set("description", values.description)
-        data.set("buyPrice", values.buyPrice)
-        data.set("departmentId", values.department.id)
-        data.set("userId", userId)
+    const handleSubmit = async (values) => {
+        let data = {
+            name: values.name,
+            description: values.description,
+            buyPrice: values.buyPrice,
+            departmentId: values.department.id,
+            userId: userId,
+            characteristics: undefined,
+            images: undefined
+        }
 
         if (values.characteristics.length)
-            data.set("characteristics", JSON.stringify(values.characteristics))
+            data.characteristics = values.characteristics
 
-        if (values.images.length)
-            data.set("images", values.images)
+        if (values.images.length) {
+            //ToDo: images upload and save data in db must be done in background
+            const files = await startUpload(values.images)
+            if (files) {
+                //await products.syncImages({userId, productId: response.id, productImages: files})
+                data.images = files.map(item => ({fileKey: item.fileKey, fileUrl: item.fileUrl}))
+            }
+        }
+
+        let response
 
         if (updateItem) {
             response = await products.update({id: updateItem.id, name: values.name, description: values.description})
         } else {
-
-
             response = await products.create(userId, data)
         }
 

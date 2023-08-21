@@ -12,38 +12,26 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
 // Create new user product
 export async function POST(req: Request, res) {
-    const data = await req.formData()
+    const {userId, name, description, departmentId, buyPrice, characteristics, images} = await req.json()
 
-    const userId = data.get('userId')
-    const name = data.get('name')
-    const description = data.get('description')
-    const departmentId = data.get('departmentId')
-    const buyPrice = data.get('buyPrice')
-    const characteristics = data.get('characteristics')
-    const images = data.get('images')
-    console.log(images)
-
-    let dataItem = {
-        owner_id: userId ? parseInt(userId) : null,
-        name,
-        description: description ? description : null,
-        department_id: departmentId ? parseInt(departmentId) : null,
-        buy_price: buyPrice ? parseFloat(buyPrice) : null,
-    }
-
-    let createObj
+    let createObj = {data: {
+            owner_id: userId ? parseInt(userId) : null,
+            name,
+            description: description ? description : null,
+            department_id: departmentId ? parseInt(departmentId) : null,
+            buy_price: buyPrice ? parseFloat(buyPrice) : null,
+        }}
 
     if (characteristics) {
-        dataItem.characteristics = {createMany: {data: JSON.parse(characteristics)}}
+        createObj.data.characteristics = {createMany: {data: characteristics}}
 
-        createObj = {
-            data: dataItem,
-            include: {
-                characteristics: true
-            }
-        }
-    } else {
-        createObj = {data: dataItem}
+        createObj.include = {characteristics: true}
+    }
+
+    if (images) {
+        createObj.data.images = {createMany: {data: images}}
+
+        createObj.include = createObj.include ? { ...createObj.include, images: true} : { images: true }
     }
 
     const newProduct = await prisma.products.create(createObj)
@@ -55,6 +43,15 @@ export async function POST(req: Request, res) {
 export async function PUT(req, res) {
     const {productId, name, description, departmentId, buyPrice} = await req.json()
 
+    const updatedProduct = await prisma.products.update({data: {name, description, department_id: parseInt(departmentId), buy_price: parseFloat(buyPrice)}, where: {id: parseInt(productId)}})
+
+    return NextResponse.json(updatedProduct)
+}
+
+// Insert metadata from already uploaded images to a user product
+export async function PATCH(req, res) {
+    const {productId, addProductImages, deleteProductImages} = await req.json()
+    //sync product images
     const updatedProduct = await prisma.products.update({data: {name, description, department_id: parseInt(departmentId), buy_price: parseFloat(buyPrice)}, where: {id: parseInt(productId)}})
 
     return NextResponse.json(updatedProduct)

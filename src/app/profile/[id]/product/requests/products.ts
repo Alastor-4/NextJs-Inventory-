@@ -29,7 +29,17 @@ const products = {
 
     create: async function (userId, data) {
         try {
-            return await apiRequest.post(url(userId), data, {headers: { "Content-Type": "multipart/form-data" }})
+            return await apiRequest.post(url(userId), data)
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    syncImages: async function ({userId, productId, productImages}) {
+        try {
+            return await apiRequest.patch(url(userId), {productId, productImages})
         } catch (e) {
             //ToDo: notify error here
         }
