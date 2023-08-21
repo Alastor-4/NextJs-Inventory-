@@ -4,8 +4,8 @@ import {
     AppBar, Avatar, Badge,
     Box,
     Button,
-    Card, Fade,
-    FormControlLabel, FormHelperText,
+    Card,
+    FormControlLabel,
     Grid,
     IconButton,
     MenuItem,
@@ -14,7 +14,7 @@ import {
     Typography
 } from "@mui/material";
 import React from "react";
-import {useFormik, Formik} from "formik";
+import {Formik} from "formik";
 import * as Yup from "yup"
 import {useParams, useRouter} from 'next/navigation';
 import products from "@/app/profile/[id]/product/requests/products";
@@ -29,16 +29,26 @@ export default function ProductsForm(props) {
 
     const params = useParams()
     const router = useRouter()
+
+    //initial values
+    const [department, setDepartment] = React.useState("")
     
-   /* React.useEffect(() => {
-        async function fetchRole(id) {
-            const rol = await roles.roleDetails(id)
-            setUpdateItem(rol)
+    React.useEffect(() => {
+        async function fetchProduct(id) {
+            const product = await products.productDetails(userId, id)
+            setUpdateItem(product)
+
+            if (product?.departments?.id) {
+                const index = departments.findIndex(item => item.id === product.departments.id)
+                if (index > -1) {
+                    setDepartment(departments[index])
+                }
+            }
         }
-        if (params?.id !== undefined) {
-            fetchRole(params.id)
-        } 
-    }, [params?.id, setUpdateItem])*/
+        if (params?.productId !== undefined) {
+            fetchProduct(params.productId)
+        }
+    }, [params.productId, userId, setUpdateItem, departments])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -66,10 +76,10 @@ export default function ProductsForm(props) {
         name: updateItem ? updateItem.name : "",
         description: updateItem?.description ? updateItem.description : "",
         buyPrice: updateItem?.buy_price ? updateItem.buy_price : "",
-        images: updateItem ? updateItem.images : [],
         imagesMaxErrorField: "",
-        department: updateItem?.departments?.id ? updateItem.departments.id : "",
-        characteristics: updateItem?.characteristics?.id ? updateItem.characteristics.id : [],
+        department: department,
+        characteristics: updateItem?.characteristics?.length ? updateItem.characteristics : [],
+        images: updateItem?.images?.length ? updateItem.images : [],
         characteristicName: "",
         characteristicValue: "",
     }

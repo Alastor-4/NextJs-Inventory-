@@ -59,7 +59,7 @@ export default function ProductsMainTable() {
     }
 
     async function handleUpdate() {
-        await router.push(`/profile/${params.id}/update/${selected.id}`)
+        await router.push(`/profile/${params.id}/product/update/${selected.id}`)
     }
 
     function handleNavigateBack() {
