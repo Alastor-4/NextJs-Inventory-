@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server'
 import {prisma} from "db";
+import { utapi } from 'uploadthing/server';
 
 // Get all user products
 export async function GET(request: Request, { params }: { params: { id: string } }) {
@@ -41,9 +42,50 @@ export async function POST(req: Request, res) {
 
 // Update user product
 export async function PUT(req, res) {
-    const {productId, name, description, departmentId, buyPrice} = await req.json()
+    const {
+        id,
+        name,
+        description,
+        departmentId,
+        buyPrice,
+        characteristics,
+        deletedCharacteristics,
+        images,
+        deletedImages
+    } = await req.json()
 
-    const updatedProduct = await prisma.products.update({data: {name, description, department_id: parseInt(departmentId), buy_price: parseFloat(buyPrice)}, where: {id: parseInt(productId)}})
+    let createObj = {
+        name,
+        description: description ? description : null,
+        department_id: departmentId ? parseInt(departmentId) : null,
+        buy_price: buyPrice ? parseFloat(buyPrice) : null,
+    }
+
+    if (deletedCharacteristics) {
+        await prisma.characteristics.deleteMany({where: {id: {in: deletedCharacteristics}}})
+    }
+
+    if (deletedImages) {
+        await utapi.deleteFiles(deletedImages.map(item => item.fileKey))
+        await prisma.images.deleteMany({where: {id: {in: deletedImages.map(item => item.id)}}})
+    }
+
+    if (characteristics) {
+        createObj.characteristics = {createMany: {data: characteristics}}
+
+        createObj.include = {characteristics: true}
+    }
+
+    if (images) {
+        createObj.images = {createMany: {data: images}}
+
+        createObj.include = createObj.include ? { ...createObj.include, images: true} : { images: true }
+    }
+
+    const updatedProduct = await prisma.products.update(
+        {data: createObj, where: {id: parseInt(id)}
+        }
+    )
 
     return NextResponse.json(updatedProduct)
 }

@@ -47,9 +47,9 @@ const products = {
         return false
     },
 
-    update: async function ({userId, productId, name, description, departmentId, buyPrice}) {
+    update: async function (userId, data) {
         try {
-            return await apiRequest.put(updateUrl(userId), {productId: productId, name, description, departmentId, buyPrice})
+            return await apiRequest.put(url(userId), data)
         } catch (e) {
             //ToDo: notify error here
         }

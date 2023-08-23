@@ -79,7 +79,9 @@ export default function ProductsForm(props) {
         imagesMaxErrorField: "",
         department: department,
         characteristics: updateItem?.characteristics?.length ? updateItem.characteristics : [],
+        deletedCharacteristics: [],
         images: updateItem?.images?.length ? updateItem.images : [],
+        deletedImages: [],
         characteristicName: "",
         characteristicValue: "",
     }
@@ -107,31 +109,44 @@ export default function ProductsForm(props) {
 
     const handleSubmit = async (values) => {
         let data = {
+            id: undefined,
             name: values.name,
             description: values.description,
             buyPrice: values.buyPrice,
             departmentId: values.department.id,
             userId: userId,
-            characteristics: undefined,
-            images: undefined
+            characteristics: null,
+            deletedCharacteristics: values.deletedCharacteristics.length ? values.deletedCharacteristics : null,
+            images: null,
+            deletedImages: null,
         }
 
-        if (values.characteristics.length)
-            data.characteristics = values.characteristics
+        if (values.characteristics.length) {
+            const newCharacteristics = values.characteristics.filter(item => !item.id)
+            data.characteristics = newCharacteristics.length ? newCharacteristics : null
+        }
+
+        if (values.deletedImages.length) {
+            data.deletedImages = values.deletedImages.map(item => ({id: item.id, fileKey: item.fileKey}))
+        }
 
         if (values.images.length) {
             //ToDo: images upload and save data in db must be done in background
-            const files = await startUpload(values.images)
-            if (files) {
-                //await products.syncImages({userId, productId: response.id, productImages: files})
-                data.images = files.map(item => ({fileKey: item.fileKey, fileUrl: item.fileUrl}))
+            const newImages = values.images.filter((item) => !item.fileKey)
+            if (newImages.length) {
+                const files = await startUpload(newImages)
+                if (files) {
+                    data.images = files.map(item => ({fileKey: item.fileKey, fileUrl: item.fileUrl}))
+                }
             }
         }
 
         let response
 
         if (updateItem) {
-            response = await products.update({id: updateItem.id, name: values.name, description: values.description})
+            data.id = updateItem.id
+
+            response = await products.update(userId, data)
         } else {
             response = await products.create(userId, data)
         }
@@ -162,6 +177,12 @@ export default function ProductsForm(props) {
 
     function handleRemoveCharacteristic(formik, index) {
         let characteristics = [...formik.values.characteristics]
+
+        if (characteristics[index].id) {
+            let deletedCharacteristics = formik.values.deletedCharacteristics
+            deletedCharacteristics.push(characteristics[index].id)
+            formik.setFieldValue("deletedCharacteristics", deletedCharacteristics)
+        }
         characteristics.splice(index, 1)
         formik.setFieldValue("characteristics", characteristics)
     }
@@ -176,7 +197,7 @@ export default function ProductsForm(props) {
                 if (addedFiles.length < 3) {
                     const index = formik.values.images.findIndex((item) => item.name === newFile.name)
                     if (index < 0) {
-                        newFile.preview = URL.createObjectURL(newFile)
+                        newFile.fileUrl = URL.createObjectURL(newFile)
                         addedFiles.push(newFile)
                     }
                 }
@@ -240,7 +261,9 @@ export default function ProductsForm(props) {
 
         let deleteIndex = formik.values.images.findIndex((item) => item.name === deletedItem.name)
         if (images[deleteIndex].id) {
-            //ToDo: inform backend about deleted images
+            const deletedImage = formik.values.deletedImages
+            deletedImage.push(images[deleteIndex])
+            formik.setFieldValue("deletedImages", [...deletedImage])
         } else {
             URL.revokeObjectURL(images[deleteIndex].preview)
         }
@@ -252,12 +275,12 @@ export default function ProductsForm(props) {
 
     const thumbs = (formik) => formik.values.images.map((file) => (
         <Badge
-            key={file.name}
+            key={file.name ? file.name : file.fileKey}
             overlap={"circular"}
-            badgeContent={<Cancel fontSize={"small"} sx={{color: "lighterRed", cursor: "pointer"}} />}
+            badgeContent={<Cancel sx={{color: "red", cursor: "pointer"}} />}
             onClick={() => handleRemoveImage(formik, file)}
         >
-            <Avatar key={file.name} src={file.preview} variant={"rounded"} sx={{width: "50px", height: "50px", marginX: "5px"}}/>
+            <Avatar src={file.fileUrl} variant={"rounded"} sx={{width: "120px", height: "120px", marginX: "10px"}}/>
         </Badge>
     ))
 
