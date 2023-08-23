@@ -29,7 +29,7 @@ const products = {
 
     create: async function (userId, data) {
         try {
-            return await apiRequest.post(url(userId), data, {headers: { "Content-Type": "multipart/form-data" }})
+            return await apiRequest.post(url(userId), data)
         } catch (e) {
             //ToDo: notify error here
         }
@@ -37,9 +37,19 @@ const products = {
         return false
     },
 
-    update: async function ({userId, productId, name, description, departmentId, buyPrice}) {
+    syncImages: async function ({userId, productId, productImages}) {
         try {
-            return await apiRequest.put(updateUrl(userId), {productId: productId, name, description, departmentId, buyPrice})
+            return await apiRequest.patch(url(userId), {productId, productImages})
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    update: async function (userId, data) {
+        try {
+            return await apiRequest.put(url(userId), data)
         } catch (e) {
             //ToDo: notify error here
         }

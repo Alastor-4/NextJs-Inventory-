@@ -4,8 +4,8 @@ import {
     AppBar, Avatar, Badge,
     Box,
     Button,
-    Card, Fade,
-    FormControlLabel, FormHelperText,
+    Card,
+    FormControlLabel,
     Grid,
     IconButton,
     MenuItem,
@@ -14,12 +14,13 @@ import {
     Typography
 } from "@mui/material";
 import React from "react";
-import {useFormik, Formik} from "formik";
+import {Formik} from "formik";
 import * as Yup from "yup"
 import {useParams, useRouter} from 'next/navigation';
 import products from "@/app/profile/[id]/product/requests/products";
 import {AddOutlined, Cancel, Close, DeleteOutline, Done} from "@mui/icons-material";
 import {useDropzone} from "react-dropzone";
+import {useUploadThing} from "@/app/api/uploadthing/utils";
 
 export default function ProductsForm(props) {
     const {userId, departments} = props
@@ -28,16 +29,26 @@ export default function ProductsForm(props) {
 
     const params = useParams()
     const router = useRouter()
+
+    //initial values
+    const [department, setDepartment] = React.useState("")
     
-   /* React.useEffect(() => {
-        async function fetchRole(id) {
-            const rol = await roles.roleDetails(id)
-            setUpdateItem(rol)
+    React.useEffect(() => {
+        async function fetchProduct(id) {
+            const product = await products.productDetails(userId, id)
+            setUpdateItem(product)
+
+            if (product?.departments?.id) {
+                const index = departments.findIndex(item => item.id === product.departments.id)
+                if (index > -1) {
+                    setDepartment(departments[index])
+                }
+            }
         }
-        if (params?.id !== undefined) {
-            fetchRole(params.id)
-        } 
-    }, [params?.id, setUpdateItem])*/
+        if (params?.productId !== undefined) {
+            fetchProduct(params.productId)
+        }
+    }, [params.productId, userId, setUpdateItem, departments])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -59,18 +70,19 @@ export default function ProductsForm(props) {
         </AppBar>
     )
 
-    const [displayCharacteristicForm, setDisplayCharacteristicForm] = React.useState(false)
-
     const initialValues = {
         name: updateItem ? updateItem.name : "",
         description: updateItem?.description ? updateItem.description : "",
         buyPrice: updateItem?.buy_price ? updateItem.buy_price : "",
-        images: updateItem ? updateItem.images : [],
         imagesMaxErrorField: "",
-        department: updateItem?.departments?.id ? updateItem.departments.id : "",
-        characteristics: updateItem?.characteristics?.id ? updateItem.characteristics.id : [],
+        department: department,
+        characteristics: updateItem?.characteristics?.length ? updateItem.characteristics : [],
+        deletedCharacteristics: [],
+        images: updateItem?.images?.length ? updateItem.images : [],
+        deletedImages: [],
         characteristicName: "",
         characteristicValue: "",
+        displayCharacteristicForm: false,
     }
 
     const validationSchema = Yup.object({
@@ -85,27 +97,56 @@ export default function ProductsForm(props) {
         characteristicValue: Yup.string().nullable(),
     })
 
+    const { startUpload } = useUploadThing("imageUploader", {
+        onClientUploadComplete: (res) => {
+            return res
+        },
+        onUploadError: () => {
+           return false
+        },
+    });
+
     const handleSubmit = async (values) => {
+        let data = {
+            id: undefined,
+            name: values.name,
+            description: values.description,
+            buyPrice: values.buyPrice,
+            departmentId: values.department.id,
+            userId: userId,
+            characteristics: null,
+            deletedCharacteristics: values.deletedCharacteristics.length ? values.deletedCharacteristics : null,
+            images: null,
+            deletedImages: null,
+        }
+
+        if (values.characteristics.length) {
+            const newCharacteristics = values.characteristics.filter(item => !item.id)
+            data.characteristics = newCharacteristics.length ? newCharacteristics : null
+        }
+
+        if (values.deletedImages.length) {
+            data.deletedImages = values.deletedImages.map(item => ({id: item.id, fileKey: item.fileKey}))
+        }
+
+        if (values.images.length) {
+            //ToDo: images upload and save data in db must be done in background
+            const newImages = values.images.filter((item) => !item.fileKey)
+            if (newImages.length) {
+                const files = await startUpload(newImages)
+                if (files) {
+                    data.images = files.map(item => ({fileKey: item.fileKey, fileUrl: item.fileUrl}))
+                }
+            }
+        }
+
         let response
 
-        let data = new FormData()
-        data.set("name", values.name)
-        data.set("description", values.description)
-        data.set("buyPrice", values.buyPrice)
-        data.set("departmentId", values.department.id)
-        data.set("userId", userId)
-
-        if (values.characteristics.length)
-            data.set("characteristics", JSON.stringify(values.characteristics))
-
-        if (values.images.length)
-            data.set("images", values.images)
-
         if (updateItem) {
-            response = await products.update({id: updateItem.id, name: values.name, description: values.description})
+            data.id = updateItem.id
+
+            response = await products.update(userId, data)
         } else {
-
-
             response = await products.create(userId, data)
         }
 
@@ -123,7 +164,7 @@ export default function ProductsForm(props) {
 
             formik.setFieldValue("characteristicName", "")
             formik.setFieldValue("characteristicValue", "")
-            setDisplayCharacteristicForm(false)
+            formik.setFieldValue("displayCharacteristicForm", false)
         } else {
             if (!formik.values.characteristicName)
                 formik.setFieldError("characteristicName", "campo requerido")
@@ -135,6 +176,12 @@ export default function ProductsForm(props) {
 
     function handleRemoveCharacteristic(formik, index) {
         let characteristics = [...formik.values.characteristics]
+
+        if (characteristics[index].id) {
+            let deletedCharacteristics = formik.values.deletedCharacteristics
+            deletedCharacteristics.push(characteristics[index].id)
+            formik.setFieldValue("deletedCharacteristics", deletedCharacteristics)
+        }
         characteristics.splice(index, 1)
         formik.setFieldValue("characteristics", characteristics)
     }
@@ -149,7 +196,7 @@ export default function ProductsForm(props) {
                 if (addedFiles.length < 3) {
                     const index = formik.values.images.findIndex((item) => item.name === newFile.name)
                     if (index < 0) {
-                        newFile.preview = URL.createObjectURL(newFile)
+                        newFile.fileUrl = URL.createObjectURL(newFile)
                         addedFiles.push(newFile)
                     }
                 }
@@ -213,7 +260,9 @@ export default function ProductsForm(props) {
 
         let deleteIndex = formik.values.images.findIndex((item) => item.name === deletedItem.name)
         if (images[deleteIndex].id) {
-            //ToDo: inform backend about deleted images
+            const deletedImage = formik.values.deletedImages
+            deletedImage.push(images[deleteIndex])
+            formik.setFieldValue("deletedImages", [...deletedImage])
         } else {
             URL.revokeObjectURL(images[deleteIndex].preview)
         }
@@ -225,12 +274,12 @@ export default function ProductsForm(props) {
 
     const thumbs = (formik) => formik.values.images.map((file) => (
         <Badge
-            key={file.name}
+            key={file.name ? file.name : file.fileKey}
             overlap={"circular"}
-            badgeContent={<Cancel fontSize={"small"} sx={{color: "lighterRed", cursor: "pointer"}} />}
+            badgeContent={<Cancel sx={{color: "red", cursor: "pointer"}} />}
             onClick={() => handleRemoveImage(formik, file)}
         >
-            <Avatar key={file.name} src={file.preview} variant={"rounded"} sx={{width: "50px", height: "50px", marginX: "5px"}}/>
+            <Avatar src={file.fileUrl} variant={"rounded"} sx={{width: "120px", height: "120px", marginX: "10px"}}/>
         </Badge>
     ))
 
@@ -350,8 +399,8 @@ export default function ProductsForm(props) {
                                                 ))
                                             }
                                             {
-                                                !displayCharacteristicForm && (
-                                                    <IconButton onClick={() => setDisplayCharacteristicForm(true)}>
+                                                !formik?.values?.displayCharacteristicForm && (
+                                                    <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm",true)}>
                                                         <AddOutlined />
                                                     </IconButton>
                                                 )
@@ -359,7 +408,7 @@ export default function ProductsForm(props) {
                                         </Grid>
 
                                         {
-                                            displayCharacteristicForm && (
+                                            formik?.values?.displayCharacteristicForm && (
                                                 <Grid container item xs={12} spacing={2}>
                                                     <Grid item xs={12}>
                                                         <TextField
@@ -388,7 +437,7 @@ export default function ProductsForm(props) {
                                                             <Done color={"primary"}/>
                                                         </IconButton>
 
-                                                        <IconButton onClick={() => setDisplayCharacteristicForm(false)}>
+                                                        <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm", false)}>
                                                             <Close />
                                                         </IconButton>
                                                     </Grid>
