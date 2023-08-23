@@ -70,8 +70,6 @@ export default function ProductsForm(props) {
         </AppBar>
     )
 
-    const [displayCharacteristicForm, setDisplayCharacteristicForm] = React.useState(false)
-
     const initialValues = {
         name: updateItem ? updateItem.name : "",
         description: updateItem?.description ? updateItem.description : "",
@@ -84,6 +82,7 @@ export default function ProductsForm(props) {
         deletedImages: [],
         characteristicName: "",
         characteristicValue: "",
+        displayCharacteristicForm: false,
     }
 
     const validationSchema = Yup.object({
@@ -165,7 +164,7 @@ export default function ProductsForm(props) {
 
             formik.setFieldValue("characteristicName", "")
             formik.setFieldValue("characteristicValue", "")
-            setDisplayCharacteristicForm(false)
+            formik.setFieldValue("displayCharacteristicForm", false)
         } else {
             if (!formik.values.characteristicName)
                 formik.setFieldError("characteristicName", "campo requerido")
@@ -400,8 +399,8 @@ export default function ProductsForm(props) {
                                                 ))
                                             }
                                             {
-                                                !displayCharacteristicForm && (
-                                                    <IconButton onClick={() => setDisplayCharacteristicForm(true)}>
+                                                !formik?.values?.displayCharacteristicForm && (
+                                                    <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm",true)}>
                                                         <AddOutlined />
                                                     </IconButton>
                                                 )
@@ -409,7 +408,7 @@ export default function ProductsForm(props) {
                                         </Grid>
 
                                         {
-                                            displayCharacteristicForm && (
+                                            formik?.values?.displayCharacteristicForm && (
                                                 <Grid container item xs={12} spacing={2}>
                                                     <Grid item xs={12}>
                                                         <TextField
@@ -438,7 +437,7 @@ export default function ProductsForm(props) {
                                                             <Done color={"primary"}/>
                                                         </IconButton>
 
-                                                        <IconButton onClick={() => setDisplayCharacteristicForm(false)}>
+                                                        <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm", false)}>
                                                             <Close />
                                                         </IconButton>
                                                     </Grid>

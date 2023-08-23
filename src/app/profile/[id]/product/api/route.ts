@@ -6,7 +6,7 @@ import { utapi } from 'uploadthing/server';
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const userId = params.id
 
-    const products = await prisma.products.findMany({where: {owner_id: parseInt(userId)}, include: {departments: true, characteristics: true}})
+    const products = await prisma.products.findMany({where: {owner_id: parseInt(userId)}, include: {departments: true, characteristics: true, images: true}})
 
     return NextResponse.json(products)
 }
@@ -54,7 +54,7 @@ export async function PUT(req, res) {
         deletedImages
     } = await req.json()
 
-    let createObj = {
+    let updateObj = {
         name,
         description: description ? description : null,
         department_id: departmentId ? parseInt(departmentId) : null,
@@ -71,19 +71,15 @@ export async function PUT(req, res) {
     }
 
     if (characteristics) {
-        createObj.characteristics = {createMany: {data: characteristics}}
-
-        createObj.include = {characteristics: true}
+        await prisma.characteristics.createMany({data: characteristics.map(item => ({...item, product_id: id}))})
     }
 
     if (images) {
-        createObj.images = {createMany: {data: images}}
-
-        createObj.include = createObj.include ? { ...createObj.include, images: true} : { images: true }
+        await prisma.images.createMany({data: images.map(item => ({...item, product_id: id}))})
     }
 
     const updatedProduct = await prisma.products.update(
-        {data: createObj, where: {id: parseInt(id)}
+        {data: updateObj, where: {id: parseInt(id)}
         }
     )
 

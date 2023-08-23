@@ -21,7 +21,6 @@ import {TableNoData} from "@/components/TableNoData";
 import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-material";
 import Link from "next/link";
 import {useParams, useRouter} from "next/navigation";
-import image from "next/image"
 import products from "@/app/profile/[id]/product/requests/products";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
@@ -196,11 +195,8 @@ export default function ProductsMainTable() {
                         </TableCell>
                         <TableCell>
                             {
-                                row.image ? (
-                                    <v-avatar>
-                                        <image href={row.image} />
-                                    </v-avatar>
-                                ) : "-"
+                                row.images.length > 0
+                                    ?  `${row.images.length} images(s)` : "-"
                             }
                         </TableCell>
                         <TableCell>
