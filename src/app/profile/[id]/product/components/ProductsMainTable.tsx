@@ -124,11 +124,6 @@ export default function ProductsMainTable() {
     const TableHeader = () => {
         const headCells = [
             {
-                id: "image",
-                label: "",
-                align: "left"
-            },
-            {
                 id: "department",
                 label: "Departamento",
                 align: "left"
@@ -151,6 +146,11 @@ export default function ProductsMainTable() {
             {
                 id: "characteristics",
                 label: "Características",
+                align: "left"
+            },
+            {
+                id: "image",
+                label: "",
                 align: "left"
             },
         ]
@@ -194,12 +194,6 @@ export default function ProductsMainTable() {
                             <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
                         </TableCell>
                         <TableCell>
-                            {
-                                row.images.length > 0
-                                    ?  `${row.images.length} images(s)` : "-"
-                            }
-                        </TableCell>
-                        <TableCell>
                             {row?.departments?.name ?? "-"}
                         </TableCell>
                         <TableCell>
@@ -237,6 +231,12 @@ export default function ProductsMainTable() {
                                     </Grid>
                                     )
                                 ) : "-"
+                            }
+                        </TableCell>
+                        <TableCell>
+                            {
+                                row.images.length > 0
+                                    ?  `${row.images.length} imagen(es)` : "-"
                             }
                         </TableCell>
                     </TableRow>
