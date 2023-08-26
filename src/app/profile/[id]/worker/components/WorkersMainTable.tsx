@@ -125,10 +125,6 @@ export default function WorkersMainTable(props) {
         }
     }
 
-    async function handleUpdate() {
-        await router.push(`/profile/${params.id}/product/update/${selected.id}`)
-    }
-
     function handleNavigateBack() {
         router.back()
     }
@@ -176,7 +172,7 @@ export default function WorkersMainTable(props) {
                                         )
                                     }
 
-                                    <Link href={`/profile/${params.id}/product/create`}>
+                                    <Link href={`/profile/${params.id}/worker/create`}>
                                         <IconButton color={"inherit"}>
                                             <AddOutlined/>
                                         </IconButton>
