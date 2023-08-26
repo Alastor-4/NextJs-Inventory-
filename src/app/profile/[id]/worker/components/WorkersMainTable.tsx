@@ -18,7 +18,7 @@ import {
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
-import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-material";
+import {AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline, EditOutlined} from "@mui/icons-material";
 import Link from "next/link";
 import {useParams, useRouter} from "next/navigation";
 import products from "@/app/profile/[id]/product/requests/products";
@@ -74,18 +74,13 @@ export default function WorkersMainTable(props) {
         };
 
         const handleApplyRole = async () => {
-            const response = await users.changeRol(selected.id, selectedRole.id)
+            const response = await ownerUsers.changeRol(params.id, selected.id, selectedRole.id)
             if (response) {
-                const updatedUser = await users.userDetails(response.id)
+                const allUsers = await ownerUsers.allWorkers(params.id)
+                if (allUsers) setData(allUsers)
 
-                if (updatedUser) {
-                    let newData = [...data]
-                    const updatedItemIndex = newData.findIndex(item => item.id === updatedUser.id)
-                    newData.splice(updatedItemIndex, 1, updatedUser)
-                    setData(newData)
-                    setSelected(null)
-                    setOpen(false)
-                }
+                setSelected(null)
+                setOpen(false)
             }
         }
 
@@ -167,8 +162,8 @@ export default function WorkersMainTable(props) {
                                     {
                                         selected && (
                                             <Box sx={{display: "flex"}}>
-                                                <IconButton color={"inherit"} onClick={handleUpdate}>
-                                                    <EditOutlined fontSize={"small"}/>
+                                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
+                                                    <ChangeCircleOutlined fontSize={"small"}/>
                                                 </IconButton>
 
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
@@ -311,23 +306,33 @@ export default function WorkersMainTable(props) {
     }
 
     return (
-        <Card variant={"outlined"}>
-            <CustomToolbar/>
+        <>
+            <ChangeRoleDialog
+                open={openDialog}
+                setOpen={setOpenDialog}
+                setData={setData}
+                selected={selected}
+                setSelected={setSelected}
+            />
 
-            <CardContent>
-                {
-                    data?.length > 0
-                        ? (
-                            <Table sx={{width: "100%"}} size={"small"}>
-                                <TableHeader/>
+            <Card variant={"outlined"}>
+                <CustomToolbar/>
 
-                                <TableContent/>
-                            </Table>
-                        ) : (
-                            <TableNoData/>
-                        )
-                }
-            </CardContent>
-        </Card>
+                <CardContent>
+                    {
+                        data?.length > 0
+                            ? (
+                                <Table sx={{width: "100%"}} size={"small"}>
+                                    <TableHeader/>
+
+                                    <TableContent/>
+                                </Table>
+                            ) : (
+                                <TableNoData/>
+                            )
+                    }
+                </CardContent>
+            </Card>
+        </>
     )
 }

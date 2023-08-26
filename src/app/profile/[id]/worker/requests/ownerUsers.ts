@@ -15,9 +15,9 @@ const ownerUsers = {
         return false
     },
 
-    changeRol: async function (id, roleId) {
+    changeRol: async function (userId, workerId, roleId) {
         try {
-            const response = await apiRequest.patch(updateUrl, {roleId: roleId}, {params: {userId: id}})
+            const response = await apiRequest.patch(url(userId), {roleId: roleId}, {params: {userId: workerId}})
             return response.data
         } catch (e) {
             //ToDo: notify error here

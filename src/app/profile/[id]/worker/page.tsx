@@ -3,7 +3,7 @@ import {prisma} from "db";
 
 export default async function Page() {
     const roles = await prisma.roles.findMany()
-    const ownerUsageRoles = roles.filter(item => item?.name?.includes("store"))
+    const ownerUsageRoles = roles.filter(item => item.name === "store_keeper" || item.name === "store_seller")
 
     return (
         <main>
