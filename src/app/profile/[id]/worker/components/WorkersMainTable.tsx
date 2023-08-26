@@ -3,12 +3,12 @@
 import React from "react";
 import {
     AppBar,
-    Box,
+    Box, Button,
     Card,
     CardContent,
-    Checkbox, Chip, CircularProgress,
-    Divider, Grid,
-    IconButton,
+    Checkbox, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
+    Divider, FormControl, Grid,
+    IconButton, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent,
     Table,
     TableBody,
     TableCell,
@@ -22,10 +22,14 @@ import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-ma
 import Link from "next/link";
 import {useParams, useRouter} from "next/navigation";
 import products from "@/app/profile/[id]/product/requests/products";
+import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
+import users from "@/app/user/requests/users";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
-export default function WorkersMainTable() {
+export default function WorkersMainTable(props) {
+    const { roles } = props
+
     const [data, setData] = React.useState(null)
 
     const params = useParams()
@@ -49,11 +53,80 @@ export default function WorkersMainTable() {
         }
     }
 
+    //change role dialog
+    const [openDialog, setOpenDialog] = React.useState(false);
+
+    const handleClickOpenDialog = () => {
+        setOpenDialog(true);
+    };
+
+    function ChangeRoleDialog(props) {
+        const {open, setOpen, selected, setData, setSelected} = props
+
+        const [selectedRole, setSelectedRole] = React.useState<number | string>('');
+
+        const handleChange = (event: SelectChangeEvent<typeof selectedRole>) => {
+            setSelectedRole(event.target.value || '');
+        };
+
+        const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
+            setOpen(false);
+        };
+
+        const handleApplyRole = async () => {
+            const response = await users.changeRol(selected.id, selectedRole.id)
+            if (response) {
+                const updatedUser = await users.userDetails(response.id)
+
+                if (updatedUser) {
+                    let newData = [...data]
+                    const updatedItemIndex = newData.findIndex(item => item.id === updatedUser.id)
+                    newData.splice(updatedItemIndex, 1, updatedUser)
+                    setData(newData)
+                    setSelected(null)
+                    setOpen(false)
+                }
+            }
+        }
+
+        return (
+            <Dialog open={open} onClose={handleClose}>
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
+                <DialogTitle>Cambiar role a "{selected ? selected.username : "" }"</DialogTitle>
+                <DialogContent>
+                    <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                        <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
+                            <InputLabel id="dialog-select-label">Rol</InputLabel>
+                            <Select
+                                labelId="dialog-select-label"
+                                id="dialog-select-label"
+                                value={selectedRole}
+                                onChange={handleChange}
+                                input={<OutlinedInput label="Rol" fullWidth/>}
+                                fullWidth
+                            >
+                                {
+                                    roles.map(item => (
+                                        <MenuItem key={item.id} value={item}>{item.name}</MenuItem>
+                                    ))
+                                }
+                            </Select>
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancelar</Button>
+                    <Button color={"primary"} disabled={!selectedRole} onClick={handleApplyRole}>Cambiar</Button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
     async function handleRemove() {
-        const response = await products.delete(params.id, selected.id)
+        const response = await ownerUsers.deleteWorker(selected.id)
         if (response) {
-            const updatedWarehouses = await products.allUserProducts(params.id)
-            if (updatedWarehouses) setData(updatedWarehouses)
+            const allUsers = await ownerUsers.allWorkers(params.id)
+            if (allUsers) setData(allUsers)
         }
     }
 

@@ -32,3 +32,17 @@ export async function PATCH(req, res) {
 
     return new Response('La acción de modificar rol ha fallado', {status: 500})
 }
+
+// Delete owner's user
+export async function DELETE(req, res) {
+    const {searchParams} = new URL(req.url)
+    const userId = searchParams.get("userId")
+
+    if (userId) {
+        const updatedUser = await prisma.users.update({data: {work_for_user_id: null}, where: {id: parseInt(userId)}})
+
+        return NextResponse.json(updatedUser)
+    }
+
+    return res.status(500).json({message: "La acción de eliminar trabajador ha fallado"})
+}
