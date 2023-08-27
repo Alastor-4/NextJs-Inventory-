@@ -30,12 +30,6 @@ export default function Home() {
                     </Grid>
 
                     <Grid item xs={3}>
-                        <Link href={"/store"}>
-                            Stores{' '}-->>
-                        </Link>
-                    </Grid>
-
-                    <Grid item xs={3}>
                         <a
                             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
                             target="_blank"

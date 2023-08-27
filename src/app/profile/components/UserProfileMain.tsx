@@ -138,7 +138,7 @@ export default function UserProfileMain(props) {
             <CardHeader title={"Usuarios"}/>
 
             <CardContent>
-                <Link href={`/profile/${userDetails.id}/user`}>
+                <Link href={`/profile/${userDetails.id}/worker`}>
                     <Grid container rowSpacing={2} item xs={12}>
                         <Grid container item xs={"auto"} alignItems={"center"}>
                             <ChevronRightOutlined fontSize={"small"}/>
