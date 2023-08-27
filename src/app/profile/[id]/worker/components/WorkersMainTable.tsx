@@ -76,7 +76,7 @@ export default function WorkersMainTable(props) {
         const handleApplyRole = async () => {
             const response = await ownerUsers.changeRol(params.id, selected.id, selectedRole.id)
             if (response) {
-                const allUsers = await ownerUsers.allWorkers(params.id)
+                const allUsers = await ownerUsers.allWorkers({userId: params.id})
                 if (allUsers) setData(allUsers)
 
                 setSelected(null)
@@ -120,7 +120,7 @@ export default function WorkersMainTable(props) {
     async function handleRemove() {
         const response = await ownerUsers.deleteWorker(selected.id)
         if (response) {
-            const allUsers = await ownerUsers.allWorkers(params.id)
+            const allUsers = await ownerUsers.allWorkers({userId: params.id})
             if (allUsers) setData(allUsers)
         }
     }

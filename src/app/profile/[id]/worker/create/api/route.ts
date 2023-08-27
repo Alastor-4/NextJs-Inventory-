@@ -17,17 +17,18 @@ export async function GET(req, res) {
     return NextResponse.json(user)
 }
 
-// Change owner's user role
-export async function PATCH(req, res) {
+// Make worker a new user
+export async function PUT(req, res) {
     const {searchParams} = new URL(req.url)
-    const userId = searchParams.get("userId")
-    const {roleId} = await req.json()
+    const ownerId = searchParams.get("ownerId")
 
-    if (userId) {
-        const updatedRole = await prisma.users.update({data: {role_id: roleId}, where: {id: parseInt(userId)}})
+    const {userId} = await req.json()
+
+    if (ownerId && userId) {
+        const updatedRole = await prisma.users.update({data: {work_for_user_id: parseInt(ownerId)}, where: {id: parseInt(userId)}})
 
         return NextResponse.json(updatedRole)
     }
 
-    return new Response('La acción de modificar rol ha fallado', {status: 500})
+    return new Response('La acción de agregar usuario ha fallado', {status: 500})
 }

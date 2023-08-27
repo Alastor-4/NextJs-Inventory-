@@ -1,11 +1,10 @@
 import apiRequest from "@/api"
-import {headers} from "next/headers";
 
 const url = (userId) => `/profile/${userId}/worker/api`
 const urlCreate = (userId) => `/profile/${userId}/worker/create/api`
 
 const ownerUsers = {
-    allWorkers: async function (userId) {
+    allWorkers: async function (userId: any) {
         try {
             const response = await apiRequest.get(url(userId))
             return response.data
@@ -16,7 +15,7 @@ const ownerUsers = {
         return false
     },
 
-    changeRol: async function (userId, workerId, roleId) {
+    changeRol: async function (userId: any, workerId: any, roleId: any) {
         try {
             const response = await apiRequest.patch(url(userId), {roleId: roleId}, {params: {userId: workerId}})
             return response.data
@@ -27,7 +26,7 @@ const ownerUsers = {
         return false
     },
 
-    deleteWorker: async function (userId) {
+    deleteWorker: async function (userId: any) {
         try {
             const response = await apiRequest.delete(url(userId), {params: {userId: userId}})
             if (response.status === 200) return true
@@ -38,12 +37,21 @@ const ownerUsers = {
         return false
     },
 
-    findNewUser: async function (userId, username, phone) {
+    findNewUser: async function (userId: any, username: any, phone: any) {
         try {
-            const response = await apiRequest.get(urlCreate(userId), {params: {username, phone}})
-            return response.data
+            return await apiRequest.get(urlCreate(userId), {params: {username, phone}})
         } catch (e) {
-            //ToDo: notify error herefind
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    addNewUser: async function (ownerId: any, userId: any) {
+        try {
+            return await apiRequest.put(urlCreate(userId), {userId}, {params: {ownerId}})
+        } catch (e) {
+            //ToDo: notify error here
         }
 
         return false
