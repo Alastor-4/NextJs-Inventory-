@@ -2,6 +2,7 @@ import apiRequest from "@/api"
 import {headers} from "next/headers";
 
 const url = (userId) => `/profile/${userId}/worker/api`
+const urlCreate = (userId) => `/profile/${userId}/worker/create/api`
 
 const ownerUsers = {
     allWorkers: async function (userId) {
@@ -32,6 +33,17 @@ const ownerUsers = {
             if (response.status === 200) return true
         } catch (e) {
             //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    findNewUser: async function (userId, username, phone) {
+        try {
+            const response = await apiRequest.get(urlCreate(userId), {params: {username, phone}})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error herefind
         }
 
         return false
