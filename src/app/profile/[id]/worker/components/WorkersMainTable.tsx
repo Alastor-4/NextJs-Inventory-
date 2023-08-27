@@ -120,7 +120,7 @@ export default function WorkersMainTable(props) {
     async function handleRemove() {
         const response = await ownerUsers.deleteWorker(selected.id)
         if (response) {
-            const allUsers = await ownerUsers.allWorkers({userId: params.id})
+            const allUsers = await ownerUsers.allWorkers(params.id)
             if (allUsers) setData(allUsers)
         }
     }
