@@ -39,7 +39,7 @@ export async function DELETE(req, res) {
     const userId = searchParams.get("userId")
 
     if (userId) {
-        const updatedUser = await prisma.users.update({data: {work_for_user_id: null}, where: {id: parseInt(userId)}})
+        const updatedUser = await prisma.users.update({data: {work_for_user_id: null, role_id: null}, where: {id: parseInt(userId)}})
 
         return NextResponse.json(updatedUser)
     }
