@@ -20,6 +20,7 @@ import {
 import {useRouter} from "next/navigation";
  import userProfileStyles from "@/assets/styles/userProfileStyles"
 import Link from "next/link";
+import dayjs from "dayjs";
 
 export default function UserProfileMain(props) {
    const {userDetails, userProductsCount, workForUsersCount} = props
@@ -135,7 +136,7 @@ export default function UserProfileMain(props) {
 
     const UsersButton = () => (
         <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-            <CardHeader title={"Usuarios"}/>
+            <CardHeader title={"Trabajadores"}/>
 
             <CardContent>
                 <Link href={`/profile/${userDetails.id}/worker`}>
@@ -144,7 +145,7 @@ export default function UserProfileMain(props) {
                             <ChevronRightOutlined fontSize={"small"}/>
                         </Grid>
                         <Grid item xs={true}>
-                            {workForUsersCount} trabajadores(s)
+                            {workForUsersCount} trabajador(es)
                         </Grid>
                     </Grid>
                 </Link>
@@ -195,6 +196,13 @@ export default function UserProfileMain(props) {
                                 <Grid item sx={userProfileStyles.leftFlex}>Teléfono:</Grid>
                                 <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails.phone}
+                                </Grid>
+                            </Grid>
+
+                            <Grid container item xs={12} spacing={1}>
+                                <Grid item sx={userProfileStyles.leftFlex}>Unido en:</Grid>
+                                <Grid item sx={userProfileStyles.rightFlex}>
+                                    {dayjs(userDetails.created_at).format("DD/MM/YYYY") }
                                 </Grid>
                             </Grid>
                         </Grid>

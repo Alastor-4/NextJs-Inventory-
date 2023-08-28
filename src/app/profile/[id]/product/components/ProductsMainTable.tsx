@@ -52,6 +52,7 @@ export default function ProductsMainTable() {
     async function handleRemove() {
         const response = await products.delete(params.id, selected.id)
         if (response) {
+            //ToDo: remove product images from uploadthing
             const updatedWarehouses = await products.allUserProducts(params.id)
             if (updatedWarehouses) setData(updatedWarehouses)
         }
