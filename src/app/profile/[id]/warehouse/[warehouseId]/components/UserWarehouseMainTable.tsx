@@ -3,12 +3,12 @@
 import React from "react";
 import {
     AppBar,
-    Box,
+    Box, Button,
     Card,
     CardContent,
-    Checkbox, CircularProgress,
-    Divider, Grid,
-    IconButton,
+    Checkbox, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
+    Divider, FormControl, Grid,
+    IconButton, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent,
     Table,
     TableBody,
     TableCell,
@@ -18,14 +18,18 @@ import {
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
-import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-material";
+import {AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline, EditOutlined} from "@mui/icons-material";
 import Link from "next/link";
 import {useParams, useRouter} from "next/navigation";
 import products from "@/app/profile/[id]/product/requests/products";
+import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
+import users from "@/app/user/requests/users";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
-export default function ProductsMainTable() {
+export default function UserWarehouseMainTable(props) {
+    const { ownerId, warehouseId } = props
+
     const [data, setData] = React.useState(null)
 
     const params = useParams()
@@ -36,8 +40,8 @@ export default function ProductsMainTable() {
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${params.id}/product/api`).then((data) => setData(data))
-    }, [params.id])
+        fetcher(`/profile/${ownerId}/warehouse/${warehouseId}/api`).then((data) => setData(data))
+    }, [ownerId, warehouseId])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -50,16 +54,11 @@ export default function ProductsMainTable() {
     }
 
     async function handleRemove() {
-        const response = await products.delete(params.id, selected.id)
+        const response = await ownerUsers.deleteWorker(selected.id)
         if (response) {
-            //ToDo: remove product images from uploadthing
-            const updatedWarehouses = await products.allUserProducts(params.id)
-            if (updatedWarehouses) setData(updatedWarehouses)
+            const allUsers = await ownerUsers.allWorkers(params.id)
+            if (allUsers) setData(allUsers)
         }
-    }
-
-    async function handleUpdate() {
-        await router.push(`/profile/${params.id}/product/update/${selected.id}`)
     }
 
     function handleNavigateBack() {
@@ -82,7 +81,7 @@ export default function ProductsMainTable() {
                             color: "white",
                         }}
                     >
-                        Productos del usuario
+                        Depósitos en almacén
                     </Typography>
                 </Box>
 
@@ -95,8 +94,8 @@ export default function ProductsMainTable() {
                                     {
                                         selected && (
                                             <Box sx={{display: "flex"}}>
-                                                <IconButton color={"inherit"} onClick={handleUpdate}>
-                                                    <EditOutlined fontSize={"small"}/>
+                                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
+                                                    <ChangeCircleOutlined fontSize={"small"}/>
                                                 </IconButton>
 
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
@@ -109,7 +108,7 @@ export default function ProductsMainTable() {
                                         )
                                     }
 
-                                    <Link href={`/profile/${params.id}/product/create`}>
+                                    <Link href={`/profile/${params.id}/worker/create`}>
                                         <IconButton color={"inherit"}>
                                             <AddOutlined/>
                                         </IconButton>
@@ -137,21 +136,6 @@ export default function ProductsMainTable() {
             {
                 id: "description",
                 label: "Descripción",
-                align: "left"
-            },
-            {
-                id: "buy_price",
-                label: "Precio de compra",
-                align: "left"
-            },
-            {
-                id: "characteristics",
-                label: "Características",
-                align: "left"
-            },
-            {
-                id: "image",
-                label: "",
                 align: "left"
             },
         ]
@@ -195,50 +179,13 @@ export default function ProductsMainTable() {
                             <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
                         </TableCell>
                         <TableCell>
-                            {row?.departments?.name ?? "-"}
+                            {row.products.departments?.name ?? "-"}
                         </TableCell>
                         <TableCell>
-                            {row.name}
+                            {row.products.name}
                         </TableCell>
                         <TableCell>
-                            {row.description ?? "-"}
-                        </TableCell>
-                        <TableCell>
-                            {row.buy_price ?? "-"}
-                        </TableCell>
-                        <TableCell>
-                            {row.characteristics.length > 0
-                                ? row.characteristics.map(item => (
-                                    <Grid
-                                        key={item.id}
-                                        sx={{
-                                            display: "inline-flex",
-                                            margin: "3px",
-                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                            padding: "2px 4px",
-                                            borderRadius: "5px 2px 2px 2px",
-                                            border: "1px solid rgba(130, 130, 130)",
-                                            fontSize: 14,
-                                        }}
-                                    >
-                                        <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
-                                            <Typography variant={"caption"} sx={{ color: "white", fontWeight: "600" }}>
-                                                {item.name.toUpperCase()}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid container item alignItems={"center"} sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                            {item.value}
-                                        </Grid>
-                                    </Grid>
-                                    )
-                                ) : "-"
-                            }
-                        </TableCell>
-                        <TableCell>
-                            {
-                                row.images.length > 0
-                                    ?  `${row.images.length} imagen(es)` : "-"
-                            }
+                            {row.products.description ?? "-"}
                         </TableCell>
                     </TableRow>
                 ))}

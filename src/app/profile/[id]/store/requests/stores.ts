@@ -1,11 +1,10 @@
 import apiRequest from "@/api"
-import {headers} from "next/headers";
 
 const url = (userId) => `/profile/${userId}/product/api`
 const updateUrl = (userId) => `/profile/${userId}/product/update/api`
 
-const products = {
-    allUserProducts: async function (userId) {
+const stores = {
+    allUserStores: async function (userId) {
         try {
             const response = await apiRequest.get(url(userId))
             return response.data
@@ -16,9 +15,9 @@ const products = {
         return false
     },
 
-    productDetails: async function (userId, productId) {
+    storeDetails: async function (userId, storeId) {
         try {
-            const response = await apiRequest.get(updateUrl(userId), {params: {productId: productId}})
+            const response = await apiRequest.get(updateUrl(userId), {params: {storeId: storeId}})
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -30,16 +29,6 @@ const products = {
     create: async function (userId, data) {
         try {
             return await apiRequest.post(url(userId), data)
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
-
-    syncImages: async function ({userId, productId, productImages}) {
-        try {
-            return await apiRequest.patch(url(userId), {productId, productImages})
         } catch (e) {
             //ToDo: notify error here
         }
@@ -69,4 +58,4 @@ const products = {
     },
 }
 
-export default products;
+export default stores;

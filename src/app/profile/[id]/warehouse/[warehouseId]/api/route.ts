@@ -1,18 +1,22 @@
 import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
-// Get all owner's user workers
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+// Get all depots in warehouse
+export async function GET(request: Request, { params }: { params: { id: string, warehouseId: string } }) {
     const ownerId = params.id
+    const warehouseId = params.warehouseId
 
-    if (ownerId) {
-        const users = await prisma.users.findMany(
+    if (ownerId && warehouseId) {
+        const warehouseDepots = await prisma.warehouses.findFirst(
             {
-                where: {work_for_user_id: parseInt(ownerId)}, include: {roles: true}
+                where: {id: parseInt(warehouseId)},
+                include: {
+                    depots: {include: {products: {include: {departments: true, characteristics: true, images: true}}}}
+                }
             }
         )
 
-        return NextResponse.json(users)
+        return NextResponse.json(warehouseDepots)
     }
 
     return new Response('La acción de obtener los usuarios ha fallado', {status: 500})
@@ -39,7 +43,7 @@ export async function DELETE(req, res) {
     const userId = searchParams.get("userId")
 
     if (userId) {
-        const updatedUser = await prisma.users.update({data: {work_for_user_id: null, role_id: null}, where: {id: parseInt(userId)}})
+        const updatedUser = await prisma.users.update({data: {work_for_user_id: null}, where: {id: parseInt(userId)}})
 
         return NextResponse.json(updatedUser)
     }
