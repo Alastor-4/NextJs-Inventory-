@@ -7,11 +7,11 @@ export async function GET(request: Request, { params }: { params: { id: string, 
     const warehouseId = params.warehouseId
 
     if (ownerId && warehouseId) {
-        const warehouseDepots = await prisma.warehouses.findFirst(
+        const warehouseDepots = await prisma.depots.findMany(
             {
-                where: {id: parseInt(warehouseId)},
+                where: {warehouse_id: parseInt(warehouseId)},
                 include: {
-                    depots: {include: {products: {include: {departments: true, characteristics: true, images: true}}}}
+                    products: {include: {departments: true, characteristics: true, images: true}}
                 }
             }
         )

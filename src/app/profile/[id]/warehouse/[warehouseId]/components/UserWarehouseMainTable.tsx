@@ -24,11 +24,12 @@ import {useParams, useRouter} from "next/navigation";
 import products from "@/app/profile/[id]/product/requests/products";
 import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
 import users from "@/app/user/requests/users";
+import dayjs from "dayjs";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function UserWarehouseMainTable(props) {
-    const { ownerId, warehouseId } = props
+    const { ownerId, warehouseDetails } = props
 
     const [data, setData] = React.useState(null)
 
@@ -40,8 +41,8 @@ export default function UserWarehouseMainTable(props) {
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${ownerId}/warehouse/${warehouseId}/api`).then((data) => setData(data))
-    }, [ownerId, warehouseId])
+        fetcher(`/profile/${ownerId}/warehouse/${warehouseDetails.id}/api`).then((data) => setData(data))
+    }, [ownerId, warehouseDetails])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -134,8 +135,13 @@ export default function UserWarehouseMainTable(props) {
                 align: "left"
             },
             {
-                id: "description",
-                label: "Descripción",
+                id: "units",
+                label: "Unidades",
+                align: "left"
+            },
+            {
+                id: "created_at",
+                label: "Creación",
                 align: "left"
             },
         ]
@@ -183,9 +189,19 @@ export default function UserWarehouseMainTable(props) {
                         </TableCell>
                         <TableCell>
                             {row.products.name}
+                            {
+                                row.products.description && (
+                                    <small>
+                                        {` ${row.products.description}`}
+                                    </small>
+                                )
+                            }
                         </TableCell>
                         <TableCell>
-                            {row.products.description ?? "-"}
+                            {row.product_total_units ?? "-"} de {row.product_total_remaining_units ?? "-"}
+                        </TableCell>
+                        <TableCell>
+                            {dayjs(row.created_at).format("DD/MM/YYYY HH:MM")}
                         </TableCell>
                     </TableRow>
                 ))}
