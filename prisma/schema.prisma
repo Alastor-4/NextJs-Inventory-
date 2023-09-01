@@ -46,10 +46,11 @@ model depots {
   product_total_remaining_units Int?
   created_at                    DateTime       @default(now()) @db.Timestamp(0)
   warehouses                    warehouses?    @relation(fields: [warehouse_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "depots_ibfk_1")
-  products                      products?      @relation(fields: [warehouse_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "depots_ibfk_2")
+  products                      products?      @relation(fields: [product_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "depots_ibfk_2")
   store_depots                  store_depots[]
 
   @@index([warehouse_id], map: "warehouse_id")
+  @@index([product_id], map: "product_id")
 }
 
 model products {
