@@ -1,9 +1,10 @@
-import RolesMainTable from "@/app/role/components/RolesMainTable";
+import StoresMainTable from "./components/StoresMainTable"
+
 
 export default function Page() {
     return (
         <main>
-            <RolesMainTable/>
+            <StoresMainTable/>
         </main>
     )
 }

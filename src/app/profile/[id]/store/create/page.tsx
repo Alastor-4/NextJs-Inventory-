@@ -1,9 +1,10 @@
-import RolesForm from "@/app/role/components/RolesForm";
+import StoresForm from "@/app/profile/[id]/store/components/StoresForm";
 
-export default function Page() {
+export default async function Page({params}) {
+    const userId = params.id
     return (
         <main>
-            <RolesForm/>
+            <StoresForm userId={userId}/>
         </main>
     )
 }

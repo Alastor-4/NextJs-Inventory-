@@ -7,7 +7,7 @@ export async function GET(req, res) {
     const storeId = searchParams.get("storeId")
 
     if (storeId) {
-        const store = await prisma.roles.findUnique({where: {id: parseInt(storeId)}})
+        const store = await prisma.stores.findUnique({where: {id: parseInt(storeId)}})
 
         return NextResponse.json(store)
     }

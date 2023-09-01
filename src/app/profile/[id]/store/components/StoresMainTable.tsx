@@ -17,17 +17,18 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import {TableNoData} from "@/components/TableNoData";
-import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-material";
+import { TableNoData } from "@/components/TableNoData";
+import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import roles from "@/app/role/requests/roles"
-import Link from "next/link";
-import {useRouter} from "next/navigation";
+import stores from "@/app/profile/[id]/store/requests/stores";
+import { useParams, useRouter } from "next/navigation";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function StoresMainTable() {
     const [data, setData] = React.useState(null)
 
+    const params = useParams()
     const router = useRouter()
 
     //ToDo: use global isLoading
@@ -35,11 +36,12 @@ export default function StoresMainTable() {
 
     //get initial data
     React.useEffect(() => {
-        fetcher("/role/api").then((data) => setData(data))
+        fetcher(`/profile/${params.id}/store/api`).then((data) => setData(data))
     }, [])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
+
     const handleSelectItem = (item) => {
         if (selected && (selected.id === item.id)) {
             setSelected(null)
@@ -49,27 +51,29 @@ export default function StoresMainTable() {
     }
 
     async function handleRemove() {
-        const response = await roles.delete(selected.id)
-        if (response) {
-            const updatedRoles = await roles.allRoles()
-            if (updatedRoles) setData(updatedRoles)
-        }
+
+        const response = await stores.delete(params.id, selected.id)
+        const updatedStores = await stores.allUserStores(params.id)
+        if (updatedStores) setData(updatedStores)
+        setSelected(null);
     }
 
     async function handleUpdate() {
-        await router.push(`/role/update/${selected.id}`)
+        await router.push(`/profile/${params.id}/store/update/${selected.id}`)
     }
-
+    async function handleCreate() {
+        await router.push(`/profile/${params.id}/store/create`)
+    }
     function handleNavigateBack() {
         router.back()
     }
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
-                <Box sx={{display: "flex", alignItems: "center"}}>
-                    <IconButton color={"inherit"} sx={{mr: "10px"}} onClick={handleNavigateBack}>
-                        <ArrowLeft fontSize={"large"}/>
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"} />
                     </IconButton>
                     <Typography
                         variant="h6"
@@ -80,38 +84,38 @@ export default function StoresMainTable() {
                             color: "white",
                         }}
                     >
-                        Listado de roles
+                        Listado de Tiendas
                     </Typography>
                 </Box>
 
-                <Box sx={{display: "flex"}}>
+                <Box sx={{ display: "flex" }}>
                     {
                         isLoading
-                            ? <CircularProgress size={24} color={"inherit"}/>
+                            ? <CircularProgress size={24} color={"inherit"} />
                             : (
                                 <>
                                     {
                                         selected && (
-                                            <Box sx={{display: "flex"}}>
+                                            <Box sx={{ display: "flex" }}>
                                                 <IconButton color={"inherit"} onClick={handleUpdate}>
-                                                    <EditOutlined fontSize={"small"}/>
+                                                    <EditOutlined fontSize={"small"} />
                                                 </IconButton>
 
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"}/>
+                                                    <DeleteOutline fontSize={"small"} />
                                                 </IconButton>
 
                                                 <Divider orientation="vertical" variant="middle" flexItem
-                                                         sx={{borderRight: "2px solid white", mx: "5px"}}/>
+                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
                                             </Box>
                                         )
                                     }
 
-                                    <Link href={"/role/create"}>
-                                        <IconButton color={"inherit"}>
-                                            <AddOutlined/>
-                                        </IconButton>
-                                    </Link>
+
+                                    <IconButton color={"inherit"} onClick={handleCreate} >
+                                        <AddOutlined />
+                                    </IconButton>
+
                                 </>
                             )
                     }
@@ -130,6 +134,16 @@ export default function StoresMainTable() {
             {
                 id: "description",
                 label: "Descripción",
+                align: "left"
+            },
+            {
+                id: "slogan",
+                label: "Slogan",
+                align: "left"
+            },
+            {
+                id: "address",
+                label: "Dirección",
                 align: "left"
             },
         ]
@@ -169,14 +183,25 @@ export default function StoresMainTable() {
                         onClick={() => handleSelectItem(row)}
                     >
                         <TableCell>
-                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
+                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
                         </TableCell>
+
                         <TableCell>
                             {row.name}
                         </TableCell>
+
                         <TableCell>
-                            {row.description}
+                            {(row.description !== '') ? row.description : '-'}
                         </TableCell>
+
+                        <TableCell>
+                            {(row.slogan !== '') ? row.slogan : '-'}
+                        </TableCell>
+
+                        <TableCell>
+                            {(row.address !== '') ? row.address : '-'}
+                        </TableCell>
+
                     </TableRow>
                 ))}
             </TableBody>
@@ -185,19 +210,19 @@ export default function StoresMainTable() {
 
     return (
         <Card variant={"outlined"}>
-            <CustomToolbar/>
+            <CustomToolbar />
 
             <CardContent>
                 {
                     data?.length > 0
                         ? (
-                            <Table sx={{width: "100%"}} size={"small"}>
-                                <TableHeader/>
+                            <Table sx={{ width: "100%" }} size={"small"}>
+                                <TableHeader />
 
-                                <TableContent/>
+                                <TableContent />
                             </Table>
                         ) : (
-                            <TableNoData/>
+                            <TableNoData />
                         )
                 }
             </CardContent>

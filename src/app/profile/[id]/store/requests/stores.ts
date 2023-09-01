@@ -1,7 +1,7 @@
 import apiRequest from "@/api"
 
-const url = (userId) => `/profile/${userId}/product/api`
-const updateUrl = (userId) => `/profile/${userId}/product/update/api`
+const url = (userId) => `/profile/${userId}/store/api`
+const updateUrl = (userId) => `/profile/${userId}/store/update/api`
 
 const stores = {
     allUserStores: async function (userId) {
@@ -46,9 +46,9 @@ const stores = {
         return false
     },
 
-    delete: async function (userId, productId) {
+    delete: async function (userId, storeId) {
         try {
-            const response = await apiRequest.delete(url(userId), {params: {productId: productId}})
+            const response = await apiRequest.delete(url(userId), {params: {storeId: storeId}})
             if (response.status === 200) return true
         } catch (e) {
             //ToDo: notify error here
