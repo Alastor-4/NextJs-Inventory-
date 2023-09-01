@@ -20,14 +20,15 @@ import {
 import {TableNoData} from "@/components/TableNoData";
 import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-material";
 import roles from "@/app/role/requests/roles"
-import Link from "next/link";
-import {useRouter} from "next/navigation";
+import stores from "@/app/profile/[id]/store/requests/stores";
+import {useParams, useRouter} from "next/navigation";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function StoresMainTable() {
     const [data, setData] = React.useState(null)
-
+    
+    const params = useParams()
     const router = useRouter()
 
     //ToDo: use global isLoading
@@ -35,7 +36,7 @@ export default function StoresMainTable() {
 
     //get initial data
     React.useEffect(() => {
-        fetcher("/role/api").then((data) => setData(data))
+        fetcher(`/profile/${params.id}/store/api`).then((data) => setData(data))
     }, [])
 
     //table selected item
@@ -49,17 +50,19 @@ export default function StoresMainTable() {
     }
 
     async function handleRemove() {
-        const response = await roles.delete(selected.id)
-        if (response) {
-            const updatedRoles = await roles.allRoles()
-            if (updatedRoles) setData(updatedRoles)
-        }
+       
+        const response = await stores.delete(params.id, selected.id)
+            const updatedStores = await stores.allUserStores(params.id)
+            if (updatedStores) setData(updatedStores)
+        
     }
 
     async function handleUpdate() {
-        await router.push(`/role/update/${selected.id}`)
+        await router.push(`/profile/${params.id}/store/update/${selected.id}`)
     }
-
+    async function handleCreate() {
+      await router.push(`/profile/${params.id}/store/create`)  
+    }
     function handleNavigateBack() {
         router.back()
     }
@@ -80,7 +83,7 @@ export default function StoresMainTable() {
                             color: "white",
                         }}
                     >
-                        Listado de roles
+                        Listado de Tiendas
                     </Typography>
                 </Box>
 
@@ -107,11 +110,11 @@ export default function StoresMainTable() {
                                         )
                                     }
 
-                                    <Link href={"/role/create"}>
-                                        <IconButton color={"inherit"}>
+                                    
+                                        <IconButton color={"inherit"} onClick={handleCreate} >
                                             <AddOutlined/>
                                         </IconButton>
-                                    </Link>
+            
                                 </>
                             )
                     }
@@ -130,6 +133,16 @@ export default function StoresMainTable() {
             {
                 id: "description",
                 label: "Descripción",
+                align: "left"
+            },
+            {
+                id: "slogan",
+                label: "Slogan",
+                align: "left"
+            },
+            {
+                id: "address",
+                label: "Direccion",
                 align: "left"
             },
         ]
@@ -175,7 +188,13 @@ export default function StoresMainTable() {
                             {row.name}
                         </TableCell>
                         <TableCell>
-                            {row.description}
+                            {(row.description !=='')?row.description:'-' }
+                        </TableCell>
+                        <TableCell>
+                        {(row.slogan !=='')?row.slogan:'-'} 
+                        </TableCell>
+                        <TableCell>
+                        {(row.address !=='')?row.address:'-' }
                         </TableCell>
                     </TableRow>
                 ))}
