@@ -5,7 +5,7 @@ import {prisma} from "db";
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const userId = params.id
 
-    const stores = await prisma.stores.findMany({where: {owner_id: parseInt(userId)}})
+    const stores = await prisma.stores.findMany({where: {owner_id: parseInt(userId)}, include: {seller_user: true}})
 
     return NextResponse.json(stores)
 }

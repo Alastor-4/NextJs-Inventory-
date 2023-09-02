@@ -19,7 +19,6 @@ import {
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
-import roles from "@/app/role/requests/roles"
 import stores from "@/app/profile/[id]/store/requests/stores";
 import { useParams, useRouter } from "next/navigation";
 
@@ -51,18 +50,17 @@ export default function StoresMainTable() {
     }
 
     async function handleRemove() {
-
         const response = await stores.delete(params.id, selected.id)
         const updatedStores = await stores.allUserStores(params.id)
         if (updatedStores) setData(updatedStores)
         setSelected(null);
     }
 
-    async function handleUpdate() {
-        await router.push(`/profile/${params.id}/store/update/${selected.id}`)
+    function handleUpdate() {
+        router.push(`/profile/${params.id}/store/update/${selected.id}`)
     }
-    async function handleCreate() {
-        await router.push(`/profile/${params.id}/store/create`)
+    function handleCreate() {
+        router.push(`/profile/${params.id}/store/create`)
     }
     function handleNavigateBack() {
         router.back()
@@ -144,6 +142,11 @@ export default function StoresMainTable() {
             {
                 id: "address",
                 label: "Dirección",
+                align: "left"
+            },
+            {
+                id: "seller",
+                label: "Vendedor(a)",
                 align: "left"
             },
         ]

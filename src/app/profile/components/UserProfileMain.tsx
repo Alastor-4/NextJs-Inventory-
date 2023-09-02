@@ -15,6 +15,7 @@ import {
     Typography
 } from "@mui/material";
 import {
+    ArrowCircleRight, ArrowCircleRightOutlined,
     ArrowLeft, ChevronRightOutlined,
 } from "@mui/icons-material";
 import {useRouter} from "next/navigation";
@@ -75,9 +76,9 @@ export default function UserProfileMain(props) {
 
             <CardContent>
                 <Grid container>
-                    {userDetails.warehouses.map(item => (
+                    {userDetails.warehouses.map((item: any, index: number) => (
                         <Link href={`/profile/${userDetails.id}/warehouse/${item.id}`} key={item.id}>
-                            <Grid container rowSpacing={2} item xs={12}>
+                            <Grid container columnSpacing={2} item xs={12} sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
                                 <Grid container item xs={"auto"} alignItems={"center"}>
                                     <ChevronRightOutlined fontSize={"small"}/>
                                 </Grid>
@@ -87,6 +88,17 @@ export default function UserProfileMain(props) {
                             </Grid>
                         </Link>
                     ))}
+
+                    <Link href={"#"}>
+                        <Grid container columnSpacing={1} item xs={12} sx={{mt: "15px"}}>
+                            <Grid container item xs={"auto"} alignItems={"center"}>
+                                <ArrowCircleRightOutlined fontSize={"small"}/>
+                            </Grid>
+                            <Grid item xs={true}>
+                                Mis almacenes
+                            </Grid>
+                        </Grid>
+                    </Link>
                 </Grid>
             </CardContent>
         </Card>
@@ -98,9 +110,9 @@ export default function UserProfileMain(props) {
 
             <CardContent>
                 <Grid container>
-                    {userDetails.stores.map(item => (
-                        <Link href={`/profile/store/${item.id}`} key={item.id}>
-                            <Grid container rowSpacing={2} item xs={12}>
+                    {userDetails.user_owner_stores.map((item, index) => (
+                        <Link href={`/profile/${userDetails.id}/store-details/${item.id}`} key={item.id}>
+                            <Grid container columnSpacing={1} item xs={12} sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
                                 <Grid container item xs={"auto"} alignItems={"center"}>
                                     <ChevronRightOutlined fontSize={"small"}/>
                                 </Grid>
@@ -110,6 +122,17 @@ export default function UserProfileMain(props) {
                             </Grid>
                         </Link>
                     ))}
+
+                    <Link href={`/profile/${userDetails.id}/store`}>
+                        <Grid container columnSpacing={1} item xs={12} sx={{mt: "15px"}}>
+                            <Grid container item xs={"auto"} alignItems={"center"}>
+                                <ArrowCircleRightOutlined fontSize={"small"}/>
+                            </Grid>
+                            <Grid item xs={true}>
+                                Mis tiendas
+                            </Grid>
+                        </Grid>
+                    </Link>
                 </Grid>
             </CardContent>
         </Card>
