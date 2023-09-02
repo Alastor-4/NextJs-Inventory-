@@ -1,27 +1,33 @@
 "use client"
 
-import { AppBar, Box, Button, Card, Grid, TextField, Toolbar, Typography } from "@mui/material";
+import {AppBar, Box, Button, Card, Grid, MenuItem, TextField, Toolbar, Typography} from "@mui/material";
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup"
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import stores from "@/app/profile/[id]/store/requests/stores";
 
 export default function StoresForm(props) {
-    const [updateItem, setUpdateItem] = React.useState()
-    const { userId, storeId } = props;
-    const params = useParams()
+    const { userId, storeId, sellerUsers } = props
+
     const router = useRouter()
+
+    const [updateItem, setUpdateItem] = React.useState()
+    const [userSeller, setUserSeller] = React.useState("")
 
     React.useEffect(() => {
         async function fetchStore(id) {
             const store = await stores.storeDetails(userId, id)
             setUpdateItem(store)
+            if (store.seller_user) {
+                const index = sellerUsers.findIndex(item => item.id === store.seller_user.id)
+                setUserSeller(index > -1 ? sellerUsers[index] : "")
+            }
         }
         if (storeId !== undefined) {
             fetchStore(storeId)
         }
-    }, [])
+    }, [sellerUsers, storeId, userId])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -48,6 +54,7 @@ export default function StoresForm(props) {
         description: updateItem ? updateItem.description : "",
         slogan: updateItem ? updateItem.slogan : "",
         address: updateItem ? updateItem.address : "",
+        sellerUser: userSeller,
     }
 
     const validationSchema = Yup.object({
@@ -55,6 +62,7 @@ export default function StoresForm(props) {
         description: Yup.string(),
         slogan: Yup.string(),
         address: Yup.string(),
+        sellerUser: Yup.object(),
     })
 
     const handleSubmit = async (values) => {
@@ -65,7 +73,7 @@ export default function StoresForm(props) {
             description: values.description,
             slogan: values.slogan,
             address: values.address,
-            sellerUserId: null
+            sellerUserId: values.sellerUser?.id ?? null
         }
 
         let response
@@ -73,11 +81,11 @@ export default function StoresForm(props) {
         if (updateItem) {
             response = await stores.update(userId, data)
         } else {
-
             response = await stores.create(userId, data)
         }
+
         if (response.status === 200) {
-            router.push(`/profile/${params.id}/store`)
+            router.push(`/profile/${userId}/store`)
         } else {
             //ToDo: catch validation errors
         }
@@ -149,6 +157,25 @@ export default function StoresForm(props) {
                             />
                         </Grid>
 
+                        <Grid item xs={12}>
+                            <TextField
+                                name={"Seller"}
+                                label="Vendedor(a)"
+                                size={"small"}
+                                fullWidth
+                                select
+                                {...formik.getFieldProps("sellerUser")}
+                                error={formik.errors.sellerUser && formik.touched.sellerUser}
+                                helperText={(formik.errors.sellerUser && formik.touched.sellerUser) && formik.errors.sellerUser}
+                            >
+                                <MenuItem value={""}>Ninguno</MenuItem>
+                                {
+                                    sellerUsers.map(item => (
+                                        <MenuItem key={item.id} value={item}>{`${item.name} (${item.username})`}</MenuItem>
+                                    ))
+                                }
+                            </TextField>
+                        </Grid>
                     </Grid>
 
                     <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>

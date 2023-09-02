@@ -15,12 +15,14 @@ import {
     Typography
 } from "@mui/material";
 import {
+    ArrowCircleRight, ArrowCircleRightOutlined,
     ArrowLeft, ChevronRightOutlined,
 } from "@mui/icons-material";
 import {useRouter} from "next/navigation";
  import userProfileStyles from "@/assets/styles/userProfileStyles"
 import Link from "next/link";
 import dayjs from "dayjs";
+import {width} from "@mui/system";
 
 export default function UserProfileMain(props) {
    const {userDetails, userProductsCount, workForUsersCount} = props
@@ -75,18 +77,33 @@ export default function UserProfileMain(props) {
 
             <CardContent>
                 <Grid container>
-                    {userDetails.warehouses.map(item => (
-                        <Link href={`/profile/${userDetails.id}/warehouse/${item.id}`} key={item.id}>
-                            <Grid container rowSpacing={2} item xs={12}>
+                    {userDetails.warehouses.map((item: any, index: number) => (
+                        <Grid container key={item.id}>
+                            <Link href={`/profile/${userDetails.id}/warehouse/${item.id}`} key={item.id}>
+                                <Grid container columnSpacing={2} item xs={12} sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
+                                    <Grid container item xs={"auto"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {item.name}
+                                    </Grid>
+                                </Grid>
+                            </Link>
+                        </Grid>
+                    ))}
+
+                    <Grid container>
+                        <Link href={"#"}>
+                            <Grid container columnSpacing={1} item xs={12} sx={{mt: "15px"}}>
                                 <Grid container item xs={"auto"} alignItems={"center"}>
-                                    <ChevronRightOutlined fontSize={"small"}/>
+                                    <ArrowCircleRightOutlined fontSize={"small"}/>
                                 </Grid>
                                 <Grid item xs={true}>
-                                    {item.name}
+                                    Mis almacenes
                                 </Grid>
                             </Grid>
                         </Link>
-                    ))}
+                    </Grid>
                 </Grid>
             </CardContent>
         </Card>
@@ -98,18 +115,33 @@ export default function UserProfileMain(props) {
 
             <CardContent>
                 <Grid container>
-                    {userDetails.stores.map(item => (
-                        <Link href={`/profile/store/${item.id}`} key={item.id}>
-                            <Grid container rowSpacing={2} item xs={12}>
+                    {userDetails.user_owner_stores.map((item, index) => (
+                        <Grid container key={item.id}>
+                            <Link href={`/profile/${userDetails.id}/store-details/${item.id}`} >
+                                <Grid container columnSpacing={1} item sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
+                                    <Grid container item xs={"auto"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {item.name}
+                                    </Grid>
+                                </Grid>
+                            </Link>
+                        </Grid>
+                    ))}
+
+                    <Grid container>
+                        <Link href={`/profile/${userDetails.id}/store`}>
+                            <Grid container columnSpacing={1} item xs={12} sx={{mt: "15px"}}>
                                 <Grid container item xs={"auto"} alignItems={"center"}>
-                                    <ChevronRightOutlined fontSize={"small"}/>
+                                    <ArrowCircleRightOutlined fontSize={"small"}/>
                                 </Grid>
                                 <Grid item xs={true}>
-                                    {item.name}
+                                    Mis tiendas
                                 </Grid>
                             </Grid>
                         </Link>
-                    ))}
+                    </Grid>
                 </Grid>
             </CardContent>
         </Card>

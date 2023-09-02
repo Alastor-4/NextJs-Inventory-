@@ -21,9 +21,9 @@ model characteristics {
 model images {
   id         Int       @id @default(autoincrement())
   product_id Int?
-  fileKey       String?   @db.VarChar(255)
-  fileUrl       String?   @db.VarChar(255)
   created_at DateTime  @default(now()) @db.Timestamp(0)
+  fileKey    String?   @db.VarChar(255)
+  fileUrl    String?   @db.VarChar(255)
   products   products? @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "images_ibfk_1")
 
   @@index([product_id], map: "product_id")
@@ -63,8 +63,8 @@ model products {
   created_at      DateTime          @default(now()) @db.Timestamp(0)
   characteristics characteristics[]
   depots          depots[]
-  departments     departments?      @relation(fields: [department_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_ibfk_1")
   images          images[]
+  departments     departments?      @relation(fields: [department_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_ibfk_1")
 
   @@index([department_id], map: "department_id")
 }
@@ -129,25 +129,28 @@ model stores {
   seller_user_id Int?
   created_at     DateTime       @default(now()) @db.Timestamp(0)
   store_depots   store_depots[]
-  users          users?         @relation(fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "stores_ibfk_1")
+  seller_user    users?         @relation("seller_user", fields: [seller_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "stores_FK")
+  owner_user     users?         @relation("owner_user", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "stores_ibfk_1")
 
   @@index([owner_id], map: "owner_id")
+  @@index([seller_user_id], map: "stores_FK")
 }
 
 model users {
-  id               Int          @id @default(autoincrement())
-  username         String       @unique(map: "username") @db.VarChar(255)
-  role_id          Int?
-  name             String?      @db.VarChar(255)
-  mail             String       @unique(map: "mail") @db.VarChar(255)
-  phone            String?      @unique(map: "phone") @db.VarChar(255)
-  is_active        Boolean?     @default(true)
-  is_verified      Boolean?     @default(false)
-  work_for_user_id Int?
-  created_at       DateTime     @default(now()) @db.Timestamp(0)
-  stores           stores[]
-  roles            roles?       @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
-  warehouses       warehouses[]
+  id                 Int          @id @default(autoincrement())
+  username           String       @unique(map: "username") @db.VarChar(255)
+  role_id            Int?
+  name               String?      @db.VarChar(255)
+  mail               String       @unique(map: "mail") @db.VarChar(255)
+  phone              String?      @unique(map: "phone") @db.VarChar(255)
+  is_active          Boolean?     @default(true)
+  is_verified        Boolean?     @default(false)
+  work_for_user_id   Int?
+  created_at         DateTime     @default(now()) @db.Timestamp(0)
+  user_seller_stores stores[]     @relation("seller_user")
+  user_owner_stores  stores[]     @relation("owner_user")
+  roles              roles?       @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
+  warehouses         warehouses[]
 
   @@index([role_id], map: "role_id")
 }
