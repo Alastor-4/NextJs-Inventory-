@@ -205,6 +205,9 @@ export default function StoresMainTable() {
                             {(row.address !== '') ? row.address : '-'}
                         </TableCell>
 
+                        <TableCell>
+                            {row.seller_user ? `${row.seller_user.name} (${row.seller_user.username})` : "-"}
+                        </TableCell>
                     </TableRow>
                 ))}
             </TableBody>
