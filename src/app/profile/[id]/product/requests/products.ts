@@ -2,12 +2,24 @@ import apiRequest from "@/api"
 import {headers} from "next/headers";
 
 const url = (userId) => `/profile/${userId}/product/api`
+const departmentsUrl = (userId) => `/profile/${userId}/product/api2`
 const updateUrl = (userId) => `/profile/${userId}/product/update/api`
 
 const products = {
-    allUserProducts: async function (userId) {
+    allUserProducts: async function (userId, departmentIds) {
         try {
-            const response = await apiRequest.get(url(userId))
+            const response = await apiRequest.get(url(userId), {params: {departmentIds: departmentIds}})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    allUserProductDepartments: async function (userId) {
+        try {
+            const response = await apiRequest.get(departmentsUrl(userId))
             return response.data
         } catch (e) {
             //ToDo: notify error here

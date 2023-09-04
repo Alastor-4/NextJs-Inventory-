@@ -3,7 +3,7 @@
 import React from "react";
 import {
     AppBar,
-    Box,
+    Box, Button,
     Card,
     CardContent,
     Checkbox, CircularProgress,
@@ -31,12 +31,18 @@ export default function ProductsMainTable() {
     const params = useParams()
     const router = useRouter()
 
+    const [departmentsFilter, setDepartmentsFilter] = React.useState([])
+
     //ToDo: use global isLoading
     const isLoading = false
 
     //get initial data
     React.useEffect(() => {
         fetcher(`/profile/${params.id}/product/api`).then((data) => setData(data))
+        fetcher(`/profile/${params.id}/product/api2`).then((data) => setDepartmentsFilter(data.map(item => ({
+            ...item,
+            selected: false
+        }))))
     }, [params.id])
 
     //table selected item
@@ -53,8 +59,21 @@ export default function ProductsMainTable() {
         const response = await products.delete(params.id, selected.id)
         if (response) {
             //ToDo: remove product images from uploadthing
-            const updatedWarehouses = await products.allUserProducts(params.id)
-            if (updatedWarehouses) setData(updatedWarehouses)
+            setSelected(null)
+
+            const filters = departmentsFilter.filter(item => item.selected).map(item => item.id)
+            const updatedProducts = await products.allUserProducts(params.id, filters.join(","))
+            if (updatedProducts) {
+                setData(updatedProducts)
+
+                const newDepartments = await products.allUserProductDepartments(params.id)
+                if (newDepartments)
+                    setDepartmentsFilter(
+                        newDepartments.map(
+                            (item: { id: any; }) => ({...item, selected: filters.includes(item.id)})
+                        )
+                    )
+            }
         }
     }
 
@@ -125,11 +144,6 @@ export default function ProductsMainTable() {
     const TableHeader = () => {
         const headCells = [
             {
-                id: "department",
-                label: "Departamento",
-                align: "left"
-            },
-            {
                 id: "name",
                 label: "Nombre",
                 align: "left"
@@ -140,8 +154,8 @@ export default function ProductsMainTable() {
                 align: "left"
             },
             {
-                id: "buy_price",
-                label: "Precio de compra",
+                id: "department",
+                label: "Departamento",
                 align: "left"
             },
             {
@@ -195,41 +209,38 @@ export default function ProductsMainTable() {
                             <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
                         </TableCell>
                         <TableCell>
-                            {row?.departments?.name ?? "-"}
-                        </TableCell>
-                        <TableCell>
                             {row.name}
                         </TableCell>
                         <TableCell>
                             {row.description ?? "-"}
                         </TableCell>
                         <TableCell>
-                            {row.buy_price ?? "-"}
+                            {row?.departments?.name ?? "-"}
                         </TableCell>
                         <TableCell>
                             {row.characteristics.length > 0
                                 ? row.characteristics.map(item => (
-                                    <Grid
-                                        key={item.id}
-                                        sx={{
-                                            display: "inline-flex",
-                                            margin: "3px",
-                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                            padding: "2px 4px",
-                                            borderRadius: "5px 2px 2px 2px",
-                                            border: "1px solid rgba(130, 130, 130)",
-                                            fontSize: 14,
-                                        }}
-                                    >
-                                        <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
-                                            <Typography variant={"caption"} sx={{ color: "white", fontWeight: "600" }}>
-                                                {item.name.toUpperCase()}
-                                            </Typography>
+                                        <Grid
+                                            key={item.id}
+                                            sx={{
+                                                display: "inline-flex",
+                                                margin: "3px",
+                                                backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                padding: "2px 4px",
+                                                borderRadius: "5px 2px 2px 2px",
+                                                border: "1px solid rgba(130, 130, 130)",
+                                                fontSize: 14,
+                                            }}
+                                        >
+                                            <Grid container item alignItems={"center"} sx={{marginRight: "3px"}}>
+                                                <Typography variant={"caption"} sx={{color: "white", fontWeight: "600"}}>
+                                                    {item.name.toUpperCase()}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid container item alignItems={"center"} sx={{color: "rgba(16,27,44,0.8)"}}>
+                                                {item.value}
+                                            </Grid>
                                         </Grid>
-                                        <Grid container item alignItems={"center"} sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                            {item.value}
-                                        </Grid>
-                                    </Grid>
                                     )
                                 ) : "-"
                             }
@@ -237,7 +248,7 @@ export default function ProductsMainTable() {
                         <TableCell>
                             {
                                 row.images.length > 0
-                                    ?  `${row.images.length} imagen(es)` : "-"
+                                    ? `${row.images.length} imagen(es)` : "-"
                             }
                         </TableCell>
                     </TableRow>
@@ -245,6 +256,50 @@ export default function ProductsMainTable() {
             </TableBody>
         )
     }
+
+    async function applyFilters() {
+        const filters = departmentsFilter.filter(item => item.selected).map(item => item.id).join(",")
+        const newProducts = await products.allUserProducts(params.id, filters)
+        if (newProducts) {
+            setData(newProducts)
+            setSelected(null)
+        }
+    }
+
+    async function handleSelectFilter(index: number) {
+        let filters = [...departmentsFilter]
+        filters[index].selected = !filters[index].selected
+
+        setDepartmentsFilter(filters)
+
+        await applyFilters()
+    }
+
+    const DepartmentsFilter = () => (
+        <Card variant={"outlined"} sx={{padding: "15px"}}>
+            <Grid container columnSpacing={2}>
+                {
+                    departmentsFilter.map((item, index) => (
+                        <Grid key={item.id} item xs={"auto"}>
+                            <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
+                                <Grid container>
+                                    <Grid item xs={12}>
+                                        {item.name}
+                                    </Grid>
+                                    <Grid container item xs={12} justifyContent={"center"}>
+                                        <Typography variant={"caption"}>
+                                            {item.products.length} productos
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+
+                            </Button>
+                        </Grid>
+                    ))
+                }
+            </Grid>
+        </Card>
+    )
 
     return (
         <Card variant={"outlined"}>
@@ -254,11 +309,15 @@ export default function ProductsMainTable() {
                 {
                     data?.length > 0
                         ? (
-                            <Table sx={{width: "100%"}} size={"small"}>
-                                <TableHeader/>
+                            <>
+                                <DepartmentsFilter/>
 
-                                <TableContent/>
-                            </Table>
+                                <Table sx={{width: "100%"}} size={"small"}>
+                                    <TableHeader/>
+
+                                    <TableContent/>
+                                </Table>
+                            </>
                         ) : (
                             <TableNoData/>
                         )

@@ -1,13 +1,29 @@
-import { NextResponse, NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import {prisma} from "db";
 import { utapi } from 'uploadthing/server';
 
 // Get all user products
 export async function GET(request: Request, { params }: { params: { id: string } }) {
+    const {searchParams} = new URL(request.url)
+
     const userId = params.id
 
-    const products = await prisma.products.findMany({where: {owner_id: parseInt(userId)}, include: {departments: true, characteristics: true, images: true}})
+    let filterCondition = {owner_id: parseInt(userId)}
 
+    const departmentIds = searchParams.get("departmentIds")
+
+    if (departmentIds) {
+        const idList = departmentIds.split(",").map(item => parseInt(item))
+
+        filterCondition.departments = {id: {in: idList}}
+    }
+
+    const products = await prisma.products.findMany(
+        {
+            where: filterCondition,
+            include: {departments: true, characteristics: true, images: true}
+        }
+    )
     return NextResponse.json(products)
 }
 
