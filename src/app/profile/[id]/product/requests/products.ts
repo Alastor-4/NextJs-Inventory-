@@ -5,7 +5,18 @@ const url = (userId) => `/profile/${userId}/product/api`
 const updateUrl = (userId) => `/profile/${userId}/product/update/api`
 
 const products = {
-    allUserProducts: async function (userId) {
+    allUserProducts: async function (userId, departmentIds) {
+        try {
+            const response = await apiRequest.get(url(userId), {params: {departmentIds: departmentIds}})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    allUserProductDepartments: async function (userId) {
         try {
             const response = await apiRequest.get(url(userId))
             return response.data

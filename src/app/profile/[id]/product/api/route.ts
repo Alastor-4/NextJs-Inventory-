@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import {prisma} from "db";
 import { utapi } from 'uploadthing/server';
 
@@ -6,9 +6,18 @@ import { utapi } from 'uploadthing/server';
 export async function GET(request: Request, { params }: { params: { id: string } }) {
     const userId = params.id
 
-    const products = await prisma.products.findMany({where: {owner_id: parseInt(userId)}, include: {departments: true, characteristics: true, images: true}})
+    const departments = await prisma.departments.findMany(
+        {
+            where: {
+                products: {some: {owner_id: parseInt(userId)}}
+            },
+            include: {
+                products: {include: {departments: true, characteristics: true, images: true}}
+            }
+        }
+    )
 
-    return NextResponse.json(products)
+    return NextResponse.json(departments)
 }
 
 // Create new user product
