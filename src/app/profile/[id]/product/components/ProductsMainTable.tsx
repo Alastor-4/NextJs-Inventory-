@@ -13,7 +13,7 @@ import {
     TableBody,
     TableCell,
     TableHead,
-    TableRow,
+    TableRow, TextField,
     Toolbar,
     Typography
 } from "@mui/material";
@@ -30,8 +30,9 @@ export default function ProductsMainTable() {
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
-    const [departmentsFilter, setDepartmentsFilter] = React.useState([])
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
+
+    const [searchBarValue, setSearchBarValue] = React.useState("")
 
     //ToDo: use global isLoading
     const isLoading = false
@@ -215,62 +216,68 @@ export default function ProductsMainTable() {
     const TableContent = () => {
         return (
             <TableBody>
-                {data.map(row => (
-                    <TableRow
-                        key={row.id}
-                        hover
-                        tabIndex={-1}
-                        selected={selected && (row.id === selected.id)}
-                        onClick={() => handleSelectItem(row)}
-                    >
-                        <TableCell>
-                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
-                        </TableCell>
-                        <TableCell>
-                            {row.name}
-                        </TableCell>
-                        <TableCell>
-                            {row.description ?? "-"}
-                        </TableCell>
-                        <TableCell>
-                            {row?.departments?.name ?? "-"}
-                        </TableCell>
-                        <TableCell>
-                            {row.characteristics.length > 0
-                                ? row.characteristics.map(item => (
-                                        <Grid
-                                            key={item.id}
-                                            sx={{
-                                                display: "inline-flex",
-                                                margin: "3px",
-                                                backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                padding: "2px 4px",
-                                                borderRadius: "5px 2px 2px 2px",
-                                                border: "1px solid rgba(130, 130, 130)",
-                                                fontSize: 14,
-                                            }}
-                                        >
-                                            <Grid container item alignItems={"center"} sx={{marginRight: "3px"}}>
-                                                <Typography variant={"caption"} sx={{color: "white", fontWeight: "600"}}>
-                                                    {item.name.toUpperCase()}
-                                                </Typography>
+                {data.filter(
+                    item =>
+                        item.name.toUpperCase().includes(searchBarValue.toUpperCase()) ||
+                        item.description.toUpperCase().includes(searchBarValue.toUpperCase())).map(
+                    row => (
+                        <TableRow
+                            key={row.id}
+                            hover
+                            tabIndex={-1}
+                            selected={selected && (row.id === selected.id)}
+                            onClick={() => handleSelectItem(row)}
+                        >
+                            <TableCell>
+                                <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
+                            </TableCell>
+                            <TableCell>
+                                {row.name}
+                            </TableCell>
+                            <TableCell>
+                                {row.description ?? "-"}
+                            </TableCell>
+                            <TableCell>
+                                {row?.departments?.name ?? "-"}
+                            </TableCell>
+                            <TableCell>
+                                {row.characteristics.length > 0
+                                    ? row.characteristics.map(item => (
+                                            <Grid
+                                                key={item.id}
+                                                sx={{
+                                                    display: "inline-flex",
+                                                    margin: "3px",
+                                                    backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                    padding: "2px 4px",
+                                                    borderRadius: "5px 2px 2px 2px",
+                                                    border: "1px solid rgba(130, 130, 130)",
+                                                    fontSize: 14,
+                                                }}
+                                            >
+                                                <Grid container item alignItems={"center"} sx={{marginRight: "3px"}}>
+                                                    <Typography variant={"caption"}
+                                                                sx={{color: "white", fontWeight: "600"}}>
+                                                        {item.name.toUpperCase()}
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid container item alignItems={"center"}
+                                                      sx={{color: "rgba(16,27,44,0.8)"}}>
+                                                    {item.value}
+                                                </Grid>
                                             </Grid>
-                                            <Grid container item alignItems={"center"} sx={{color: "rgba(16,27,44,0.8)"}}>
-                                                {item.value}
-                                            </Grid>
-                                        </Grid>
-                                    )
-                                ) : "-"
-                            }
-                        </TableCell>
-                        <TableCell>
-                            {
-                                row.images.length > 0
-                                    ? `${row.images.length} imagen(es)` : "-"
-                            }
-                        </TableCell>
-                    </TableRow>
-                ))}
+                                        )
+                                    ) : "-"
+                                }
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    row.images.length > 0
+                                        ? `${row.images.length} imagen(es)` : "-"
+                                }
+                            </TableCell>
+                        </TableRow>
+                    ))}
             </TableBody>
         )
     }
@@ -282,38 +289,79 @@ export default function ProductsMainTable() {
         setAllProductsByDepartment(filters)
     }
 
-    const DepartmentsFilter = () => (
-        <Card variant={"outlined"} sx={{padding: "15px"}}>
-            <Grid container columnSpacing={2}>
-                {
-                    allProductsByDepartment.map((item, index) => (
-                        <Grid key={item.id} item xs={"auto"}>
-                            <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
-                                <Grid container>
-                                    <Grid item xs={12}>
-                                        {item.name}
-                                    </Grid>
-                                    <Grid container item xs={12} justifyContent={"center"}>
-                                        <Typography variant={"caption"}>
-                                            {item.products.length} productos
-                                        </Typography>
-                                    </Grid>
-                                </Grid>
+    const DepartmentsFilter = ({searchBarValue, setSearchBarValue}) => {
+        function handleChangeSearchBarValue(e) {
+            setSearchBarValue(e.target.value)
+        }
 
-                            </Button>
-                        </Grid>
-                    ))
-                }
-            </Grid>
-        </Card>
-    )
+        return (
+            <Card variant={"outlined"} sx={{padding: "15px"}}>
+                <Grid container rowSpacing={2}>
+                    <Grid item>
+                        <Typography variant={"subtitle2"}>
+                            Seleccione departamentos para encontrar el producto que busca
+                        </Typography>
+                    </Grid>
+                    <Grid container item columnSpacing={2}>
+                        {
+                            allProductsByDepartment.map((item, index) => (
+                                <Grid key={item.id} item xs={"auto"}>
+                                    <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
+                                        <Grid container>
+                                            <Grid item xs={12}>
+                                                {item.name}
+                                            </Grid>
+                                            <Grid container item xs={12} justifyContent={"center"}>
+                                                <Typography variant={"caption"}>
+                                                    {item.products.length} productos
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                    </Button>
+                                </Grid>
+                            ))
+                        }
+                    </Grid>
+
+                    {
+                        data?.length > 0 && (
+                            <Grid container item rowSpacing={1}>
+                                <Grid item xs={12}>
+                                    <Typography variant={"subtitle2"}>
+                                        Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name={"handleChangeSearchBarValue"}
+                                        placeholder="Buscar producto..."
+                                        size={"small"}
+                                        fullWidth
+                                        autoFocus
+                                        value={searchBarValue}
+                                        onChange={handleChangeSearchBarValue}
+                                    />
+                                </Grid>
+                            </Grid>
+                        )
+                    }
+                </Grid>
+
+            </Card>
+        )
+    }
 
     return (
         <Card variant={"outlined"}>
             <CustomToolbar/>
 
             <CardContent>
-                <DepartmentsFilter/>
+                {
+                    allProductsByDepartment.length > 0 && (
+                        <DepartmentsFilter searchBarValue={searchBarValue} setSearchBarValue={setSearchBarValue}/>
+                    )
+                }
+
                 {
                     data?.length > 0
                         ? (
