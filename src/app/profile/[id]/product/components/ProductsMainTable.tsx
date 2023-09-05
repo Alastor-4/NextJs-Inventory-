@@ -22,6 +22,8 @@ import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-ma
 import Link from "next/link";
 import {useParams, useRouter} from "next/navigation";
 import products from "@/app/profile/[id]/product/requests/products";
+import * as Yup from "yup";
+import {Formik, useFormik} from "formik";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -31,8 +33,6 @@ export default function ProductsMainTable() {
 
     const [data, setData] = React.useState(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
-
-    const [searchBarValue, setSearchBarValue] = React.useState("")
 
     //ToDo: use global isLoading
     const isLoading = false
@@ -213,13 +213,13 @@ export default function ProductsMainTable() {
         )
     }
 
-    const TableContent = () => {
+    const TableContent = ({formik}) => {
         return (
             <TableBody>
                 {data.filter(
                     item =>
-                        item.name.toUpperCase().includes(searchBarValue.toUpperCase()) ||
-                        item.description.toUpperCase().includes(searchBarValue.toUpperCase())).map(
+                        item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                        item.description.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
                     row => (
                         <TableRow
                             key={row.id}
@@ -289,11 +289,7 @@ export default function ProductsMainTable() {
         setAllProductsByDepartment(filters)
     }
 
-    const DepartmentsFilter = ({searchBarValue, setSearchBarValue}) => {
-        function handleChangeSearchBarValue(e) {
-            setSearchBarValue(e.target.value)
-        }
-
+    const DepartmentsFilter = ({formik}) => {
         return (
             <Card variant={"outlined"} sx={{padding: "15px"}}>
                 <Grid container rowSpacing={2}>
@@ -337,9 +333,7 @@ export default function ProductsMainTable() {
                                         placeholder="Buscar producto..."
                                         size={"small"}
                                         fullWidth
-                                        autoFocus
-                                        value={searchBarValue}
-                                        onChange={handleChangeSearchBarValue}
+                                        {...formik.getFieldProps("searchBarValue")}
                                     />
                                 </Grid>
                             </Grid>
@@ -351,30 +345,45 @@ export default function ProductsMainTable() {
         )
     }
 
+    const initialValues = {
+        searchBarValue: ""
+    }
+
     return (
-        <Card variant={"outlined"}>
-            <CustomToolbar/>
+        <Formik
+            initialValues={initialValues}
+            onSubmit={() => {
 
-            <CardContent>
-                {
-                    allProductsByDepartment.length > 0 && (
-                        <DepartmentsFilter searchBarValue={searchBarValue} setSearchBarValue={setSearchBarValue}/>
-                    )
-                }
+            }}
+        >
+            {
+                (formik) => (
+                    <Card variant={"outlined"}>
+                        <CustomToolbar/>
 
-                {
-                    data?.length > 0
-                        ? (
-                            <Table sx={{width: "100%"}} size={"small"}>
-                                <TableHeader/>
+                        <CardContent>
+                            {
+                                allProductsByDepartment.length > 0 && (
+                                    <DepartmentsFilter formik={formik}/>
+                                )
+                            }
 
-                                <TableContent/>
-                            </Table>
-                        ) : (
-                            <TableNoData/>
-                        )
-                }
-            </CardContent>
-        </Card>
+                            {
+                                data?.length > 0
+                                    ? (
+                                        <Table sx={{width: "100%"}} size={"small"}>
+                                            <TableHeader/>
+
+                                            <TableContent formik={formik}/>
+                                        </Table>
+                                    ) : (
+                                        <TableNoData/>
+                                    )
+                            }
+                        </CardContent>
+                    </Card>
+                )
+            }
+        </Formik>
     )
 }
