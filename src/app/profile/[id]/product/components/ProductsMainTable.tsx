@@ -26,24 +26,48 @@ import products from "@/app/profile/[id]/product/requests/products";
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function ProductsMainTable() {
-    const [data, setData] = React.useState(null)
-
     const params = useParams()
     const router = useRouter()
 
+    const [data, setData] = React.useState(null)
     const [departmentsFilter, setDepartmentsFilter] = React.useState([])
+    const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
 
     //ToDo: use global isLoading
     const isLoading = false
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${params.id}/product/api`).then((data) => setData(data))
-        fetcher(`/profile/${params.id}/product/api2`).then((data) => setDepartmentsFilter(data.map(item => ({
+        fetcher(`/profile/${params.id}/product/api`).then((data) => setAllProductsByDepartment(data.map(item => ({
             ...item,
             selected: false
         }))))
     }, [params.id])
+
+    React.useEffect(() => {
+        if (allProductsByDepartment.length) {
+            let allProducts = []
+
+            allProductsByDepartment.forEach((departmentItem) => {
+                if (departmentItem.selected) {
+                    allProducts = [...allProducts, ...departmentItem.products]
+                }
+            })
+
+            allProducts.sort((a, b) => {
+                if (a.name < b.name)
+                    return -1
+
+                if (a.name > a.name)
+                    return 1
+
+                return 0
+            })
+
+            setData(allProducts)
+        }
+
+    }, [allProductsByDepartment])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -61,18 +85,12 @@ export default function ProductsMainTable() {
             //ToDo: remove product images from uploadthing
             setSelected(null)
 
-            const filters = departmentsFilter.filter(item => item.selected).map(item => item.id)
-            const updatedProducts = await products.allUserProducts(params.id, filters.join(","))
-            if (updatedProducts) {
-                setData(updatedProducts)
+            const selectedFilters = allProductsByDepartment.filter(item => item.selected).map(item => item.id)
 
-                const newDepartments = await products.allUserProductDepartments(params.id)
-                if (newDepartments)
-                    setDepartmentsFilter(
-                        newDepartments.map(
-                            (item: { id: any; }) => ({...item, selected: filters.includes(item.id)})
-                        )
-                    )
+            const updatedProducts = await products.allUserProductDepartments(params.id)
+
+            if (updatedProducts) {
+                setAllProductsByDepartment(updatedProducts.map(item => ({...item, selected: selectedFilters.includes(item.id)})))
             }
         }
     }
@@ -257,29 +275,18 @@ export default function ProductsMainTable() {
         )
     }
 
-    async function applyFilters() {
-        const filters = departmentsFilter.filter(item => item.selected).map(item => item.id).join(",")
-        const newProducts = await products.allUserProducts(params.id, filters)
-        if (newProducts) {
-            setData(newProducts)
-            setSelected(null)
-        }
-    }
-
     async function handleSelectFilter(index: number) {
-        let filters = [...departmentsFilter]
+        let filters = [...allProductsByDepartment]
         filters[index].selected = !filters[index].selected
 
-        setDepartmentsFilter(filters)
-
-        await applyFilters()
+        setAllProductsByDepartment(filters)
     }
 
     const DepartmentsFilter = () => (
         <Card variant={"outlined"} sx={{padding: "15px"}}>
             <Grid container columnSpacing={2}>
                 {
-                    departmentsFilter.map((item, index) => (
+                    allProductsByDepartment.map((item, index) => (
                         <Grid key={item.id} item xs={"auto"}>
                             <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
                                 <Grid container>
@@ -306,18 +313,15 @@ export default function ProductsMainTable() {
             <CustomToolbar/>
 
             <CardContent>
+                <DepartmentsFilter/>
                 {
                     data?.length > 0
                         ? (
-                            <>
-                                <DepartmentsFilter/>
+                            <Table sx={{width: "100%"}} size={"small"}>
+                                <TableHeader/>
 
-                                <Table sx={{width: "100%"}} size={"small"}>
-                                    <TableHeader/>
-
-                                    <TableContent/>
-                                </Table>
-                            </>
+                                <TableContent/>
+                            </Table>
                         ) : (
                             <TableNoData/>
                         )

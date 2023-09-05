@@ -4,27 +4,20 @@ import { utapi } from 'uploadthing/server';
 
 // Get all user products
 export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const {searchParams} = new URL(request.url)
-
     const userId = params.id
 
-    let filterCondition = {owner_id: parseInt(userId)}
-
-    const departmentIds = searchParams.get("departmentIds")
-
-    if (departmentIds) {
-        const idList = departmentIds.split(",").map(item => parseInt(item))
-
-        filterCondition.departments = {id: {in: idList}}
-    }
-
-    const products = await prisma.products.findMany(
+    const departments = await prisma.departments.findMany(
         {
-            where: filterCondition,
-            include: {departments: true, characteristics: true, images: true}
+            where: {
+                products: {some: {owner_id: parseInt(userId)}}
+            },
+            include: {
+                products: {include: {departments: true, characteristics: true, images: true}}
+            }
         }
     )
-    return NextResponse.json(products)
+
+    return NextResponse.json(departments)
 }
 
 // Create new user product
