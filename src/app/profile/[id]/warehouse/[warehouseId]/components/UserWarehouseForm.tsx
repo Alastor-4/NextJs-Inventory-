@@ -21,6 +21,7 @@ import roles from "@/app/role/requests/roles";
 import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
 import {Done, InfoOutlined} from "@mui/icons-material";
 import DepartmentProductsSelect from "@/components/DepartmentProductsSelect";
+import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
 
 export default function UserWarehouseForm({ownerId, warehouseId, departmentProducts}) {
     const router = useRouter()
@@ -54,16 +55,23 @@ export default function UserWarehouseForm({ownerId, warehouseId, departmentProdu
     }
 
     const validationSchema = Yup.object({
-        product: Yup.object().required("campo requerido"),
-        productTotalUnits: Yup.number().integer().required("campo requerido"),
+        product: Yup.object().required("seleccione un producto"),
+        productTotalUnits: Yup.number().integer().required("especifique cantidad"),
     })
 
     const handleSubmit = async (values) => {
-        let response = await ownerUsers.findNewUser(ownerId, values.username, values.phone)
+        let response = await warehouseDepots.createDepot(
+            {
+                warehouseId: warehouseId,
+                userId: ownerId,
+                productId: values.product.id,
+                productTotalUnits: values.productTotalUnits,
+                insertedById: ownerId,
+            }
+        )
 
         if (response?.status === 200) {
-            setFoundUserData(response.data)
-            setDisplaySearchResult(true)
+            router.push(`/profile/${ownerId}/warehouse/${warehouseId}`)
         } else {
             //ToDo: catch validation errors
         }
@@ -85,6 +93,17 @@ export default function UserWarehouseForm({ownerId, warehouseId, departmentProdu
 
                     <Grid container item rowSpacing={2} sx={{padding: "25px"}}>
                         <Grid item xs={12}>
+                            <TextField
+                                name={"productTotalUnits"}
+                                label="Cantidad de unidades"
+                                size={"small"}
+                                {...formik.getFieldProps("productTotalUnits")}
+                                error={formik.errors.productTotalUnits && formik.touched.productTotalUnits}
+                                helperText={(formik.errors.productTotalUnits && formik.touched.productTotalUnits) && formik.errors.productTotalUnits}
+                            />
+                        </Grid>
+
+                        <Grid item xs={12}>
                             <DepartmentProductsSelect
                                 departmentProductsList={departmentProductsList}
                                 setDepartmentProductsList={setDepartmentProductsList}
@@ -94,17 +113,6 @@ export default function UserWarehouseForm({ownerId, warehouseId, departmentProdu
                             <FormHelperText sx={{color: "red"}}>
                                 {formik.errors.product}
                             </FormHelperText>
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <TextField
-                                name={"productTotalUnits"}
-                                label="Cantidad de unidades"
-                                size={"small"}
-                                {...formik.getFieldProps("productTotalUnits")}
-                                error={formik.errors.productTotalUnits && formik.touched.productTotalUnits}
-                                helperText={(formik.errors.productTotalUnits && formik.touched.productTotalUnits) && formik.errors.productTotalUnits}
-                            />
                         </Grid>
                     </Grid>
 
