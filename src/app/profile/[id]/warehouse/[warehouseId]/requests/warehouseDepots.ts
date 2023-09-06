@@ -15,10 +15,9 @@ const warehouseDepots = {
         return false
     },
 
-    changeRol: async function (userId: any, workerId: any, roleId: any) {
+    createDepot: async function ({userId, productId, warehouseId, insertedById, productTotalUnits}) {
         try {
-            const response = await apiRequest.patch(url(userId), {roleId: roleId}, {params: {userId: workerId}})
-            return response.data
+            return await apiRequest.put(url(userId, warehouseId), {warehouseId, productId, insertedById, productTotalUnits})
         } catch (e) {
             //ToDo: notify error here
         }
@@ -26,30 +25,10 @@ const warehouseDepots = {
         return false
     },
 
-    deleteWorker: async function (userId: any) {
+    deleteDepot: async function (userId: string, warehouseId: string, depotId: string) {
         try {
-            const response = await apiRequest.delete(url(userId), {params: {userId: userId}})
+            const response = await apiRequest.delete(url(userId, warehouseId), {params: {depotId: depotId}})
             if (response.status === 200) return true
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
-
-    findNewUser: async function (userId: any, username: any, phone: any) {
-        try {
-            return await apiRequest.get(urlCreate(userId), {params: {username, phone}})
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
-
-    addNewUser: async function (ownerId: any, userId: any) {
-        try {
-            return await apiRequest.put(urlCreate(userId), {userId}, {params: {ownerId}})
         } catch (e) {
             //ToDo: notify error here
         }

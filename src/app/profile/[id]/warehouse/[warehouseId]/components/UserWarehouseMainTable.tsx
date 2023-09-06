@@ -25,6 +25,7 @@ import products from "@/app/profile/[id]/product/requests/products";
 import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
 import users from "@/app/user/requests/users";
 import dayjs from "dayjs";
+import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -33,7 +34,6 @@ export default function UserWarehouseMainTable(props) {
 
     const [data, setData] = React.useState(null)
 
-    const params = useParams()
     const router = useRouter()
 
     //ToDo: use global isLoading
@@ -55,15 +55,19 @@ export default function UserWarehouseMainTable(props) {
     }
 
     async function handleRemove() {
-        const response = await ownerUsers.deleteWorker(selected.id)
+        const response = await warehouseDepots.deleteDepot(ownerId, warehouseDetails.id, selected.id)
         if (response) {
-            const allUsers = await ownerUsers.allWorkers(params.id)
-            if (allUsers) setData(allUsers)
+            const allDepots = await warehouseDepots.allDepots(ownerId, warehouseDetails.id)
+            if (allDepots) setData(allDepots)
         }
     }
 
     function handleNavigateBack() {
         router.back()
+    }
+
+    async function handleUpdate() {
+        await router.push(`/profile/${ownerId}/warehouse/update/${selected.id}`)
     }
 
     const CustomToolbar = () => (
@@ -95,8 +99,8 @@ export default function UserWarehouseMainTable(props) {
                                     {
                                         selected && (
                                             <Box sx={{display: "flex"}}>
-                                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
-                                                    <ChangeCircleOutlined fontSize={"small"}/>
+                                                <IconButton color={"inherit"} onClick={handleUpdate}>
+                                                    <EditOutlined fontSize={"small"}/>
                                                 </IconButton>
 
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
@@ -109,7 +113,7 @@ export default function UserWarehouseMainTable(props) {
                                         )
                                     }
 
-                                    <Link href={`/profile/${params.id}/worker/create`}>
+                                    <Link href={`/profile/${ownerId}/warehouse/${warehouseDetails.id}/create`}>
                                         <IconButton color={"inherit"}>
                                             <AddOutlined/>
                                         </IconButton>
