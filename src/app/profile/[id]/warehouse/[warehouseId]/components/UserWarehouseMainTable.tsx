@@ -66,6 +66,10 @@ export default function UserWarehouseMainTable(props) {
         router.back()
     }
 
+    async function handleUpdate() {
+        await router.push(`/profile/${params.id}/warehouse/update/${selected.id}`)
+    }
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
@@ -95,8 +99,8 @@ export default function UserWarehouseMainTable(props) {
                                     {
                                         selected && (
                                             <Box sx={{display: "flex"}}>
-                                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
-                                                    <ChangeCircleOutlined fontSize={"small"}/>
+                                                <IconButton color={"inherit"} onClick={handleUpdate}>
+                                                    <EditOutlined fontSize={"small"}/>
                                                 </IconButton>
 
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
@@ -109,7 +113,7 @@ export default function UserWarehouseMainTable(props) {
                                         )
                                     }
 
-                                    <Link href={`/profile/${params.id}/worker/create`}>
+                                    <Link href={`/profile/${params.id}/warehouse/${params.warehouseId}/create`}>
                                         <IconButton color={"inherit"}>
                                             <AddOutlined/>
                                         </IconButton>
