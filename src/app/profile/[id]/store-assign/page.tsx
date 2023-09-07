@@ -1,9 +1,15 @@
-import StoresMainTable from "./components/StoresMainTable"
+import StoreDepotsAssign from "@/components/StoreDepotsAssign";
+import {prisma} from "db";
 
-export default function Page() {
+export default async function Page({params}) {
+    const ownerId = params.id
+    const ownerWarehouses = await prisma.warehouses.findMany({where: {owner_id: parseInt(ownerId)}})
+    const ownerStores = await prisma.stores.findMany({where: {owner_id: parseInt(ownerId)}})
+
     return (
         <main>
-            <StoresMainTable/>
+            <StoreDepotsAssign ownerId={ownerId} warehouseListProp={ownerWarehouses} selectedWarehouseIdProp={ownerWarehouses[0].id}
+                               storeListProp={ownerStores} selectedStoreIdProp={null}/>
         </main>
     )
 }

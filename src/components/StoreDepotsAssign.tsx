@@ -1,3 +1,5 @@
+"use client"
+
 import {
     Button,
     Card,
@@ -16,9 +18,10 @@ import React from "react";
 import {Formik} from "formik";
 import {TableNoData} from "@/components/TableNoData";
 import * as Yup from "yup";
+import storeAssign from "@/app/profile/[id]/store-assign/requests/store-assign";
 
 export default function StoreDepotsAssign(
-    {warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp}
+    {ownerId, warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp}
 ) {
     const [selectedWarehouse, setSelectedWarehouse] = React.useState("")
     const [selectedStore, setSelectedStore] = React.useState("")
@@ -26,7 +29,7 @@ export default function StoreDepotsAssign(
     //initial make selected a warehouse
     React.useEffect(() => {
         if (selectedWarehouseIdProp !== null) {
-            const index = warehouseListProp.find(item => item.id === selectedWarehouseIdProp)
+            const index = warehouseListProp.findIndex(item => item.id === selectedWarehouseIdProp)
             if (index > -1) {
                 setSelectedWarehouse(warehouseListProp[index])
             }
@@ -47,11 +50,15 @@ export default function StoreDepotsAssign(
 
     //load depots for every selected warehouse
     React.useEffect(() => {
-        if (selectedWarehouse) {
-            const depots = [] //ToDo: load departments with products including depots, from selected warehouse
+        async function fetchDepots() {
+            const depots = await storeAssign.allWarehouseDepotsByDepartments(ownerId, selectedWarehouse.id)
             setWarehouseDepotsByDepartmentOptions(depots.map(item => ({...item, selected: false})))
         }
-    }, [selectedWarehouse])
+
+        if (selectedWarehouse) {
+            fetchDepots()
+        }
+    }, [ownerId, selectedWarehouse])
 
     const [data, setData] = React.useState([])
 
@@ -283,15 +290,28 @@ export default function StoreDepotsAssign(
                                         }
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            )
+                        )
+                )}
             </TableBody>
         )
+    }
+
+    function loadWarehouseDepots(e) {
+        const warehouseId = e.target.value.id
+        //load warehouse depots
+    }
+
+    function loadStoreDepots(e) {
+        const storeId = e.target.value.id
+        //load store depots
     }
 
     return (
         <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
+            enableReinitialize={true}
             onSubmit={() => {
 
             }}
@@ -300,15 +320,16 @@ export default function StoreDepotsAssign(
                 (formik) => (
                     <Card variant={"outlined"}>
                         <CardContent>
-                            <Grid container>
+                            <Grid container rowSpacing={2}>
                                 <Grid item xs={12}>
                                     <TextField
                                         name={"selectedWarehouse"}
-                                        label="Warehouse"
+                                        label="Almacén"
                                         size={"small"}
                                         fullWidth
                                         select
                                         {...formik.getFieldProps("selectedWarehouse")}
+                                        onChange={loadWarehouseDepots}
                                         error={formik.errors.selectedWarehouse && formik.touched.selectedWarehouse}
                                         helperText={(formik.errors.selectedWarehouse && formik.touched.selectedWarehouse) && formik.errors.selectedWarehouse}
                                     >
@@ -329,6 +350,7 @@ export default function StoreDepotsAssign(
                                         fullWidth
                                         select
                                         {...formik.getFieldProps("selectedStore")}
+                                        onChange={loadStoreDepots}
                                         error={formik.errors.selectedStore && formik.touched.selectedStore}
                                         helperText={(formik.errors.selectedStore && formik.touched.selectedStore) && formik.errors.selectedStore}
                                     >
@@ -340,24 +362,26 @@ export default function StoreDepotsAssign(
                                         }
                                     </TextField>
                                 </Grid>
+
+                                <Grid item xs={12}>
+                                    <DepartmentsFilter formik={formik}/>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    {
+                                        data?.length > 0
+                                            ? (
+                                                <Table sx={{width: "100%"}} size={"small"}>
+                                                    <TableHeader/>
+
+                                                    <TableContent formik={formik}/>
+                                                </Table>
+                                            ) : (
+                                                <TableNoData/>
+                                            )
+                                    }
+                                </Grid>
                             </Grid>
-
-                            {
-                                <DepartmentsFilter formik={formik}/>
-                            }
-
-                            {
-                                data?.length > 0
-                                    ? (
-                                        <Table sx={{width: "100%"}} size={"small"}>
-                                            <TableHeader/>
-
-                                            <TableContent formik={formik}/>
-                                        </Table>
-                                    ) : (
-                                        <TableNoData/>
-                                    )
-                            }
                         </CardContent>
                     </Card>
                 )

@@ -1,12 +1,12 @@
 import apiRequest from "@/api"
 
-const url = (userId) => `/profile/${userId}/store/api`
+const url = (userId) => `/profile/${userId}/store-assign/api1`
 const updateUrl = (userId) => `/profile/${userId}/store/update/api`
 
-const stores = {
-    allUserStores: async function (userId) {
+const storeAssign = {
+    allWarehouseDepotsByDepartments: async function (userId, warehouseId) {
         try {
-            const response = await apiRequest.get(url(userId))
+            const response = await apiRequest.get(url(userId), {params: {warehouseId: warehouseId}})
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -58,4 +58,4 @@ const stores = {
     },
 }
 
-export default stores;
+export default storeAssign;
