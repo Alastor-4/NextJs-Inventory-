@@ -18,32 +18,90 @@ import {TableNoData} from "@/components/TableNoData";
 import * as Yup from "yup";
 
 export default function StoreDepotsAssign(
-    {storeListProp, depotsByDepartmentsListProp, selectedDepotProp}
+    {warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp}
 ) {
-    const [data, setData] = React.useState([])
-
-    //ToDo: when there is a selectedDepotProp, corresponding department filter must be selected to
     //ToDo: get all store_depots for every selected store
 
+    const [selectedWarehouse, setSelectedWarehouse] = React.useState("")
+    const [selectedStore, setSelectedStore] = React.useState("")
+
+    //initial make selected a warehouse
+    React.useEffect(() => {
+        if (selectedWarehouseIdProp !== null) {
+            const index = warehouseListProp.find(item => item.id === selectedWarehouseIdProp)
+            if (index > -1) {
+                setSelectedWarehouse(warehouseListProp[index])
+            }
+        }
+    }, [selectedWarehouseIdProp, warehouseListProp])
+
+    //initial make selected a store
+    React.useEffect(() => {
+        if (selectedStoreIdProp !== null) {
+            const index = storeListProp.find(item => item.id === selectedStoreIdProp)
+            if (index > -1) {
+                setSelectedStore(storeListProp[index])
+            }
+        }
+    }, [selectedStoreIdProp, storeListProp])
+
+    const [warehouseDepotsByDepartmentOptions, setWarehouseDepotsByDepartmentOptions] = React.useState([])
+
+    //load depots for every selected warehouse
+    React.useEffect(() => {
+        if (selectedWarehouse) {
+            const depots = [] //ToDo: load departments with products including depots, from selected warehouse
+            setWarehouseDepotsByDepartmentOptions(depots.map(item => ({...item, selected: false})))
+        }
+    }, [selectedWarehouse])
+
+    const [data, setData] = React.useState([])
+
+    //update data every time filters change
+    React.useEffect(() => {
+        if (warehouseDepotsByDepartmentOptions.length) {
+            let allDepots = []
+
+            warehouseDepotsByDepartmentOptions.forEach((departmentItem) => {
+                if (departmentItem.selected) {
+                    allDepots = [...allDepots, ...departmentItem.products]
+                }
+            })
+
+            allDepots.sort((a, b) => {
+                if (a.name < b.name)
+                    return -1
+
+                if (a.name > a.name)
+                    return 1
+
+                return 0
+            })
+
+            setData(allDepots)
+        }
+
+    }, [warehouseDepotsByDepartmentOptions])
+
     const initialValues = {
-        selectedStore: storeListProp.length === 1 ? storeListProp[0] : "",
-        depotList: depotsByDepartmentsListProp.map(item => ({...item, selected: false})),
-        selectedDepot: selectedDepotProp ?? "",
+        selectedWarehouse: selectedWarehouse,
+        selectedStore: selectedStore,
         searchBarValue: "",
+        selectedDepot: "",
     }
 
     const validationSchema = Yup.object({
+        selectedWarehouse: Yup.object().required("seleccione un almacén"),
         selectedStore: Yup.object().required("seleccione una tienda"),
-        depotList: Yup.array().of(Yup.object()),
-        selectedDepot: Yup.object().required("seleccione un producto"),
         searchBarValue: Yup.string(),
+        selectedDepot: Yup.object(),
     })
 
-    function handleSelectFilter(formik: any, index: number) {
-        let filters = [...formik.values.depotList]
+    function handleSelectFilter(index: number) {
+        let filters = [...warehouseDepotsByDepartmentOptions]
         filters[index].selected = !filters[index].selected
 
-        formik.setFieldValue("depotList", filters)
+        setWarehouseDepotsByDepartmentOptions(filters)
     }
 
     const DepartmentsFilter = ({formik}) => (
@@ -56,10 +114,10 @@ export default function StoreDepotsAssign(
                 </Grid>
                 <Grid container item columnSpacing={2}>
                     {
-                        formik.values.depotList.map((item, index) => (
+                        warehouseDepotsByDepartmentOptions.map((item, index) => (
                             <Grid key={item.id} item xs={"auto"}>
                                 <Button variant={item.selected ? "contained" : "outlined"}
-                                        onClick={() => handleSelectFilter(formik, index)}>
+                                        onClick={() => handleSelectFilter(index)}>
                                     <Grid container>
                                         <Grid item xs={12}>
                                             {item.name}
@@ -166,67 +224,67 @@ export default function StoreDepotsAssign(
             <TableBody>
                 {data.filter(
                     item =>
-                        item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
-                        item.description.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                    row => (
-                        <TableRow
-                            key={row.depots.id}
-                            hover
-                            tabIndex={-1}
-                            selected={formik.values.selectedDepot?.depots.id === row.depots.id}
-                            onClick={() => handleSelectItem(formik, row)}
-                        >
-                            <TableCell>
-                                <Checkbox size={"small"}
-                                          checked={formik.values.selectedDepot?.depots.id === row.depots.id}/>
-                            </TableCell>
-                            <TableCell>
-                                {row.name}
-                            </TableCell>
-                            <TableCell>
-                                {row.description ?? "-"}
-                            </TableCell>
-                            <TableCell>
-                                {row?.departments?.name ?? "-"}
-                            </TableCell>
-                            <TableCell>
-                                {row.characteristics.length > 0
-                                    ? row.characteristics.map(item => (
-                                            <Grid
-                                                key={item.id}
-                                                sx={{
-                                                    display: "inline-flex",
-                                                    margin: "3px",
-                                                    backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                    padding: "2px 4px",
-                                                    borderRadius: "5px 2px 2px 2px",
-                                                    border: "1px solid rgba(130, 130, 130)",
-                                                    fontSize: 14,
-                                                }}
-                                            >
-                                                <Grid container item alignItems={"center"} sx={{marginRight: "3px"}}>
-                                                    <Typography variant={"caption"}
-                                                                sx={{color: "white", fontWeight: "600"}}>
-                                                        {item.name.toUpperCase()}
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid container item alignItems={"center"}
-                                                      sx={{color: "rgba(16,27,44,0.8)"}}>
-                                                    {item.value}
-                                                </Grid>
-                                            </Grid>
-                                        )
-                                    ) : "-"
-                                }
-                            </TableCell>
-                            <TableCell>
-                                {
-                                    row.images.length > 0
-                                        ? `${row.images.length} imagen(es)` : "-"
-                                }
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                        item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()).map(
+                            row => (
+                                <TableRow
+                                    key={row.depots.id}
+                                    hover
+                                    tabIndex={-1}
+                                    selected={formik.values.selectedDepot?.depots.id === row.depots.id}
+                                    onClick={() => handleSelectItem(formik, row)}
+                                >
+                                    <TableCell>
+                                        <Checkbox size={"small"}
+                                                  checked={formik.values.selectedDepot?.depots.id === row.depots.id}/>
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.description ?? "-"}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row?.departments?.name ?? "-"}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.characteristics.length > 0
+                                            ? row.characteristics.map(item => (
+                                                    <Grid
+                                                        key={item.id}
+                                                        sx={{
+                                                            display: "inline-flex",
+                                                            margin: "3px",
+                                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                            padding: "2px 4px",
+                                                            borderRadius: "5px 2px 2px 2px",
+                                                            border: "1px solid rgba(130, 130, 130)",
+                                                            fontSize: 14,
+                                                        }}
+                                                    >
+                                                        <Grid container item alignItems={"center"}
+                                                              sx={{marginRight: "3px"}}>
+                                                            <Typography variant={"caption"}
+                                                                        sx={{color: "white", fontWeight: "600"}}>
+                                                                {item.name.toUpperCase()}
+                                                            </Typography>
+                                                        </Grid>
+                                                        <Grid container item alignItems={"center"}
+                                                              sx={{color: "rgba(16,27,44,0.8)"}}>
+                                                            {item.value}
+                                                        </Grid>
+                                                    </Grid>
+                                                )
+                                            ) : "-"
+                                        }
+                                    </TableCell>
+                                    <TableCell>
+                                        {
+                                            row.images.length > 0
+                                                ? `${row.images.length} imagen(es)` : "-"
+                                        }
+                                    </TableCell>
+                                </TableRow>
+                            ))}
             </TableBody>
         )
     }
@@ -244,6 +302,26 @@ export default function StoreDepotsAssign(
                     <Card variant={"outlined"}>
                         <CardContent>
                             <Grid container>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name={"selectedWarehouse"}
+                                        label="Warehouse"
+                                        size={"small"}
+                                        fullWidth
+                                        select
+                                        {...formik.getFieldProps("selectedWarehouse")}
+                                        error={formik.errors.selectedWarehouse && formik.touched.selectedWarehouse}
+                                        helperText={(formik.errors.selectedWarehouse && formik.touched.selectedWarehouse) && formik.errors.selectedWarehouse}
+                                    >
+                                        {
+                                            warehouseListProp.map(item => (
+                                                <MenuItem key={item.id}
+                                                          value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
+                                            ))
+                                        }
+                                    </TextField>
+                                </Grid>
+
                                 <Grid item xs={12}>
                                     <TextField
                                         name={"selectedStore"}
