@@ -20,8 +20,6 @@ import * as Yup from "yup";
 export default function StoreDepotsAssign(
     {warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp}
 ) {
-    //ToDo: get all store_depots for every selected store
-
     const [selectedWarehouse, setSelectedWarehouse] = React.useState("")
     const [selectedStore, setSelectedStore] = React.useState("")
 
@@ -89,6 +87,7 @@ export default function StoreDepotsAssign(
         searchBarValue: "",
         selectedDepot: "",
     }
+    //ToDo: get all store_depots for every selected store
 
     const validationSchema = Yup.object({
         selectedWarehouse: Yup.object().required("seleccione un almacén"),
