@@ -49,6 +49,7 @@ model depots {
   products                      products?      @relation(fields: [product_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "depots_ibfk_2")
   store_depots                  store_depots[]
 
+  @@unique([product_id, warehouse_id])
   @@index([warehouse_id], map: "warehouse_id")
   @@index([product_id], map: "product_id")
 }
@@ -109,12 +110,16 @@ model store_depots {
   product_units            Int?
   product_remaining_units  Int?
   seller_profit_percentage Float?               @db.Float
+  offer_notes              String?              @db.VarChar(255)
+  price_discount           String?              @db.VarChar(255)
+  is_active                Boolean?             @default(true) @db.TinyInt
   created_at               DateTime             @default(now()) @db.Timestamp(0)
   products_sell            products_sell[]
   sell_price_history       sell_price_history[]
   stores                   stores?              @relation(fields: [store_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_1")
   depots                   depots?              @relation(fields: [depot_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_2")
 
+  @@unique([store_id, depot_id])
   @@index([depot_id], map: "depot_id")
   @@index([store_id], map: "store_id")
 }
