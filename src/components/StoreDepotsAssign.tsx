@@ -52,7 +52,24 @@ export default function StoreDepotsAssign(
     React.useEffect(() => {
         async function fetchDepots() {
             const depots = await storeAssign.allWarehouseDepotsByDepartments(ownerId, selectedWarehouse.id)
-            setWarehouseDepotsByDepartmentOptions(depots.map(item => ({...item, selected: false})))
+
+            //build structure with response
+            if (depots.length > 0) {
+                let differentDepartments = {}
+
+                depots.forEach((depot: any) => {
+                    const departmentData = {...depot.products.departments}
+                    if (differentDepartments[departmentData.id]) {
+                        differentDepartments[departmentData.id].depots.push(depot)
+                    } else {
+                        differentDepartments[departmentData.id] = {...departmentData, depots: [depot]}
+                    }
+                })
+
+                const departments =  Object.values(differentDepartments).map(item => ({...item, selected: false}))
+
+                setWarehouseDepotsByDepartmentOptions(departments)
+            }
         }
 
         if (selectedWarehouse) {
@@ -69,15 +86,15 @@ export default function StoreDepotsAssign(
 
             warehouseDepotsByDepartmentOptions.forEach((departmentItem) => {
                 if (departmentItem.selected) {
-                    allDepots = [...allDepots, ...departmentItem.products]
+                    allDepots = [...allDepots, ...departmentItem.depots]
                 }
             })
 
             allDepots.sort((a, b) => {
-                if (a.name < b.name)
+                if (a.products.name < b.products.name)
                     return -1
 
-                if (a.name > a.name)
+                if (a.products.name > a.products.name)
                     return 1
 
                 return 0
@@ -130,7 +147,7 @@ export default function StoreDepotsAssign(
                                         </Grid>
                                         <Grid container item xs={12} justifyContent={"center"}>
                                             <Typography variant={"caption"}>
-                                                {item.products.length} productos
+                                                {item.depots.length} productos
                                             </Typography>
                                         </Grid>
                                     </Grid>
@@ -230,79 +247,100 @@ export default function StoreDepotsAssign(
             <TableBody>
                 {data.filter(
                     item =>
-                        item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()).map(
-                            row => (
-                                <TableRow
-                                    key={row.depots.id}
-                                    hover
-                                    tabIndex={-1}
-                                    selected={formik.values.selectedDepot?.depots.id === row.depots.id}
-                                    onClick={() => handleSelectItem(formik, row)}
-                                >
-                                    <TableCell>
-                                        <Checkbox size={"small"}
-                                                  checked={formik.values.selectedDepot?.depots.id === row.depots.id}/>
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.description ?? "-"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row?.departments?.name ?? "-"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.characteristics.length > 0
-                                            ? row.characteristics.map(item => (
-                                                    <Grid
-                                                        key={item.id}
-                                                        sx={{
-                                                            display: "inline-flex",
-                                                            margin: "3px",
-                                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                            padding: "2px 4px",
-                                                            borderRadius: "5px 2px 2px 2px",
-                                                            border: "1px solid rgba(130, 130, 130)",
-                                                            fontSize: 14,
-                                                        }}
-                                                    >
-                                                        <Grid container item alignItems={"center"}
-                                                              sx={{marginRight: "3px"}}>
-                                                            <Typography variant={"caption"}
-                                                                        sx={{color: "white", fontWeight: "600"}}>
-                                                                {item.name.toUpperCase()}
-                                                            </Typography>
-                                                        </Grid>
-                                                        <Grid container item alignItems={"center"}
-                                                              sx={{color: "rgba(16,27,44,0.8)"}}>
-                                                            {item.value}
-                                                        </Grid>
-                                                    </Grid>
-                                                )
-                                            ) : "-"
-                                        }
-                                    </TableCell>
-                                    <TableCell>
-                                        {
-                                            row.images.length > 0
-                                                ? `${row.images.length} imagen(es)` : "-"
-                                        }
-                                    </TableCell>
-                                </TableRow>
-                            )
-                        )
+                        item.products.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
+                    row => (
+                        <TableRow
+                            key={row.id}
+                            hover
+                            tabIndex={-1}
+                            selected={formik.values.selectedDepot?.id === row.id}
+                            onClick={() => handleSelectItem(formik, row)}
+                        >
+                            <TableCell>
+                                <Checkbox size={"small"}
+                                          checked={formik.values.selectedDepot?.id === row.id}/>
+                            </TableCell>
+                            <TableCell>
+                                {row.products.name}
+                            </TableCell>
+                            <TableCell>
+                                {row.products.description ?? "-"}
+                            </TableCell>
+                            <TableCell>
+                                {row?.products.departments?.name ?? "-"}
+                            </TableCell>
+                            <TableCell>
+                                {row.products.characteristics?.length > 0
+                                    ? row.products.characteristics.map(item => (
+                                            <Grid
+                                                key={item.id}
+                                                sx={{
+                                                    display: "inline-flex",
+                                                    margin: "3px",
+                                                    backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                    padding: "2px 4px",
+                                                    borderRadius: "5px 2px 2px 2px",
+                                                    border: "1px solid rgba(130, 130, 130)",
+                                                    fontSize: 14,
+                                                }}
+                                            >
+                                                <Grid container item alignItems={"center"}
+                                                      sx={{marginRight: "3px"}}>
+                                                    <Typography variant={"caption"}
+                                                                sx={{color: "white", fontWeight: "600"}}>
+                                                        {item.name.toUpperCase()}
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid container item alignItems={"center"}
+                                                      sx={{color: "rgba(16,27,44,0.8)"}}>
+                                                    {item.value}
+                                                </Grid>
+                                            </Grid>
+                                        )
+                                    ) : "-"
+                                }
+                            </TableCell>
+                            <TableCell>
+                                {
+                                    row.products.images?.length > 0
+                                        ? `${row.products.images.length} imagen(es)` : "-"
+                                }
+                            </TableCell>
+                        </TableRow>
+                    )
                 )}
             </TableBody>
         )
     }
 
-    function loadWarehouseDepots(e) {
+    async function handleWarehouseChange(e, formik) {
+        formik.setFieldValue("selectedWarehouse", e.target.value)
         const warehouseId = e.target.value.id
+
         //load warehouse depots
+        const depots = await storeAssign.allWarehouseDepotsByDepartments(ownerId, warehouseId)
+
+        //build structure with response
+        if (depots.length > 0) {
+            let differentDepartments = {}
+
+            depots.forEach((depot: any) => {
+                const departmentData = {...depot.products.departments}
+                if (differentDepartments[departmentData.id]) {
+                    differentDepartments[departmentData.id].depots.push(depot)
+                } else {
+                    differentDepartments[departmentData.id] = {...departmentData, depots: [depot]}
+                }
+            })
+
+            const departments = Object.values(differentDepartments).map(item => ({...item, selected: false}))
+
+            setWarehouseDepotsByDepartmentOptions(departments)
+        }
     }
 
-    function loadStoreDepots(e) {
+    function handleStoreChange(e, formik) {
+        formik.setFieldValue("selectedStore", e.target.value)
         const storeId = e.target.value.id
         //load store depots
     }
@@ -329,7 +367,8 @@ export default function StoreDepotsAssign(
                                         fullWidth
                                         select
                                         {...formik.getFieldProps("selectedWarehouse")}
-                                        onChange={loadWarehouseDepots}
+                                        value={formik.values.selectedWarehouse}
+                                        onChange={(e) => handleWarehouseChange(e, formik)}
                                         error={formik.errors.selectedWarehouse && formik.touched.selectedWarehouse}
                                         helperText={(formik.errors.selectedWarehouse && formik.touched.selectedWarehouse) && formik.errors.selectedWarehouse}
                                     >
@@ -349,8 +388,8 @@ export default function StoreDepotsAssign(
                                         size={"small"}
                                         fullWidth
                                         select
-                                        {...formik.getFieldProps("selectedStore")}
-                                        onChange={loadStoreDepots}
+                                        value={formik.values.selectedStore}
+                                        onChange={(e) => handleStoreChange(e, formik)}
                                         error={formik.errors.selectedStore && formik.touched.selectedStore}
                                         helperText={(formik.errors.selectedStore && formik.touched.selectedStore) && formik.errors.selectedStore}
                                     >

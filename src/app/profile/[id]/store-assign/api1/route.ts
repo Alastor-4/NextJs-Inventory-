@@ -1,22 +1,42 @@
-import { NextResponse } from 'next/server'
+import {NextResponse} from 'next/server'
 import {prisma} from "db";
 
 // Get all warehouse depots
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, {params}: { params: { id: string } }, res) {
     const {searchParams} = new URL(request.url)
 
     const warehouseId = searchParams.get("warehouseId")
 
-    const warehouseDepots = await prisma.departments.findMany({where: {products: {some: {depots: {some: {warehouse_id: parseInt(warehouseId)}}}}}, include: {products: {include: {depots: true}}}})
+    if (warehouseId) {
+        const warehouseDepots = await prisma.depots.findMany(
+            {
+                where: {warehouse_id: parseInt(warehouseId)},
+                include: {
+                    products: {include: {departments: true, images: true, characteristics: true}}
+                },
+            },
+        )
 
-    return NextResponse.json(warehouseDepots)
+        return NextResponse.json(warehouseDepots)
+    }
+
+    return res.status(500).json({message: "La acción de obtener los depósitos ha fallado"})
 }
 
 // Create new user store
 export async function POST(req, res) {
     const {ownerId, name, description, slogan, address, sellerUserId} = await req.json()
 
-    const newStore = await prisma.stores.create({data: {owner_id: ownerId, name, description, slogan, address, seller_user_id: sellerUserId}})
+    const newStore = await prisma.stores.create({
+        data: {
+            owner_id: ownerId,
+            name,
+            description,
+            slogan,
+            address,
+            seller_user_id: sellerUserId
+        }
+    })
 
     return NextResponse.json(newStore)
 }
@@ -25,7 +45,15 @@ export async function POST(req, res) {
 export async function PUT(req, res) {
     const {storeId, name, description, slogan, address, sellerUserId} = await req.json()
 
-    const updatedStore = await prisma.stores.update({data: {name, description, slogan, address, seller_user_id: sellerUserId}, where: {id: storeId}})
+    const updatedStore = await prisma.stores.update({
+        data: {
+            name,
+            description,
+            slogan,
+            address,
+            seller_user_id: sellerUserId
+        }, where: {id: storeId}
+    })
 
     return NextResponse.json(updatedStore)
 }
