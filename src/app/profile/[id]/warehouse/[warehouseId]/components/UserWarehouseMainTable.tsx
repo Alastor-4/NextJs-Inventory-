@@ -82,7 +82,7 @@ export default function UserWarehouseMainTable(props) {
     }
 
     async function handleRemove() {
-        const response = await warehouseDepots.deleteDepot(ownerId, warehouseDetails.id, selected.id)
+        const response = await warehouseDepots.deleteDepot(ownerId, warehouseDetails.id, selected.depots[0].id)
         if (response) {
             setSelected(null)
             const allDepots = await warehouseDepots.allDepots(ownerId, warehouseDetails.id)
