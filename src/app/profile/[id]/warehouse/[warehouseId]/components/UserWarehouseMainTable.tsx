@@ -13,7 +13,7 @@ import {
     TableBody,
     TableCell,
     TableHead,
-    TableRow,
+    TableRow, TextField,
     Toolbar,
     Typography
 } from "@mui/material";
@@ -26,22 +26,49 @@ import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
 import users from "@/app/user/requests/users";
 import dayjs from "dayjs";
 import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
+import {Formik} from "formik";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function UserWarehouseMainTable(props) {
     const { ownerId, warehouseDetails } = props
 
-    const [data, setData] = React.useState(null)
+    const [data, setData] = React.useState([])
+    const [depositByDepartment, setDepositByDepartment] = React.useState([])
 
     const router = useRouter()
+
+    React.useEffect(() => {
+        if (depositByDepartment.length) {
+            let allProducts = []
+
+            depositByDepartment.forEach((departmentItem) => {
+                if (departmentItem.selected) {
+                    allProducts = [...allProducts, ...departmentItem.products]
+                }
+            })
+
+            allProducts.sort((a, b) => {
+                if (a.name < b.name)
+                    return -1
+
+                if (a.name > a.name)
+                    return 1
+
+                return 0
+            })
+
+            setData(allProducts)
+        }
+
+    }, [depositByDepartment])
 
     //ToDo: use global isLoading
     const isLoading = false
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${ownerId}/warehouse/${warehouseDetails.id}/api`).then((data) => setData(data))
+        fetcher(`/profile/${ownerId}/warehouse/${warehouseDetails.id}/api`).then((data) => setDepositByDepartment(data.map(item => ({...item, selected: false}))))
     }, [ownerId, warehouseDetails])
 
     //table selected item
@@ -57,8 +84,9 @@ export default function UserWarehouseMainTable(props) {
     async function handleRemove() {
         const response = await warehouseDepots.deleteDepot(ownerId, warehouseDetails.id, selected.id)
         if (response) {
+            setSelected(null)
             const allDepots = await warehouseDepots.allDepots(ownerId, warehouseDetails.id)
-            if (allDepots) setData(allDepots)
+            if (allDepots) setDepositByDepartment(allDepots.map(item => ({...item, selected: false})))
         }
     }
 
@@ -126,16 +154,81 @@ export default function UserWarehouseMainTable(props) {
         </AppBar>
     )
 
+    function handleSelectFilter(index: number) {
+        let filters = [...depositByDepartment]
+        filters[index].selected = !filters[index].selected
+
+        setDepositByDepartment(filters)
+    }
+
+    const initialValues = {
+        searchBarValue: ""
+    }
+
+    const DepartmentsFilter = ({formik}) => (
+        <Card variant={"outlined"} sx={{padding: "15px"}}>
+            <Grid container rowSpacing={2}>
+                <Grid item>
+                    <Typography variant={"subtitle2"}>
+                        Seleccione departamentos para encontrar el producto que busca
+                    </Typography>
+                </Grid>
+                <Grid container item columnSpacing={2}>
+                    {
+                        depositByDepartment.map((item, index) => (
+                            <Grid key={item.id} item xs={"auto"}>
+                                <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
+                                    <Grid container>
+                                        <Grid item xs={12}>
+                                            {item.name}
+                                        </Grid>
+                                        <Grid container item xs={12} justifyContent={"center"}>
+                                            <Typography variant={"caption"}>
+                                                {item.products.length} productos
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
+                                </Button>
+                            </Grid>
+                        ))
+                    }
+                </Grid>
+
+                {
+                    data?.length > 0 && (
+                        <Grid container item rowSpacing={1}>
+                            <Grid item xs={12}>
+                                <Typography variant={"subtitle2"}>
+                                    Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name={"handleChangeSearchBarValue"}
+                                    placeholder="Buscar producto..."
+                                    size={"small"}
+                                    fullWidth
+                                    {...formik.getFieldProps("searchBarValue")}
+                                />
+                            </Grid>
+                        </Grid>
+                    )
+                }
+            </Grid>
+        </Card>
+    )
+
+
     const TableHeader = () => {
         const headCells = [
             {
-                id: "department",
-                label: "Departamento",
+                id: "name",
+                label: "Nombre",
                 align: "left"
             },
             {
-                id: "name",
-                label: "Nombre",
+                id: "department",
+                label: "Departamento",
                 align: "left"
             },
             {
@@ -174,10 +267,14 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
-    const TableContent = () => {
+    const TableContent = ({formik}) => {
         return (
             <TableBody>
-                {data.map(row => (
+                {data.filter(
+                    item =>
+                        item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                        item?.description?.toUpperCase()?.includes(formik.values.searchBarValue.toUpperCase())).map(
+                    row => (
                     <TableRow
                         key={row.id}
                         hover
@@ -189,23 +286,23 @@ export default function UserWarehouseMainTable(props) {
                             <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
                         </TableCell>
                         <TableCell>
-                            {row.products.departments?.name ?? "-"}
-                        </TableCell>
-                        <TableCell>
-                            {row.products.name}
+                            {row.name}
                             {
-                                row.products.description && (
+                                row.description && (
                                     <small>
-                                        {` ${row.products.description}`}
+                                        {` ${row.description}`}
                                     </small>
                                 )
                             }
                         </TableCell>
                         <TableCell>
-                            {row.product_total_units ?? "-"} de {row.product_total_remaining_units ?? "-"}
+                            {row.departments?.name ?? "-"}
                         </TableCell>
                         <TableCell>
-                            {dayjs(row.created_at).format("DD/MM/YYYY HH:MM")}
+                            {row.depots[0].product_total_units ?? "-"} de {row.depots[0].product_total_remaining_units ?? "-"}
+                        </TableCell>
+                        <TableCell>
+                            {dayjs(row.depots.created_at).format("DD/MM/YYYY HH:MM")}
                         </TableCell>
                     </TableRow>
                 ))}
@@ -214,23 +311,40 @@ export default function UserWarehouseMainTable(props) {
     }
 
     return (
-        <Card variant={"outlined"}>
-            <CustomToolbar/>
+        <Formik
+            initialValues={initialValues}
+            onSubmit={() => {
 
-            <CardContent>
-                {
-                    data?.length > 0
-                        ? (
-                            <Table sx={{width: "100%"}} size={"small"}>
-                                <TableHeader/>
+            }}
+        >
+            {
+                (formik) => (
+                    <Card variant={"outlined"}>
+                        <CustomToolbar/>
 
-                                <TableContent/>
-                            </Table>
-                        ) : (
-                            <TableNoData/>
-                        )
-                }
-            </CardContent>
-        </Card>
+                        <CardContent>
+                            {
+                                depositByDepartment.length > 0 && (
+                                    <DepartmentsFilter formik={formik}/>
+                                )
+                            }
+
+                            {
+                                data?.length > 0
+                                    ? (
+                                        <Table sx={{width: "100%"}} size={"small"}>
+                                            <TableHeader/>
+
+                                            <TableContent formik={formik}/>
+                                        </Table>
+                                    ) : (
+                                        <TableNoData/>
+                                    )
+                            }
+                        </CardContent>
+                    </Card>
+                )
+            }
+        </Formik>
     )
 }

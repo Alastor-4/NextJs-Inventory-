@@ -177,7 +177,7 @@ export default function DepartmentProductsSelect(
                 {data.filter(
                     item =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
-                        item.description.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
+                        item?.description?.toUpperCase()?.includes(formik.values.searchBarValue.toUpperCase())).map(
                     row => (
                         <TableRow
                             key={row.id}

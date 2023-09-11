@@ -7,19 +7,40 @@ export async function GET(request: Request, { params }: { params: { id: string, 
     const warehouseId = params.warehouseId
 
     if (ownerId && warehouseId) {
-        const warehouseDepots = await prisma.depots.findMany(
-            {
-                where: {warehouse_id: parseInt(warehouseId)},
-                include: {
-                    products: {include: {departments: true, characteristics: true, images: true}}
+        const warehouseDepots = await prisma.departments.findMany({
+            where: {
+                products: {
+                    some: {
+                        depots: {
+                            some: {warehouse_id: parseInt(warehouseId)}
+                        }
+                    }
+                }
+            },
+            include: {
+                products: {
+                    where: {
+                        depots: {
+                            some: {warehouse_id: parseInt(warehouseId)}
+                        }
+                    },
+                    include:
+                        {
+                            departments: true,
+                            characteristics: true,
+                            images: true,
+                            depots: {
+                                where: {warehouse_id: parseInt(warehouseId)}
+                            }
+                        }
                 }
             }
-        )
+        })
 
         return NextResponse.json(warehouseDepots)
     }
 
-    return new Response('La acción de obtener los usuarios ha fallado', {status: 500})
+    return new Response('La acción de obtener los depósitos ha fallado', {status: 500})
 }
 
 //ToDo: decide to update an existing depot of a warehouse for the same product or create a new one
