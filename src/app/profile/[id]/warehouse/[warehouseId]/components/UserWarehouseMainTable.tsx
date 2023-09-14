@@ -252,6 +252,10 @@ export default function UserWarehouseMainTable(props) {
     const [displayNewUnitsForm, setDisplayNewUnitsForm] = React.useState(false)
     const [displayUpdateUnitsForm, setDisplayUpdateUnitsForm] = React.useState(false)
 
+    function handleNewUnits() {
+
+    }
+
     const NewUnitsQuantityForm = ({formik}) => (
         <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
             <Grid container item spacing={2}>
@@ -273,7 +277,7 @@ export default function UserWarehouseMainTable(props) {
                 </Grid>
 
                 <Grid item>
-                    <IconButton color={"primary"}>
+                    <IconButton color={"primary"} onClick={handleNewUnits}>
                         <Done/>
                     </IconButton>
 
