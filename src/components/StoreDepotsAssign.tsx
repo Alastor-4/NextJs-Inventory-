@@ -4,23 +4,18 @@ import {
     Button,
     Card,
     CardContent,
-    Checkbox,
-    Grid, MenuItem,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
+    Grid,
+    MenuItem,
     TextField,
-    Typography
 } from "@mui/material";
-import React, { useState } from "react";
-import { Formik } from "formik";
+import React, {useState} from "react";
+import {Formik} from "formik";
 import * as Yup from "yup";
 import ShowProductsStore from "@/app/profile/[id]/store-assign/components/ShowProductsStore";
 import ShowProductsWarehouse from "@/app/profile/[id]/store-assign/components/ShowProductsWarehouse"
+
 export default function StoreDepotsAssign(
-    { ownerId, warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp }
+    {warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp}
 ) {
     const [selectedWarehouse, setSelectedWarehouse] = useState("")
     const [selectedStore, setSelectedStore] = useState("")
@@ -48,7 +43,6 @@ export default function StoreDepotsAssign(
     }, [selectedStoreIdProp, storeListProp])
 
 
-
     const initialValues = {
         selectedWarehouse: selectedWarehouse,
         selectedStore: selectedStore,
@@ -61,7 +55,6 @@ export default function StoreDepotsAssign(
     })
 
 
-
     async function handleWarehouseChange(e, formik) {
         formik.setFieldValue("selectedWarehouse", e.target.value)
         const warehouseId = e.target.value.id
@@ -72,14 +65,15 @@ export default function StoreDepotsAssign(
         formik.setFieldValue("selectedStore", e.target.value)
         setSelectedStore(e.target.value);
     }
+
     const showMainTable = () => {
         if (!selectedButton) {
             if (selectedStore !== '')
-                return <ShowProductsStore storeId={selectedStore.id} />
+                return <ShowProductsStore storeId={selectedStore.id}/>
 
         } else {
             if (selectedStore !== '' && selectedWarehouse !== '')
-                return <ShowProductsWarehouse storeId={selectedStore.id} warehouseId={selectedWarehouse.id} />
+                return <ShowProductsWarehouse storeId={selectedStore.id} warehouseId={selectedWarehouse.id}/>
         }
     }
 
@@ -96,7 +90,7 @@ export default function StoreDepotsAssign(
                 (formik) => (
                     <Card variant={"outlined"}>
                         <CardContent>
-                            <Grid container rowSpacing={2} direction={"column"} >
+                            <Grid container rowSpacing={2} direction={"column"}>
                                 <Grid item xs={12}>
                                     <TextField
                                         name={"selectedWarehouse"}
@@ -113,7 +107,7 @@ export default function StoreDepotsAssign(
                                         {
                                             warehouseListProp.map(item => (
                                                 <MenuItem key={item.id}
-                                                    value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
+                                                          value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
                                             ))
                                         }
                                     </TextField>
@@ -134,20 +128,25 @@ export default function StoreDepotsAssign(
                                         {
                                             storeListProp.map(item => (
                                                 <MenuItem key={item.id}
-                                                    value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
+                                                          value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
                                             ))
                                         }
                                     </TextField>
                                 </Grid>
-                                <Grid item >
+                                <Grid item>
                                     <Button
                                         variant={(!selectedButton) ? 'contained' : 'outlined'}
                                         onClick={() => setSelectedButton((e) => false)}
-                                    >Administar Tienda</Button>
+                                    >
+                                        Administar Tienda
+                                    </Button>
                                     <Button
                                         variant={(selectedButton) ? 'contained' : 'outlined'}
                                         onClick={() => setSelectedButton((e) => true)}
-                                    >Agregar productos del almacen</Button>
+                                        sx={{ml: "10px"}}
+                                    >
+                                        Agregar productos del almacen
+                                    </Button>
                                 </Grid>
 
                                 <Grid item>

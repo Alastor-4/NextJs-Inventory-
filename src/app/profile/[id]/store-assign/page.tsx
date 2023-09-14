@@ -8,7 +8,7 @@ export default async function Page({ params }) {
 
     return (
         <main>
-            <StoreDepotsAssign ownerId={ownerId} warehouseListProp={ownerWarehouses} selectedWarehouseIdProp={ownerWarehouses[0].id}
+            <StoreDepotsAssign warehouseListProp={ownerWarehouses} selectedWarehouseIdProp={ownerWarehouses[0].id}
                 storeListProp={ownerStores} selectedStoreIdProp={null} />
         </main>
     )

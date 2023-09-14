@@ -1,12 +1,22 @@
 "use client"
-import React, { useState, useEffect } from 'react'
-import { Button, TextField } from '@mui/material'
-import { Formik } from 'formik'
+
+import React, {useState, useEffect} from 'react'
+import {Button, TextField} from '@mui/material'
+import {Formik} from 'formik'
 import * as Yup from 'yup'
 import storeAssign from '@/app/profile/[id]/store-assign/requests/store-assign'
-import { useParams } from 'next/navigation'
+import {useParams} from 'next/navigation'
 
-function InputTableCell({ warehouseUnits, storeUnits, storeDepot, updateDepot, depot, setProductsInputValue, defaultValue, index }) {
+function InputTableCell({
+                            warehouseUnits,
+                            storeUnits,
+                            storeDepot,
+                            updateDepot,
+                            depot,
+                            setProductsInputValue,
+                            defaultValue,
+                            index
+                        }) {
 
     const [inputValues, setInputValues] = useState(defaultValue[index].value)
 
@@ -34,12 +44,10 @@ function InputTableCell({ warehouseUnits, storeUnits, storeDepot, updateDepot, d
         const result = await storeAssign.UpdateProductStore(params.id, storeDepot)
 
         if (result.status === 200) {
-
             defaultValue[index].value = '0'
             setProductsInputValue(defaultValue)
 
             updateDepot(-parseInt(inputValues), depot);
-
         }
     }
 
@@ -52,7 +60,7 @@ function InputTableCell({ warehouseUnits, storeUnits, storeDepot, updateDepot, d
         <>
 
             <Formik
-                initialValues={{ add_remove_units: inputValues }}
+                initialValues={{add_remove_units: inputValues}}
                 validationSchema={setValidationSchema}
                 onSubmit={handleSubmit}
                 enableReinitialize={true}
@@ -67,21 +75,18 @@ function InputTableCell({ warehouseUnits, storeUnits, storeDepot, updateDepot, d
                                 {...formik.getFieldProps("add_remove_units")}
                                 error={formik.errors.add_remove_units && formik.touched.add_remove_units}
                                 helperText={(formik.errors.add_remove_units && formik.touched.add_remove_units) && formik.errors.add_remove_units}
-                                onChange={e => { setInputValues(e.target.value) }}
+                                onChange={e => {
+                                    setInputValues(e.target.value)
+                                }}
                             />
-                            {inputValues !== '0' && <Button type='submit'>
+                            {inputValues !== '0' && <Button type='submit' sx={{ml: "5px"}}>
                                 {removeOrAdd()}
                             </Button>
                             }
                         </form>
                     )
-
                 }
             </Formik>
-
-
-
-
         </>
     )
 }
