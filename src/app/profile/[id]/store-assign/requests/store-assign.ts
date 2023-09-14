@@ -2,11 +2,15 @@ import apiRequest from "@/api"
 
 const url = (userId) => `/profile/${userId}/store-assign/api1`
 const updateUrl = (userId) => `/profile/${userId}/store/update/api`
-const showProductUrl = (userId) => `/profile/${userId}/store-assign/showProductApi/api`
+const showProductWarehouseUrl = (userId) => `/profile/${userId}/store-assign/showProductApi/apiWarehouse`
+const showProductStoreUrl = (userId) => `/profile/${userId}/store-assign/showProductApi/apiStore`
+
+
 const storeAssign = {
-    allWarehouseDepotsByDepartments: async function (userId, warehouseId) {
+    //Periciones del component ShowPoductStore
+    allProductsbyDepartmentStore: async function (userId, storeId) {
         try {
-            const response = await apiRequest.get(url(userId), { params: { warehouseId: warehouseId } })
+            const response = await apiRequest.get(showProductStoreUrl(userId), { params: { storeId: storeId } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -15,10 +19,10 @@ const storeAssign = {
         return false
     },
 
-    storeDetails: async function (userId, storeId) {
+    UpdateProductStore: async function (userId, data) {
         try {
-            const response = await apiRequest.get(updateUrl(userId), { params: { storeId: storeId } })
-            return response.data
+            const response = await apiRequest.put(showProductStoreUrl(userId), data)
+            return response
         } catch (e) {
             //ToDo: notify error here
         }
@@ -26,9 +30,10 @@ const storeAssign = {
         return false
     },
 
-    create: async function (userId, data) {
+    UpdateProductWarehouse: async function (userId, data) {
         try {
-            return await apiRequest.post(url(userId), data)
+            const response = await apiRequest.put(showProductWarehouseUrl(userId), data)
+            return response
         } catch (e) {
             //ToDo: notify error here
         }
@@ -36,9 +41,10 @@ const storeAssign = {
         return false
     },
 
-    update: async function (userId, data) {
+    RemoveProductStore: async function (userId, storeDepotId) {
         try {
-            return await apiRequest.put(url(userId), data)
+            const response = await apiRequest.delete(showProductStoreUrl(userId), { params: { storeDepotId: storeDepotId } })
+            return response
         } catch (e) {
             //ToDo: notify error here
         }
@@ -46,20 +52,10 @@ const storeAssign = {
         return false
     },
 
-    delete: async function (userId, storeId) {
+    // Peticiones para el component ShowProductWarehouse
+    allProductbyDepartmentWarehouse: async function (userId, storeId, warehouseId) {
         try {
-            const response = await apiRequest.delete(url(userId), { params: { storeId: storeId } })
-            if (response.status === 200) return true
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
-    // Peticiones para el component ShowProduct
-    allProductbyDepartment: async function (userId, storeId, warehouseId) {
-        try {
-            const response = await apiRequest.get(showProductUrl(userId), { params: { storeId: storeId, warehouseId: warehouseId } })
+            const response = await apiRequest.get(showProductWarehouseUrl(userId), { params: { storeId: storeId, warehouseId: warehouseId } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -70,7 +66,7 @@ const storeAssign = {
 
     postProductToStoreDepot: async function (userId, data) {
         try {
-            const response = await apiRequest.post(showProductUrl(userId), data)
+            const response = await apiRequest.post(showProductWarehouseUrl(userId), data)
             return response
         } catch (e) {
             //ToDo: notify error here
