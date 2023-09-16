@@ -5,7 +5,6 @@ import {
     Box,
     Button,
     Card,
-    Divider,
     FormHelperText,
     Grid,
     IconButton,
@@ -16,10 +15,7 @@ import {
 import React, {useState} from "react";
 import {useFormik} from "formik";
 import * as Yup from "yup"
-import {useParams, useRouter} from 'next/navigation';
-import roles from "@/app/role/requests/roles";
-import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
-import {Done, InfoOutlined} from "@mui/icons-material";
+import {useRouter} from 'next/navigation';
 import DepartmentProductsSelect from "@/components/DepartmentProductsSelect";
 import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
 
@@ -50,7 +46,7 @@ export default function UserWarehouseForm({ownerId, warehouseId, departmentProdu
     )
 
     const initialValues = {
-        product: "",
+        product: null,
         productTotalUnits: "",
     }
 

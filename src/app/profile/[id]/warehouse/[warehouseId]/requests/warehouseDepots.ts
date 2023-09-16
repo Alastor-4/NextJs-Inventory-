@@ -17,7 +17,17 @@ const warehouseDepots = {
 
     createDepot: async function ({userId, productId, warehouseId, insertedById, productTotalUnits}) {
         try {
-            return await apiRequest.put(url(userId, warehouseId), {warehouseId, productId, insertedById, productTotalUnits})
+            return await apiRequest.post(url(userId, warehouseId), {warehouseId, productId, insertedById, productTotalUnits})
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    increaseUnitsDepot: async function ({ownerId, warehouseId, depotId, newUnits}) {
+        try {
+            return await apiRequest.put(url(ownerId, warehouseId), {ownerId, depotId, newUnits})
         } catch (e) {
             //ToDo: notify error here
         }

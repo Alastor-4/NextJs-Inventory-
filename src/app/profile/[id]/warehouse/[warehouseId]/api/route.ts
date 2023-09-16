@@ -46,7 +46,7 @@ export async function GET(request: Request, { params }: { params: { id: string, 
 //ToDo: decide to update an existing depot of a warehouse for the same product or create a new one
 
 // Create warehouse depot
-export async function PUT(req, res) {
+export async function POST(req, res) {
     const {warehouseId, productId, insertedById, productTotalUnits} = await req.json()
 
     const createdDepot = await prisma.depots.create(
@@ -64,19 +64,22 @@ export async function PUT(req, res) {
     return NextResponse.json(createdDepot)
 }
 
-// Change owner's user role
-export async function PATCH(req, res) {
-    const {searchParams} = new URL(req.url)
-    const userId = searchParams.get("userId")
-    const {roleId} = await req.json()
+// Add new units to a depot
+export async function PUT(req, res) {
+    const {ownerId, depotId, newUnits} = await req.json()
 
-    if (userId) {
-        const updatedRole = await prisma.users.update({data: {role_id: roleId}, where: {id: parseInt(userId)}})
+    if (ownerId && depotId) {
+        const updatedDeposit = await prisma.depots.update(
+            {
+                data: {product_total_units: {increment: parseInt(newUnits)}, product_total_remaining_units: {increment: parseInt(newUnits)}},
+                where: {id: parseInt(depotId)}
+            }
+        )
 
-        return NextResponse.json(updatedRole)
+        return NextResponse.json(updatedDeposit)
     }
 
-    return new Response('La acción de modificar rol ha fallado', {status: 500})
+    return new Response('La acción de agregar productos ha fallado', {status: 500})
 }
 
 // Delete warehouse depot

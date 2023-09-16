@@ -6,14 +6,17 @@ import {
     Box, Button,
     Card,
     CardContent,
-    Checkbox, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
-    Divider, FormControl, Grid,
-    IconButton, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent,
+    Checkbox,
+    CircularProgress,
+    Divider,
+    Grid,
+    IconButton,
     Table,
     TableBody,
     TableCell,
     TableHead,
-    TableRow, TextField,
+    TableRow,
+    TextField,
     Toolbar,
     Typography
 } from "@mui/material";
@@ -22,20 +25,17 @@ import {
     AddBoxOutlined,
     AddOutlined,
     ArrowLeft,
-    CancelOutlined,
-    ChangeCircleOutlined,
-    DeleteOutline, Done,
-    EditOutlined, NotesOutlined, SaveOutlined
+    DeleteOutline,
+    Done,
+    NotesOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
-import {useParams, useRouter} from "next/navigation";
-import products from "@/app/profile/[id]/product/requests/products";
-import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
-import users from "@/app/user/requests/users";
+import {useRouter} from "next/navigation";
 import dayjs from "dayjs";
 import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
 import {Formik} from "formik";
 import * as Yup from "yup";
+import UpdateValueDialog from "@/components/UpdateValueDialog";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -83,9 +83,23 @@ export default function UserWarehouseMainTable(props) {
 
     const validationSchema = Yup.object({
         searchBarValue: Yup.string(),
-        productNewUnitsQuantity: Yup.number().integer().min(0),
-        updateTotalUnitsQuantity: Yup.number().integer().min(0).nullable(),
-        updateRemainingUnitsQuantity: Yup.number().integer().min(0).nullable(),
+        productNewUnitsQuantity: Yup
+            .number()
+            .typeError("especifique un número entero mayor que cero")
+            .integer("especifique un número entero mayor que cero")
+            .min(0, "especifique un número entero mayor que cero"),
+        updateTotalUnitsQuantity: Yup
+            .number()
+            .typeError("especifique un número entero mayor que cero")
+            .integer("especifique un número entero mayor que cero")
+            .min(0, "especifique un número entero mayor que cero")
+            .nullable(),
+        updateRemainingUnitsQuantity: Yup
+            .number()
+            .typeError("especifique un número entero mayor que cero")
+            .integer("especifique un número entero mayor que cero")
+            .min(0, "especifique un número entero mayor que cero")
+            .nullable(),
     })
 
     //ToDo: use global isLoading
@@ -252,51 +266,65 @@ export default function UserWarehouseMainTable(props) {
     const [displayNewUnitsForm, setDisplayNewUnitsForm] = React.useState(false)
     const [displayUpdateUnitsForm, setDisplayUpdateUnitsForm] = React.useState(false)
 
-    function handleNewUnits() {
+    const NewUnitsQuantityForm = ({formik}) => {
+        async function handleNewUnitsAdd() {
+            const updatedDepot = await warehouseDepots.increaseUnitsDepot(
+                {
+                    ownerId,
+                    warehouseId: warehouseDetails.id,
+                    depotId: selected.depots[0].id,
+                    newUnits: formik.values.productNewUnitsQuantity
+                }
+            )
 
+            if (updatedDepot?.data?.id) {
+                const newDepots = [...depositByDepartment]
+
+                for (const departmentItem of depositByDepartment) {
+                    const departmentIndex = newDepots.indexOf(departmentItem)
+
+                    const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.data.id)
+                    if (updatedIndex > - 1) {
+                        newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_units = updatedDepot.data.product_total_units
+                        newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units
+
+                        setDepositByDepartment(newDepots)
+
+                        break
+                    }
+                }
+
+                setDisplayNewUnitsForm(false)
+            }
+        }
+
+        return (
+            <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
+                <Grid container item spacing={2}>
+                    <Grid item>
+                        <TextField
+                            name={"productNewUnitsQuantity"}
+                            label="Nuevas unidades"
+                            size={"small"}
+                            {...formik.getFieldProps("productNewUnitsQuantity")}
+                            error={formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity}
+                            helperText={(formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity) && formik.errors.productNewUnitsQuantity}
+                        />
+                    </Grid>
+
+                    <Grid item>
+                        <IconButton color={"primary"} onClick={handleNewUnitsAdd}>
+                            <Done/>
+                        </IconButton>
+                    </Grid>
+                </Grid>
+            </Card>
+        )
     }
-
-    const NewUnitsQuantityForm = ({formik}) => (
-        <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
-            <Grid container item spacing={2}>
-                <Grid item xs={12}>
-                    <Typography variant={"subtitle2"}>
-                        Agregar nuevos productos a este depósito.
-                    </Typography>
-                </Grid>
-
-                <Grid item>
-                    <TextField
-                        name={"productNewUnitsQuantity"}
-                        label="Nuevas unidades"
-                        size={"small"}
-                        {...formik.getFieldProps("productNewUnitsQuantity")}
-                        error={formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity}
-                        helperText={(formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity) && formik.errors.productNewUnitsQuantity}
-                    />
-                </Grid>
-
-                <Grid item>
-                    <IconButton color={"primary"} onClick={handleNewUnits}>
-                        <Done/>
-                    </IconButton>
-
-                    <IconButton color={"secondary"} onClick={() => setDisplayNewUnitsForm(false)}>
-                        <CancelOutlined/>
-                    </IconButton>
-                </Grid>
-            </Grid>
-        </Card>
-    )
 
     const UpdateUnitsQuantityForm = ({formik}) => (
         <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
             <Grid container item spacing={2}>
-                <Grid item xs={12}>
-                    <Typography variant={"subtitle2"}>
-                        Establezca las nuevas cantidades.
-                    </Typography>
-                </Grid>
                 <Grid item>
                     <TextField
                         name={"updateTotalUnitsQuantity"}
@@ -322,10 +350,6 @@ export default function UserWarehouseMainTable(props) {
                 <Grid item>
                     <IconButton color={"primary"}>
                         <Done/>
-                    </IconButton>
-
-                    <IconButton color={"secondary"} onClick={() => setDisplayUpdateUnitsForm(false)}>
-                        <CancelOutlined/>
                     </IconButton>
                 </Grid>
             </Grid>
@@ -434,6 +458,22 @@ export default function UserWarehouseMainTable(props) {
             {
                 (formik) => (
                     <Card variant={"outlined"}>
+                        <UpdateValueDialog
+                            dialogTitle={"Agregar nuevos productos a este depósito"}
+                            open={displayNewUnitsForm}
+                            setOpen={setDisplayNewUnitsForm}
+                        >
+                            <NewUnitsQuantityForm formik={formik}/>
+                        </UpdateValueDialog>
+
+                        <UpdateValueDialog
+                            dialogTitle={"Establezca las nuevas cantidades"}
+                            open={displayUpdateUnitsForm}
+                            setOpen={setDisplayUpdateUnitsForm}
+                        >
+                            <UpdateUnitsQuantityForm formik={formik}/>
+                        </UpdateValueDialog>
+
                         <CustomToolbar formik={formik}/>
 
                         <CardContent>
@@ -445,23 +485,6 @@ export default function UserWarehouseMainTable(props) {
                                         </Grid>
                                     )
                                 }
-
-                                {
-                                    displayNewUnitsForm && (
-                                        <Grid item xs={12}>
-                                            <NewUnitsQuantityForm formik={formik}/>
-                                        </Grid>
-                                    )
-                                }
-
-                                {
-                                    displayUpdateUnitsForm && (
-                                        <Grid item xs={12}>
-                                            <UpdateUnitsQuantityForm formik={formik}/>
-                                        </Grid>
-                                    )
-                                }
-
 
                                 {
                                     data?.length > 0
