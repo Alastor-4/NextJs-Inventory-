@@ -7,10 +7,24 @@ export default async function Page({params}) {
     const departmentProducts = await prisma.departments.findMany(
         {
             where: {
-                products: {some: {owner_id: parseInt(userId)}}
+                AND: [
+                    {
+                        products: {
+                            some: {owner_id: parseInt(userId)}
+                        },
+                    },
+                    {
+                        products: {
+                            some: {depots: {none: {warehouse_id: parseInt(warehouseId)}}}
+                        },
+                    },
+                ]
             },
             include: {
-                products: {include: {departments: true, characteristics: true, images: true}}
+                products: {
+                    where: {depots: {none: {warehouse_id: parseInt(warehouseId)}}},
+                    include: {departments: true, characteristics: true, images: true},
+                }
             }
         }
     )
