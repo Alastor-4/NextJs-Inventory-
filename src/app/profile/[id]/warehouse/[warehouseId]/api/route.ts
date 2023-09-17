@@ -43,8 +43,6 @@ export async function GET(request: Request, { params }: { params: { id: string, 
     return new Response('La acción de obtener los depósitos ha fallado', {status: 500})
 }
 
-//ToDo: decide to update an existing depot of a warehouse for the same product or create a new one
-
 // Create warehouse depot
 export async function POST(req, res) {
     const {warehouseId, productId, insertedById, productTotalUnits} = await req.json()
