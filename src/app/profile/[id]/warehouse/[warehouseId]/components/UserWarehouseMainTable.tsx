@@ -22,12 +22,12 @@ import {
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
 import {
-    AddBoxOutlined,
+    Add,
     AddOutlined,
     ArrowLeft,
     DeleteOutline,
     Done,
-    NotesOutlined,
+    EditOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -133,17 +133,7 @@ export default function UserWarehouseMainTable(props) {
         router.back()
     }
 
-    async function handleUpdate() {
-        await router.push(`/profile/${ownerId}/warehouse/update/${selected.id}`)
-    }
-
-    function handleOpenUpdateForm(formik) {
-        formik.setFieldValue("updateTotalUnitsQuantity", selected.depots.product_total_units)
-        formik.setFieldValue("updateRemainingUnitsQuantity", selected.depots.product_total_remaining_units)
-        setDisplayUpdateUnitsForm(true)
-    }
-
-    const CustomToolbar = ({formik}) => (
+    const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
                 <Box sx={{display: "flex", alignItems: "center"}}>
@@ -172,14 +162,6 @@ export default function UserWarehouseMainTable(props) {
                                     {
                                         selected && (
                                             <Box sx={{display: "flex"}}>
-                                                <IconButton color={"inherit"} onClick={() => setDisplayNewUnitsForm(true)}>
-                                                    <AddBoxOutlined fontSize={"small"}/>
-                                                </IconButton>
-
-                                                <IconButton color={"inherit"} onClick={() => handleOpenUpdateForm(formik)}>
-                                                    <NotesOutlined fontSize={"small"}/>
-                                                </IconButton>
-
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
                                                     <DeleteOutline fontSize={"small"}/>
                                                 </IconButton>
@@ -322,39 +304,73 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
-    const UpdateUnitsQuantityForm = ({formik}) => (
-        <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
-            <Grid container item spacing={2}>
-                <Grid item>
-                    <TextField
-                        name={"updateTotalUnitsQuantity"}
-                        label="Total de unidades"
-                        size={"small"}
-                        {...formik.getFieldProps("updateTotalUnitsQuantity")}
-                        error={formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity}
-                        helperText={(formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity) && formik.errors.updateTotalUnitsQuantity}
-                    />
-                </Grid>
+    const UpdateUnitsQuantityForm = ({formik}) => {
+        async function handleUpdateUnits() {
+            const updatedDepot = await warehouseDepots.updateUnitsDepot(
+                {
+                    ownerId,
+                    warehouseId: warehouseDetails.id,
+                    depotId: selected.depots[0].id,
+                    productTotalUnits: formik.values.updateTotalUnitsQuantity,
+                    productTotalRemainingUnits: formik.values.updateRemainingUnitsQuantity,
+                }
+            )
 
-                <Grid item>
-                    <TextField
-                        name={"updateRemainingUnitsQuantity"}
-                        label="Unidades restantes"
-                        size={"small"}
-                        {...formik.getFieldProps("updateRemainingUnitsQuantity")}
-                        error={formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity}
-                        helperText={(formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity) && formik.errors.updateRemainingUnitsQuantity}
-                    />
-                </Grid>
+            if (updatedDepot?.data?.id) {
+                const newDepots = [...depositByDepartment]
 
-                <Grid item>
-                    <IconButton color={"primary"}>
-                        <Done/>
-                    </IconButton>
+                for (const departmentItem of depositByDepartment) {
+                    const departmentIndex = newDepots.indexOf(departmentItem)
+
+                    const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.data.id)
+                    if (updatedIndex > - 1) {
+                        newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_units = updatedDepot.data.product_total_units
+                        newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units
+
+                        setDepositByDepartment(newDepots)
+
+                        break
+                    }
+                }
+
+                setDisplayUpdateUnitsForm(false)
+            }
+        }
+
+        return (
+            <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
+                <Grid container item spacing={2}>
+                    <Grid item>
+                        <TextField
+                            name={"updateTotalUnitsQuantity"}
+                            label="Total de unidades"
+                            size={"small"}
+                            {...formik.getFieldProps("updateTotalUnitsQuantity")}
+                            error={formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity}
+                            helperText={(formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity) && formik.errors.updateTotalUnitsQuantity}
+                        />
+                    </Grid>
+
+                    <Grid item>
+                        <TextField
+                            name={"updateRemainingUnitsQuantity"}
+                            label="Unidades restantes"
+                            size={"small"}
+                            {...formik.getFieldProps("updateRemainingUnitsQuantity")}
+                            error={formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity}
+                            helperText={(formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity) && formik.errors.updateRemainingUnitsQuantity}
+                        />
+                    </Grid>
+
+                    <Grid item>
+                        <IconButton color={"primary"} onClick={handleUpdateUnits}>
+                            <Done/>
+                        </IconButton>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </Card>
-    )
+            </Card>
+        )
+    }
 
     const TableHeader = () => {
         const headCells = [
@@ -405,6 +421,29 @@ export default function UserWarehouseMainTable(props) {
     }
 
     const TableContent = ({formik}) => {
+        function handleOpenNewUnitsForm(e, row) {
+            e.stopPropagation()
+
+            if (!selected || (selected?.id !== row.id)) {
+                setSelected(row)
+            }
+
+            setDisplayNewUnitsForm(true)
+        }
+
+        function handleOpenUpdateUnitsForm(e, row) {
+            e.stopPropagation()
+
+            if (!selected || (selected?.id !== row.id)) {
+                setSelected(row)
+            }
+
+            formik.setFieldValue("updateTotalUnitsQuantity", row.depots[0].product_total_units)
+            formik.setFieldValue("updateRemainingUnitsQuantity", row.depots[0].product_total_remaining_units)
+
+            setDisplayUpdateUnitsForm(true)
+        }
+
         return (
             <TableBody>
                 {data.filter(
@@ -437,6 +476,22 @@ export default function UserWarehouseMainTable(props) {
                         </TableCell>
                         <TableCell>
                             {row.depots[0].product_total_units ?? "-"} de {row.depots[0].product_total_remaining_units ?? "-"}
+
+                            <IconButton
+                                color={"inherit"}
+                                onClick={(e) => handleOpenNewUnitsForm(e, row)}
+                                sx={{ml: "10px"}}
+                            >
+                                <Add fontSize={"small"}/>
+                            </IconButton>
+
+                            <IconButton
+                                color={"inherit"}
+                                onClick={(e) => handleOpenUpdateUnitsForm(e, row)}
+                                sx={{ml: "5px"}}
+                            >
+                                <EditOutlined fontSize={"small"}/>
+                            </IconButton>
                         </TableCell>
                         <TableCell>
                             {dayjs(row.depots.created_at).format("DD/MM/YYYY HH:MM")}
@@ -474,7 +529,7 @@ export default function UserWarehouseMainTable(props) {
                             <UpdateUnitsQuantityForm formik={formik}/>
                         </UpdateValueDialog>
 
-                        <CustomToolbar formik={formik}/>
+                        <CustomToolbar/>
 
                         <CardContent>
                             <Grid container rowSpacing={3}>

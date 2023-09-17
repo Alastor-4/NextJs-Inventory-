@@ -35,6 +35,16 @@ const warehouseDepots = {
         return false
     },
 
+    updateUnitsDepot: async function ({ownerId, warehouseId, depotId, productTotalUnits, productTotalRemainingUnits}) {
+        try {
+            return await apiRequest.patch(url(ownerId, warehouseId), {ownerId, depotId, productTotalUnits, productTotalRemainingUnits})
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
     deleteDepot: async function (userId: string, warehouseId: string, depotId: string) {
         try {
             const response = await apiRequest.delete(url(userId, warehouseId), {params: {depotId: depotId}})

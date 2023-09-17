@@ -82,6 +82,24 @@ export async function PUT(req, res) {
     return new Response('La acción de agregar productos ha fallado', {status: 500})
 }
 
+// Update new units to a depot
+export async function PATCH(req, res) {
+    const {ownerId, depotId, productTotalUnits, productTotalRemainingUnits} = await req.json()
+
+    if (ownerId && depotId) {
+        const updatedDeposit = await prisma.depots.update(
+            {
+                data: {product_total_units: parseInt(productTotalUnits), product_total_remaining_units: parseInt(productTotalRemainingUnits)},
+                where: {id: parseInt(depotId)}
+            }
+        )
+
+        return NextResponse.json(updatedDeposit)
+    }
+
+    return new Response('La acción de modificar las cantidades de productos ha fallado', {status: 500})
+}
+
 // Delete warehouse depot
 export async function DELETE(req, res) {
     const {searchParams} = new URL(req.url)
