@@ -27,7 +27,7 @@ import {
     ArrowLeft,
     DeleteOutline,
     Done,
-    EditOutlined, ExpandLessOutlined, ExpandMoreOutlined,
+    EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, Visibility, VisibilityOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -37,6 +37,7 @@ import {Formik} from "formik";
 import * as Yup from "yup";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import tableStyles from "@/assets/styles/tableStyles";
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -424,6 +425,14 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
+    const [openImageDialog, setOpenImagesDialog] = React.useState(false)
+    const [dialogImages, setDialogImages] = React.useState([])
+
+    function handleOpenImagesDialog(images) {
+        setDialogImages(images)
+        setOpenImagesDialog(true)
+    }
+
     //expand description
     const [expandIndex, setExpandIndex] = React.useState(null)
 
@@ -603,7 +612,21 @@ export default function UserWarehouseMainTable(props) {
 
                                             <Grid container item spacing={1} xs={12}>
                                                 <Grid item xs={"auto"} sx={{fontWeight: 600}}>Imágenes:</Grid>
-                                                <Grid item xs={true}>{row.images.length}</Grid>
+                                                <Grid item xs={true}>
+                                                    {
+                                                        row.images.length > 0
+                                                            ? (
+                                                                <Box
+                                                                    sx={{cursor: "pointer", display: "flex", alignItems: "center"}}
+                                                                    onClick={() => handleOpenImagesDialog(row.images)}
+                                                                >
+                                                                    {row.images.length}
+
+                                                                    <VisibilityOutlined fontSize={"small"} sx={{ml: "5px"}}/>
+                                                                </Box>
+                                                            ) : "no"
+                                                    }
+                                                </Grid>
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
@@ -655,6 +678,13 @@ export default function UserWarehouseMainTable(props) {
                         >
                             <UpdateUnitsQuantityForm formik={formik}/>
                         </UpdateValueDialog>
+
+                        <ImagesDisplayDialog
+                            dialogTitle={"Imágenes del producto"}
+                            open={openImageDialog}
+                            setOpen={setOpenImagesDialog}
+                            images={dialogImages}
+                        />
 
                         <CustomToolbar/>
 
