@@ -7,7 +7,7 @@ import {
     Card,
     CardContent,
     Checkbox,
-    CircularProgress,
+    CircularProgress, Collapse,
     Divider,
     Grid,
     IconButton,
@@ -17,7 +17,7 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Toolbar,
+    Toolbar, Tooltip,
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
@@ -27,7 +27,7 @@ import {
     ArrowLeft,
     DeleteOutline,
     Done,
-    EditOutlined,
+    EditOutlined, ExpandLessOutlined, ExpandMoreOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -36,11 +36,12 @@ import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests
 import {Formik} from "formik";
 import * as Yup from "yup";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
+import tableStyles from "@/assets/styles/tableStyles";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function UserWarehouseMainTable(props) {
-    const { ownerId, warehouseDetails } = props
+    const {ownerId, warehouseDetails} = props
 
     const [data, setData] = React.useState([])
     const [depositByDepartment, setDepositByDepartment] = React.useState([])
@@ -206,7 +207,8 @@ export default function UserWarehouseMainTable(props) {
                     {
                         depositByDepartment.map((item, index) => (
                             <Grid key={item.id} item xs={"auto"}>
-                                <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
+                                <Button variant={item.selected ? "contained" : "outlined"}
+                                        onClick={() => handleSelectFilter(index)}>
                                     <Grid container>
                                         <Grid item xs={12}>
                                             {item.name}
@@ -268,7 +270,7 @@ export default function UserWarehouseMainTable(props) {
                     const departmentIndex = newDepots.indexOf(departmentItem)
 
                     const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.data.id)
-                    if (updatedIndex > - 1) {
+                    if (updatedIndex > -1) {
                         newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_units = updatedDepot.data.product_total_units
                         newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units
 
@@ -325,7 +327,7 @@ export default function UserWarehouseMainTable(props) {
                     const departmentIndex = newDepots.indexOf(departmentItem)
 
                     const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.data.id)
-                    if (updatedIndex > - 1) {
+                    if (updatedIndex > -1) {
                         newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_units = updatedDepot.data.product_total_units
                         newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units
 
@@ -422,6 +424,9 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
+    //expand description
+    const [expandIndex, setExpandIndex] = React.useState(null)
+
     const TableContent = ({formik}) => {
         function handleOpenNewUnitsForm(e, row) {
             e.stopPropagation()
@@ -446,59 +451,179 @@ export default function UserWarehouseMainTable(props) {
             setDisplayUpdateUnitsForm(true)
         }
 
+        function handleExpand(e, rowIndex) {
+            e.stopPropagation()
+
+            if (rowIndex === expandIndex)
+                return setExpandIndex(null)
+
+            return setExpandIndex(rowIndex)
+        }
+
         return (
             <TableBody>
                 {data.filter(
                     item =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                         item?.description?.toUpperCase()?.includes(formik.values.searchBarValue.toUpperCase())).map(
-                    row => (
-                    <TableRow
-                        key={row.id}
-                        hover
-                        tabIndex={-1}
-                        selected={selected && (row.id === selected.id)}
-                        onClick={() => handleSelectItem(row)}
-                    >
-                        <TableCell>
-                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
-                        </TableCell>
-                        <TableCell>
-                            {row.name}
-                            {
-                                row.description && (
-                                    <small>
-                                        {` ${row.description}`}
-                                    </small>
-                                )
-                            }
-                        </TableCell>
-                        <TableCell>
-                            {row.departments?.name ?? "-"}
-                        </TableCell>
-                        <TableCell>
-                            {row.depots[0].product_total_units ?? "-"} de {row.depots[0].product_total_remaining_units ?? "-"}
-
-                            <IconButton
-                                color={"inherit"}
-                                onClick={(e) => handleOpenNewUnitsForm(e, row)}
-                                sx={{ml: "10px"}}
+                    (row, index) => (
+                        <React.Fragment key={row.id}>
+                            <TableRow
+                                hover
+                                tabIndex={-1}
+                                selected={selected && (row.id === selected.id)}
+                                onClick={() => handleSelectItem(row)}
+                                sx={tableStyles.row}
                             >
-                                <Add fontSize={"small"}/>
-                            </IconButton>
+                                <TableCell>
+                                    <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
+                                </TableCell>
+                                <TableCell>
+                                    <div>
+                                        {row.name} <br/>
+                                        {
+                                            row.description && (
+                                                <small>
+                                                    {` ${row.description.slice(0, 20)}`}
+                                                </small>
+                                            )
+                                        }
+                                    </div>
+                                </TableCell>
+                                <TableCell>
+                                    {row.departments?.name ?? "-"}
+                                </TableCell>
+                                <TableCell>
+                                    {row.depots[0].product_total_units ?? "-"} de {row.depots[0].product_total_remaining_units ?? "-"}
 
-                            <IconButton
-                                color={"inherit"}
-                                onClick={(e) => handleOpenUpdateUnitsForm(e, row)}
-                                sx={{ml: "5px"}}
-                            >
-                                <EditOutlined fontSize={"small"}/>
-                            </IconButton>
-                        </TableCell>
-                        <TableCell>
-                            {dayjs(row.depots.created_at).format("DD/MM/YYYY HH:MM")}
-                        </TableCell>
-                    </TableRow>
+                                    <IconButton
+                                        color={"inherit"}
+                                        onClick={(e) => handleOpenNewUnitsForm(e, row)}
+                                        sx={{ml: "10px"}}
+                                    >
+                                        <Add fontSize={"small"}/>
+                                    </IconButton>
+
+                                    <IconButton
+                                        color={"inherit"}
+                                        onClick={(e) => handleOpenUpdateUnitsForm(e, row)}
+                                        sx={{ml: "5px"}}
+                                    >
+                                        <EditOutlined fontSize={"small"}/>
+                                    </IconButton>
+                                </TableCell>
+                                <TableCell>
+                                    {dayjs(row.depots[0].created_at).format("DD/MM/YYYY HH:MM")}
+
+                                    <Box sx={tableStyles.actionColumn}>
+                                        <Tooltip title={"Details"}>
+                                            <IconButton
+                                                size={"small"}
+                                                sx={{m: "3px"}}
+                                                onClick={(e) => handleExpand(e, index)}
+                                            >
+                                                {
+                                                    expandIndex === index
+                                                        ? <ExpandLessOutlined/>
+                                                        : <ExpandMoreOutlined/>
+                                                }
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Box>
+                                </TableCell>
+                            </TableRow>
+
+                            <TableRow>
+                                <TableCell style={{ padding: 0 }} colSpan={5}>
+                                    <Collapse in={ expandIndex === index } timeout="auto" unmountOnExit>
+                                        <Grid container spacing={1} sx={{padding: "8px 26px"}}>
+                                            <Grid item xs={12}>
+                                                <Typography variant="subtitle1" gutterBottom component="div">
+                                                    Detalles:
+                                                </Typography>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Producto:</Grid>
+                                                <Grid item xs={true}>
+                                                    {row.name}
+                                                    {
+                                                        row.description && (
+                                                            <small>
+                                                                {` ${row.description}`}
+                                                            </small>
+                                                        )
+                                                    }
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Departamento:</Grid>
+                                                <Grid item xs={true}>{row.departments?.name ?? "-"}</Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>Características:</Grid>
+                                                <Grid item xs={true} sx={{display: "flex", alignItems: "center"}}>
+                                                    {row.characteristics.length > 0
+                                                        ? row.characteristics.map(item => (
+                                                                <Grid
+                                                                    key={item.id}
+                                                                    sx={{
+                                                                        display: "inline-flex",
+                                                                        margin: "3px",
+                                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                                        padding: "2px 4px",
+                                                                        borderRadius: "5px 2px 2px 2px",
+                                                                        border: "1px solid rgba(130, 130, 130)",
+                                                                        fontSize: 14,
+                                                                    }}
+                                                                >
+                                                                    <Grid container item alignItems={"center"} sx={{marginRight: "3px"}}>
+                                                                        <Typography variant={"caption"}
+                                                                                    sx={{color: "white", fontWeight: "600"}}>
+                                                                            {item.name.toUpperCase()}
+                                                                        </Typography>
+                                                                    </Grid>
+                                                                    <Grid container item alignItems={"center"}
+                                                                          sx={{color: "rgba(16,27,44,0.8)"}}>
+                                                                        {item.value}
+                                                                    </Grid>
+                                                                </Grid>
+                                                            )
+                                                        ) : "-"
+                                                    }
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Precio de compra:</Grid>
+                                                <Grid item xs={true}>{row.buy_price ?? "-"}</Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Imágenes:</Grid>
+                                                <Grid item xs={true}>{row.images.length}</Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Creación:</Grid>
+                                                <Grid item xs={true}>
+                                                    {`${dayjs(row.depots[0].created_at).format("DD/MM/YYYY HH:MM")} por ${row.depots[0].inserted_by_id}`}
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Unidades restantes de total:</Grid>
+                                                <Grid item xs={true}>
+                                                    {row.depots[0].product_total_units ?? "-"} de {row.depots[0].product_total_remaining_units ?? "-"}
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </Collapse>
+                                </TableCell>
+                            </TableRow>
+                        </React.Fragment>
                 ))}
             </TableBody>
         )
