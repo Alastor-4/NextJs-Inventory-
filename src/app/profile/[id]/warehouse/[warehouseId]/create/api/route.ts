@@ -1,34 +1,39 @@
-import { NextResponse } from 'next/server'
+import {NextResponse} from 'next/server'
 import {prisma} from "db";
 
-// Owner find a user to add it as worker
-export async function GET(req, res) {
-    const {searchParams} = new URL(req.url)
-    const username = searchParams.get("username") ?? ""
-    const phone = searchParams.get("phone") ?? ""
+// Get all products with out depots in warehouse
+export async function GET(request: Request, {params}: { params: { id: string, warehouseId: string } }) {
+    const ownerId = params.id
+    const warehouseId = params.warehouseId
 
-    //find a user with provided username and phone, without role and not a worker for any owner
-    const user = await prisma.users.findFirst(
-        {
-            where: {username: username, phone: phone, work_for_user_id: null, role_id: null},
-        }
-    )
+    if (ownerId && warehouseId) {
+        const warehouseDepots = await prisma.departments.findMany(
+            {
+                where: {
+                    AND: [
+                        {
+                            products: {
+                                some: {owner_id: parseInt(ownerId)}
+                            },
+                        },
+                        {
+                            products: {
+                                some: {depots: {none: {warehouse_id: parseInt(warehouseId)}}}
+                            },
+                        },
+                    ]
+                },
+                include: {
+                    products: {
+                        where: {depots: {none: {warehouse_id: parseInt(warehouseId)}}},
+                        include: {departments: true, characteristics: true, images: true},
+                    }
+                }
+            }
+        )
 
-    return NextResponse.json(user)
-}
-
-// Make worker a new user
-export async function PUT(req, res) {
-    const {searchParams} = new URL(req.url)
-    const ownerId = searchParams.get("ownerId")
-
-    const {userId} = await req.json()
-
-    if (ownerId && userId) {
-        const updatedRole = await prisma.users.update({data: {work_for_user_id: parseInt(ownerId)}, where: {id: parseInt(userId)}})
-
-        return NextResponse.json(updatedRole)
+        return NextResponse.json(warehouseDepots)
     }
 
-    return new Response('La acción de agregar usuario ha fallado', {status: 500})
+    return new Response('La acción de obtener los depósitos ha fallado', {status: 500})
 }

@@ -1,12 +1,23 @@
 import apiRequest from "@/api"
 
 const url = (ownerId: string, warehouseId: string) => `/profile/${ownerId}/warehouse/${warehouseId}/api`
-const urlCreate = (userId) => `/profile/${userId}/worker/create/api`
+const urlCreate = (ownerId: string, warehouseId: string) => `/profile/${ownerId}/warehouse/${warehouseId}/create/api`
 
 const warehouseDepots = {
     allDepots: async function (userId: string, warehouseId: string) {
         try {
             const response = await apiRequest.get(url(userId, warehouseId))
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    allProductsWithoutDepots: async function (userId: string, warehouseId: string) {
+        try {
+            const response = await apiRequest.get(urlCreate(userId, warehouseId))
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -28,6 +39,16 @@ const warehouseDepots = {
     increaseUnitsDepot: async function ({ownerId, warehouseId, depotId, newUnits}) {
         try {
             return await apiRequest.put(url(ownerId, warehouseId), {ownerId, depotId, newUnits})
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    updateUnitsDepot: async function ({ownerId, warehouseId, depotId, productTotalUnits, productTotalRemainingUnits}) {
+        try {
+            return await apiRequest.patch(url(ownerId, warehouseId), {ownerId, depotId, productTotalUnits, productTotalRemainingUnits})
         } catch (e) {
             //ToDo: notify error here
         }

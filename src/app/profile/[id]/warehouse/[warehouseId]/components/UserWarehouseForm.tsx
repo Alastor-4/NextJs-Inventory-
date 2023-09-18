@@ -19,11 +19,20 @@ import {useRouter} from 'next/navigation';
 import DepartmentProductsSelect from "@/components/DepartmentProductsSelect";
 import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
 
-export default function UserWarehouseForm({ownerId, warehouseId, departmentProducts}) {
+export default function UserWarehouseForm({ownerId, warehouseId}) {
     const router = useRouter()
 
-    const [updateItem, setUpdateItem] = React.useState()
-    const [departmentProductsList, setDepartmentProductsList] = React.useState(departmentProducts)
+    const [departmentProductsList, setDepartmentProductsList] = React.useState([])
+
+    React.useEffect(() => {
+        async function fetchData() {
+            const departmentProductsList = await warehouseDepots.allProductsWithoutDepots(ownerId, warehouseId)
+
+            setDepartmentProductsList(departmentProductsList)
+        }
+
+        fetchData()
+    }, [ownerId, warehouseId])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -131,7 +140,7 @@ export default function UserWarehouseForm({ownerId, warehouseId, departmentProdu
                             sx={{m: 1}}
                             disabled={!formik.isValid}
                         >
-                            {updateItem ? "Update" : "Create"}
+                            Create
                         </Button>
                     </Grid>
                 </Grid>
