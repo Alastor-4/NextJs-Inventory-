@@ -68,6 +68,8 @@ export default function UserWarehouseMainTable(props) {
             })
 
             setData(allProducts)
+        } else {
+            setData([])
         }
 
     }, [depositByDepartment])

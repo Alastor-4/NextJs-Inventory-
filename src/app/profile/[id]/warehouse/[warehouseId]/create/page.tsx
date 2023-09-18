@@ -1,5 +1,4 @@
 import UserWarehouseForm from "@/app/profile/[id]/warehouse/[warehouseId]/components/UserWarehouseForm";
-import {prisma} from "db";
 
 export default async function Page({params}) {
     const userId = params.id
