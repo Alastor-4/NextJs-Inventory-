@@ -2,6 +2,7 @@ import apiRequest from "@/api"
 
 const url = (ownerId: string, warehouseId: string) => `/profile/${ownerId}/warehouse/${warehouseId}/api`
 const urlCreate = (ownerId: string, warehouseId: string) => `/profile/${ownerId}/warehouse/${warehouseId}/create/api`
+const urlDepotAssign = (ownerId: string, warehouseId: string) => `/profile/${ownerId}/warehouse/${warehouseId}/depot-assign/api`
 
 const warehouseDepots = {
     allDepots: async function (userId: string, warehouseId: string) {
@@ -18,6 +19,17 @@ const warehouseDepots = {
     allProductsWithoutDepots: async function (userId: string, warehouseId: string) {
         try {
             const response = await apiRequest.get(urlCreate(userId, warehouseId))
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    depotStoreDistribution: async function (userId: string, warehouseId: string, depotId: string) {
+        try {
+            const response = await apiRequest.get(urlDepotAssign(userId, warehouseId), {params: {depotId: depotId}})
             return response.data
         } catch (e) {
             //ToDo: notify error here
