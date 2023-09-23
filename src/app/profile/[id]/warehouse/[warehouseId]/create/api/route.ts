@@ -1,7 +1,7 @@
 import {NextResponse} from 'next/server'
 import {prisma} from "db";
 
-// Get all products with out depots in warehouse
+// Get all products without depots in warehouse
 export async function GET(request: Request, {params}: { params: { id: string, warehouseId: string } }) {
     const ownerId = params.id
     const warehouseId = params.warehouseId

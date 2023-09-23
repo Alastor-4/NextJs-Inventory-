@@ -24,10 +24,10 @@ import {TableNoData} from "@/components/TableNoData";
 import {
     Add,
     AddOutlined,
-    ArrowLeft,
+    ArrowLeft, ChevronRightOutlined,
     DeleteOutline,
     Done,
-    EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, Visibility, VisibilityOutlined,
+    EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined, Visibility, VisibilityOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -137,6 +137,10 @@ export default function UserWarehouseMainTable(props) {
         router.back()
     }
 
+    function handleStoreAssign() {
+        router.push(`/profile/${ownerId}/store-assign`)
+    }
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
@@ -175,6 +179,10 @@ export default function UserWarehouseMainTable(props) {
                                             </Box>
                                         )
                                     }
+
+                                    <IconButton color={"inherit"} onClick={handleStoreAssign}>
+                                        <ShareOutlined fontSize={"small"}/>
+                                    </IconButton>
 
                                     <Link href={`/profile/${ownerId}/warehouse/${warehouseDetails.id}/create`}>
                                         <IconButton color={"inherit"}>
@@ -433,6 +441,13 @@ export default function UserWarehouseMainTable(props) {
         setOpenImagesDialog(true)
     }
 
+    const [storesDepotDistribution, setStoresDepotDistribution] = React.useState(null)
+    async function handleLoadStoresDistribution(depot) {
+        const response = await warehouseDepots.depotStoreDistribution(ownerId, warehouseDetails.id, depot.id)
+        if (response)
+            setStoresDepotDistribution(response)
+    }
+
     //expand description
     const [expandIndex, setExpandIndex] = React.useState(null)
 
@@ -617,7 +632,7 @@ export default function UserWarehouseMainTable(props) {
                                                         row.images.length > 0
                                                             ? (
                                                                 <Box
-                                                                    sx={{cursor: "pointer", display: "flex", alignItems: "center"}}
+                                                                    sx={{cursor: "pointer", display: "flex", alignItems: "center", color: "blue"}}
                                                                     onClick={() => handleOpenImagesDialog(row.images)}
                                                                 >
                                                                     {row.images.length}
@@ -642,6 +657,38 @@ export default function UserWarehouseMainTable(props) {
                                                     {row.depots[0].product_total_units ?? "-"} de {row.depots[0].product_total_remaining_units ?? "-"}
                                                 </Grid>
                                             </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{color: "blue"}}>
+                                                    <Box
+                                                        sx={{cursor: "pointer", display: "flex", alignItems: "center"}}
+                                                        onClick={() => handleLoadStoresDistribution(row.depots[0])}
+                                                    >
+                                                        Ver distribución del producto
+                                                        <ShareOutlined fontSize={"small"} sx={{ml: "5px"}}/>
+                                                    </Box>
+                                                </Grid>
+                                            </Grid>
+
+                                            {
+                                                storesDepotDistribution && (
+                                                    storesDepotDistribution.map(item => (
+                                                        <Grid container item spacing={1} xs={12} key={item.id}>
+                                                            <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                                                <ChevronRightOutlined fontSize={"small"}/>
+                                                                {item.name}:
+                                                            </Grid>
+                                                            <Grid item xs={true}>
+                                                                {
+                                                                    item.store_depots.length > 0
+                                                                        ? `Total (${item.store_depots[0].product_units}) - Restantes (${item.store_depots[0].product_remaining_units})`
+                                                                        : "no asignado"
+                                                                }
+                                                            </Grid>
+                                                        </Grid>
+                                                    ))
+                                                )
+                                            }
                                         </Grid>
                                     </Collapse>
                                 </TableCell>
