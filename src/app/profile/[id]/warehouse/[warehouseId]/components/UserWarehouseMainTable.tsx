@@ -27,7 +27,7 @@ import {
     ArrowLeft,
     DeleteOutline,
     Done,
-    EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, Visibility, VisibilityOutlined,
+    EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined, Visibility, VisibilityOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -137,6 +137,10 @@ export default function UserWarehouseMainTable(props) {
         router.back()
     }
 
+    function handleStoreAssign() {
+        router.push(`/profile/${ownerId}/store-assign`)
+    }
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
@@ -175,6 +179,10 @@ export default function UserWarehouseMainTable(props) {
                                             </Box>
                                         )
                                     }
+
+                                    <IconButton color={"inherit"} onClick={handleStoreAssign}>
+                                        <ShareOutlined fontSize={"small"}/>
+                                    </IconButton>
 
                                     <Link href={`/profile/${ownerId}/warehouse/${warehouseDetails.id}/create`}>
                                         <IconButton color={"inherit"}>
