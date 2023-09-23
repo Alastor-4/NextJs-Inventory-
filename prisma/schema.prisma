@@ -100,6 +100,7 @@ model store_depots {
   product_units            Int?
   product_remaining_units  Int?
   seller_profit_percentage Float?          @db.Float
+  seller_profit_quantity   Float?          @db.Float
   created_at               DateTime        @default(now()) @db.Timestamp(0)
   is_active                Boolean?        @default(false)
   offer_notes              String?         @db.VarChar(255)
@@ -126,7 +127,8 @@ model stores {
   created_at                     DateTime                 @default(now()) @db.Timestamp(0)
   online_catalog                 Boolean?                 @default(false)
   online_reservation             Boolean?                 @default(false)
-  fixed_seller_profit_percentage Float?                   @default(5) @db.Float
+  fixed_seller_profit_percentage Float?                   @db.Float
+  fixed_seller_profit_quantity   Float?                   @db.Float
   auto_open_time                 Boolean?                 @default(true)
   auto_reservation_time          Boolean?                 @default(true)
   store_depots                   store_depots[]
