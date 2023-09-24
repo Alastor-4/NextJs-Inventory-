@@ -444,8 +444,19 @@ export default function UserWarehouseMainTable(props) {
     const [storesDepotDistribution, setStoresDepotDistribution] = React.useState(null)
     async function handleLoadStoresDistribution(depot) {
         const response = await warehouseDepots.depotStoreDistribution(ownerId, warehouseDetails.id, depot.id)
-        if (response)
-            setStoresDepotDistribution(response)
+        if (response) {
+            const newDepositByDepartment = [...depositByDepartment]
+            depositByDepartment.forEach((departmentItem, departmentIndex) => {
+                const productIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === depot.id)
+                if (productIndex > -1) {
+                    newDepositByDepartment[departmentIndex].products[productIndex].storesDistribution = response
+
+                    //break loop
+                }
+            })
+
+            setDepositByDepartment(newDepositByDepartment)
+        }
     }
 
     //expand description
@@ -632,7 +643,7 @@ export default function UserWarehouseMainTable(props) {
                                                         row.images.length > 0
                                                             ? (
                                                                 <Box
-                                                                    sx={{cursor: "pointer", display: "flex", alignItems: "center", color: "blue"}}
+                                                                    sx={{cursor: "pointer", display: "inline-flex", alignItems: "center", color: "blue"}}
                                                                     onClick={() => handleOpenImagesDialog(row.images)}
                                                                 >
                                                                     {row.images.length}
@@ -659,20 +670,26 @@ export default function UserWarehouseMainTable(props) {
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{color: "blue"}}>
-                                                    <Box
-                                                        sx={{cursor: "pointer", display: "flex", alignItems: "center"}}
-                                                        onClick={() => handleLoadStoresDistribution(row.depots[0])}
-                                                    >
-                                                        Ver distribución del producto
-                                                        <ShareOutlined fontSize={"small"} sx={{ml: "5px"}}/>
-                                                    </Box>
+                                                <Grid item xs={"auto"}>
+                                                    {
+                                                        row.storesDistribution ? (
+                                                            <Box sx={{display: "inline-flex", fontWeight: 600}}>Distribución del producto</Box>
+                                                        ) : (
+                                                            <Box
+                                                                sx={{cursor: "pointer", display: "flex", alignItems: "center", color: "blue"}}
+                                                                onClick={() => handleLoadStoresDistribution(row.depots[0])}
+                                                            >
+                                                                Ver distribución del producto
+                                                                <ShareOutlined fontSize={"small"} sx={{ml: "5px"}}/>
+                                                            </Box>
+                                                        )
+                                                    }
                                                 </Grid>
                                             </Grid>
 
                                             {
-                                                storesDepotDistribution && (
-                                                    storesDepotDistribution.map(item => (
+                                                row.storesDistribution && (
+                                                    row.storesDistribution.map(item => (
                                                         <Grid container item spacing={1} xs={12} key={item.id}>
                                                             <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
                                                                 <ChevronRightOutlined fontSize={"small"}/>
