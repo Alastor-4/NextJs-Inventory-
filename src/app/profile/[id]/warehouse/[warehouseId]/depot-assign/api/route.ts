@@ -82,7 +82,42 @@ export async function PUT(req, res) {
             }
         }
 
+        return new Response('La acción de agregar productos ha fallado', {status: 412})
+    } catch (e) {
         return new Response('La acción de agregar productos ha fallado', {status: 500})
+    }
+}
+
+// Send depot units from store to warehouse
+export async function PATCH(req, res) {
+    const {ownerId, depotId, storeDepotId, moveUnitQuantity} = await req.json()
+
+    try {
+        if (ownerId && depotId && storeDepotId) {
+            const storeDepot = await prisma.store_depots.findUnique({where: {id: parseInt(storeDepotId)}})
+
+            if (parseInt(moveUnitQuantity) <= storeDepot.product_remaining_units) {
+                const updatedStoreDepot = await prisma.store_depots.update(
+                    {
+                        data: {product_remaining_units: {decrement: parseInt(moveUnitQuantity)}},
+                        where: {id: parseInt(storeDepotId)}
+                    }
+                )
+
+                const updatedDepot = await prisma.depots.update(
+                    {
+                        data: {product_total_remaining_units: {increment: parseInt(moveUnitQuantity)}},
+                        where: {id: parseInt(depotId)}
+                    }
+                )
+
+                return NextResponse.json({updatedDepot, updatedStoreDepot})
+            } else {
+                return new Response('La acción de agregar productos ha fallado', {status: 412})
+            }
+        }
+
+        return new Response('La acción de agregar productos ha fallado', {status: 412})
     } catch (e) {
         return new Response('La acción de agregar productos ha fallado', {status: 500})
     }

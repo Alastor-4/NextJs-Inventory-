@@ -7,7 +7,8 @@ import {
     Card,
     CardContent,
     Checkbox,
-    CircularProgress, Collapse,
+    CircularProgress,
+    Collapse,
     Divider,
     Grid,
     IconButton,
@@ -17,23 +18,22 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Toolbar, Tooltip,
+    Toolbar,
+    Tooltip,
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
 import {
     Add,
-    AddOutlined, ArrowCircleDownOutlined, ArrowCircleUpOutlined,
-    ArrowLeft, ChangeCircleOutlined,
+    AddOutlined,
+    ArrowLeft,
     ChevronRightOutlined,
     DeleteOutline,
     Done,
     EditOutlined,
     ExpandLessOutlined,
     ExpandMoreOutlined,
-    KeyboardArrowUpOutlined,
-    ShareOutlined, ToggleOnOutlined,
-    Visibility,
+    ShareOutlined,
     VisibilityOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
@@ -418,6 +418,34 @@ export default function UserWarehouseMainTable(props) {
     const UpdateStoreDepotQuantityForm = ({formik}) => {
         const {warehouseQuantity, storeQuantity, moveQuantity} = formik.values.productStoreDepotDistribution
 
+        function updateLocalData(updatedDepot, updatedStoreDepot) {
+            const newDepots = [...depositByDepartment]
+
+            for (const departmentItem of depositByDepartment) {
+                const departmentIndex = newDepots.indexOf(departmentItem)
+
+                //find updatedDepot
+                const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.id)
+                if (updatedIndex > -1) {
+                    //update depot data
+                    newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.product_total_remaining_units
+
+                    //find updated store_depot
+                    const updatedStoreDepotIndex = departmentItem.products[updatedIndex].storesDistribution.findIndex(
+                        storeItem => storeItem.id === updatedStoreDepot.store_id
+                    )
+
+                    if (updatedStoreDepotIndex > - 1) {
+                        newDepots[departmentIndex].products[updatedIndex].storesDistribution[updatedStoreDepotIndex].store_depots[0] = updatedStoreDepot
+                    }
+
+                    setDepositByDepartment(newDepots)
+
+                    break
+                }
+            }
+        }
+
         async function handleMoveToStore() {
             const updateResponse = await warehouseDepots.sendDepotFromWarehouseToStore(
                 {
@@ -431,31 +459,7 @@ export default function UserWarehouseMainTable(props) {
             )
 
             if (updateResponse?.updatedDepot && updateResponse?.updatedStoreDepot) {
-                const newDepots = [...depositByDepartment]
-
-                for (const departmentItem of depositByDepartment) {
-                    const departmentIndex = newDepots.indexOf(departmentItem)
-
-                    //find updatedDepot
-                    const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updateResponse.updatedDepot.id)
-                    if (updatedIndex > -1) {
-                        //update depot data
-                        newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updateResponse.updatedDepot.product_total_remaining_units
-
-                        //find updated store_depot
-                        const updatedStoreDepotIndex = departmentItem.products[updatedIndex].storesDistribution.findIndex(
-                            storeItem => storeItem.id === updateResponse.updatedStoreDepot.store_id
-                        )
-
-                        if (updatedStoreDepotIndex > - 1) {
-                            newDepots[departmentIndex].products[updatedIndex].storesDistribution[updatedStoreDepotIndex].store_depots[0] = updateResponse.updatedStoreDepot
-                        }
-
-                        setDepositByDepartment(newDepots)
-
-                        break
-                    }
-                }
+                updateLocalData(updateResponse.updatedDepot, updateResponse.updatedStoreDepot)
 
                 formik.resetForm()
 
@@ -463,11 +467,23 @@ export default function UserWarehouseMainTable(props) {
             }
         }
 
-        function handleButtonUpClick() {
-            if (warehouseQuantity > moveQuantity) {
-                formik.setFieldValue("productStoreDepotDistribution.moveQuantity", parseInt(moveQuantity) + 1)
-            } else {
-                formik.setFieldError("productStoreDepotDistribution.moveQuantity", "máxima cantidad a enviar")
+        async function handleMoveToWarehouse() {
+            const updateResponse = await warehouseDepots.sendDepotFromStoreToWarehouse(
+                {
+                    userId: ownerId,
+                    warehouseId: warehouseDetails.id,
+                    depotId: selected.depots[0].id,
+                    storeDepotId: selected.storesDistribution[storeDepotUpdateIndex].store_depots[0].id,
+                    moveUnitQuantity: formik.values.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity,
+                }
+            )
+
+            if (updateResponse?.updatedDepot && updateResponse?.updatedStoreDepot) {
+                updateLocalData(updateResponse.updatedDepot, updateResponse.updatedStoreDepot)
+
+                formik.resetForm()
+
+                setDisplayUpdateDepotQuantityForm(false)
             }
         }
 
@@ -540,7 +556,7 @@ export default function UserWarehouseMainTable(props) {
                                         }
                                     />
 
-                                    <IconButton color={"secondary"} onClick={handleMoveToStore} sx={{ml: "10px"}}>
+                                    <IconButton color={"secondary"} onClick={handleMoveToWarehouse} sx={{ml: "10px"}}>
                                         <Done/>
                                     </IconButton>
                                 </Grid>
