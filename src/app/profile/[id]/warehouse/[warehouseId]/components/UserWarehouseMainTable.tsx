@@ -7,7 +7,8 @@ import {
     Card,
     CardContent,
     Checkbox,
-    CircularProgress, Collapse,
+    CircularProgress,
+    Collapse,
     Divider,
     Grid,
     IconButton,
@@ -17,17 +18,23 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Toolbar, Tooltip,
+    Toolbar,
+    Tooltip,
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
 import {
     Add,
     AddOutlined,
-    ArrowLeft, ChevronRightOutlined,
+    ArrowLeft,
+    ChevronRightOutlined,
     DeleteOutline,
     Done,
-    EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined, Visibility, VisibilityOutlined,
+    EditOutlined,
+    ExpandLessOutlined,
+    ExpandMoreOutlined,
+    ShareOutlined,
+    VisibilityOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
@@ -83,6 +90,11 @@ export default function UserWarehouseMainTable(props) {
             newTotal: "",
             newRemaining: "",
         },
+        productStoreDepotDistribution: {
+            warehouseQuantity: "",
+            storeQuantity: "",
+            moveQuantity: 0,
+        },
     }
 
     const validationSchema = Yup.object({
@@ -104,6 +116,22 @@ export default function UserWarehouseMainTable(props) {
             .integer("especifique un número entero mayor que cero")
             .min(0, "especifique un número entero mayor que cero")
             .nullable(),
+        productStoreDepotDistribution: Yup.object({
+            warehouseQuantity: Yup.number().integer(),
+            storeQuantity: Yup.number().integer().nullable(),
+            moveFromWarehouseToStoreQuantity: Yup
+                .number()
+                .typeError("número entero")
+                .integer("número entero")
+                .min(0, "cantidad mayor que 0")
+                .max(Yup.ref("warehouseQuantity"), "cantidad menor que lo disponible en almacén"),
+            moveFromStoreToWarehouseQuantity: Yup
+                .number()
+                .typeError("número entero")
+                .integer("número entero")
+                .min(0, "cantidad mayor que 0")
+                .max(Yup.ref("storeQuantity"), "cantidad menor que lo disponible en tienda")
+        })
     })
 
     //ToDo: use global isLoading
@@ -260,6 +288,8 @@ export default function UserWarehouseMainTable(props) {
 
     const [displayNewUnitsForm, setDisplayNewUnitsForm] = React.useState(false)
     const [displayUpdateUnitsForm, setDisplayUpdateUnitsForm] = React.useState(false)
+    const [displayUpdateDepotQuantityForm, setDisplayUpdateDepotQuantityForm] = React.useState(false)
+    const [storeDepotUpdateIndex, setStoreDepotUpdateIndex] = React.useState(null)
 
     const NewUnitsQuantityForm = ({formik}) => {
         async function handleNewUnitsAdd() {
@@ -385,6 +415,159 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
+    const UpdateStoreDepotQuantityForm = ({formik}) => {
+        const {warehouseQuantity, storeQuantity, moveQuantity} = formik.values.productStoreDepotDistribution
+
+        function updateLocalData(updatedDepot, updatedStoreDepot) {
+            const newDepots = [...depositByDepartment]
+
+            for (const departmentItem of depositByDepartment) {
+                const departmentIndex = newDepots.indexOf(departmentItem)
+
+                //find updatedDepot
+                const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.id)
+                if (updatedIndex > -1) {
+                    //update depot data
+                    newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.product_total_remaining_units
+
+                    //find updated store_depot
+                    const updatedStoreDepotIndex = departmentItem.products[updatedIndex].storesDistribution.findIndex(
+                        storeItem => storeItem.id === updatedStoreDepot.store_id
+                    )
+
+                    if (updatedStoreDepotIndex > - 1) {
+                        newDepots[departmentIndex].products[updatedIndex].storesDistribution[updatedStoreDepotIndex].store_depots[0] = updatedStoreDepot
+                    }
+
+                    setDepositByDepartment(newDepots)
+
+                    break
+                }
+            }
+        }
+
+        async function handleMoveToStore() {
+            const updateResponse = await warehouseDepots.sendDepotFromWarehouseToStore(
+                {
+                    userId: ownerId,
+                    warehouseId: warehouseDetails.id,
+                    depotId: selected.depots[0].id,
+                    storeDepotId: selected.storesDistribution[storeDepotUpdateIndex]?.store_depots[0]?.id ?? null,
+                    storeId: selected.storesDistribution[storeDepotUpdateIndex].id,
+                    moveUnitQuantity: formik.values.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity,
+                }
+            )
+
+            if (updateResponse?.updatedDepot && updateResponse?.updatedStoreDepot) {
+                updateLocalData(updateResponse.updatedDepot, updateResponse.updatedStoreDepot)
+
+                formik.resetForm()
+
+                setDisplayUpdateDepotQuantityForm(false)
+            }
+        }
+
+        async function handleMoveToWarehouse() {
+            const updateResponse = await warehouseDepots.sendDepotFromStoreToWarehouse(
+                {
+                    userId: ownerId,
+                    warehouseId: warehouseDetails.id,
+                    depotId: selected.depots[0].id,
+                    storeDepotId: selected.storesDistribution[storeDepotUpdateIndex].store_depots[0].id,
+                    moveUnitQuantity: formik.values.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity,
+                }
+            )
+
+            if (updateResponse?.updatedDepot && updateResponse?.updatedStoreDepot) {
+                updateLocalData(updateResponse.updatedDepot, updateResponse.updatedStoreDepot)
+
+                formik.resetForm()
+
+                setDisplayUpdateDepotQuantityForm(false)
+            }
+        }
+
+        function handleButtonDownClick() {
+            if (moveQuantity > 0) {
+                formik.setFieldValue("productStoreDepotDistribution.moveQuantity", parseInt(moveQuantity) - 1)
+            }
+        }
+
+        return (
+            <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
+                <Grid container item spacing={2}>
+                    <Grid item xs={12}>
+                        Mover de almacén hacia tienda: {warehouseQuantity} disponibles
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <TextField
+                            name={"productStoreDepotDistribution"}
+                            label={"Enviar a tienda"}
+                            color={"primary"}
+                            type={"number"}
+                            size={"small"}
+                            {...formik.getFieldProps("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity")}
+                            error={
+                                formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity &&
+                                formik.touched.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
+                            }
+                            helperText={
+                                (
+                                    formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity &&
+                                    formik.touched.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
+                                ) && formik.errors.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity
+                            }
+                        />
+
+                        <IconButton color={"primary"} onClick={handleMoveToStore} sx={{ml: "10px"}}>
+                            <Done/>
+                        </IconButton>
+                    </Grid>
+
+                    {
+                        storeQuantity && (
+                            <>
+                                <Grid item xs={12}>
+                                   <Divider flexItem sx={{width: 1}}/>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    Retirar de tienda hacia el almacén: {storeQuantity} disponibles
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name={"productStoreDepotDistribution"}
+                                        label={"Retirar de tienda"}
+                                        color={"secondary"}
+                                        type={"number"}
+                                        size={"small"}
+                                        {...formik.getFieldProps("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity")}
+                                        error={
+                                            formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity &&
+                                            formik.touched.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
+                                        }
+                                        helperText={
+                                            (
+                                                formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity &&
+                                                formik.touched.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
+                                            ) && formik.errors.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity
+                                        }
+                                    />
+
+                                    <IconButton color={"secondary"} onClick={handleMoveToWarehouse} sx={{ml: "10px"}}>
+                                        <Done/>
+                                    </IconButton>
+                                </Grid>
+                            </>
+                        )
+                    }
+                </Grid>
+            </Card>
+        )
+    }
+
     const TableHeader = () => {
         const headCells = [
             {
@@ -441,7 +624,6 @@ export default function UserWarehouseMainTable(props) {
         setOpenImagesDialog(true)
     }
 
-    const [storesDepotDistribution, setStoresDepotDistribution] = React.useState(null)
     async function handleLoadStoresDistribution(depot) {
         const response = await warehouseDepots.depotStoreDistribution(ownerId, warehouseDetails.id, depot.id)
         if (response) {
@@ -451,7 +633,7 @@ export default function UserWarehouseMainTable(props) {
                 if (productIndex > -1) {
                     newDepositByDepartment[departmentIndex].products[productIndex].storesDistribution = response
 
-                    //break loop
+                    //ToDo: break loop
                 }
             })
 
@@ -484,6 +666,26 @@ export default function UserWarehouseMainTable(props) {
             formik.setFieldValue("updateRemainingUnitsQuantity", row.depots[0].product_total_remaining_units)
 
             setDisplayUpdateUnitsForm(true)
+        }
+
+        function handleOpenUpdateStoreDepotForm(e, row, storeIndex) {
+            e.stopPropagation()
+
+            if (!selected || (selected?.id !== row.id)) {
+                setSelected(row)
+            }
+
+            formik.setFieldValue(
+                "productStoreDepotDistribution.warehouseQuantity",
+                row.depots[0].product_total_remaining_units
+            )
+            formik.setFieldValue(
+                "productStoreDepotDistribution.storeQuantity",
+                row.storesDistribution[storeIndex]?.store_depots[0]?.product_remaining_units ?? null
+            )
+
+            setStoreDepotUpdateIndex(storeIndex)
+            setDisplayUpdateDepotQuantityForm(true)
         }
 
         function handleExpand(e, rowIndex) {
@@ -529,7 +731,7 @@ export default function UserWarehouseMainTable(props) {
                                     {row.departments?.name ?? "-"}
                                 </TableCell>
                                 <TableCell>
-                                    {row.depots[0].product_total_units ?? "-"} de {row.depots[0].product_total_remaining_units ?? "-"}
+                                    {row.depots[0].product_total_remaining_units ?? "-"} de {row.depots[0].product_total_units ?? "-"}
 
                                     <IconButton
                                         color={"inherit"}
@@ -569,8 +771,8 @@ export default function UserWarehouseMainTable(props) {
                             </TableRow>
 
                             <TableRow>
-                                <TableCell style={{ padding: 0 }} colSpan={5}>
-                                    <Collapse in={ expandIndex === index } timeout="auto" unmountOnExit>
+                                <TableCell style={{padding: 0}} colSpan={5}>
+                                    <Collapse in={expandIndex === index} timeout="auto" unmountOnExit>
                                         <Grid container spacing={1} sx={{padding: "8px 26px"}}>
                                             <Grid item xs={12}>
                                                 <Typography variant="subtitle1" gutterBottom component="div">
@@ -598,7 +800,8 @@ export default function UserWarehouseMainTable(props) {
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>Características:</Grid>
+                                                <Grid item xs={"auto"}
+                                                      sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>Características:</Grid>
                                                 <Grid item xs={true} sx={{display: "flex", alignItems: "center"}}>
                                                     {row.characteristics.length > 0
                                                         ? row.characteristics.map(item => (
@@ -614,7 +817,8 @@ export default function UserWarehouseMainTable(props) {
                                                                         fontSize: 14,
                                                                     }}
                                                                 >
-                                                                    <Grid container item alignItems={"center"} sx={{marginRight: "3px"}}>
+                                                                    <Grid container item alignItems={"center"}
+                                                                          sx={{marginRight: "3px"}}>
                                                                         <Typography variant={"caption"}
                                                                                     sx={{color: "white", fontWeight: "600"}}>
                                                                             {item.name.toUpperCase()}
@@ -648,7 +852,8 @@ export default function UserWarehouseMainTable(props) {
                                                                 >
                                                                     {row.images.length}
 
-                                                                    <VisibilityOutlined fontSize={"small"} sx={{ml: "5px"}}/>
+                                                                    <VisibilityOutlined fontSize={"small"}
+                                                                                        sx={{ml: "5px"}}/>
                                                                 </Box>
                                                             ) : "no"
                                                     }
@@ -663,9 +868,10 @@ export default function UserWarehouseMainTable(props) {
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Unidades restantes de total:</Grid>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Unidades restantes de
+                                                    total:</Grid>
                                                 <Grid item xs={true}>
-                                                    {row.depots[0].product_total_units ?? "-"} de {row.depots[0].product_total_remaining_units ?? "-"}
+                                                    {row.depots[0].product_total_remaining_units ?? "-"} de {row.depots[0].product_total_units ?? "-"}
                                                 </Grid>
                                             </Grid>
 
@@ -673,7 +879,8 @@ export default function UserWarehouseMainTable(props) {
                                                 <Grid item xs={"auto"}>
                                                     {
                                                         row.storesDistribution ? (
-                                                            <Box sx={{display: "inline-flex", fontWeight: 600}}>Distribución del producto</Box>
+                                                            <Box sx={{display: "inline-flex", fontWeight: 600}}>Distribución
+                                                                del producto</Box>
                                                         ) : (
                                                             <Box
                                                                 sx={{cursor: "pointer", display: "flex", alignItems: "center", color: "blue"}}
@@ -689,9 +896,10 @@ export default function UserWarehouseMainTable(props) {
 
                                             {
                                                 row.storesDistribution && (
-                                                    row.storesDistribution.map(item => (
+                                                    row.storesDistribution.map((item, storeIndex) => (
                                                         <Grid container item spacing={1} xs={12} key={item.id}>
-                                                            <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                                            <Grid item xs={"auto"}
+                                                                  sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
                                                                 <ChevronRightOutlined fontSize={"small"}/>
                                                                 {item.name}:
                                                             </Grid>
@@ -701,6 +909,14 @@ export default function UserWarehouseMainTable(props) {
                                                                         ? `Total (${item.store_depots[0].product_units}) - Restantes (${item.store_depots[0].product_remaining_units})`
                                                                         : "no asignado"
                                                                 }
+
+                                                                <IconButton
+                                                                    size={"small"}
+                                                                    sx={{ml: "10px"}}
+                                                                    onClick={(e) => handleOpenUpdateStoreDepotForm(e, row, storeIndex)}
+                                                                >
+                                                                    <EditOutlined fontSize={"small"}/>
+                                                                </IconButton>
                                                             </Grid>
                                                         </Grid>
                                                     ))
@@ -711,7 +927,7 @@ export default function UserWarehouseMainTable(props) {
                                 </TableCell>
                             </TableRow>
                         </React.Fragment>
-                ))}
+                    ))}
             </TableBody>
         )
     }
@@ -741,6 +957,14 @@ export default function UserWarehouseMainTable(props) {
                             setOpen={setDisplayUpdateUnitsForm}
                         >
                             <UpdateUnitsQuantityForm formik={formik}/>
+                        </UpdateValueDialog>
+
+                        <UpdateValueDialog
+                            dialogTitle={"Redistribuir productos en tienda"}
+                            open={displayUpdateDepotQuantityForm}
+                            setOpen={setDisplayUpdateDepotQuantityForm}
+                        >
+                            <UpdateStoreDepotQuantityForm formik={formik}/>
                         </UpdateValueDialog>
 
                         <ImagesDisplayDialog

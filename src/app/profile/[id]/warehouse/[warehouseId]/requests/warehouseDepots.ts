@@ -68,6 +68,28 @@ const warehouseDepots = {
         return false
     },
 
+    sendDepotFromWarehouseToStore: async function ({userId, warehouseId, depotId, storeDepotId, storeId, moveUnitQuantity}) {
+        try {
+            const response = await apiRequest.put(urlDepotAssign(userId, warehouseId), {ownerId: userId, depotId, storeDepotId, storeId, moveUnitQuantity})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
+    sendDepotFromStoreToWarehouse: async function ({userId, warehouseId, depotId, storeDepotId, moveUnitQuantity}) {
+        try {
+            const response = await apiRequest.patch(urlDepotAssign(userId, warehouseId), {ownerId: userId, depotId, storeDepotId, moveUnitQuantity})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
     deleteDepot: async function (userId: string, warehouseId: string, depotId: string) {
         try {
             const response = await apiRequest.delete(url(userId, warehouseId), {params: {depotId: depotId}})
