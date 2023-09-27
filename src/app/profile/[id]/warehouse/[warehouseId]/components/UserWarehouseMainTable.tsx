@@ -93,7 +93,8 @@ export default function UserWarehouseMainTable(props) {
         productStoreDepotDistribution: {
             warehouseQuantity: "",
             storeQuantity: "",
-            moveQuantity: 0,
+            moveFromWarehouseToStoreQuantity: "",
+            moveFromStoreToWarehouseQuantity: "",
         },
     }
 
@@ -123,13 +124,13 @@ export default function UserWarehouseMainTable(props) {
                 .number()
                 .typeError("número entero")
                 .integer("número entero")
-                .min(0, "cantidad mayor que 0")
+                .min(1, "cantidad mayor que 0")
                 .max(Yup.ref("warehouseQuantity"), "cantidad menor que lo disponible en almacén"),
             moveFromStoreToWarehouseQuantity: Yup
                 .number()
                 .typeError("número entero")
                 .integer("número entero")
-                .min(0, "cantidad mayor que 0")
+                .min(1, "cantidad mayor que 0")
                 .max(Yup.ref("storeQuantity"), "cantidad menor que lo disponible en tienda")
         })
     })
@@ -488,12 +489,6 @@ export default function UserWarehouseMainTable(props) {
             }
         }
 
-        function handleButtonDownClick() {
-            if (moveQuantity > 0) {
-                formik.setFieldValue("productStoreDepotDistribution.moveQuantity", parseInt(moveQuantity) - 1)
-            }
-        }
-
         return (
             <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
                 <Grid container item spacing={2}>
@@ -521,7 +516,12 @@ export default function UserWarehouseMainTable(props) {
                             }
                         />
 
-                        <IconButton color={"primary"} onClick={handleMoveToStore} sx={{ml: "10px"}}>
+                        <IconButton
+                            color={"primary"}
+                            onClick={handleMoveToStore}
+                            sx={{ml: "10px"}}
+                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity}
+                        >
                             <Done/>
                         </IconButton>
                     </Grid>
@@ -557,7 +557,12 @@ export default function UserWarehouseMainTable(props) {
                                         }
                                     />
 
-                                    <IconButton color={"secondary"} onClick={handleMoveToWarehouse} sx={{ml: "10px"}}>
+                                    <IconButton
+                                        color={"secondary"}
+                                        onClick={handleMoveToWarehouse}
+                                        sx={{ml: "10px"}}
+                                        disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity}
+                                    >
                                         <Done/>
                                     </IconButton>
                                 </Grid>
