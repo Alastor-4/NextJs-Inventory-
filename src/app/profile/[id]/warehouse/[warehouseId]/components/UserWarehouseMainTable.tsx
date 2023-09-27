@@ -290,6 +290,7 @@ export default function UserWarehouseMainTable(props) {
     const [displayUpdateUnitsForm, setDisplayUpdateUnitsForm] = React.useState(false)
     const [displayUpdateDepotQuantityForm, setDisplayUpdateDepotQuantityForm] = React.useState(false)
     const [storeDepotUpdateIndex, setStoreDepotUpdateIndex] = React.useState(null)
+    const [storeDepotUpdateName, setStoreDepotUpdateName] = React.useState("")
 
     const NewUnitsQuantityForm = ({formik}) => {
         async function handleNewUnitsAdd() {
@@ -668,7 +669,7 @@ export default function UserWarehouseMainTable(props) {
             setDisplayUpdateUnitsForm(true)
         }
 
-        function handleOpenUpdateStoreDepotForm(e, row, storeIndex) {
+        function handleOpenUpdateStoreDepotForm(e, row, storeIndex, storeName) {
             e.stopPropagation()
 
             if (!selected || (selected?.id !== row.id)) {
@@ -685,6 +686,7 @@ export default function UserWarehouseMainTable(props) {
             )
 
             setStoreDepotUpdateIndex(storeIndex)
+            setStoreDepotUpdateName(storeName)
             setDisplayUpdateDepotQuantityForm(true)
         }
 
@@ -906,15 +908,16 @@ export default function UserWarehouseMainTable(props) {
                                                             <Grid item xs={true}>
                                                                 {
                                                                     item.store_depots.length > 0
-                                                                        ? `Total (${item.store_depots[0].product_units}) - Restantes (${item.store_depots[0].product_remaining_units})`
+                                                                        ? `Total ${item.store_depots[0].product_units} | ${item.store_depots[0].product_remaining_units} Restantes`
                                                                         : "no asignado"
                                                                 }
 
                                                                 <IconButton
                                                                     size={"small"}
                                                                     sx={{ml: "10px"}}
-                                                                    onClick={(e) => handleOpenUpdateStoreDepotForm(e, row, storeIndex)}
-                                                                >
+                                                                    onClick={
+                                                                    (e) => handleOpenUpdateStoreDepotForm(e, row, storeIndex, item.name)
+                                                                }>
                                                                     <EditOutlined fontSize={"small"}/>
                                                                 </IconButton>
                                                             </Grid>
@@ -960,7 +963,7 @@ export default function UserWarehouseMainTable(props) {
                         </UpdateValueDialog>
 
                         <UpdateValueDialog
-                            dialogTitle={"Redistribuir productos en tienda"}
+                            dialogTitle={"Redistribuir productos en " + storeDepotUpdateName}
                             open={displayUpdateDepotQuantityForm}
                             setOpen={setDisplayUpdateDepotQuantityForm}
                         >
