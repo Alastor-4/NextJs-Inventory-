@@ -52,9 +52,8 @@ export default function ImagesDisplayDialog(props) {
                                                 <Circle color={"info"} sx={{cursor: "pointer", mx: "7px"}}/>
                                             ) : (
                                                 <CircleOutlined
-                                                    color={"action"}
                                                     onClick={() => setImageIndex(index)}
-                                                    sx={{cursor: "pointer", mx: "5px"}}
+                                                    sx={{cursor: "pointer", mx: "7px"}}
                                                 />
                                             )
                                         }
