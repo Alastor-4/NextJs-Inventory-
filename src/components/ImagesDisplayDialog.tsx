@@ -8,6 +8,7 @@ import {
     DialogTitle, Grid,
 } from "@mui/material";
 import React from "react";
+import {Circle, CircleOutlined, ControlPoint, FormatListBulletedOutlined} from "@mui/icons-material";
 
 export default function ImagesDisplayDialog(props) {
     const {open, setOpen, dialogTitle, images} = props
@@ -18,6 +19,12 @@ export default function ImagesDisplayDialog(props) {
 
     const [imageIndex, setImageIndex] = React.useState(0)
 
+    React.useEffect(() => {
+        if (images.length) {
+            setImageIndex(0)
+        }
+    }, [images])
+
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>{dialogTitle}</DialogTitle>
@@ -27,7 +34,7 @@ export default function ImagesDisplayDialog(props) {
                         {
                             images.length && (
                                 <Avatar
-                                    src={images[imageIndex].fileUrl}
+                                    src={images[imageIndex]?.fileUrl ?? ""}
                                     variant={"rounded"}
                                     sx={{width: "250px", maxWidth: "300px", height: "auto"}}
                                 />
@@ -35,17 +42,27 @@ export default function ImagesDisplayDialog(props) {
                         }
                     </Grid>
 
-                    <Grid container item xs={12} justifyContent={"space-around"}>
-                        {images.map((item, index) => (
-                            <Chip
-                                key={item.id}
-                                label={`imagen-${index + 1}`}
-                                variant={"outlined"}
-                                color={index === imageIndex ? "primary" : "info"}
-                                onClick={() => setImageIndex(index)}
-                            />
-                        ))}
-                    </Grid>
+                    {
+                        images.length > 1 && (
+                            <Grid container item xs={12} justifyContent={"center"}>
+                                {images.map((item, index) => (
+                                    <React.Fragment key={item.id}>
+                                        {
+                                            imageIndex === index ? (
+                                                <Circle color={"info"} sx={{cursor: "pointer", mx: "7px"}}/>
+                                            ) : (
+                                                <CircleOutlined
+                                                    color={"action"}
+                                                    onClick={() => setImageIndex(index)}
+                                                    sx={{cursor: "pointer", mx: "5px"}}
+                                                />
+                                            )
+                                        }
+                                    </React.Fragment>
+                                ))}
+                            </Grid>
+                        )
+                    }
                 </Grid>
             </DialogContent>
             <DialogActions>

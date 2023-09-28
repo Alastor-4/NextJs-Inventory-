@@ -93,7 +93,8 @@ export default function UserWarehouseMainTable(props) {
         productStoreDepotDistribution: {
             warehouseQuantity: "",
             storeQuantity: "",
-            moveQuantity: 0,
+            moveFromWarehouseToStoreQuantity: "",
+            moveFromStoreToWarehouseQuantity: "",
         },
     }
 
@@ -123,13 +124,13 @@ export default function UserWarehouseMainTable(props) {
                 .number()
                 .typeError("número entero")
                 .integer("número entero")
-                .min(0, "cantidad mayor que 0")
+                .min(1, "cantidad mayor que 0")
                 .max(Yup.ref("warehouseQuantity"), "cantidad menor que lo disponible en almacén"),
             moveFromStoreToWarehouseQuantity: Yup
                 .number()
                 .typeError("número entero")
                 .integer("número entero")
-                .min(0, "cantidad mayor que 0")
+                .min(1, "cantidad mayor que 0")
                 .max(Yup.ref("storeQuantity"), "cantidad menor que lo disponible en tienda")
         })
     })
@@ -290,6 +291,7 @@ export default function UserWarehouseMainTable(props) {
     const [displayUpdateUnitsForm, setDisplayUpdateUnitsForm] = React.useState(false)
     const [displayUpdateDepotQuantityForm, setDisplayUpdateDepotQuantityForm] = React.useState(false)
     const [storeDepotUpdateIndex, setStoreDepotUpdateIndex] = React.useState(null)
+    const [storeDepotUpdateName, setStoreDepotUpdateName] = React.useState("")
 
     const NewUnitsQuantityForm = ({formik}) => {
         async function handleNewUnitsAdd() {
@@ -487,12 +489,6 @@ export default function UserWarehouseMainTable(props) {
             }
         }
 
-        function handleButtonDownClick() {
-            if (moveQuantity > 0) {
-                formik.setFieldValue("productStoreDepotDistribution.moveQuantity", parseInt(moveQuantity) - 1)
-            }
-        }
-
         return (
             <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
                 <Grid container item spacing={2}>
@@ -520,7 +516,12 @@ export default function UserWarehouseMainTable(props) {
                             }
                         />
 
-                        <IconButton color={"primary"} onClick={handleMoveToStore} sx={{ml: "10px"}}>
+                        <IconButton
+                            color={"primary"}
+                            onClick={handleMoveToStore}
+                            sx={{ml: "10px"}}
+                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity}
+                        >
                             <Done/>
                         </IconButton>
                     </Grid>
@@ -556,7 +557,12 @@ export default function UserWarehouseMainTable(props) {
                                         }
                                     />
 
-                                    <IconButton color={"secondary"} onClick={handleMoveToWarehouse} sx={{ml: "10px"}}>
+                                    <IconButton
+                                        color={"secondary"}
+                                        onClick={handleMoveToWarehouse}
+                                        sx={{ml: "10px"}}
+                                        disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity}
+                                    >
                                         <Done/>
                                     </IconButton>
                                 </Grid>
@@ -668,7 +674,7 @@ export default function UserWarehouseMainTable(props) {
             setDisplayUpdateUnitsForm(true)
         }
 
-        function handleOpenUpdateStoreDepotForm(e, row, storeIndex) {
+        function handleOpenUpdateStoreDepotForm(e, row, storeIndex, storeName) {
             e.stopPropagation()
 
             if (!selected || (selected?.id !== row.id)) {
@@ -685,6 +691,7 @@ export default function UserWarehouseMainTable(props) {
             )
 
             setStoreDepotUpdateIndex(storeIndex)
+            setStoreDepotUpdateName(storeName)
             setDisplayUpdateDepotQuantityForm(true)
         }
 
@@ -906,15 +913,16 @@ export default function UserWarehouseMainTable(props) {
                                                             <Grid item xs={true}>
                                                                 {
                                                                     item.store_depots.length > 0
-                                                                        ? `Total (${item.store_depots[0].product_units}) - Restantes (${item.store_depots[0].product_remaining_units})`
+                                                                        ? `Total ${item.store_depots[0].product_units} | ${item.store_depots[0].product_remaining_units} Restantes`
                                                                         : "no asignado"
                                                                 }
 
                                                                 <IconButton
                                                                     size={"small"}
                                                                     sx={{ml: "10px"}}
-                                                                    onClick={(e) => handleOpenUpdateStoreDepotForm(e, row, storeIndex)}
-                                                                >
+                                                                    onClick={
+                                                                    (e) => handleOpenUpdateStoreDepotForm(e, row, storeIndex, item.name)
+                                                                }>
                                                                     <EditOutlined fontSize={"small"}/>
                                                                 </IconButton>
                                                             </Grid>
@@ -960,7 +968,7 @@ export default function UserWarehouseMainTable(props) {
                         </UpdateValueDialog>
 
                         <UpdateValueDialog
-                            dialogTitle={"Redistribuir productos en tienda"}
+                            dialogTitle={"Redistribuir productos en " + storeDepotUpdateName}
                             open={displayUpdateDepotQuantityForm}
                             setOpen={setDisplayUpdateDepotQuantityForm}
                         >
