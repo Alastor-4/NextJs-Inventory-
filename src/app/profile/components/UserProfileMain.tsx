@@ -25,7 +25,7 @@ import dayjs from "dayjs";
 import {width} from "@mui/system";
 
 export default function UserProfileMain(props) {
-   const {userDetails, userProductsCount, workForUsersCount} = props
+   const {userDetails, userRole, ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount, sellerStores} = props
 
     const router = useRouter()
 
@@ -71,119 +71,196 @@ export default function UserProfileMain(props) {
         }
     }
 
-    const WarehouseButton = () => (
-        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-            <CardHeader title={"Almacenes"}/>
+    const OwnerModule = ({ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount}) => {
+        const WarehouseButton = () => (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <CardHeader title={"Almacenes"}/>
 
-            <CardContent>
-                <Grid container>
-                    {userDetails.warehouses.map((item: any, index: number) => (
-                        <Grid container key={item.id}>
-                            <Link href={`/profile/${userDetails.id}/warehouse/${item.id}`} key={item.id}>
-                                <Grid container columnSpacing={2} item xs={12} sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
+                <CardContent>
+                    <Grid container>
+                        {ownerWarehouses.map((item: any, index: number) => (
+                            <Grid container key={item.id}>
+                                <Link href={`/profile/${userDetails.id}/warehouse/${item.id}`} key={item.id}>
+                                    <Grid container columnSpacing={2} item xs={12} sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
+                                        <Grid container item xs={"auto"} alignItems={"center"}>
+                                            <ChevronRightOutlined fontSize={"small"}/>
+                                        </Grid>
+                                        <Grid item xs={true}>
+                                            {item.name}
+                                        </Grid>
+                                    </Grid>
+                                </Link>
+                            </Grid>
+                        ))}
+
+                        <Grid container>
+                            <Link href={"#"}>
+                                <Grid container columnSpacing={1} item xs={12} sx={{mt: "15px"}}>
                                     <Grid container item xs={"auto"} alignItems={"center"}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        <ArrowCircleRightOutlined fontSize={"small"}/>
                                     </Grid>
                                     <Grid item xs={true}>
-                                        {item.name}
+                                        Mis almacenes
                                     </Grid>
                                 </Grid>
                             </Link>
                         </Grid>
-                    ))}
-
-                    <Grid container>
-                        <Link href={"#"}>
-                            <Grid container columnSpacing={1} item xs={12} sx={{mt: "15px"}}>
-                                <Grid container item xs={"auto"} alignItems={"center"}>
-                                    <ArrowCircleRightOutlined fontSize={"small"}/>
-                                </Grid>
-                                <Grid item xs={true}>
-                                    Mis almacenes
-                                </Grid>
-                            </Grid>
-                        </Link>
                     </Grid>
-                </Grid>
-            </CardContent>
-        </Card>
-    )
+                </CardContent>
+            </Card>
+        )
 
-    const StoreButton = () => (
-        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-            <CardHeader title={"Tiendas"}/>
+        const StoreButton = () => (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <CardHeader title={"Tiendas"}/>
 
-            <CardContent>
-                <Grid container>
-                    {userDetails.user_owner_stores.map((item, index) => (
-                        <Grid container key={item.id}>
-                            <Link href={`/profile/${userDetails.id}/store-details/${item.id}`} >
-                                <Grid container columnSpacing={1} item sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
+                <CardContent>
+                    <Grid container>
+                        {ownerStores.map((item, index) => (
+                            <Grid container key={item.id}>
+                                <Link href={`/profile/${userDetails.id}/store-details/${item.id}`} >
+                                    <Grid container columnSpacing={1} item sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
+                                        <Grid container item xs={"auto"} alignItems={"center"}>
+                                            <ChevronRightOutlined fontSize={"small"}/>
+                                        </Grid>
+                                        <Grid item xs={true}>
+                                            {item.name}
+                                        </Grid>
+                                    </Grid>
+                                </Link>
+                            </Grid>
+                        ))}
+
+                        <Grid container>
+                            <Link href={`/profile/${userDetails.id}/store`}>
+                                <Grid container columnSpacing={1} item xs={12} sx={{mt: "15px"}}>
                                     <Grid container item xs={"auto"} alignItems={"center"}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        <ArrowCircleRightOutlined fontSize={"small"}/>
                                     </Grid>
                                     <Grid item xs={true}>
-                                        {item.name}
+                                        Mis tiendas
                                     </Grid>
                                 </Grid>
                             </Link>
                         </Grid>
-                    ))}
+                    </Grid>
+                </CardContent>
+            </Card>
+        )
 
-                    <Grid container>
-                        <Link href={`/profile/${userDetails.id}/store`}>
-                            <Grid container columnSpacing={1} item xs={12} sx={{mt: "15px"}}>
-                                <Grid container item xs={"auto"} alignItems={"center"}>
-                                    <ArrowCircleRightOutlined fontSize={"small"}/>
-                                </Grid>
-                                <Grid item xs={true}>
-                                    Mis tiendas
-                                </Grid>
+        const ProductButton = () => (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <CardHeader title={"Productos"}/>
+
+                <CardContent>
+                    <Link href={`/profile/${userDetails.id}/product`}>
+                        <Grid container rowSpacing={2} item xs={12}>
+                            <Grid container item xs={"auto"} alignItems={"center"}>
+                                <ChevronRightOutlined fontSize={"small"}/>
                             </Grid>
-                        </Link>
+                            <Grid item xs={true}>
+                                {ownerProductsCount} producto(s)
+                            </Grid>
+                        </Grid>
+                    </Link>
+                </CardContent>
+            </Card>
+        )
+
+        const UsersButton = () => (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <CardHeader title={"Trabajadores"}/>
+
+                <CardContent>
+                    <Link href={`/profile/${userDetails.id}/worker`}>
+                        <Grid container rowSpacing={2} item xs={12}>
+                            <Grid container item xs={"auto"} alignItems={"center"}>
+                                <ChevronRightOutlined fontSize={"small"}/>
+                            </Grid>
+                            <Grid item xs={true}>
+                                {ownerWorkersCount} trabajador(es)
+                            </Grid>
+                        </Grid>
+                    </Link>
+                </CardContent>
+            </Card>
+        )
+
+       return (
+           <Grid container rowSpacing={3}>
+               <Grid item xs={12}>
+                   <Divider flexItem color={"primary"} variant={"fullWidth"} orientation={"horizontal"}/>
+               </Grid>
+
+               <Grid item xs={12}>
+                   <Typography variant={"h5"} sx={{textAlign: "center"}}>Administración</Typography>
+               </Grid>
+
+               <Grid container item rowSpacing={2}>
+                   <Grid container item xs={6} justifyContent={"center"}>
+                       <WarehouseButton/>
+                   </Grid>
+
+                   <Grid container item xs={6} justifyContent={"center"}>
+                       <StoreButton/>
+                   </Grid>
+
+                   <Grid container item xs={6} justifyContent={"center"}>
+                       <ProductButton/>
+                   </Grid>
+
+                   <Grid container item xs={6} justifyContent={"center"}>
+                       <UsersButton/>
+                   </Grid>
+               </Grid>
+           </Grid>
+       )
+    }
+
+    const SellerModule = ({sellerStores}) => {
+        const StoreButton = () => (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <CardHeader title={"Ventas"}/>
+
+                <CardContent>
+                    <Grid container>
+                        {sellerStores.map((item, index) => (
+                            <Grid container key={item.id}>
+                                <Link href={`/profile/${userDetails.id}/store-details/${item.id}`} >
+                                    <Grid container columnSpacing={1} item sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
+                                        <Grid container item xs={"auto"} alignItems={"center"}>
+                                            <ChevronRightOutlined fontSize={"small"}/>
+                                        </Grid>
+                                        <Grid item xs={true}>
+                                            {item.name}
+                                        </Grid>
+                                    </Grid>
+                                </Link>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </CardContent>
+            </Card>
+        )
+
+        return (
+            <Grid container rowSpacing={3}>
+                <Grid item xs={12}>
+                    <Divider flexItem color={"primary"} variant={"fullWidth"} orientation={"horizontal"}/>
+                </Grid>
+
+                <Grid item xs={12}>
+                    <Typography variant={"h5"} sx={{textAlign: "center"}}>Ventas</Typography>
+                </Grid>
+
+                <Grid container item rowSpacing={2}>
+                    <Grid container item xs={6} justifyContent={"center"}>
+                        <StoreButton/>
                     </Grid>
                 </Grid>
-            </CardContent>
-        </Card>
-    )
-
-    const ProductButton = () => (
-        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-            <CardHeader title={"Productos"}/>
-
-            <CardContent>
-                <Link href={`/profile/${userDetails.id}/product`}>
-                    <Grid container rowSpacing={2} item xs={12}>
-                        <Grid container item xs={"auto"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"}/>
-                        </Grid>
-                        <Grid item xs={true}>
-                            {userProductsCount} producto(s)
-                        </Grid>
-                    </Grid>
-                </Link>
-            </CardContent>
-        </Card>
-    )
-
-    const UsersButton = () => (
-        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-            <CardHeader title={"Trabajadores"}/>
-
-            <CardContent>
-                <Link href={`/profile/${userDetails.id}/worker`}>
-                    <Grid container rowSpacing={2} item xs={12}>
-                        <Grid container item xs={"auto"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"}/>
-                        </Grid>
-                        <Grid item xs={true}>
-                            {workForUsersCount} trabajador(es)
-                        </Grid>
-                    </Grid>
-                </Link>
-            </CardContent>
-        </Card>
-    )
+            </Grid>
+        )
+    }
 
     return (
         <>
@@ -191,7 +268,7 @@ export default function UserProfileMain(props) {
                 <CustomToolbar/>
 
                 <CardContent>
-                    <Grid container rowSpacing={3}>
+                    <Grid container rowSpacing={5}>
                         <Grid container item rowSpacing={3}>
                             <Grid container item xs={12} spacing={1}>
                                 <Grid item sx={userProfileStyles.leftFlex}>Nombre:</Grid>
@@ -239,27 +316,26 @@ export default function UserProfileMain(props) {
                             </Grid>
                         </Grid>
 
-                        <Grid item xs={12}>
-                            <Divider flexItem color={"primary"} variant={"fullWidth"} orientation={"horizontal"}/>
-                        </Grid>
+                        {
+                            userRole === "store_owner" && (
+                                <Grid item xs={12}>
+                                    <OwnerModule
+                                        ownerWarehouses={ownerWarehouses}
+                                        ownerStores={ownerStores}
+                                        ownerProductsCount={ownerProductsCount}
+                                        ownerWorkersCount={ownerWorkersCount}
+                                    />
+                                </Grid>
+                            )
+                        }
 
-                        <Grid container item rowSpacing={2}>
-                            <Grid container item xs={6} justifyContent={"center"}>
-                                <WarehouseButton/>
-                            </Grid>
-
-                            <Grid container item xs={6} justifyContent={"center"}>
-                                <StoreButton/>
-                            </Grid>
-
-                            <Grid container item xs={6} justifyContent={"center"}>
-                                <ProductButton/>
-                            </Grid>
-
-                            <Grid container item xs={6} justifyContent={"center"}>
-                                <UsersButton/>
-                            </Grid>
-                        </Grid>
+                        {
+                            (userRole === "store_owner" ||userRole === "store_seller") && (
+                                <Grid item xs={12}>
+                                    <SellerModule sellerStores={sellerStores}/>
+                                </Grid>
+                            )
+                        }
                     </Grid>
                 </CardContent>
             </Card>
