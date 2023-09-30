@@ -187,7 +187,15 @@ function showProducts({ storeId, warehouseId }) {
             depotId: parseInt(row.depots[0].id),
             productUnits: 0,
             productRemainingUnits: 0,
-            sellerProfitPercentage: 0
+            sellerProfitPercentage: 0,//Tienes q copiar el porcentage de la tienda
+            seller_profit_quantity: 0,
+            is_active: true,
+            offer_notes: null,
+            price_discount_percentage: null,
+            price_discount_quantity: null,
+            sell_price: row.buy_price,
+            sell_price_unit: 'CUP'
+
         }
 
         const response = await storeAssign.postProductToStoreDepot(params.id, datos);

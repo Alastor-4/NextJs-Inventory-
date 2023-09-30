@@ -1,8 +1,8 @@
 "use client"
 
-import {AppBar, Box, Button, Card, Grid, MenuItem, TextField, Toolbar, Typography} from "@mui/material";
+import { AppBar, Box, Button, Card, Checkbox, Grid, MenuItem, Switch, TextField, Toolbar, Typography } from "@mui/material";
 import React from "react";
-import { useFormik } from "formik";
+import { Formik, useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import stores from "@/app/profile/[id]/store/requests/stores";
@@ -15,6 +15,12 @@ export default function StoresForm(props) {
     const [updateItem, setUpdateItem] = React.useState()
     const [userSeller, setUserSeller] = React.useState("")
 
+    const [sellProfit, setSellProfit] = React.useState(false);
+
+   const [activeCatalogo, setActiveCatalogo] = React.useState( updateItem ? updateItem.online_catalog : false );
+   const [activeReservations, setActiveReservations] = React.useState( updateItem ? updateItem.online_reservation : false );
+
+   
     React.useEffect(() => {
         async function fetchStore(id) {
             const store = await stores.storeDetails(userId, id)
@@ -55,6 +61,13 @@ export default function StoresForm(props) {
         slogan: updateItem ? updateItem.slogan : "",
         address: updateItem ? updateItem.address : "",
         sellerUser: userSeller,
+       /* currency: sellProfit
+            ? ("%")
+            : (updateItem ? updateItem.sell_price_unit : "CUP"),*/
+        valueSellProfit: sellProfit
+            ? (updateItem ? updateItem.fixed_seller_profit_percentage : 0)
+            : (updateItem ? updateItem.fixed_seller_profit_quantity : 0)
+
     }
 
     const validationSchema = Yup.object({
@@ -63,6 +76,20 @@ export default function StoresForm(props) {
         slogan: Yup.string(),
         address: Yup.string(),
         sellerUser: Yup.object(),
+        valueSellProfit: sellProfit
+            ? (
+                Yup.number()
+                    .min(0, "El minimo q puedes ingresar es 0")
+                    .max(100, "El maximo q puedes ingresar es 100")
+                    .required("Campo obligatorio")
+
+            )
+            : (
+                Yup.number()
+                    .min(0, "El minimo q puedes ingresar es 0")
+                    .required("Campo obligatorio")
+            ),
+        //currency: Yup.object()
     })
 
     const handleSubmit = async (values) => {
@@ -97,6 +124,68 @@ export default function StoresForm(props) {
         onSubmit: handleSubmit,
         enableReinitialize: true,
     })
+
+
+    const editPercentage = (formik) => (
+        <Grid item container columnSpacing={1}>
+            <Grid item>
+                <TextField
+                    name={"sell_profit_percentage"}
+                    label="Ganancia del vendedor"
+                    size={"small"}
+                    {...formik.getFieldProps("valueSellProfit")}
+                    error={formik.errors.valueSellProfit && formik.touched.valueSellProfit}
+                    helperText={(formik.errors.valueSellProfit && formik.touched.valueSellProfit) && formik.errors.valueSellProfit}
+                />
+            </Grid>
+
+            <Grid item alignSelf={"center"}>
+                
+            <Typography variant="h6" >%</Typography>
+
+            </Grid>
+
+        </Grid>
+
+    )
+
+    const editQuantity = (formik) => (
+        <Grid item container columnSpacing={1}>
+            <Grid item>
+                <TextField
+                    name={"sell_profit_quantity"}
+                    label="Ganancia del vendedor"
+                    size={"small"}
+                    {...formik.getFieldProps("valueSellProfit")}
+                    error={formik.errors.valueSellProfit && formik.touched.valueSellProfit}
+                    helperText={(formik.errors.valueSellProfit && formik.touched.valueSellProfit) && formik.errors.valueSellProfit}
+                />
+            </Grid>
+
+            <Grid item alignSelf={"center"}>
+
+                <Typography variant="h6" >CUP</Typography>
+                {/* <TextField
+                    name={"currency"}
+                    size="small"
+                    select
+                    {...formik.getFieldProps("currency")}
+                >
+                    <MenuItem value={"CUP"}>CUP</MenuItem>
+                    <MenuItem value={"MLC"}>MLC</MenuItem>
+                    <MenuItem value={"USD"}>USD</MenuItem>
+
+                </TextField> */}
+
+            </Grid>
+
+        </Grid>
+
+
+
+    )
+
+
 
     return (
         <Card variant={"outlined"}>
@@ -176,31 +265,106 @@ export default function StoresForm(props) {
                                 }
                             </TextField>
                         </Grid>
+
+
+                        <Grid item xs={12}>
+                            {
+                                sellProfit
+                                    ? editPercentage(formik)
+                                    : editQuantity(formik)
+                            }
+
+                            <Grid item container >
+
+                                <Grid item >
+
+                                    <Grid item container>
+                                        <Grid item >
+                                            <Checkbox
+                                                size="small"
+                                                checked={sellProfit}
+                                                onClick={() => setSellProfit(true)}
+                                            />
+                                        </Grid>
+                                        <Grid item alignSelf={"center"}>
+                                            <Typography variant="subtitle2">Porcentaje</Typography>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+
+                                <Grid item>
+
+                                    <Grid item container>
+                                        <Grid item >
+                                            <Checkbox
+                                                size="small"
+                                                checked={!sellProfit}
+                                                onClick={() => setSellProfit(false)}
+                                            />
+                                        </Grid>
+                                        <Grid item alignSelf={"center"} >
+                                            <Typography variant="subtitle2">Cantidad</Typography>
+                                        </Grid>
+                                    </Grid>
+
+                                </Grid>
+
+                            </Grid>
+
+                        </Grid>
+
+                        <Grid item container xs={12}>
+                            <Grid item>
+                                <Switch
+                                    size="small"
+                                    checked={activeCatalogo}
+                                    onClick={()=>setActiveCatalogo(!activeCatalogo)}
+                                />
+                            </Grid>
+                            
+                            <Grid item alignSelf={"flex-end"}>Activar catálogo en línea </Grid>
+
+                        </Grid>
+
+                        <Grid item container xs={12}>
+                            <Grid item>
+                                <Switch
+                                    size="small"
+                                    checked={activeReservations}
+                                    onClick={()=>setActiveReservations(!activeReservations)}
+                                />
+                            </Grid>
+                            
+                            <Grid item alignSelf={"flex-end"}>Activar reservaciones en línea </Grid>
+
+                        </Grid>
+
+
+                        <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
+                            <Button
+                                color={"secondary"}
+                                variant={"outlined"}
+                                size={"small"}
+                                sx={{ m: 1 }}
+                                onClick={() => router.back()}
+                            >
+                                Cancel
+                            </Button>
+
+                            <Button
+                                type={"submit"}
+                                color={"primary"}
+                                variant={"outlined"}
+                                size={"small"}
+                                sx={{ m: 1 }}
+                                disabled={!formik.isValid}
+                            >
+                                {updateItem ? "Update" : "Create"}
+                            </Button>
+
+                        </Grid>
+
                     </Grid>
-
-                    <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
-                        <Button
-                            color={"secondary"}
-                            variant={"outlined"}
-                            size={"small"}
-                            sx={{ m: 1 }}
-                            onClick={() => router.back()}
-                        >
-                            Cancel
-                        </Button>
-
-                        <Button
-                            type={"submit"}
-                            color={"primary"}
-                            variant={"outlined"}
-                            size={"small"}
-                            sx={{ m: 1 }}
-                            disabled={!formik.isValid}
-                        >
-                            {updateItem ? "Update" : "Create"}
-                        </Button>
-                    </Grid>
-
                 </Grid>
             </form>
         </Card>

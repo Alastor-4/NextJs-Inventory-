@@ -54,10 +54,50 @@ export async function GET(req: Request, { params }: Params) {
                         }
                     },
                     departments: true,
+                    characteristics: true,
+                    images: true,
                 }
             }
         }
 
     })
     return NextResponse.json(result)
+}
+
+export async function PUT(req: Request) {
+    const {
+        id,
+        store_id,
+        depot_id,
+        product_units,
+        product_remaining_units,
+        seller_profit_percentage,
+        is_active,
+        offer_notes,
+        sell_price,
+        sell_price_unit,
+        seller_profit_quantity,
+        price_discount_percentage,
+        price_discount_quantity,
+
+
+    } = await req.json();
+    const result = await prisma.store_depots.update({data:{
+        id,
+        store_id,
+        depot_id,
+        product_units,
+        product_remaining_units,
+        seller_profit_percentage,
+        is_active,
+        offer_notes,
+        sell_price,
+        sell_price_unit,
+        seller_profit_quantity,
+        price_discount_percentage,
+        price_discount_quantity,
+    }, where:{ id: id } })
+
+    return NextResponse.json(result)
+
 }
