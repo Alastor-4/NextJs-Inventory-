@@ -7,7 +7,9 @@ import {
     Card,
     CardContent,
     Checkbox, CircularProgress,
+    Collapse,
     Divider,
+    Grid,
     IconButton,
     Table,
     TableBody,
@@ -15,10 +17,11 @@ import {
     TableHead,
     TableRow,
     Toolbar,
+    Tooltip,
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
+import { AddOutlined, ArrowLeft, AutoStories, DeleteOutline, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShoppingBagOutlined, ShoppingCartOutlined } from "@mui/icons-material";
 import stores from "@/app/profile/[id]/store/requests/stores";
 import { useParams, useRouter } from "next/navigation";
 
@@ -26,6 +29,7 @@ const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function StoresMainTable() {
     const [data, setData] = React.useState(null)
+    const [showDetails, setShowDetails] = React.useState(false)
 
     const params = useParams()
     const router = useRouter()
@@ -130,18 +134,13 @@ export default function StoresMainTable() {
                 align: "left"
             },
             {
-                id: "description",
-                label: "Descripción",
-                align: "left"
-            },
-            {
                 id: "slogan",
                 label: "Slogan",
                 align: "left"
             },
             {
-                id: "address",
-                label: "Dirección",
+                id: "active_service",
+                label: "Servicios",
                 align: "left"
             },
             {
@@ -149,6 +148,12 @@ export default function StoresMainTable() {
                 label: "Vendedor(a)",
                 align: "left"
             },
+            {
+                id: "details",
+                label: "",
+                align: "left"
+            },
+
         ]
 
         return (
@@ -174,41 +179,203 @@ export default function StoresMainTable() {
             </TableHead>
         )
     }
-
     const TableContent = () => {
         return (
             <TableBody>
-                {data.map(row => (
-                    <TableRow
-                        key={row.id}
-                        hover
-                        tabIndex={-1}
-                        onClick={() => handleSelectItem(row)}
-                    >
-                        <TableCell>
-                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
-                        </TableCell>
+                {data.map((row, index) => (
+                    <React.Fragment key={row.id}>
+                        <TableRow
+                            key={row.id}
+                            hover
+                            tabIndex={-1}
+                            onClick={() => handleSelectItem(row)}
+                        >
+                            <TableCell>
+                                <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                            </TableCell>
 
-                        <TableCell>
-                            {row.name}
-                        </TableCell>
+                            <TableCell>
+                                {row.name}
+                                <br />
+                                <small>
+                                    {(row.description !== '') ? row.description : ''}
+                                </small>
+                            </TableCell>
 
-                        <TableCell>
-                            {(row.description !== '') ? row.description : '-'}
-                        </TableCell>
+                            <TableCell>
+                                {(row.slogan !== '') ? row.slogan : '-'}
+                            </TableCell>
 
-                        <TableCell>
-                            {(row.slogan !== '') ? row.slogan : '-'}
-                        </TableCell>
+                            <TableCell>
+                                <Grid container columnSpacing={1} >
 
-                        <TableCell>
-                            {(row.address !== '') ? row.address : '-'}
-                        </TableCell>
+                                    <Grid item >
+                                        <Tooltip title={"Catálogo"} >
+                                            <AutoStories
+                                                color={row.online_catalog ? "primary" : "disabled"}
+                                                fontSize="small" />
+                                        </Tooltip>
+                                    </Grid>
 
-                        <TableCell>
-                            {row.seller_user ? `${row.seller_user.name} (${row.seller_user.username})` : "-"}
-                        </TableCell>
-                    </TableRow>
+                                    <Grid item >
+                                        <Tooltip title={"Reservaciones"} >
+                                            <ShoppingCartOutlined
+                                                color={row.online_reservation ? "primary" : "disabled"}
+                                                fontSize="small" />
+                                        </Tooltip>
+                                    </Grid>
+
+                                </Grid>
+
+                            </TableCell>
+
+                            <TableCell>
+                                {row.seller_user ? `${row.seller_user.name} (${row.seller_user.username})` : "-"}
+                            </TableCell>
+
+                            <TableCell style={{ padding: 0 }} colSpan={5}>
+                                <Tooltip title={"Details"}>
+                                    <IconButton
+                                        size={"small"}
+                                        sx={{ m: "3px" }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowDetails((showDetails !== index) ? index : '')
+                                        }}
+                                    >
+                                        {
+
+
+                                            (showDetails !== index)
+                                                ? <ExpandMoreOutlined />
+                                                : <ExpandLessOutlined />
+                                        }
+                                    </IconButton>
+                                </Tooltip>
+                            </TableCell>
+
+                        </TableRow>
+
+
+                        <TableRow >
+
+                            <TableCell style={{ padding: 0 }} colSpan={5}>
+
+                                {showDetails === index && (
+                                    <Collapse in={showDetails === index} timeout="auto" unmountOnExit>
+                                        <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
+                                            <Grid item xs={12}>
+                                                <Typography variant="subtitle1" gutterBottom component="div">
+                                                    Detalles:
+                                                </Typography>
+                                            </Grid>
+
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
+                                                <Grid item xs={true}>
+                                                    {row.name}
+                                                    {
+                                                        row.description && (
+                                                            <small>
+                                                                {` ${row.description}`}
+                                                            </small>
+                                                        )
+                                                    }
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Slogan:</Grid>
+                                                <Grid item xs={true}>
+                                                    {row.slogan}
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Direccion:</Grid>
+                                                <Grid item xs={true}>
+                                                    {row.address}
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{`Vendedor(a):`}</Grid>
+                                                <Grid item xs={true}>
+                                                    {
+                                                        (row.seller_user)
+                                                            ? `${row.seller_user.name} (${row.seller_user.username})`
+                                                            : "No hay vendedor asignado"
+                                                    }
+                                                </Grid>
+                                            </Grid>
+
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ganacia del vendedor por defecto:</Grid>
+                                                <Grid item xs={true}>
+                                                    {
+                                                        (row.fixed_seller_profit_percentage)
+                                                            ? `${row.fixed_seller_profit_percentage} %`
+                                                            : `${row.fixed_seller_profit_quantity} CUP`
+                                                    }
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Catálogo en línea:</Grid>
+                                                <Grid item xs={true}>
+                                                    {
+
+                                                        <Grid container columnSpacing={1}>
+                                                            <Grid item > {`Servicio ${row.online_catalog ? "activo" : "inactivo"}  `}</Grid>
+                                                            <Grid item>
+                                                            <Tooltip title={"Catálogo"} >
+                                                                <AutoStories
+                                                                    color={row.online_catalog ? "primary" : "disabled"}
+                                                                    fontSize="small" />
+                                                            </Tooltip>
+
+                                                            </Grid>
+
+                                                        </Grid>
+
+                                                    }
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Reservaciones en línea:</Grid>
+                                                <Grid item xs={true}>
+                                                    {
+
+                                                        <Grid container columnSpacing={1}>
+                                                            <Grid item > {`Servicio ${row.online_reservation ? "activo" : "inactivo"}  `}</Grid>
+                                                            <Grid item>
+                                                            <Tooltip title={"Reservaciones"} >
+                                                                <ShoppingCartOutlined
+                                                                    color={row.online_reservation ? "primary" : "disabled"}
+                                                                    fontSize="small" />
+                                                            </Tooltip>
+
+                                                            </Grid>
+
+                                                        </Grid>
+
+                                                    }
+                                                </Grid>
+                                            </Grid>
+
+
+                                        </Grid>
+                                    </Collapse>
+                                )
+                                }
+                            </TableCell>
+
+                        </TableRow>
+
+                    </React.Fragment>
                 ))}
             </TableBody>
         )

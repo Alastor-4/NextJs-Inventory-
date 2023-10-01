@@ -15,12 +15,12 @@ export default function StoresForm(props) {
     const [updateItem, setUpdateItem] = React.useState()
     const [userSeller, setUserSeller] = React.useState("")
 
-    const [sellProfit, setSellProfit] = React.useState(false);
+    const [sellProfit, setSellProfit] = React.useState(true);
 
-   const [activeCatalogo, setActiveCatalogo] = React.useState( updateItem ? updateItem.online_catalog : false );
-   const [activeReservations, setActiveReservations] = React.useState( updateItem ? updateItem.online_reservation : false );
+    const [activeCatalogo, setActiveCatalogo] = React.useState(false);
+    const [activeReservations, setActiveReservations] = React.useState(false);
 
-   
+
     React.useEffect(() => {
         async function fetchStore(id) {
             const store = await stores.storeDetails(userId, id)
@@ -34,6 +34,15 @@ export default function StoresForm(props) {
             fetchStore(storeId)
         }
     }, [sellerUsers, storeId, userId])
+
+    React.useEffect(() => {
+
+        if (updateItem) {
+            setSellProfit( updateItem?.fixed_seller_profit_quantity !== null ? false : true)
+            setActiveCatalogo(updateItem ? updateItem.online_catalog : false)
+            setActiveReservations(updateItem ? updateItem.online_reservation : false)
+        }
+    }, [updateItem])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -61,12 +70,12 @@ export default function StoresForm(props) {
         slogan: updateItem ? updateItem.slogan : "",
         address: updateItem ? updateItem.address : "",
         sellerUser: userSeller,
-       /* currency: sellProfit
-            ? ("%")
-            : (updateItem ? updateItem.sell_price_unit : "CUP"),*/
+        /* currency: sellProfit
+             ? ("%")
+             : (updateItem ? updateItem.sell_price_unit : "CUP"),*/
         valueSellProfit: sellProfit
-            ? (updateItem ? updateItem.fixed_seller_profit_percentage : 0)
-            : (updateItem ? updateItem.fixed_seller_profit_quantity : 0)
+            ? (updateItem?.fixed_seller_profit_percentage ?? 0)
+            : (updateItem?.fixed_seller_profit_quantity ?? 0)
 
     }
 
@@ -100,7 +109,11 @@ export default function StoresForm(props) {
             description: values.description,
             slogan: values.slogan,
             address: values.address,
-            sellerUserId: values.sellerUser?.id ?? null
+            sellerUserId: values.sellerUser?.id ?? null,
+            fixed_seller_profit_percentage: (sellProfit) ? parseFloat(values.valueSellProfit) : null,
+            fixed_seller_profit_quantity: (!sellProfit) ? parseFloat(values.valueSellProfit) : null,
+            online_catalog: activeCatalogo,
+            online_reservation: activeReservations
         }
 
         let response
@@ -140,8 +153,8 @@ export default function StoresForm(props) {
             </Grid>
 
             <Grid item alignSelf={"center"}>
-                
-            <Typography variant="h6" >%</Typography>
+
+                <Typography variant="h6" >%</Typography>
 
             </Grid>
 
@@ -165,17 +178,6 @@ export default function StoresForm(props) {
             <Grid item alignSelf={"center"}>
 
                 <Typography variant="h6" >CUP</Typography>
-                {/* <TextField
-                    name={"currency"}
-                    size="small"
-                    select
-                    {...formik.getFieldProps("currency")}
-                >
-                    <MenuItem value={"CUP"}>CUP</MenuItem>
-                    <MenuItem value={"MLC"}>MLC</MenuItem>
-                    <MenuItem value={"USD"}>USD</MenuItem>
-
-                </TextField> */}
 
             </Grid>
 
@@ -318,10 +320,10 @@ export default function StoresForm(props) {
                                 <Switch
                                     size="small"
                                     checked={activeCatalogo}
-                                    onClick={()=>setActiveCatalogo(!activeCatalogo)}
+                                    onClick={() => setActiveCatalogo(!activeCatalogo)}
                                 />
                             </Grid>
-                            
+
                             <Grid item alignSelf={"flex-end"}>Activar catálogo en línea </Grid>
 
                         </Grid>
@@ -331,10 +333,10 @@ export default function StoresForm(props) {
                                 <Switch
                                     size="small"
                                     checked={activeReservations}
-                                    onClick={()=>setActiveReservations(!activeReservations)}
+                                    onClick={() => setActiveReservations(!activeReservations)}
                                 />
                             </Grid>
-                            
+
                             <Grid item alignSelf={"flex-end"}>Activar reservaciones en línea </Grid>
 
                         </Grid>

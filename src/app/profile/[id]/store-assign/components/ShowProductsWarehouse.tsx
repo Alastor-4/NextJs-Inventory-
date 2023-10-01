@@ -6,7 +6,7 @@ import { Button, Card, CardContent, Checkbox, Grid, IconButton, Table, TableBody
 import { useParams } from 'next/navigation'
 import { Formik } from 'formik'
 import { AddOutlined } from '@mui/icons-material';
-function showProducts({ storeId, warehouseId }) {
+function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity }) {
     const params = useParams();
 
     const [allProductbyWarehouseDepartament, setAllProductbyWarehouseDepartament] = useState(null);
@@ -187,12 +187,12 @@ function showProducts({ storeId, warehouseId }) {
             depotId: parseInt(row.depots[0].id),
             productUnits: 0,
             productRemainingUnits: 0,
-            sellerProfitPercentage: 0,//Tienes q copiar el porcentage de la tienda
+            sellerProfitPercentage: 0,
             seller_profit_quantity: 0,
             is_active: true,
             offer_notes: null,
-            price_discount_percentage: null,
-            price_discount_quantity: null,
+            price_discount_percentage: defaultPercentage ?? null,
+            price_discount_quantity: defaultQuantity ?? null,
             sell_price: row.buy_price,
             sell_price_unit: 'CUP'
 
