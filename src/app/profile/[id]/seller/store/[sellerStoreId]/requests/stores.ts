@@ -26,6 +26,17 @@ const sellerStore = {
         return false
     },
 
+    changeAutoReservationTime: async function (userId, sellerStoreId) {
+        try {
+            const response = await apiRequest.patch(url(userId, sellerStoreId), null, {params: {storeId: sellerStoreId}})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
 }
 
 export default sellerStore;

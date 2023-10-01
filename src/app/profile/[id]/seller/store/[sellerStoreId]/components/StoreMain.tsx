@@ -91,6 +91,23 @@ export default function StoreMain() {
         setStoreDetails(storeData)
     }
 
+    const [autoReservationTime, setAutoReservationTime] = React.useState(true)
+    React.useEffect(() => {
+        if (storeDetails) {
+            setAutoReservationTime(storeDetails?.auto_reservation_time ?? false)
+        }
+    }, [storeDetails])
+
+    async function handleToggleAutoReservation() {
+        //change auto reservation time
+        const updatedStore = await stores.changeAutoReservationTime(userId, sellerStoreId)
+
+        let storeData = {...storeDetails}
+        storeData.auto_reservation_time = updatedStore.auto_reservation_time
+
+        setStoreDetails(storeData)
+    }
+
     function checkOpenCondition() {
         if (!storeDetails.auto_open_time) return false
 
@@ -156,9 +173,9 @@ export default function StoreMain() {
                                     {storeDetails?.address ?? "-"}
                                 </Grid>
 
-                                <Grid container item xs={12} rowSpacing={2}>
+                                <Grid container item xs={12} md={6} rowSpacing={2}>
                                     <Grid item xs={12} sx={{fontWeight: 600}}>
-                                        Horarios de trabajo:
+                                        Horarios de apertura:
                                         <Switch checked={autoOpenTime} onChange={handleToggleAutoOpen} color={autoOpenTime ? "success" : "warning"}/>
                                     </Grid>
                                     <Grid item xs={12}>
@@ -205,6 +222,60 @@ export default function StoreMain() {
                                         }
                                     </Grid>
                                 </Grid>
+
+                                {
+                                    storeDetails.online_reservation && (
+                                        <Grid container item xs={12} md={6} rowSpacing={2}>
+                                            <Grid item xs={12} sx={{fontWeight: 600}}>
+                                                Horarios de reservaciones:
+                                                <Switch checked={autoReservationTime} onChange={handleToggleAutoReservation} color={autoReservationTime ? "success" : "warning"}/>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Box sx={
+                                                    autoReservationTime ?
+                                                        {
+                                                            border: "2px solid",
+                                                            display: "inline-flex",
+                                                            padding: "3px",
+                                                            borderRadius: "4px",
+                                                            borderColor: "lightgreen",
+                                                            alignItems: "center",
+                                                        } : {
+                                                            border: "2px solid",
+                                                            display: "inline-flex",
+                                                            padding: "3px",
+                                                            borderRadius: "4px",
+                                                            borderColor: "orangered",
+                                                            alignItems: "center",
+                                                        }
+                                                }>
+                                                    <InfoOutlined color={autoReservationTime ? "success" : "error"} sx={{mr: "3px"}}/>
+                                                    {autoReservationTime
+                                                        ? "Recibiendo reservaciones automáticamente en los horarios establecidos"
+                                                        : "No se reciben reservaciones"
+                                                    }
+                                                </Box>
+                                            </Grid>
+                                            <Grid item xs={12} container rowSpacing={1}>
+                                                {
+                                                    storeDetails?.store_reservation_days?.length ? (
+                                                        storeDetails.store_reservation_days.map(reservationItem => (
+                                                            <Grid container item spacing={1} xs={12} key={reservationItem.id}>
+                                                                <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                                                    <ChevronRightOutlined fontSize={"small"}/>
+                                                                    {daysMap[reservationItem.week_day_number]}:
+                                                                </Grid>
+                                                                <Grid item xs={true}>
+                                                                    De {reservationItem?.day_start_time ? dayjs(reservationItem.day_start_time).format("hh:mm A") : "-"} a {reservationItem?.day_end_time ? dayjs(reservationItem.day_end_time).format("hh:mm A") : "-"}
+                                                                </Grid>
+                                                            </Grid>
+                                                        ))
+                                                    ) : "no especificado"
+                                                }
+                                            </Grid>
+                                        </Grid>
+                                    )
+                                }
                             </Grid>
                         </Grid>
                     </CardContent>
