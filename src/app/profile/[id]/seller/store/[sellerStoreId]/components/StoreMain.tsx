@@ -6,23 +6,20 @@ import {
     Box,
     Card,
     CardContent,
-    Checkbox, Chip, CircularProgress,
-    Divider, Grid,
+    Chip,
+    Grid,
     IconButton,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
+    Switch,
     Toolbar,
     Typography
 } from "@mui/material";
-import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
-import stores from "@/app/profile/[id]/store/requests/stores";
+import {ArrowLeft, ChevronRightOutlined, DeleteOutline, EditOutlined, InfoOutlined} from "@mui/icons-material"
 import { useParams, useRouter } from "next/navigation";
-import userProfileStyles from "@/assets/styles/userProfileStyles";
 import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+import {lightGreen} from "@mui/material/colors";
+
+dayjs.extend(isBetween)
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -42,8 +39,6 @@ export default function StoreMain() {
     React.useEffect(() => {
         fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/api`).then((data) => setStoreDetails(data))
     }, [sellerStoreId, userId])
-
-
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -68,43 +63,147 @@ export default function StoreMain() {
         </AppBar>
     )
 
+    const daysMap = {
+        0: "Domingo",
+        1: "Lunes",
+        2: "Martes",
+        3: "Miércoles",
+        4: "Jueves",
+        5: "Viernes",
+        6: "Sábado",
+    }
+
+    const [autoOpenTime, setAutoOpenTime] = React.useState(true)
+    React.useEffect(() => {
+        if (storeDetails) {
+            setAutoOpenTime(storeDetails?.auto_open_time ?? false)
+        }
+    }, [storeDetails])
+
+    function handleChangeAutoOpen(e) {
+        //change auto open time
+        setAutoOpenTime(e.target.checked)
+    }
+
+    function checkOpenCondition() {
+        if (!storeDetails.auto_open_time) return false
+
+        const openDays = storeDetails.store_open_days
+
+        const todayWorkIndex = openDays.findIndex(openItem => openItem.week_day_number === dayjs().get("day"))
+        const todayIsWorkDay = todayWorkIndex > -1
+
+        if (!todayIsWorkDay) return false
+
+        const openTime = dayjs(openDays[todayWorkIndex].day_start_time, "HH:mm:ss")
+        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time, "HH:mm:ss")
+        const now = dayjs(Date(), "HH:mm:ss")
+
+        if (openTime.hour() <= now.hour() && now.hour() <= closeTime.hour()) {
+            if (openTime.hour() === now.hour() && openTime.minute() < now.minute()) return false
+
+            return !(closeTime.hour() === now.hour() && closeTime.minute() < now.minute())
+        }
+
+        return false
+    }
+
     return (
         <Card variant={"outlined"}>
             <CustomToolbar/>
 
-            <CardContent>
-                <Grid container rowSpacing={5}>
-                    <Grid container item rowSpacing={3}>
-                        <Grid container item xs={12} spacing={1}>
-                            <Grid item sx={userProfileStyles.leftFlex}>Nombre:</Grid>
-                            <Grid item sx={userProfileStyles.rightFlex}>
-                                {storeDetails?.name ?? "-"}
-                            </Grid>
-                        </Grid>
+            {
+                storeDetails && (
+                    <CardContent>
+                        <Grid container rowSpacing={5}>
+                            <Grid container item rowSpacing={3}>
+                                <Grid container item xs={12} justifyContent={"center"}>
+                                    {storeDetails?.name ?? "-"}
+                                    <Box sx={{display: "inline-flex", ml: "10px"}}>
+                                        {
+                                            checkOpenCondition() ? (
+                                                <Chip
+                                                    size={"small"}
+                                                    label={"Ahora Abierto"}
+                                                    color={"success"}
+                                                />
+                                            ) : (
+                                                <Chip
+                                                    size={"small"}
+                                                    label={"Ahora Cerrado"}
+                                                    color={"error"}
+                                                />
+                                            )
+                                        }
+                                    </Box>
+                                </Grid>
 
-                        <Grid container item xs={12} spacing={1}>
-                            <Grid item sx={userProfileStyles.leftFlex}>Descripción:</Grid>
-                            <Grid item sx={userProfileStyles.rightFlex}>
-                                {storeDetails?.description ?? "-"}
-                            </Grid>
-                        </Grid>
+                                <Grid container item xs={12} justifyContent={"center"}>
+                                    {storeDetails?.slogan ?? "-"}
+                                </Grid>
 
-                        <Grid container item xs={12} spacing={1}>
-                            <Grid item sx={userProfileStyles.leftFlex}>Slogan:</Grid>
-                            <Grid item sx={userProfileStyles.rightFlex}>
-                                {storeDetails?.slogan ?? ""}
-                            </Grid>
-                        </Grid>
+                                <Grid container item xs={12} justifyContent={"center"}>
+                                    {storeDetails?.description ?? "-"}
+                                </Grid>
 
-                        <Grid container item xs={12} spacing={1}>
-                            <Grid item sx={userProfileStyles.leftFlex}>Dirección:</Grid>
-                            <Grid item sx={userProfileStyles.rightFlex}>
-                                {storeDetails?.address ?? ""}
+                                <Grid container item xs={12} justifyContent={"center"}>
+                                    {storeDetails?.address ?? "-"}
+                                </Grid>
+
+                                <Grid container item xs={12} rowSpacing={2}>
+                                    <Grid item xs={12} sx={{fontWeight: 600}}>
+                                        Horarios de trabajo:
+                                        <Switch checked={autoOpenTime} onChange={handleChangeAutoOpen} color={autoOpenTime ? "success" : "warning"}/>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Box sx={
+                                            autoOpenTime ?
+                                                {
+                                                    border: "2px solid",
+                                                    display: "inline-flex",
+                                                    padding: "3px",
+                                                    borderRadius: "4px",
+                                                    borderColor: "lightgreen",
+                                                    alignItems: "center",
+                                                } : {
+                                                    border: "2px solid",
+                                                    display: "inline-flex",
+                                                    padding: "3px",
+                                                    borderRadius: "4px",
+                                                    borderColor: "orangered",
+                                                    alignItems: "center",
+                                                }
+                                        }>
+                                            <InfoOutlined color={autoOpenTime ? "success" : "error"} sx={{mr: "3px"}}/>
+                                            {autoOpenTime
+                                                ? "Abriendo tienda automáticamente en los horarios establecidos"
+                                                : "La tienda permanece cerrada"
+                                            }
+                                        </Box>
+                                    </Grid>
+                                    <Grid item xs={12} container rowSpacing={1}>
+                                        {
+                                            storeDetails?.store_open_days?.length ? (
+                                                storeDetails.store_open_days.map(openItem => (
+                                                    <Grid container item spacing={1} xs={12} key={openItem.id}>
+                                                        <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                                            <ChevronRightOutlined fontSize={"small"}/>
+                                                            {daysMap[openItem.week_day_number]}:
+                                                        </Grid>
+                                                        <Grid item xs={true}>
+                                                            De {openItem?.day_start_time ? dayjs(openItem.day_start_time).format("hh:mm A") : "-"} a {openItem?.day_end_time ? dayjs(openItem.day_end_time).format("hh:mm A") : "-"}
+                                                        </Grid>
+                                                    </Grid>
+                                                ))
+                                            ) : "no especificado"
+                                        }
+                                    </Grid>
+                                </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
-                </Grid>
-            </CardContent>
+                    </CardContent>
+                )
+            }
         </Card>
     )
 }
