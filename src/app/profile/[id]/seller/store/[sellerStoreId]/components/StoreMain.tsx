@@ -18,6 +18,7 @@ import { useParams, useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import {lightGreen} from "@mui/material/colors";
+import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/stores";
 
 dayjs.extend(isBetween)
 
@@ -80,9 +81,14 @@ export default function StoreMain() {
         }
     }, [storeDetails])
 
-    function handleChangeAutoOpen(e) {
+    async function handleToggleAutoOpen() {
         //change auto open time
-        setAutoOpenTime(e.target.checked)
+        const updatedStore = await stores.changeAutoOpenTime(userId, sellerStoreId)
+
+        let storeData = {...storeDetails}
+        storeData.auto_open_time = updatedStore.auto_open_time
+
+        setStoreDetails(storeData)
     }
 
     function checkOpenCondition() {
@@ -153,7 +159,7 @@ export default function StoreMain() {
                                 <Grid container item xs={12} rowSpacing={2}>
                                     <Grid item xs={12} sx={{fontWeight: 600}}>
                                         Horarios de trabajo:
-                                        <Switch checked={autoOpenTime} onChange={handleChangeAutoOpen} color={autoOpenTime ? "success" : "warning"}/>
+                                        <Switch checked={autoOpenTime} onChange={handleToggleAutoOpen} color={autoOpenTime ? "success" : "warning"}/>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Box sx={
