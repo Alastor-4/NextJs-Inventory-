@@ -220,13 +220,13 @@ export default function UserProfileMain(props) {
     const SellerModule = ({sellerStores}) => {
         const StoreButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <CardHeader title={"Ventas"}/>
+                <CardHeader title={"Tiendas"}/>
 
                 <CardContent>
                     <Grid container>
                         {sellerStores.map((item, index) => (
                             <Grid container key={item.id}>
-                                <Link href={`/profile/${userDetails.id}/store-details/${item.id}`} >
+                                <Link href={`/profile/${userDetails.id}/seller/store/${item.id}`} >
                                     <Grid container columnSpacing={1} item sx={index > 0 ? {mt: "10px"} : {mt: "0"}}>
                                         <Grid container item xs={"auto"} alignItems={"center"}>
                                             <ChevronRightOutlined fontSize={"small"}/>
@@ -250,7 +250,7 @@ export default function UserProfileMain(props) {
                 </Grid>
 
                 <Grid item xs={12}>
-                    <Typography variant={"h5"} sx={{textAlign: "center"}}>Ventas</Typography>
+                    <Typography variant={"h5"} sx={{textAlign: "center"}}>Vendedor</Typography>
                 </Grid>
 
                 <Grid container item rowSpacing={2}>
