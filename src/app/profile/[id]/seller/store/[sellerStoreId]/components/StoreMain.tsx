@@ -131,6 +131,29 @@ export default function StoreMain() {
         return false
     }
 
+    function checkOpenReservationCondition() {
+        if (!storeDetails.auto_reservation_time) return false
+
+        const openDays = storeDetails.store_reservation_days
+
+        const todayWorkIndex = openDays.findIndex(openItem => openItem.week_day_number === dayjs().get("day"))
+        const todayIsWorkDay = todayWorkIndex > -1
+
+        if (!todayIsWorkDay) return false
+
+        const openTime = dayjs(openDays[todayWorkIndex].day_start_time, "HH:mm:ss")
+        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time, "HH:mm:ss")
+        const now = dayjs(Date(), "HH:mm:ss")
+
+        if (openTime.hour() <= now.hour() && now.hour() <= closeTime.hour()) {
+            if (openTime.hour() === now.hour() && openTime.minute() < now.minute()) return false
+
+            return !(closeTime.hour() === now.hour() && closeTime.minute() < now.minute())
+        }
+
+        return false
+    }
+
     return (
         <Card variant={"outlined"}>
             <CustomToolbar/>
@@ -139,9 +162,12 @@ export default function StoreMain() {
                 storeDetails && (
                     <CardContent>
                         <Grid container rowSpacing={5}>
-                            <Grid container item rowSpacing={3}>
+                            <Grid container item spacing={3}>
                                 <Grid container item xs={12} justifyContent={"center"}>
                                     {storeDetails?.name ?? "-"}
+                                </Grid>
+
+                                <Grid container item xs={12} justifyContent={"center"}>
                                     <Box sx={{display: "inline-flex", ml: "10px"}}>
                                         {
                                             checkOpenCondition() ? (
@@ -156,6 +182,30 @@ export default function StoreMain() {
                                                     label={"Ahora Cerrado"}
                                                     color={"error"}
                                                 />
+                                            )
+                                        }
+
+                                        {
+                                            storeDetails.online_reservation && (
+                                                <>
+                                                    {
+                                                        checkOpenReservationCondition() ? (
+                                                            <Chip
+                                                                size={"small"}
+                                                                label={"Aceptando Reservaciones Ahora"}
+                                                                color={"success"}
+                                                                sx={{ml: "10px"}}
+                                                            />
+                                                        ) : (
+                                                            <Chip
+                                                                size={"small"}
+                                                                label={"Reservaciones No Aceptadas Ahora"}
+                                                                color={"error"}
+                                                                sx={{ml: "10px"}}
+                                                            />
+                                                        )
+                                                    }
+                                                </>
                                             )
                                         }
                                     </Box>
@@ -173,66 +223,16 @@ export default function StoreMain() {
                                     {storeDetails?.address ?? "-"}
                                 </Grid>
 
-                                <Grid container item xs={12} md={6} rowSpacing={2}>
-                                    <Grid item xs={12} sx={{fontWeight: 600}}>
-                                        Horarios de apertura:
-                                        <Switch checked={autoOpenTime} onChange={handleToggleAutoOpen} color={autoOpenTime ? "success" : "warning"}/>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Box sx={
-                                            autoOpenTime ?
-                                                {
-                                                    border: "2px solid",
-                                                    display: "inline-flex",
-                                                    padding: "3px",
-                                                    borderRadius: "4px",
-                                                    borderColor: "lightgreen",
-                                                    alignItems: "center",
-                                                } : {
-                                                    border: "2px solid",
-                                                    display: "inline-flex",
-                                                    padding: "3px",
-                                                    borderRadius: "4px",
-                                                    borderColor: "orangered",
-                                                    alignItems: "center",
-                                                }
-                                        }>
-                                            <InfoOutlined color={autoOpenTime ? "success" : "error"} sx={{mr: "3px"}}/>
-                                            {autoOpenTime
-                                                ? "Abriendo tienda automáticamente en los horarios establecidos"
-                                                : "La tienda permanece cerrada"
-                                            }
-                                        </Box>
-                                    </Grid>
-                                    <Grid item xs={12} container rowSpacing={1}>
-                                        {
-                                            storeDetails?.store_open_days?.length ? (
-                                                storeDetails.store_open_days.map(openItem => (
-                                                    <Grid container item spacing={1} xs={12} key={openItem.id}>
-                                                        <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                                            <ChevronRightOutlined fontSize={"small"}/>
-                                                            {daysMap[openItem.week_day_number]}:
-                                                        </Grid>
-                                                        <Grid item xs={true}>
-                                                            De {openItem?.day_start_time ? dayjs(openItem.day_start_time).format("hh:mm A") : "-"} a {openItem?.day_end_time ? dayjs(openItem.day_end_time).format("hh:mm A") : "-"}
-                                                        </Grid>
-                                                    </Grid>
-                                                ))
-                                            ) : "no especificado"
-                                        }
-                                    </Grid>
-                                </Grid>
-
-                                {
-                                    storeDetails.online_reservation && (
-                                        <Grid container item xs={12} md={6} rowSpacing={2}>
+                                <Grid item xs={12} md={6}>
+                                    <Card variant={"outlined"} sx={{padding: "10px"}}>
+                                        <Grid container rowSpacing={2}>
                                             <Grid item xs={12} sx={{fontWeight: 600}}>
-                                                Horarios de reservaciones:
-                                                <Switch checked={autoReservationTime} onChange={handleToggleAutoReservation} color={autoReservationTime ? "success" : "warning"}/>
+                                                Horarios de apertura:
+                                                <Switch checked={autoOpenTime} onChange={handleToggleAutoOpen} color={autoOpenTime ? "success" : "warning"}/>
                                             </Grid>
                                             <Grid item xs={12}>
                                                 <Box sx={
-                                                    autoReservationTime ?
+                                                    autoOpenTime ?
                                                         {
                                                             border: "2px solid",
                                                             display: "inline-flex",
@@ -249,30 +249,88 @@ export default function StoreMain() {
                                                             alignItems: "center",
                                                         }
                                                 }>
-                                                    <InfoOutlined color={autoReservationTime ? "success" : "error"} sx={{mr: "3px"}}/>
-                                                    {autoReservationTime
-                                                        ? "Recibiendo reservaciones automáticamente en los horarios establecidos"
-                                                        : "No se reciben reservaciones"
+                                                    <InfoOutlined color={autoOpenTime ? "success" : "error"} sx={{mr: "3px"}}/>
+                                                    {autoOpenTime
+                                                        ? "Abriendo tienda automáticamente en los horarios establecidos"
+                                                        : "La tienda permanece cerrada"
                                                     }
                                                 </Box>
                                             </Grid>
                                             <Grid item xs={12} container rowSpacing={1}>
                                                 {
-                                                    storeDetails?.store_reservation_days?.length ? (
-                                                        storeDetails.store_reservation_days.map(reservationItem => (
-                                                            <Grid container item spacing={1} xs={12} key={reservationItem.id}>
+                                                    storeDetails?.store_open_days?.length ? (
+                                                        storeDetails.store_open_days.map(openItem => (
+                                                            <Grid container item spacing={1} xs={12} key={openItem.id}>
                                                                 <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
                                                                     <ChevronRightOutlined fontSize={"small"}/>
-                                                                    {daysMap[reservationItem.week_day_number]}:
+                                                                    {daysMap[openItem.week_day_number]}:
                                                                 </Grid>
                                                                 <Grid item xs={true}>
-                                                                    De {reservationItem?.day_start_time ? dayjs(reservationItem.day_start_time).format("hh:mm A") : "-"} a {reservationItem?.day_end_time ? dayjs(reservationItem.day_end_time).format("hh:mm A") : "-"}
+                                                                    De {openItem?.day_start_time ? dayjs(openItem.day_start_time).format("hh:mm A") : "-"} a {openItem?.day_end_time ? dayjs(openItem.day_end_time).format("hh:mm A") : "-"}
                                                                 </Grid>
                                                             </Grid>
                                                         ))
                                                     ) : "no especificado"
                                                 }
                                             </Grid>
+                                        </Grid>
+                                    </Card>
+                                </Grid>
+
+                                {
+                                    storeDetails.online_reservation && (
+                                        <Grid item xs={12} md={6}>
+                                            <Card variant={"outlined"} sx={{padding: "10px"}}>
+                                                <Grid container rowSpacing={2}>
+                                                    <Grid item xs={12} sx={{fontWeight: 600}}>
+                                                        Horarios de reservaciones:
+                                                        <Switch checked={autoReservationTime} onChange={handleToggleAutoReservation} color={autoReservationTime ? "success" : "warning"}/>
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        <Box sx={
+                                                            autoReservationTime ?
+                                                                {
+                                                                    border: "2px solid",
+                                                                    display: "inline-flex",
+                                                                    padding: "3px",
+                                                                    borderRadius: "4px",
+                                                                    borderColor: "lightgreen",
+                                                                    alignItems: "center",
+                                                                } : {
+                                                                    border: "2px solid",
+                                                                    display: "inline-flex",
+                                                                    padding: "3px",
+                                                                    borderRadius: "4px",
+                                                                    borderColor: "orangered",
+                                                                    alignItems: "center",
+                                                                }
+                                                        }>
+                                                            <InfoOutlined color={autoReservationTime ? "success" : "error"} sx={{mr: "3px"}}/>
+                                                            {autoReservationTime
+                                                                ? "Recibiendo reservaciones automáticamente en los horarios establecidos"
+                                                                : "No se reciben reservaciones"
+                                                            }
+                                                        </Box>
+                                                    </Grid>
+                                                    <Grid item xs={12} container rowSpacing={1}>
+                                                        {
+                                                            storeDetails?.store_reservation_days?.length ? (
+                                                                storeDetails.store_reservation_days.map(reservationItem => (
+                                                                    <Grid container item spacing={1} xs={12} key={reservationItem.id}>
+                                                                        <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                                                            <ChevronRightOutlined fontSize={"small"}/>
+                                                                            {daysMap[reservationItem.week_day_number]}:
+                                                                        </Grid>
+                                                                        <Grid item xs={true}>
+                                                                            De {reservationItem?.day_start_time ? dayjs(reservationItem.day_start_time).format("hh:mm A") : "-"} a {reservationItem?.day_end_time ? dayjs(reservationItem.day_end_time).format("hh:mm A") : "-"}
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                ))
+                                                            ) : "no especificado"
+                                                        }
+                                                    </Grid>
+                                                </Grid>
+                                            </Card>
                                         </Grid>
                                     )
                                 }
