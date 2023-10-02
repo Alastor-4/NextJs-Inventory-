@@ -12,7 +12,7 @@ export async function GET(request: Request, { params }: { params: { id: string, 
             include: {
                 store_open_days: {orderBy: {week_day_number: "asc"}},
                 store_reservation_days: {orderBy: {week_day_number: "asc"}},
-                store_depots: {include: {_count: true}}}
+            }
         }
     )
 

@@ -13,7 +13,14 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import {ArrowLeft, ChevronRightOutlined, DeleteOutline, EditOutlined, InfoOutlined} from "@mui/icons-material"
+import {
+    ArrowLeft,
+    ChevronRightOutlined,
+    DeleteOutline,
+    EditOutlined,
+    ExpandLessOutlined, ExpandMoreOutlined,
+    InfoOutlined
+} from "@mui/icons-material"
 import { useParams, useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
@@ -154,6 +161,9 @@ export default function StoreMain() {
         return false
     }
 
+    const [displayAutoOpenSection, setDisplayAutoOpenSection] = React.useState(false)
+    const [displayAutoReservationSection, setDisplayAutoReservationSection] = React.useState(false)
+
     return (
         <Card variant={"outlined"}>
             <CustomToolbar/>
@@ -257,20 +267,38 @@ export default function StoreMain() {
                                                 </Box>
                                             </Grid>
                                             <Grid item xs={12} container rowSpacing={1}>
+                                                <Grid container item xs={12} alignItems={"center"}>
+                                                    Ver horarios
+                                                    <IconButton
+                                                        size={"small"}
+                                                        sx={{m: "3px"}}
+                                                        onClick={() => setDisplayAutoOpenSection(!displayAutoOpenSection)}
+                                                    >
+                                                        {displayAutoOpenSection ? <ExpandLessOutlined/> : <ExpandMoreOutlined/>}
+                                                    </IconButton>
+
+                                                </Grid>
+
                                                 {
-                                                    storeDetails?.store_open_days?.length ? (
-                                                        storeDetails.store_open_days.map(openItem => (
-                                                            <Grid container item spacing={1} xs={12} key={openItem.id}>
-                                                                <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                                                    <ChevronRightOutlined fontSize={"small"}/>
-                                                                    {daysMap[openItem.week_day_number]}:
-                                                                </Grid>
-                                                                <Grid item xs={true}>
-                                                                    De {openItem?.day_start_time ? dayjs(openItem.day_start_time).format("hh:mm A") : "-"} a {openItem?.day_end_time ? dayjs(openItem.day_end_time).format("hh:mm A") : "-"}
-                                                                </Grid>
-                                                            </Grid>
-                                                        ))
-                                                    ) : "no especificado"
+                                                    displayAutoOpenSection && (
+                                                        <>
+                                                            {
+                                                                storeDetails?.store_open_days?.length ? (
+                                                                    storeDetails.store_open_days.map(openItem => (
+                                                                        <Grid container item spacing={1} xs={12} key={openItem.id}>
+                                                                            <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                                                                <ChevronRightOutlined fontSize={"small"}/>
+                                                                                {daysMap[openItem.week_day_number]}:
+                                                                            </Grid>
+                                                                            <Grid item xs={true}>
+                                                                                De {openItem?.day_start_time ? dayjs(openItem.day_start_time).format("hh:mm A") : "-"} a {openItem?.day_end_time ? dayjs(openItem.day_end_time).format("hh:mm A") : "-"}
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                    ))
+                                                                ) : "no especificado"
+                                                            }
+                                                        </>
+                                                    )
                                                 }
                                             </Grid>
                                         </Grid>
@@ -313,20 +341,38 @@ export default function StoreMain() {
                                                         </Box>
                                                     </Grid>
                                                     <Grid item xs={12} container rowSpacing={1}>
+                                                        <Grid container item xs={12} alignItems={"center"}>
+                                                            Ver horarios
+                                                            <IconButton
+                                                                size={"small"}
+                                                                sx={{m: "3px"}}
+                                                                onClick={() => setDisplayAutoReservationSection(!displayAutoReservationSection)}
+                                                            >
+                                                                {displayAutoReservationSection ? <ExpandLessOutlined/> : <ExpandMoreOutlined/>}
+                                                            </IconButton>
+
+                                                        </Grid>
+
                                                         {
-                                                            storeDetails?.store_reservation_days?.length ? (
-                                                                storeDetails.store_reservation_days.map(reservationItem => (
-                                                                    <Grid container item spacing={1} xs={12} key={reservationItem.id}>
-                                                                        <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                                                            <ChevronRightOutlined fontSize={"small"}/>
-                                                                            {daysMap[reservationItem.week_day_number]}:
-                                                                        </Grid>
-                                                                        <Grid item xs={true}>
-                                                                            De {reservationItem?.day_start_time ? dayjs(reservationItem.day_start_time).format("hh:mm A") : "-"} a {reservationItem?.day_end_time ? dayjs(reservationItem.day_end_time).format("hh:mm A") : "-"}
-                                                                        </Grid>
-                                                                    </Grid>
-                                                                ))
-                                                            ) : "no especificado"
+                                                            displayAutoReservationSection && (
+                                                                <>
+                                                                    {
+                                                                        storeDetails?.store_reservation_days?.length ? (
+                                                                            storeDetails.store_reservation_days.map(reservationItem => (
+                                                                                <Grid container item spacing={1} xs={12} key={reservationItem.id}>
+                                                                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                                                                        <ChevronRightOutlined fontSize={"small"}/>
+                                                                                        {daysMap[reservationItem.week_day_number]}:
+                                                                                    </Grid>
+                                                                                    <Grid item xs={true}>
+                                                                                        De {reservationItem?.day_start_time ? dayjs(reservationItem.day_start_time).format("hh:mm A") : "-"} a {reservationItem?.day_end_time ? dayjs(reservationItem.day_end_time).format("hh:mm A") : "-"}
+                                                                                    </Grid>
+                                                                                </Grid>
+                                                                            ))
+                                                                        ) : "no especificado"
+                                                                    }
+                                                                </>
+                                                            )
                                                         }
                                                     </Grid>
                                                 </Grid>
