@@ -179,18 +179,21 @@ export default function StoreMain() {
 
                                 <Grid container item xs={12} justifyContent={"center"}>
                                     <Box sx={{display: "inline-flex", ml: "10px"}}>
+                                        Ahora mismo:
                                         {
                                             checkOpenCondition() ? (
                                                 <Chip
                                                     size={"small"}
-                                                    label={"Ahora Abierto"}
+                                                    label={"Abierto"}
                                                     color={"success"}
+                                                    sx={{ml: "10px"}}
                                                 />
                                             ) : (
                                                 <Chip
                                                     size={"small"}
-                                                    label={"Ahora Cerrado"}
+                                                    label={"Cerrado"}
                                                     color={"error"}
+                                                    sx={{ml: "10px"}}
                                                 />
                                             )
                                         }
@@ -202,14 +205,14 @@ export default function StoreMain() {
                                                         checkOpenReservationCondition() ? (
                                                             <Chip
                                                                 size={"small"}
-                                                                label={"Aceptando Reservaciones Ahora"}
+                                                                label={"Aceptando Reservaciones"}
                                                                 color={"success"}
                                                                 sx={{ml: "10px"}}
                                                             />
                                                         ) : (
                                                             <Chip
                                                                 size={"small"}
-                                                                label={"Reservaciones No Aceptadas Ahora"}
+                                                                label={"Reservaciones No Aceptadas"}
                                                                 color={"error"}
                                                                 sx={{ml: "10px"}}
                                                             />
@@ -261,8 +264,8 @@ export default function StoreMain() {
                                                 }>
                                                     <InfoOutlined color={autoOpenTime ? "success" : "error"} sx={{mr: "3px"}}/>
                                                     {autoOpenTime
-                                                        ? "Abriendo tienda automáticamente en los horarios establecidos"
-                                                        : "La tienda permanece cerrada"
+                                                        ? "Abriendo en los horarios establecidos"
+                                                        : "La tienda permanecerá siempre cerrada"
                                                     }
                                                 </Box>
                                             </Grid>
@@ -335,8 +338,8 @@ export default function StoreMain() {
                                                         }>
                                                             <InfoOutlined color={autoReservationTime ? "success" : "error"} sx={{mr: "3px"}}/>
                                                             {autoReservationTime
-                                                                ? "Recibiendo reservaciones automáticamente en los horarios establecidos"
-                                                                : "No se reciben reservaciones"
+                                                                ? "Recibiendo reservaciones en los horarios establecidos"
+                                                                : "No se recibirán reservaciones"
                                                             }
                                                         </Box>
                                                     </Grid>
