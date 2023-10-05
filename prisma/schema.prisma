@@ -79,7 +79,7 @@ model products_sell {
   payment_method          String?       @db.VarChar(255)
   units_returned_quantity Int?
   returned_reason         String?       @db.Text
-  returned_at             DateTime      @default(now()) @db.Timestamp(0)
+  returned_at             DateTime      @db.Timestamp(0)
   created_at              DateTime      @default(now()) @db.Timestamp(0)
   store_depots            store_depots? @relation(fields: [store_depot_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_sell_ibfk_1")
 
