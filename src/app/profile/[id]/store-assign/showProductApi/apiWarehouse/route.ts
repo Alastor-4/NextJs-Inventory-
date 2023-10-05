@@ -80,7 +80,9 @@ export async function GET(req: Request, { params }: Params) {
                 },
                 include: {
                     departments: true,
-                    depots: true
+                    depots: true,
+                    characteristics: true,
+                    images: true
                 }
             }
         }

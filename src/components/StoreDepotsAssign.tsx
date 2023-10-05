@@ -69,7 +69,11 @@ export default function StoreDepotsAssign(
     const showMainTable = () => {
         if (!selectedButton) {
             if (selectedStore !== '')
-                return <ShowProductsStore storeId={selectedStore.id}/>
+                return <ShowProductsStore 
+                storeId={selectedStore.id}
+                nameStore = {selectedStore.name}
+                nameWarehouse = { selectedWarehouse.name }
+                />
 
         } else {
             if (selectedStore !== '' && selectedWarehouse !== '')
