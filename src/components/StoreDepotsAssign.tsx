@@ -77,7 +77,12 @@ export default function StoreDepotsAssign(
 
         } else {
             if (selectedStore !== '' && selectedWarehouse !== '')
-                return <ShowProductsWarehouse storeId={selectedStore.id} warehouseId={selectedWarehouse.id}/>
+                return <ShowProductsWarehouse 
+                storeId={selectedStore.id} 
+                warehouseId={selectedWarehouse.id} 
+                defaultPercentage={ selectedStore.fixed_seller_profit_percentage }
+                defaultQuantity={ selectedStore.fixed_seller_profit_quantity }
+                />
         }
     }
 

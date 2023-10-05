@@ -7,22 +7,30 @@ import {
     Card,
     CardContent,
     Checkbox, CircularProgress,
-    Divider, Grid,
+    Collapse,
+    Divider, Fade, Grid,
     IconButton,
+    Modal,
+    Tab,
     Table,
     TableBody,
     TableCell,
     TableHead,
     TableRow, TextField,
     Toolbar,
+    Tooltip,
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft } from "@mui/icons-material";
+import { AddOutlined, ArrowLeft, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined } from "@mui/icons-material";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Formik } from "formik";
 import stores from "@/app/profile/[id]/store/requests/stores"
+import StoreMoreDetails from "./StoreMoreDetails";
+import StoreModalPrice from "./Modal/StoreModalPrice"
+import StoreEditPrice from "./Modal/StoreEditPrice";
+import { storeDetails } from "../request/storeDetails";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -33,6 +41,12 @@ export default function StoreMainTable() {
     const [data, setData] = React.useState(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
     const [storeName, setStoreName] = React.useState('')
+
+    const [showDetails, setShowDetails] = React.useState('')
+    const [activeModalPrice, setActiveModalPrice] = React.useState({ active: false, storeDepot: [] })
+    //const [isActive, setIsActive] = React.useState()
+    
+
     //ToDo: use global isLoading
     const isLoading = false
 
@@ -80,7 +94,7 @@ export default function StoreMainTable() {
             dataStore()
         }
 
-    }, [storeName,setStoreName])
+    }, [storeName, setStoreName])
 
     function handleNavigateBack() {
         router.back()
@@ -138,15 +152,21 @@ export default function StoreMainTable() {
                 align: "left"
             },
             {
-                id: "productRemaining",
-                label: "Unidades restantes",
+                id: "buy_Price",
+                label: "Precio",
                 align: "left"
             },
             {
-                id: "productUnit",
-                label: "Total de unidades",
+                id: "units",
+                label: "Unidades",
                 align: "left"
             },
+            {
+                id: "details",
+                label: "",
+                align: "left"
+            },
+
 
         ]
 
@@ -167,31 +187,130 @@ export default function StoreMainTable() {
         )
     }
 
+    const showPrice = (priceProductStore, discountQuantity, discountPorcentage, currency) => {
+        let pricePorcentage = (discountPorcentage !== null) ? discountPorcentage * priceProductStore / 100 : null;
+
+        let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
+
+        return <>
+            <Typography
+                display={"inline"}
+                color={price !== priceProductStore ? "forestgreen" : "black"}
+            >{`${price} ${currency}`}</Typography>
+
+        </>
+    }
+    //limegreen
+    const loadDates = async () => {
+        let newAllProductsbyDepartment = await storeDetails.getAllProductsByDepartament(params.id, params.storeDetailsId);
+
+        let selectedDepartment = allProductsByDepartment.filter(element => (element.selected)).map(element => element.id)
+
+        newAllProductsbyDepartment = newAllProductsbyDepartment.map(element => ({
+            ...element,
+            selected: (selectedDepartment.includes(element.id))
+        }))
+        setAllProductsByDepartment(newAllProductsbyDepartment);
+    }
+    const changeBackground = (color) => (color) ? 'limegreen' : "rgb(220,20,60)"
+
     const TableContent = ({ formik }) => {
         return (
             <TableBody>
                 {data.filter(
                     item =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                            row => (
-                                <TableRow
-                                    key={row.id}
-                                    hover
-                                    tabIndex={-1}
-                                >
-                                    <TableCell>
-                                        {row.name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.departments?.name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.depots[0].store_depots[0].product_remaining_units}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.depots[0].store_depots[0].product_units}
-                                    </TableCell>
-                                </TableRow>
+                            (row, index) => (
+                                <React.Fragment key={row.id}>
+                                    <TableRow
+                                        hover
+                                        tabIndex={-1}
+                                    >
+                                        <TableCell>
+
+                                            <div>
+                                                <Grid item container >
+                                                    <Grid item alignSelf={"flex-end"}>
+                                                        <Box width={8} height={8} borderRadius={"100%"} sx={{ backgroundColor: changeBackground(row.depots[0].store_depots[0].is_active), marginBottom: '4px', marginRight: "2px" }}  ></Box>
+                                                    </Grid>
+
+                                                    <Grid>
+                                                        {row.name}
+                                                    </Grid>
+
+                                                </Grid>
+                                                {
+                                                    row.description && (
+                                                        <small>
+                                                            {` ${row.description.slice(0, 20)}`}
+                                                        </small>
+                                                    )
+                                                }
+                                            </div>
+
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.departments?.name}
+                                        </TableCell>
+                                        <TableCell>
+
+                                            {
+                                                showPrice(
+                                                    row.depots[0].store_depots[0].sell_price,
+                                                    row.depots[0].store_depots[0].price_discount_quantity,
+                                                    row.depots[0].store_depots[0].price_discount_percentage,
+                                                    row.depots[0].store_depots[0].sell_price_unit
+                                                )
+
+                                            }
+
+                                            <IconButton size="small" color="primary"
+                                                onClick={() => setActiveModalPrice({ active: true, storeDepot: row.depots[0].store_depots[0] })}>
+                                                <EditOutlined fontSize="small" />
+                                            </IconButton>
+                                        </TableCell>
+                                        <TableCell>
+                                            {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
+                                        </TableCell>
+                                        <TableCell style={{ padding: 0 }} colSpan={5}>
+                                            <Tooltip title={"Details"}>
+                                                <IconButton
+                                                    size={"small"}
+                                                    sx={{ m: "3px" }}
+                                                    onClick={(e) => setShowDetails((showDetails !== index) ? index : '')}
+                                                >
+                                                    {
+
+
+                                                        (showDetails !== index)
+                                                            ? <ExpandMoreOutlined />
+                                                            : <ExpandLessOutlined />
+                                                    }
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+
+
+                                    </TableRow>
+
+                                    <TableRow >
+
+                                        <TableCell style={{ padding: 0 }} colSpan={5}>
+
+                                            {showDetails === index && (
+                                                <StoreMoreDetails
+                                                    userId={params.id}
+                                                    details={row.depots[0].store_depots[0]}
+                                                    show={(showDetails === index)}
+                                                    loadDates={loadDates}
+                                                    row={row}
+                                                />
+                                            )
+                                            }
+                                        </TableCell>
+
+                                    </TableRow>
+                                </React.Fragment>
                             ))}
             </TableBody>
         )
@@ -276,6 +395,18 @@ export default function StoreMainTable() {
                     <Card variant={"outlined"}>
                         <CustomToolbar />
 
+                        <>
+
+                            <StoreModalPrice
+                                dialogTitle={"Editar Precio"}
+                                open={activeModalPrice.active}
+                                setOpen={setActiveModalPrice}
+                            >
+                                <StoreEditPrice userId={params.id} storeDepot={activeModalPrice.storeDepot} setActiveModalPrice={setActiveModalPrice} loadDates={loadDates} />
+                            </StoreModalPrice>
+
+                        </>
+
                         <CardContent>
                             {
                                 allProductsByDepartment.length > 0 && (
@@ -290,6 +421,8 @@ export default function StoreMainTable() {
                                             <TableHeader />
 
                                             <TableContent formik={formik} />
+
+
                                         </Table>
                                     ) : (
                                         <TableNoData />
