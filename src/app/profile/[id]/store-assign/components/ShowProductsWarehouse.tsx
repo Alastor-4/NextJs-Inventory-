@@ -2,15 +2,23 @@
 import React, { useEffect, useState } from 'react'
 import storeAssign from '@/app/profile/[id]/store-assign/requests/store-assign'
 import { TableNoData } from "@/components/TableNoData";
-import { Button, Card, CardContent, Checkbox, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Box, Button, Card, CardContent, Checkbox, Collapse, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import { useParams } from 'next/navigation'
 import { Formik } from 'formik'
-import { AddOutlined } from '@mui/icons-material';
+import { AddOutlined, ExpandLessOutlined, ExpandMoreOutlined, VisibilityOutlined } from '@mui/icons-material';
+import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
+
+
 function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity }) {
     const params = useParams();
 
     const [allProductbyWarehouseDepartament, setAllProductbyWarehouseDepartament] = useState(null);
     const [data, setData] = useState();
+
+    const [showDetails, setShowDetails] = useState(false)
+
+    const [openImageDialog, setOpenImageDialog] = useState(false)
+    const [dialogImages, setDialogImages] = useState([]);
 
     useEffect(()=>{
         setAllProductbyWarehouseDepartament(null)
@@ -142,10 +150,14 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
             },
             {
                 id: "add",
+                label: "Agregar a tienda",
+                align: "left"
+            },
+            {
+                id: "more_details",
                 label: "",
                 align: "left"
             },
-
         ]
 
         return (
@@ -209,6 +221,11 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
 
     }
 
+    function handleOpenImagesDialog(images) {
+        setDialogImages(images)
+        setOpenImageDialog(true)
+    }
+
     const TableContent = ({ formik }) => {
         return (
             <TableBody>
@@ -216,6 +233,7 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
                     item =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
                             (row, index) => (
+                                <React.Fragment key={row.id}>
                                 <TableRow
                                     key={row.id}
                                     hover
@@ -236,7 +254,141 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
                                             <AddOutlined />
                                         </IconButton>
                                     </TableCell>
+
+
+                                    <TableCell style={{ padding: 0 }} colSpan={5}>
+                                            <Tooltip title={"Details"}>
+                                                <IconButton
+                                                    size={"small"}
+                                                    sx={{ m: "3px" }}
+                                                    onClick={(e) => setShowDetails((showDetails !== index) ? index : '')}
+                                                >
+                                                    {
+
+
+                                                        (showDetails !== index)
+                                                            ? <ExpandMoreOutlined />
+                                                            : <ExpandLessOutlined />
+                                                    }
+                                                </IconButton>
+                                            </Tooltip>
+                                        </TableCell>
+
+
                                 </TableRow>
+
+
+                                <TableRow >
+
+                                        <TableCell style={{ padding: 0 }} colSpan={5}>
+
+                                            {showDetails === index && (
+                                                <Collapse in={showDetails === index} timeout="auto" unmountOnExit>
+                                                    <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
+                                                        <Grid item xs={12}>
+
+                                                            <Typography variant="subtitle1" gutterBottom component="div">
+                                                                Detalles:
+                                                            </Typography>
+                                                        </Grid>
+
+
+                                                        <Grid container item spacing={1} xs={12}>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
+                                                            <Grid item xs={true}>
+                                                                {row.name}
+                                                                {
+                                                                    row.description && (
+                                                                        <small>
+                                                                            {` ${row.description}`}
+                                                                        </small>
+                                                                    )
+                                                                }
+                                                            </Grid>
+                                                        </Grid>
+
+
+                                                        <Grid container item spacing={1} xs={12}>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
+                                                            <Grid item xs={true}>
+                                                                {row.departments.name}
+                                                            </Grid>
+                                                        </Grid>
+
+
+                                                        <Grid container item spacing={1} xs={12}>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
+                                                            <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
+                                                                {row.characteristics.length > 0
+                                                                    ? row.characteristics.map(item => (
+                                                                        <Grid
+                                                                            key={item.id}
+                                                                            sx={{
+                                                                                display: "inline-flex",
+                                                                                margin: "3px",
+                                                                                backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                                                padding: "2px 4px",
+                                                                                borderRadius: "5px 2px 2px 2px",
+                                                                                border: "1px solid rgba(130, 130, 130)",
+                                                                                fontSize: 14,
+                                                                            }}
+                                                                        >
+                                                                            <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
+                                                                                <Typography variant={"caption"}
+                                                                                    sx={{ color: "white", fontWeight: "600" }}>
+                                                                                    {item.name.toUpperCase()}
+                                                                                </Typography>
+                                                                            </Grid>
+                                                                            <Grid container item alignItems={"center"}
+                                                                                sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                                                {item.value}
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                    )
+                                                                    ) : "-"
+                                                                }
+                                                            </Grid>
+                                                        </Grid>
+
+
+                                                        <Grid container item spacing={1} xs={12}>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
+                                                            <Grid item xs={true}>
+                                                                {
+                                                                    row.images.length > 0
+                                                                        ? (
+                                                                            <Box
+                                                                                sx={{ cursor: "pointer", display: "inline-flex", alignItems: "center", color: "blue" }}
+                                                                                onClick={() => handleOpenImagesDialog(row.images)}
+                                                                            >
+                                                                                {row.images.length}
+
+                                                                                <VisibilityOutlined fontSize={"small"}
+                                                                                    sx={{ ml: "5px" }} />
+                                                                            </Box>
+                                                                        ) : "no"
+                                                                }
+                                                            </Grid>
+                                                        </Grid>
+
+                                                        <Grid container item spacing={1} xs={12}>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades restantes en el almacén</Grid>
+                                                            <Grid item xs={true}>
+                                                                {row.depots[0].product_total_remaining_units}
+                                                            </Grid>
+                                                        </Grid>
+
+
+
+
+                                                    </Grid>
+                                                </Collapse>
+                                            )
+                                            }
+                                        </TableCell>
+                                    </TableRow>
+
+                                </React.Fragment>
                             ))}
             </TableBody>
         )
@@ -253,6 +405,13 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
                 {
                     (formik) => (
                         <Card variant={"outlined"}>
+                        
+                        <ImagesDisplayDialog
+                                dialogTitle={"Imágenes del producto"}
+                                open={openImageDialog}
+                                setOpen={setOpenImageDialog}
+                                images={dialogImages}
+                            />
 
 
                             <CardContent>
