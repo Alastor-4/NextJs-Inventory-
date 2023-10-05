@@ -41,10 +41,7 @@ export async function GET(req) {
                         include: {
                             store_depots: true
                         }
-                    },
-                    characteristics: true,
-                    images: true,
-                    
+                    }
                 }
             }
         }

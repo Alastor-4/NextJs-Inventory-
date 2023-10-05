@@ -22,7 +22,7 @@ const storeAssign = {
     UpdateProductStore: async function (userId, data) {
         try {
             const response = await apiRequest.put(showProductStoreUrl(userId), data)
-            return response.status
+            return response
         } catch (e) {
             //ToDo: notify error here
         }

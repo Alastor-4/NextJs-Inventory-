@@ -6,30 +6,27 @@ import { Button, Card, CardContent, Checkbox, Grid, IconButton, Table, TableBody
 import { useParams } from 'next/navigation'
 import { Formik } from 'formik'
 import { AddOutlined } from '@mui/icons-material';
-function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity }) {
+function showProducts({ storeId, warehouseId }) {
     const params = useParams();
 
-    const [allProductbyWarehouseDepartament, setAllProductbyWarehouseDepartament] = useState(null);
+    const [allProductbyWarehouseDepartament, setAllProductbyWarehouseDepartament] = useState([]);
     const [data, setData] = useState();
 
-    useEffect(()=>{
-        setAllProductbyWarehouseDepartament(null)
-    },[storeId, warehouseId])
 
     useEffect(() => {
         const Datos = async () => {
-            const result = await storeAssign.allProductbyDepartmentWarehouse(params.id, storeId, warehouseId)
+            const result = await storeAssign.allProductbyDepartment(params.id, storeId, warehouseId)
             setAllProductbyWarehouseDepartament(() => result.map(data => ({
                 ...data,
                 selected: false
             })))
         }
-        if (allProductbyWarehouseDepartament === null) Datos()
+        if (allProductbyWarehouseDepartament.length === 0) Datos()
 
     }, [allProductbyWarehouseDepartament])
 
-    useEffect(() => {
-        if (allProductbyWarehouseDepartament !== null) {
+    React.useEffect(() => {
+        if (allProductbyWarehouseDepartament.length > 0) {
 
             let allProducts = []
 
@@ -166,20 +163,25 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
         )
     }
 
+    // devuelve el indice del array analizado
+    const searchArray = (elementId: String, array: Array<Object>) => {
+        return array.findIndex((element) => (element.id === elementId))
+    }
 
-    const loadDates = async () => {
-        let newAllProductbyDepartmentWarehouse = await storeAssign.allProductbyDepartmentWarehouse(params.id, storeId, warehouseId);
-    
-        let selectedDepartment = allProductbyWarehouseDepartament.filter(element => (element.selected)).map( element => element.id)
-    
-        newAllProductbyDepartmentWarehouse = newAllProductbyDepartmentWarehouse.map(element => ({
-          ...element,
-          selected: (selectedDepartment.includes(element.id))
-        }))
-        setAllProductbyWarehouseDepartament(newAllProductbyDepartmentWarehouse);
-      }
+    // Elimina el producto localmente
+    const removeProduct = (departmentId: String, productId: String) => {
+        let newAllProductbyWarehouseDepartament = [...allProductbyWarehouseDepartament];
+
+        const departmentIndex = searchArray(departmentId, newAllProductbyWarehouseDepartament)
+        const productIndex = searchArray(productId, newAllProductbyWarehouseDepartament[departmentIndex].products)
+
+        newAllProductbyWarehouseDepartament[departmentIndex].products.splice(productIndex, 1);
 
 
+        setAllProductbyWarehouseDepartament(
+            newAllProductbyWarehouseDepartament.filter(valor => (valor.products.length !== 0))
+        )
+    }
     // Se Agrega a los Depositos de la Tienda y da la orden de eliminar
     const addStoreDepot = async (row: Object) => {
         const datos = {
@@ -187,22 +189,13 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
             depotId: parseInt(row.depots[0].id),
             productUnits: 0,
             productRemainingUnits: 0,
-            sellerProfitPercentage: 0,
-            seller_profit_quantity: 0,
-            is_active: true,
-            offer_notes: null,
-            price_discount_percentage: defaultPercentage ?? null,
-            price_discount_quantity: defaultQuantity ?? null,
-            sell_price: row.buy_price,
-            sell_price_unit: 'CUP'
-
+            sellerProfitPercentage: 0
         }
 
         const response = await storeAssign.postProductToStoreDepot(params.id, datos);
 
         if (response.status === 200) {
-            //removeProduct(row.departments.id, row.id);
-            loadDates()
+            removeProduct(row.departments.id, row.id);
         } else {
             //ToDo: catch validation errors
         }
@@ -257,7 +250,6 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
 
                             <CardContent>
                                 {
-                                    Array.isArray(allProductbyWarehouseDepartament) &&
                                     allProductbyWarehouseDepartament.length > 0 && (
                                         <DepartmentsFilter formik={formik} />
                                     )
