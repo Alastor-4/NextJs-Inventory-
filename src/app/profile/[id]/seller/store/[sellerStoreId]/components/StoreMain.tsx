@@ -5,7 +5,7 @@ import {
     AppBar,
     Box,
     Card,
-    CardContent,
+    CardContent, CardHeader,
     Chip,
     Grid,
     IconButton,
@@ -33,6 +33,7 @@ const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function StoreMain() {
     const [storeDetails, setStoreDetails] = React.useState(null)
+    const [productSells, setProductSells] = React.useState(null)
 
     const params = useParams()
     const router = useRouter()
@@ -46,6 +47,12 @@ export default function StoreMain() {
     //get initial storeDetails
     React.useEffect(() => {
         fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/api`).then((data) => setStoreDetails(data))
+
+        fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/sellsApi`)
+            .then((data) => {
+                console.log(data)
+            })
+
     }, [sellerStoreId, userId])
 
     const CustomToolbar = () => (
@@ -163,6 +170,19 @@ export default function StoreMain() {
 
     const [displayAutoOpenSection, setDisplayAutoOpenSection] = React.useState(false)
     const [displayAutoReservationSection, setDisplayAutoReservationSection] = React.useState(false)
+
+    const TodaySells = () => {
+
+        return (
+            <Card variant={"outlined"}>
+                <CardHeader title={"Ventas de hoy"}/>
+
+                <CardContent>
+                    contenido aqui
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <Card variant={"outlined"}>
@@ -383,6 +403,10 @@ export default function StoreMain() {
                                         </Grid>
                                     )
                                 }
+
+                                <Grid item xs={12} md={6}>
+                                    <TodaySells/>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </CardContent>
