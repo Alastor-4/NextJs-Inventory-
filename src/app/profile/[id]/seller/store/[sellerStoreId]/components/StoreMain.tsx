@@ -16,15 +16,12 @@ import {
 import {
     ArrowLeft,
     ChevronRightOutlined,
-    DeleteOutline,
-    EditOutlined,
     ExpandLessOutlined, ExpandMoreOutlined,
     InfoOutlined
 } from "@mui/icons-material"
 import { useParams, useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import {lightGreen} from "@mui/material/colors";
 import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/stores";
 
 dayjs.extend(isBetween)
@@ -33,6 +30,7 @@ const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function StoreMain() {
     const [storeDetails, setStoreDetails] = React.useState(null)
+    const [storeDepotsDetails, setStoreDepotsDetails] = React.useState(null)
     const [productSells, setProductSells] = React.useState(null)
 
     const params = useParams()
@@ -46,12 +44,37 @@ export default function StoreMain() {
 
     //get initial storeDetails
     React.useEffect(() => {
-        fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/api`).then((data) => setStoreDetails(data))
+        fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/api`)
+            .then((data) => {
+                setStoreDetails(data)
+
+                const depotsTotal = data.store_depots.length
+                let depotsRemainingUnitsTotal = 0
+                let depotsNotRemainingUnitsTotal = 0
+                let depotsNotActiveTotal = 0
+                let depotsWithoutPriceTotal = 0
+                let depotsWithDiscountTotal = 0
+
+                data.store_depots.forEach(item => {
+                    depotsRemainingUnitsTotal += item.product_remaining_units
+                    if (!item.product_remaining_units) depotsNotRemainingUnitsTotal++
+                    if (!item.is_active) depotsNotActiveTotal++
+                    if (!item.sell_price) depotsWithoutPriceTotal++
+                    if (item.price_discount_percentage || item.price_discount_quantity) depotsWithDiscountTotal++
+                })
+
+                setStoreDepotsDetails({
+                    depotsTotal,
+                    depotsRemainingUnitsTotal,
+                    depotsNotRemainingUnitsTotal,
+                    depotsNotActiveTotal,
+                    depotsWithoutPriceTotal,
+                    depotsWithDiscountTotal,
+                })
+            })
 
         fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/sellsApi`)
-            .then((data) => {
-                console.log(data)
-            })
+            .then((data) => {setProductSells(data)})
 
     }, [sellerStoreId, userId])
 
@@ -171,6 +194,73 @@ export default function StoreMain() {
     const [displayAutoOpenSection, setDisplayAutoOpenSection] = React.useState(false)
     const [displayAutoReservationSection, setDisplayAutoReservationSection] = React.useState(false)
 
+    const StoreProducts = () => {
+
+        return (
+            <Card variant={"outlined"}>
+                <CardHeader title={"Productos en tienda"}/>
+
+                <CardContent>
+                    {
+                        storeDepotsDetails && (
+                            <Grid container rowSpacing={2}>
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Productos:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {storeDepotsDetails.depotsTotal} ({storeDepotsDetails.depotsRemainingUnitsTotal} total de unidades)
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Productos agotados:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {storeDepotsDetails.depotsNotRemainingUnitsTotal}
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Productos inactivos:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {storeDepotsDetails.depotsNotActiveTotal}
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Productos sin precio:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {storeDepotsDetails.depotsWithoutPriceTotal}
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Productos con descuento:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {storeDepotsDetails.depotsWithDiscountTotal}
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        )
+                    }
+                </CardContent>
+            </Card>
+        )
+    }
+
     const TodaySells = () => {
 
         return (
@@ -183,6 +273,163 @@ export default function StoreMain() {
             </Card>
         )
     }
+
+    const TodayTransfers = () => {
+
+        return (
+            <Card variant={"outlined"}>
+                <CardHeader title={"Transferencias de hoy"}/>
+
+                <CardContent>
+                    contenido aqui
+                </CardContent>
+            </Card>
+        )
+    }
+
+    const StoreHours = () => (
+        <Card variant={"outlined"} sx={{padding: "10px"}}>
+            <Grid container rowSpacing={2}>
+                <Grid item xs={12} sx={{fontWeight: 600}}>
+                    Horarios de apertura:
+                    <Switch checked={autoOpenTime} onChange={handleToggleAutoOpen} color={autoOpenTime ? "success" : "warning"}/>
+                </Grid>
+                <Grid item xs={12}>
+                    <Box sx={
+                        autoOpenTime ?
+                            {
+                                border: "2px solid",
+                                display: "inline-flex",
+                                padding: "3px",
+                                borderRadius: "4px",
+                                borderColor: "lightgreen",
+                                alignItems: "center",
+                            } : {
+                                border: "2px solid",
+                                display: "inline-flex",
+                                padding: "3px",
+                                borderRadius: "4px",
+                                borderColor: "orangered",
+                                alignItems: "center",
+                            }
+                    }>
+                        <InfoOutlined color={autoOpenTime ? "success" : "error"} sx={{mr: "3px"}}/>
+                        {autoOpenTime
+                            ? "Abriendo en los horarios establecidos"
+                            : "La tienda permanecerá siempre cerrada"
+                        }
+                    </Box>
+                </Grid>
+                <Grid item xs={12} container rowSpacing={1}>
+                    <Grid container item xs={12} alignItems={"center"}>
+                        Ver horarios
+                        <IconButton
+                            size={"small"}
+                            sx={{m: "3px"}}
+                            onClick={() => setDisplayAutoOpenSection(!displayAutoOpenSection)}
+                        >
+                            {displayAutoOpenSection ? <ExpandLessOutlined/> : <ExpandMoreOutlined/>}
+                        </IconButton>
+
+                    </Grid>
+
+                    {
+                        displayAutoOpenSection && (
+                            <>
+                                {
+                                    storeDetails?.store_open_days?.length ? (
+                                        storeDetails.store_open_days.map(openItem => (
+                                            <Grid container item spacing={1} xs={12} key={openItem.id}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                                    <ChevronRightOutlined fontSize={"small"}/>
+                                                    {daysMap[openItem.week_day_number]}:
+                                                </Grid>
+                                                <Grid item xs={true}>
+                                                    De {openItem?.day_start_time ? dayjs(openItem.day_start_time).format("hh:mm A") : "-"} a {openItem?.day_end_time ? dayjs(openItem.day_end_time).format("hh:mm A") : "-"}
+                                                </Grid>
+                                            </Grid>
+                                        ))
+                                    ) : "no especificado"
+                                }
+                            </>
+                        )
+                    }
+                </Grid>
+            </Grid>
+        </Card>
+    )
+
+    const ReservationHours = () => (
+        <Card variant={"outlined"} sx={{padding: "10px"}}>
+            <Grid container rowSpacing={2}>
+                <Grid item xs={12} sx={{fontWeight: 600}}>
+                    Horarios de reservaciones:
+                    <Switch checked={autoReservationTime} onChange={handleToggleAutoReservation} color={autoReservationTime ? "success" : "warning"}/>
+                </Grid>
+                <Grid item xs={12}>
+                    <Box sx={
+                        autoReservationTime ?
+                            {
+                                border: "2px solid",
+                                display: "inline-flex",
+                                padding: "3px",
+                                borderRadius: "4px",
+                                borderColor: "lightgreen",
+                                alignItems: "center",
+                            } : {
+                                border: "2px solid",
+                                display: "inline-flex",
+                                padding: "3px",
+                                borderRadius: "4px",
+                                borderColor: "orangered",
+                                alignItems: "center",
+                            }
+                    }>
+                        <InfoOutlined color={autoReservationTime ? "success" : "error"} sx={{mr: "3px"}}/>
+                        {autoReservationTime
+                            ? "Recibiendo reservaciones en los horarios establecidos"
+                            : "No se recibirán reservaciones"
+                        }
+                    </Box>
+                </Grid>
+                <Grid item xs={12} container rowSpacing={1}>
+                    <Grid container item xs={12} alignItems={"center"}>
+                        Ver horarios
+                        <IconButton
+                            size={"small"}
+                            sx={{m: "3px"}}
+                            onClick={() => setDisplayAutoReservationSection(!displayAutoReservationSection)}
+                        >
+                            {displayAutoReservationSection ? <ExpandLessOutlined/> : <ExpandMoreOutlined/>}
+                        </IconButton>
+
+                    </Grid>
+
+                    {
+                        displayAutoReservationSection && (
+                            <>
+                                {
+                                    storeDetails?.store_reservation_days?.length ? (
+                                        storeDetails.store_reservation_days.map(reservationItem => (
+                                            <Grid container item spacing={1} xs={12} key={reservationItem.id}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                                    <ChevronRightOutlined fontSize={"small"}/>
+                                                    {daysMap[reservationItem.week_day_number]}:
+                                                </Grid>
+                                                <Grid item xs={true}>
+                                                    De {reservationItem?.day_start_time ? dayjs(reservationItem.day_start_time).format("hh:mm A") : "-"} a {reservationItem?.day_end_time ? dayjs(reservationItem.day_end_time).format("hh:mm A") : "-"}
+                                                </Grid>
+                                            </Grid>
+                                        ))
+                                    ) : "no especificado"
+                                }
+                            </>
+                        )
+                    }
+                </Grid>
+            </Grid>
+        </Card>
+    )
 
     return (
         <Card variant={"outlined"}>
@@ -256,157 +503,29 @@ export default function StoreMain() {
                                     {storeDetails?.address ?? "-"}
                                 </Grid>
 
+                                <Grid item xs={12}>
+                                    <StoreProducts/>
+                                </Grid>
+
                                 <Grid item xs={12} md={6}>
-                                    <Card variant={"outlined"} sx={{padding: "10px"}}>
-                                        <Grid container rowSpacing={2}>
-                                            <Grid item xs={12} sx={{fontWeight: 600}}>
-                                                Horarios de apertura:
-                                                <Switch checked={autoOpenTime} onChange={handleToggleAutoOpen} color={autoOpenTime ? "success" : "warning"}/>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <Box sx={
-                                                    autoOpenTime ?
-                                                        {
-                                                            border: "2px solid",
-                                                            display: "inline-flex",
-                                                            padding: "3px",
-                                                            borderRadius: "4px",
-                                                            borderColor: "lightgreen",
-                                                            alignItems: "center",
-                                                        } : {
-                                                            border: "2px solid",
-                                                            display: "inline-flex",
-                                                            padding: "3px",
-                                                            borderRadius: "4px",
-                                                            borderColor: "orangered",
-                                                            alignItems: "center",
-                                                        }
-                                                }>
-                                                    <InfoOutlined color={autoOpenTime ? "success" : "error"} sx={{mr: "3px"}}/>
-                                                    {autoOpenTime
-                                                        ? "Abriendo en los horarios establecidos"
-                                                        : "La tienda permanecerá siempre cerrada"
-                                                    }
-                                                </Box>
-                                            </Grid>
-                                            <Grid item xs={12} container rowSpacing={1}>
-                                                <Grid container item xs={12} alignItems={"center"}>
-                                                    Ver horarios
-                                                    <IconButton
-                                                        size={"small"}
-                                                        sx={{m: "3px"}}
-                                                        onClick={() => setDisplayAutoOpenSection(!displayAutoOpenSection)}
-                                                    >
-                                                        {displayAutoOpenSection ? <ExpandLessOutlined/> : <ExpandMoreOutlined/>}
-                                                    </IconButton>
+                                    <TodaySells/>
+                                </Grid>
 
-                                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TodayTransfers/>
+                                </Grid>
 
-                                                {
-                                                    displayAutoOpenSection && (
-                                                        <>
-                                                            {
-                                                                storeDetails?.store_open_days?.length ? (
-                                                                    storeDetails.store_open_days.map(openItem => (
-                                                                        <Grid container item spacing={1} xs={12} key={openItem.id}>
-                                                                            <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                                                                <ChevronRightOutlined fontSize={"small"}/>
-                                                                                {daysMap[openItem.week_day_number]}:
-                                                                            </Grid>
-                                                                            <Grid item xs={true}>
-                                                                                De {openItem?.day_start_time ? dayjs(openItem.day_start_time).format("hh:mm A") : "-"} a {openItem?.day_end_time ? dayjs(openItem.day_end_time).format("hh:mm A") : "-"}
-                                                                            </Grid>
-                                                                        </Grid>
-                                                                    ))
-                                                                ) : "no especificado"
-                                                            }
-                                                        </>
-                                                    )
-                                                }
-                                            </Grid>
-                                        </Grid>
-                                    </Card>
+                                <Grid item xs={12} md={6}>
+                                    <StoreHours/>
                                 </Grid>
 
                                 {
                                     storeDetails.online_reservation && (
                                         <Grid item xs={12} md={6}>
-                                            <Card variant={"outlined"} sx={{padding: "10px"}}>
-                                                <Grid container rowSpacing={2}>
-                                                    <Grid item xs={12} sx={{fontWeight: 600}}>
-                                                        Horarios de reservaciones:
-                                                        <Switch checked={autoReservationTime} onChange={handleToggleAutoReservation} color={autoReservationTime ? "success" : "warning"}/>
-                                                    </Grid>
-                                                    <Grid item xs={12}>
-                                                        <Box sx={
-                                                            autoReservationTime ?
-                                                                {
-                                                                    border: "2px solid",
-                                                                    display: "inline-flex",
-                                                                    padding: "3px",
-                                                                    borderRadius: "4px",
-                                                                    borderColor: "lightgreen",
-                                                                    alignItems: "center",
-                                                                } : {
-                                                                    border: "2px solid",
-                                                                    display: "inline-flex",
-                                                                    padding: "3px",
-                                                                    borderRadius: "4px",
-                                                                    borderColor: "orangered",
-                                                                    alignItems: "center",
-                                                                }
-                                                        }>
-                                                            <InfoOutlined color={autoReservationTime ? "success" : "error"} sx={{mr: "3px"}}/>
-                                                            {autoReservationTime
-                                                                ? "Recibiendo reservaciones en los horarios establecidos"
-                                                                : "No se recibirán reservaciones"
-                                                            }
-                                                        </Box>
-                                                    </Grid>
-                                                    <Grid item xs={12} container rowSpacing={1}>
-                                                        <Grid container item xs={12} alignItems={"center"}>
-                                                            Ver horarios
-                                                            <IconButton
-                                                                size={"small"}
-                                                                sx={{m: "3px"}}
-                                                                onClick={() => setDisplayAutoReservationSection(!displayAutoReservationSection)}
-                                                            >
-                                                                {displayAutoReservationSection ? <ExpandLessOutlined/> : <ExpandMoreOutlined/>}
-                                                            </IconButton>
-
-                                                        </Grid>
-
-                                                        {
-                                                            displayAutoReservationSection && (
-                                                                <>
-                                                                    {
-                                                                        storeDetails?.store_reservation_days?.length ? (
-                                                                            storeDetails.store_reservation_days.map(reservationItem => (
-                                                                                <Grid container item spacing={1} xs={12} key={reservationItem.id}>
-                                                                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                                                                        <ChevronRightOutlined fontSize={"small"}/>
-                                                                                        {daysMap[reservationItem.week_day_number]}:
-                                                                                    </Grid>
-                                                                                    <Grid item xs={true}>
-                                                                                        De {reservationItem?.day_start_time ? dayjs(reservationItem.day_start_time).format("hh:mm A") : "-"} a {reservationItem?.day_end_time ? dayjs(reservationItem.day_end_time).format("hh:mm A") : "-"}
-                                                                                    </Grid>
-                                                                                </Grid>
-                                                                            ))
-                                                                        ) : "no especificado"
-                                                                    }
-                                                                </>
-                                                            )
-                                                        }
-                                                    </Grid>
-                                                </Grid>
-                                            </Card>
+                                            <ReservationHours/>
                                         </Grid>
                                     )
                                 }
-
-                                <Grid item xs={12} md={6}>
-                                    <TodaySells/>
-                                </Grid>
                             </Grid>
                         </Grid>
                     </CardContent>
