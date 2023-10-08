@@ -5,7 +5,8 @@ import {
     AppBar,
     Box,
     Card,
-    CardContent, CardHeader,
+    CardContent,
+    CardHeader,
     Chip,
     Grid,
     IconButton,
@@ -16,7 +17,8 @@ import {
 import {
     ArrowLeft,
     ChevronRightOutlined,
-    ExpandLessOutlined, ExpandMoreOutlined,
+    ExpandLessOutlined,
+    ExpandMoreOutlined,
     InfoOutlined
 } from "@mui/icons-material"
 import { useParams, useRouter } from "next/navigation";
