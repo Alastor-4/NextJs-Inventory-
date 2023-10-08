@@ -30,8 +30,9 @@ const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function StoreMain() {
     const [storeDetails, setStoreDetails] = React.useState(null)
-    const [storeDepotsDetails, setStoreDepotsDetails] = React.useState(null)
+    const [storeDepotsStats, setStoreDepotsStats] = React.useState(null)
     const [productSells, setProductSells] = React.useState(null)
+    const [productSellsStats, setProductSellsStats] = React.useState(null)
 
     const params = useParams()
     const router = useRouter()
@@ -63,7 +64,7 @@ export default function StoreMain() {
                     if (item.price_discount_percentage || item.price_discount_quantity) depotsWithDiscountTotal++
                 })
 
-                setStoreDepotsDetails({
+                setStoreDepotsStats({
                     depotsTotal,
                     depotsRemainingUnitsTotal,
                     depotsNotRemainingUnitsTotal,
@@ -74,7 +75,44 @@ export default function StoreMain() {
             })
 
         fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/sellsApi`)
-            .then((data) => {setProductSells(data)})
+            .then((data) => {
+                setProductSells(data)
+
+                const sellsTotal = data.length
+                let sellsDifferentProductsTotal = 0
+                let sellsUnitsTotal = 0
+                let sellsAmountTotal = 0
+                let sellsUnitsReturnedTotal = 0
+                let sellerProfitTotal = 0
+
+                let seeDepotsId = {}
+
+                data.forEach(item => {
+                    if (!seeDepotsId[item.store_depots.depot_id]) {
+                        sellsDifferentProductsTotal++
+                        seeDepotsId[item.store_depots.depot_id] = true
+                    }
+
+                    sellsUnitsTotal += item.units_quantity
+                    sellsAmountTotal += item.total_price
+                    sellsUnitsReturnedTotal += item.units_returned_quantity
+
+                    const itemProfitQuantity = item.store_depots.seller_profit_quantity
+                        ? item.store_depots.seller_profit_quantity * item.units_quantity
+                        : item.store_depots.seller_profit_percentage * item.total_price / 100
+
+                    sellerProfitTotal += itemProfitQuantity
+                })
+
+                setProductSellsStats({
+                    sellsTotal,
+                    sellsDifferentProductsTotal,
+                    sellsUnitsTotal,
+                    sellsAmountTotal,
+                    sellsUnitsReturnedTotal,
+                    sellerProfitTotal,
+                })
+            })
 
     }, [sellerStoreId, userId])
 
@@ -202,7 +240,7 @@ export default function StoreMain() {
 
                 <CardContent>
                     {
-                        storeDepotsDetails && (
+                        storeDepotsStats && (
                             <Grid container rowSpacing={2}>
                                 <Grid container item spacing={1} xs={12}>
                                     <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
@@ -210,7 +248,7 @@ export default function StoreMain() {
                                         Productos:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        {storeDepotsDetails.depotsTotal} ({storeDepotsDetails.depotsRemainingUnitsTotal} total de unidades)
+                                        {storeDepotsStats.depotsTotal} ({storeDepotsStats.depotsRemainingUnitsTotal} total de unidades)
                                     </Grid>
                                 </Grid>
 
@@ -220,7 +258,7 @@ export default function StoreMain() {
                                         Productos agotados:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        {storeDepotsDetails.depotsNotRemainingUnitsTotal}
+                                        {storeDepotsStats.depotsNotRemainingUnitsTotal}
                                     </Grid>
                                 </Grid>
 
@@ -230,7 +268,7 @@ export default function StoreMain() {
                                         Productos inactivos:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        {storeDepotsDetails.depotsNotActiveTotal}
+                                        {storeDepotsStats.depotsNotActiveTotal}
                                     </Grid>
                                 </Grid>
 
@@ -240,7 +278,7 @@ export default function StoreMain() {
                                         Productos sin precio:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        {storeDepotsDetails.depotsWithoutPriceTotal}
+                                        {storeDepotsStats.depotsWithoutPriceTotal}
                                     </Grid>
                                 </Grid>
 
@@ -250,7 +288,7 @@ export default function StoreMain() {
                                         Productos con descuento:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        {storeDepotsDetails.depotsWithDiscountTotal}
+                                        {storeDepotsStats.depotsWithDiscountTotal}
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -268,7 +306,51 @@ export default function StoreMain() {
                 <CardHeader title={"Ventas de hoy"}/>
 
                 <CardContent>
-                    contenido aqui
+                    {
+                        productSellsStats && (
+                            <Grid container rowSpacing={2}>
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Ventas:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {productSellsStats.sellsTotal} ({productSellsStats.sellsUnitsTotal} unidades total) ({productSellsStats.sellsDifferentProductsTotal} productos diferentes)
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Productos devueltos:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {productSellsStats.sellsUnitsReturnedTotal}
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Total vendido:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        $ {productSellsStats.sellsAmountTotal}
+                                    </Grid>
+                                </Grid>
+
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Desglose:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        $ {productSellsStats.sellsAmountTotal - productSellsStats.sellerProfitTotal} del dueño | $ {productSellsStats.sellerProfitTotal} del vendedor
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        )
+                    }
                 </CardContent>
             </Card>
         )
@@ -503,7 +585,7 @@ export default function StoreMain() {
                                     {storeDetails?.address ?? "-"}
                                 </Grid>
 
-                                <Grid item xs={12}>
+                                <Grid item xs={12} md={6}>
                                     <StoreProducts/>
                                 </Grid>
 
