@@ -71,19 +71,22 @@ model products {
 }
 
 model products_sell {
-  id                      Int           @id @default(autoincrement())
+  id                      Int                   @id @default(autoincrement())
   store_depot_id          Int?
   units_quantity          Int?
   unit_buy_price          Float?
   total_price             Float?
-  payment_method          String?       @db.VarChar(255)
+  payment_method          String?               @db.VarChar(255)
   units_returned_quantity Int?
-  returned_reason         String?       @db.Text
-  returned_at             DateTime      @db.Timestamp(0)
-  created_at              DateTime      @default(now()) @db.Timestamp(0)
-  store_depots            store_depots? @relation(fields: [store_depot_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_sell_ibfk_1")
+  created_at              DateTime              @default(now()) @db.Timestamp(0)
+  returned_at             DateTime?             @db.Timestamp(0)
+  returned_reason         String?               @db.Text
+  from_reservation_id     Int?
+  products_reservation    products_reservation? @relation(fields: [from_reservation_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_sell_FK")
+  store_depots            store_depots?         @relation(fields: [store_depot_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_sell_ibfk_1")
 
   @@index([store_depot_id], map: "store_depot_id")
+  @@index([from_reservation_id], map: "products_sell_FK")
 }
 
 model product_store_transfers {
@@ -98,6 +101,9 @@ model product_store_transfers {
   created_at                 DateTime      @default(now()) @db.Timestamp(0)
   store_depots               store_depots? @relation(fields: [store_depot_id], references: [id])
   stores                     stores?       @relation(fields: [to_store_id], references: [id])
+
+  @@index([store_depot_id], map: "product_store_transfers_store_depot_id_fkey")
+  @@index([to_store_id], map: "product_store_transfers_to_store_id_fkey")
 }
 
 model store_depot_transfers {
@@ -107,6 +113,8 @@ model store_depot_transfers {
   transfer_direction         String?       @db.VarChar(255)
   created_at                 DateTime      @default(now()) @db.Timestamp(0)
   store_depots               store_depots? @relation(fields: [store_depot_id], references: [id])
+
+  @@index([store_depot_id], map: "store_depot_transfers_store_depot_id_fkey")
 }
 
 model roles {
@@ -132,12 +140,13 @@ model store_depots {
   seller_profit_quantity    Float?                    @db.Float
   price_discount_percentage Float?                    @db.Float
   price_discount_quantity   Float?                    @db.Float
+  product_store_transfers   product_store_transfers[]
+  products_reservation      products_reservation[]
   products_sell             products_sell[]
   store_collection_depots   store_collection_depots[]
+  store_depot_transfers     store_depot_transfers[]
   stores                    stores?                   @relation(fields: [store_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_1")
   depots                    depots?                   @relation(fields: [depot_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_2")
-  product_store_transfers   product_store_transfers[]
-  store_depot_transfers     store_depot_transfers[]
 
   @@unique([store_id, depot_id])
   @@index([depot_id], map: "depot_id")
@@ -159,33 +168,34 @@ model stores {
   online_catalog                 Boolean?                  @default(false)
   online_reservation             Boolean?                  @default(false)
   fixed_seller_profit_quantity   Float?                    @db.Float
+  product_store_transfers        product_store_transfers[]
   store_collections              store_collections[]
   store_depots                   store_depots[]
   store_open_days                store_open_days[]
   store_reservation_days         store_reservation_days[]
   seller_user                    users?                    @relation("seller_user", fields: [seller_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "stores_FK")
   owner_user                     users?                    @relation("owner_user", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "stores_ibfk_1")
-  product_store_transfers        product_store_transfers[]
 
   @@index([owner_id], map: "owner_id")
   @@index([seller_user_id], map: "stores_FK")
 }
 
 model users {
-  id                 Int          @id @default(autoincrement())
-  username           String       @unique(map: "username") @db.VarChar(255)
-  role_id            Int?
-  name               String?      @db.VarChar(255)
-  mail               String       @unique(map: "mail") @db.VarChar(255)
-  phone              String?      @unique(map: "phone") @db.VarChar(255)
-  is_active          Boolean?     @default(true)
-  is_verified        Boolean?     @default(false)
-  work_for_user_id   Int?
-  created_at         DateTime     @default(now()) @db.Timestamp(0)
-  user_seller_stores stores[]     @relation("seller_user")
-  user_owner_stores  stores[]     @relation("owner_user")
-  roles              roles?       @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
-  warehouses         warehouses[]
+  id                   Int                    @id @default(autoincrement())
+  username             String                 @unique(map: "username") @db.VarChar(255)
+  role_id              Int?
+  name                 String?                @db.VarChar(255)
+  mail                 String                 @unique(map: "mail") @db.VarChar(255)
+  phone                String?                @unique(map: "phone") @db.VarChar(255)
+  is_active            Boolean?               @default(true)
+  is_verified          Boolean?               @default(false)
+  work_for_user_id     Int?
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  products_reservation products_reservation[]
+  user_seller_stores   stores[]               @relation("seller_user")
+  user_owner_stores    stores[]               @relation("owner_user")
+  roles                roles?                 @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
+  warehouses           warehouses[]
 
   @@index([role_id], map: "role_id")
 }
@@ -248,4 +258,22 @@ model store_collections {
   stores                  stores                    @relation(fields: [store_id], references: [id], onUpdate: Restrict, map: "store_collections_FK")
 
   @@index([store_id], map: "store_collections_FK")
+}
+
+model products_reservation {
+  id                 Int             @id @default(autoincrement())
+  store_depot_id     Int
+  units_quantity     Int
+  payment_method     String?         @db.VarChar(255)
+  created_at         DateTime        @default(now()) @db.Timestamp(0)
+  requesting_user_id Int
+  status             String          @db.VarChar(100)
+  request_delivery   Boolean         @default(false)
+  delivery_notes     String?         @db.Text
+  store_depots       store_depots    @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "products_reservation_depot_FK")
+  users              users           @relation(fields: [requesting_user_id], references: [id], onUpdate: Restrict, map: "products_reservation_user_FK")
+  products_sell      products_sell[]
+
+  @@index([requesting_user_id], map: "products_reservation_user_FK")
+  @@index([store_depot_id], map: "store_depot_id")
 }
