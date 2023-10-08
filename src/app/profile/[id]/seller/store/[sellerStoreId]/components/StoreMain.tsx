@@ -317,7 +317,7 @@ export default function StoreMain() {
                                         Pendientes:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        0 (0 de hoy)
+                                        x (x de hoy)
                                     </Grid>
                                 </Grid>
 
@@ -327,7 +327,7 @@ export default function StoreMain() {
                                         Aceptadas hoy:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        0
+                                        x
                                     </Grid>
                                 </Grid>
 
@@ -337,7 +337,7 @@ export default function StoreMain() {
                                         Canceladas hoy:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        0
+                                        x
                                     </Grid>
                                 </Grid>
 
@@ -347,7 +347,7 @@ export default function StoreMain() {
                                         Vendidas hoy:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        0
+                                        x
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -428,6 +428,30 @@ export default function StoreMain() {
             </Card>
         )
     }
+
+    const StoreCollections = () => {
+
+        return (
+            <Card variant={"outlined"}>
+                <CardHeader title={"Colecciones"}/>
+
+                <CardContent>
+                    <Grid container rowSpacing={2}>
+                        <Grid container item spacing={1} xs={12}>
+                            <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
+                                <ChevronRightOutlined fontSize={"small"}/>
+                                Colecciones:
+                            </Grid>
+                            <Grid item xs={true}>
+                                - (con xx productos)
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
+        )
+    }
+
 
     const StoreHours = () => (
         <Card variant={"outlined"} sx={{padding: "10px"}}>
@@ -653,12 +677,20 @@ export default function StoreMain() {
                                     <TodaySells/>
                                 </Grid>
 
-                                <Grid item xs={12} md={6}>
-                                    <StoreReservation/>
-                                </Grid>
+                                {
+                                    storeDetails.online_reservation && (
+                                        <Grid item xs={12} md={6}>
+                                            <StoreReservation/>
+                                        </Grid>
+                                    )
+                                }
 
                                 <Grid item xs={12} md={6}>
                                     <TodayTransfers/>
+                                </Grid>
+
+                                <Grid item xs={12} md={6}>
+                                    <StoreCollections/>
                                 </Grid>
 
                                 <Grid item xs={12} md={6}>
