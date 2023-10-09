@@ -25,6 +25,7 @@ import { useParams, useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/stores";
+import Link from "next/link";
 
 dayjs.extend(isBetween)
 
@@ -238,7 +239,9 @@ export default function StoreMain() {
 
         return (
             <Card variant={"outlined"}>
-                <CardHeader title={"Productos en tienda"}/>
+                <Link href={`/profile/${userId}/seller/store/${sellerStoreId}/product`}>
+                    <CardHeader title={"Productos en tienda"}/>
+                </Link>
 
                 <CardContent>
                     {
