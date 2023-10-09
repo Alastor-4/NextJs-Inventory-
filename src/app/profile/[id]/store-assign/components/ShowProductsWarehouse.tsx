@@ -9,7 +9,7 @@ import { AddOutlined, ExpandLessOutlined, ExpandMoreOutlined, VisibilityOutlined
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 
 
-function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity }) {
+function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaultQuantity }) {
     const params = useParams();
 
     const [allProductbyWarehouseDepartament, setAllProductbyWarehouseDepartament] = useState(null);
@@ -197,9 +197,18 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
         const datos = {
             storeId: parseInt(storeId),
             depotId: parseInt(row.depots[0].id),
-            productUnits: 0,
-            productRemainingUnits: 0,
-            sellerProfitPercentage: 0
+            product_units: 0,
+            product_remaining_units: 0,
+            sell_price: row.buy_price ?? 0,
+            sell_price_units: "CUP",
+            price_discount_percentage: null,
+            price_discount_quantity: null,
+            seller_profit_percentage: defaultPercentage ?? null,
+            seller_profit_quantity: defaultQuantity ?? null,
+            is_active: true,
+            offer_notes:null,
+
+
         }
 
         const response = await storeAssign.postProductToStoreDepot(params.id, datos);
@@ -435,4 +444,4 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
     )
 }
 
-export default showProducts
+export default showProductsWarehouse

@@ -8,6 +8,8 @@ import { storeDetails } from '../../request/storeDetails'
 function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) {
 
     const [activeDiscount, setActiveDiscount] = useState(false)
+    const [activePercentage, setActivePercentage] = useState(false)
+    const [newSellPrice, setNewSellPrice] = useState(storeDepot.sell_price);
 
     useEffect(() => {
         if (storeDepot.price_discount_quantity || storeDepot.price_discount_percentage) {
@@ -15,31 +17,45 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
         }
     }, [setActiveDiscount])
 
-    const initialValues = ({
-        price: storeDepot.sell_price,
-        currency: storeDepot.sell_price_unit,
-        discount: storeDepot.price_discount_quantity ?? storeDepot.sell_price,
-        percentage: storeDepot.price_discount_percentage ?? 100,
-        option: storeDepot.price_discount_percentage !== null ? '%' : '',
-    })
+    useEffect( () => {
+        setActivePercentage( storeDepot.price_discount_percentage ? true : false ) 
+    },[setActivePercentage])
 
+    const initialValues = ({
+        price: newSellPrice,
+        currency: storeDepot.sell_price_unit ?? "CUP",
+
+        discount: !activePercentage
+         ? storeDepot.price_discount_quantity ?? newSellPrice
+         : storeDepot.price_discount_percentage ?? 100,
+         
+          option: !activePercentage 
+                 ? storeDepot.sell_price_units ?? "CUP"
+                 : '%'
+    })
+    
     const setValidationSchema = () => (
         Yup.object({
-            price: Yup.number()
-            .min(0,"No se admiten precios negativos")
-            .required("El precio no puede estar vacio"),
-            
-            currency: Yup.string().required("Debes poner alguna moneda"),
-            
-            discount: Yup.number()
-            .max(storeDepot.sell_price,`La rebaja no puede ser mayor al precio original (${storeDepot.sell_price})`)
-            .min(0,"NO se admiten precios negativos")
-            .required("Campo obligatorio"),
 
-            percentage: Yup.number()
+            price: Yup.number()
+                .min(0, "No se admiten precios negativos")
+                .required("Debe definir un precio"),
+
+            currency: Yup.string().required("Debes poner alguna moneda"),
+
+            discount: !activePercentage
+             ? (
+                Yup.number()
+                .max(newSellPrice, `La rebaja no puede ser mayor al precio original (${newSellPrice})`)
+                .min(0, "No se admiten precios negativos")
+                .required("Defina una rebaja")
+             )
+             :  ( 
+                Yup.number()
                 .min(0, 'El limite inferior es 0')
                 .max(100, 'El limite superior es 100')
-                .required("Campo obligatorio"),
+                .required("Defina un porcentaje")
+             ),
 
             option: Yup.string()
 
@@ -52,10 +68,8 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
         let discount_percentage = null;
 
         if (activeDiscount) {
-            precioOriginal = storeDepot.sell_price;
-
             if (values.option !== '%') discount_quantity = values.discount
-            else discount_percentage = values.percentage
+            else discount_percentage = values.discount
         }
 
         const data = {
@@ -95,14 +109,17 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
                     value={formik.values.price || ""}
                     error={formik.errors.price && formik.touched.price}
                     helperText={(formik.errors.price && formik.touched.price) && formik.errors.price}
-
+                    onChange={(e) => { 
+                        setNewSellPrice(e.target.value) 
+                       formik.setFieldValue( "price", e.target.value )
+                    }}
                 />
 
                 <TextField
                     name={"currency"}
                     select
                     {...formik.getFieldProps("currency")}
-                    value={formik.values.currency || "CUP"}
+                    value={formik.values.currency ?? "CUP"}
                     error={formik.errors.currency && formik.touched.currency}
                     helperText={(formik.errors.currency && formik.touched.currency) && formik.errors.currency}
                 >
@@ -120,8 +137,6 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
             <Grid item container gap={1} direction={'column'}>
 
                 <Grid item container columnGap={1} >
-                    {formik.values.option !== '%'
-                        ? (
                             <TextField
                                 name='discount'
                                 label="Rebaja"
@@ -129,23 +144,14 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
                                 value={formik.values.discount}
                                 error={formik.errors.discount && formik.touched.discount}
                                 helperText={(formik.errors.discount && formik.touched.discount) && formik.errors.discount}
-
+                                onChange={ (e) => {
+                                    activeDiscount
+                                    ? storeDepot.price_discount_quantity = e.target.value
+                                    : storeDepot.price_discount_percentage = e.target.value
+                               
+                                    formik.setFieldValue("discount",e.target.value)
+                                } }
                             />
-                        )
-                        : (
-                            <TextField
-                                name='percentage'
-                                label="Rebaja"
-                                {...formik.getFieldProps("percentage")}
-                                value={formik.values.percentage}
-                                error={formik.errors.percentage && formik.touched.percentage}
-                                helperText={(formik.errors.percentage && formik.touched.percentage) && formik.errors.percentage}
-
-                            />
-
-                        )
-
-                    }
 
 
                     <TextField
@@ -155,6 +161,10 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
                         value={formik.values.option = (formik.values.option !== '%') ? formik.values.currency : '%'}
                         error={formik.errors.option && formik.touched.option}
                         helperText={(formik.errors.option && formik.touched.option) && formik.errors.option}
+                        onChange={(e) => {
+                            e.target.value === '%' ? setActivePercentage(true) : setActivePercentage(false)
+                            formik.setFieldValue('option',e.target.value)
+                        }}
                     >
                         <MenuItem value={formik.values.currency} >{formik.values.currency}</MenuItem>
                         <MenuItem value={"%"} >%</MenuItem>
@@ -181,12 +191,7 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
                         <Card variant='outlined' sx={{ padding: '10px' }} >
                             <Grid container direction={'column'} >
                                 <Grid item container gap={2} direction={'column'}>
-
-                                    {activeDiscount
-                                        ? Rebaja(formik)
-                                        : Original(formik)
-                                    }
-
+                                    {Original(formik)}
 
                                     <Grid item >
                                         <Switch
@@ -194,6 +199,9 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
                                             onChange={() => setActiveDiscount((e) => !e)}
                                         /> Activar rebaja
                                     </Grid>
+
+                                    {activeDiscount && Rebaja(formik)}
+
 
                                     <Grid item >
                                         <Button type='submit'>Guardar cambios</Button>

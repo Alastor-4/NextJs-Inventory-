@@ -11,40 +11,9 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
 
     const [showOffers, setShowOffers] = useState(false)
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
-    
-    const [openImageDialog,setOpenImageDialog] = useState(false);
+
+    const [openImageDialog, setOpenImageDialog] = useState(false);
     const [dialogImages, setDialogImages] = useState([])
-    const [isActive, setIsActive] = useState( details.is_active);
-    
-
-    useEffect(()=>{
-        const updateIsActive = async() =>{
-            const data = {
-                id: details.id,
-                store_id: details.store_id,
-                depot_id: details.depot_id,
-                product_units: details.product_units,
-                product_remaining_units: details.product_remaining_units,
-                seller_profit_percentage: details.seller_profit_percentage,
-                is_active: isActive,
-                offer_notes: details.offer_notes,
-                sell_price: details.sell_price,
-                sell_price_unit: details.sell_price_unit,
-                seller_profit_quantity: details.seller_profit_quantity,
-                price_discount_percentage: details.price_discount_percentage,
-                price_discount_quantity: details.price_discount_quantity,
-            }
-            const response = await storeDetails.update(userId, details.id, data)
-           if( response === 200){
-            loadDates();
-            details.is_active = isActive;
-           } 
-        }
-
-       if(isActive !== details.is_active){
-         updateIsActive();
-        }
-    },[isActive])
 
     const showSellerProfit = () => {
         const valuePercentage = (details.seller_profit_percentage) ? details.seller_profit_percentage * details.sell_price / 100 : null;
@@ -56,7 +25,7 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
         setDialogImages(images)
         setOpenImageDialog(true)
     }
-    
+
 
 
 
@@ -77,11 +46,11 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
             </StoreModalDetails>
 
             <ImagesDisplayDialog
-                            dialogTitle={"Imágenes del producto"}
-                            open={openImageDialog}
-                            setOpen={setOpenImageDialog}
-                            images={dialogImages}
-                        />
+                dialogTitle={"Imágenes del producto"}
+                open={openImageDialog}
+                setOpen={setOpenImageDialog}
+                images={dialogImages}
+            />
 
             <Collapse in={show} timeout="auto" unmountOnExit>
                 <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
@@ -171,29 +140,21 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
 
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ganancia del vendedor por producto:</Grid>
-                        <Grid item xs={true}>
-                            {showSellerProfit()}
-                            <IconButton size="small" color="primary" onClick={() => setActiveModalSellerProfit(true)} >
-                                <EditOutlined fontSize="small" />
-                            </IconButton>
+                        <Grid item container xs={true}>
+                            
+                            <Grid item>
+                                {showSellerProfit()}
+                            </Grid>
+
+                            <Grid item>
+                                <IconButton sx={{ padding: 0 }} size="small" color="primary" onClick={() => setActiveModalSellerProfit(true)} >
+                                    <EditOutlined fontSize="small" />
+                                </IconButton>
+                            </Grid>
+                        
                         </Grid>
                     </Grid>
 
-                    <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Disponible:</Grid>
-                       
-                        <Grid item>
-                        <Switch
-                        size='small'
-                            checked={isActive}
-                            color={'success'}
-                            onChange={() =>  setIsActive( !details.is_active  ) }
-                        />
-                        </Grid>
-
-                    </Grid>
-
-                    
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ofertas</Grid>
 

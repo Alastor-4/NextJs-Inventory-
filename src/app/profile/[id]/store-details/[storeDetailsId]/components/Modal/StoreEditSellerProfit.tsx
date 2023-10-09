@@ -12,8 +12,8 @@ console.log(storeDepot)
     const [selectedButton, setSelectedButton] = useState(storeDepot.seller_profit_percentage !== null ? false : true)
 
     const initialValues = ({
-        percentage: storeDepot.seller_profit_percentage ?? "0",
-        quantity: storeDepot.seller_profit_quantity ?? "0",
+        percentage: !selectedButton ? storeDepot.seller_profit_percentage ?? "0" : "0",
+        quantity: selectedButton ? storeDepot.seller_profit_quantity ?? "0" : "0",
     });
     const setValidationSchema = () => (
         Yup.object({
