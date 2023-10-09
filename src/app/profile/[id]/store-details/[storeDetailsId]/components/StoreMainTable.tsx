@@ -41,7 +41,7 @@ export default function StoreMainTable() {
 
     const [data, setData] = React.useState(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
-    const [storeName, setStoreName] = React.useState('')
+    const [dataStore, setDataStore] = React.useState('')
 
     const [showDetails, setShowDetails] = React.useState('')
     const [activeModalPrice, setActiveModalPrice] = React.useState({ active: false, storeDepot: [] })
@@ -87,15 +87,15 @@ export default function StoreMainTable() {
 
     //Get Store name
     React.useEffect(() => {
-        const dataStore = async () => {
-            const newStoreName = await stores.storeDetails(params.id, params.storeDetailsId);
-            setStoreName(newStoreName.name);
+        const getDataStore = async () => {
+            const newdataStore = await stores.storeDetails(params.id, params.storeDetailsId);
+            setDataStore(newdataStore);
         }
-        if (storeName === '') {
-            dataStore()
+        if (dataStore === '') {
+            getDataStore()
         }
 
-    }, [storeName, setStoreName])
+    }, [dataStore, setDataStore])
 
     function handleNavigateBack() {
         router.back()
@@ -140,7 +140,7 @@ export default function StoreMainTable() {
                             color: "white",
                         }}
                     >
-                        {storeName}
+                        {dataStore.name}
                     </Typography>
                 </Box>
 
@@ -150,13 +150,11 @@ export default function StoreMainTable() {
                             ? <CircularProgress size={24} color={"inherit"} />
                             : (
                                 <>
-                                     
-                                     
-                                    <IconButton color={"inherit"} >
+                                               
+                                    <IconButton color={"inherit"} onClick={ () => router.push(`/profile/${params.id}/store-assign?storeId=${dataStore.id}`) } >
                                       <ShareOutlined fontSize={"small"}/>
                                     </IconButton>
                                         
-                                   
                                 </>
                             )
                     }
