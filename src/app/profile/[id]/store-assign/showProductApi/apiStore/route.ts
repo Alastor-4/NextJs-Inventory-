@@ -14,7 +14,14 @@ export async function GET(req) {
                         some: {
                             store_depots: {
                                 some: {
-                                    store_id: storeId
+                                    AND: [
+                                        {
+                                            store_id: storeId
+                                        },
+                                        {
+                                            product_units: { not: -1 }
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -29,7 +36,14 @@ export async function GET(req) {
                         some: {
                             store_depots: {
                                 some: {
-                                    store_id: storeId
+                                    AND: [
+                                        {
+                                            store_id: storeId
+                                        },
+                                        {
+                                            product_units: { not: -1 }
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -52,16 +66,24 @@ export async function GET(req) {
     return NextResponse.json(result)
 }
 export async function PUT(req) {
-    const { id, store_id, depot_id, product_units, product_remaining_units } = await req.json();
+    const { id, store_id, depot_id, product_units, product_remaining_units, sell_price, sell_price_units, price_discount_percentage, price_discount_quantity, seller_profit_percentage, seller_profit_quantity, is_active } = await req.json();
     const data = {
-        store_id: store_id,
-        depot_id: depot_id,
-        product_units: product_units,
-        product_remaining_units: product_remaining_units
-    }
-    const result = await prisma.store_depots.update({ data, where: { id: id } })
-    return NextResponse.json(data)
+            store_id,
+            depot_id,
+            product_units,
+            product_remaining_units,
+            sell_price,
+            sell_price_units,
+            price_discount_percentage,
+            price_discount_quantity,
+            seller_profit_percentage,
+            seller_profit_quantity,
+            is_active,
 }
+    const result = await prisma.store_depots.update({ data, where: { id: id } })
+    return NextResponse.json(result)
+}
+
 export async function DELETE(req) {
     const { searchParams } = new URL(req.url)
     const storeDepotId = parseInt(searchParams.get("storeDepotId"))

@@ -9,7 +9,7 @@ import {
     TextField,
 } from "@mui/material";
 import React, { useState } from "react";
-import { Formik, isObject } from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
 import ShowProductsStore from "@/app/profile/[id]/store-assign/components/ShowProductsStore";
 import ShowProductsWarehouse from "@/app/profile/[id]/store-assign/components/ShowProductsWarehouse"
@@ -51,7 +51,6 @@ export default function StoreDepotsAssign(
         selectedWarehouse: selectedWarehouse,
         selectedStore: selectedStore,
     }
-    
 
     const validationSchema = Yup.object({
         selectedWarehouse: Yup.object().required("seleccione un almacén"),

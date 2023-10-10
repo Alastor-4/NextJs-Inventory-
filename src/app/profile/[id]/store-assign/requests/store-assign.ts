@@ -67,7 +67,7 @@ const storeAssign = {
     postProductToStoreDepot: async function (userId, data) {
         try {
             const response = await apiRequest.post(showProductWarehouseUrl(userId), data)
-            return response
+            return response.status
         } catch (e) {
             //ToDo: notify error here
         }

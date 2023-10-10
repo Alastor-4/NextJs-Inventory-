@@ -19,7 +19,15 @@ export async function GET(req: Request, { params }: Params) {
                         some: {
                             store_depots: {
                                 some: {
-                                    store_id: storeId
+                                    AND: [
+                                        {
+                                            store_id: storeId
+                                        },
+                                        {
+                                            product_units: { not: -1 }
+                                        }
+                                    ]
+
                                 }
                             }
                         }
@@ -35,7 +43,14 @@ export async function GET(req: Request, { params }: Params) {
                         some: {
                             store_depots: {
                                 some: {
-                                    store_id: storeId
+                                    AND: [
+                                        {
+                                            store_id: storeId
+                                        },
+                                        {
+                                            product_units: { not: -1 }
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -48,7 +63,14 @@ export async function GET(req: Request, { params }: Params) {
                         select: {
                             store_depots: {
                                 where: {
-                                    store_id: storeId
+                                    AND: [
+                                        {
+                                            store_id: storeId
+                                        },
+                                        {
+                                            product_units: { not: -1 }
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -82,21 +104,23 @@ export async function PUT(req: Request) {
 
 
     } = await req.json();
-    const result = await prisma.store_depots.update({data:{
-        id,
-        store_id,
-        depot_id,
-        product_units,
-        product_remaining_units,
-        seller_profit_percentage,
-        is_active,
-        offer_notes,
-        sell_price,
-        sell_price_unit,
-        seller_profit_quantity,
-        price_discount_percentage,
-        price_discount_quantity,
-    }, where:{ id: id } })
+    const result = await prisma.store_depots.update({
+        data: {
+            id,
+            store_id,
+            depot_id,
+            product_units,
+            product_remaining_units,
+            seller_profit_percentage,
+            is_active,
+            offer_notes,
+            sell_price,
+            sell_price_unit,
+            seller_profit_quantity,
+            price_discount_percentage,
+            price_discount_quantity,
+        }, where: { id: id }
+    })
 
     return NextResponse.json(result)
 

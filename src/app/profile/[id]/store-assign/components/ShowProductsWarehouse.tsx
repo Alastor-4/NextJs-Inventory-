@@ -194,26 +194,35 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
 
     // Se Agrega a los Depositos de la Tienda y da la orden de eliminar
     const addStoreDepot = async (row: Object) => {
-        const datos = {
-            storeId: parseInt(storeId),
-            depotId: parseInt(row.depots[0].id),
-            product_units: 0,
-            product_remaining_units: 0,
-            sell_price: row.buy_price ?? 0,
-            sell_price_units: "CUP",
-            price_discount_percentage: null,
-            price_discount_quantity: null,
-            seller_profit_percentage: defaultPercentage ?? null,
-            seller_profit_quantity: defaultQuantity ?? null,
-            is_active: true,
-            offer_notes:null,
+        let productStoreDepot = row.depots[0].store_depots[0]
+        let response;
 
+        if( productStoreDepot?.product_units ){
+         
+          productStoreDepot.product_units = 0;
+          productStoreDepot.is_active = true;  
+         
+           response = await storeAssign.UpdateProductStore(params.id, productStoreDepot);
 
+        }else {
+            const datos = {
+                storeId: parseInt(storeId),
+                depotId: parseInt(row.depots[0].id),
+                product_units: 0,
+                product_remaining_units: 0,
+                sell_price: row.buy_price ?? 0,
+                sell_price_units: "CUP",
+                price_discount_percentage: null,
+                price_discount_quantity: null,
+                seller_profit_percentage: defaultPercentage ?? null,
+                seller_profit_quantity: defaultQuantity ?? null,
+                is_active: true,
+                offer_notes:null,
+            }
+           response = await storeAssign.postProductToStoreDepot(params.id, datos);
         }
 
-        const response = await storeAssign.postProductToStoreDepot(params.id, datos);
-
-        if (response.status === 200) {
+        if (response === 200) {
             //removeProduct(row.departments.id, row.id);
             loadDates()
         } else {
