@@ -25,7 +25,7 @@ import {
 import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined } from "@mui/icons-material";
 import Link from "next/link";
-import { useParams , useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Formik } from "formik";
 import stores from "@/app/profile/[id]/store/requests/stores"
 import StoreMoreDetails from "./StoreMoreDetails";
@@ -150,11 +150,11 @@ export default function StoreMainTable() {
                             ? <CircularProgress size={24} color={"inherit"} />
                             : (
                                 <>
-                                               
-                                    <IconButton color={"inherit"} onClick={ () => router.push(`/profile/${params.id}/store-assign?storeId=${dataStore.id}`) } >
-                                      <ShareOutlined fontSize={"small"}/>
+
+                                    <IconButton color={"inherit"} onClick={() => router.push(`/profile/${params.id}/store-assign?storeId=${dataStore.id}`)} >
+                                        <ShareOutlined fontSize={"small"} />
                                     </IconButton>
-                                        
+
                                 </>
                             )
                     }
@@ -227,10 +227,10 @@ export default function StoreMainTable() {
                 <small>{` ${currency}  `}</small>
                 <small>
                     {pricePorcentage || discountQuantity
-                        ? <s>{`  ${priceProductStore} ${currency}  `}</s> 
+                        ? <s>{`  ${priceProductStore} ${currency}  `}</s>
                         : ""
                     }
-                    
+
                 </small>
 
             </Typography>
@@ -302,7 +302,27 @@ export default function StoreMainTable() {
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>
-                                            {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
+                                            <Grid container columnSpacing={1}>
+
+                                                <Grid item>
+                                                    {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
+                                                </Grid>
+
+                                                <Grid item>
+                                                    <IconButton sx={{ padding: 0 }} size="small" color="primary"
+                                                        onClick={() => setActiveModalPrice({ active: true, storeDepot: row.depots[0].store_depots[0] })}>
+                                                        <AddOutlined fontSize="small" />
+                                                    </IconButton>
+                                                </Grid>
+
+                                                <Grid item>
+                                                    <IconButton sx={{ padding: 0 }} size="small" color="primary"
+                                                        onClick={() => setActiveModalPrice({ active: true, storeDepot: row.depots[0].store_depots[0] })}>
+                                                        <EditOutlined fontSize="small" />
+                                                    </IconButton>
+                                                </Grid>
+
+                                            </Grid>
                                         </TableCell>
 
                                         <TableCell>

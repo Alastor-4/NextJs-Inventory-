@@ -3,7 +3,7 @@ import { Box, Collapse, Grid, IconButton, Switch, Typography } from '@mui/materi
 import React, { useEffect, useState } from 'react'
 import StoreListOffers from './StoreListOffers'
 import StoreEditSellerProfit from '@/app/profile/[id]/store-details/[storeDetailsId]/components/Modal/StoreEditSellerProfit'
-import StoreModalDetails from './Modal/StoreModalDetails'
+import StoreModalDefault from './Modal/StoreModalDefault'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import { storeDetails } from '../request/storeDetails'
 function StoreMoreDetails({ userId, details, show, loadDates, row }) {
@@ -32,7 +32,7 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
     return (
         <>
 
-            <StoreModalDetails
+            <StoreModalDefault
                 dialogTitle={"Editar ganacia del vendedor"}
                 open={activeModalSellerProfit}
                 setOpen={setActiveModalSellerProfit}
@@ -43,7 +43,7 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
                     setActiveModalSellerProfit={setActiveModalSellerProfit}
                     loadDates={loadDates}
                 />
-            </StoreModalDetails>
+            </StoreModalDefault>
 
             <ImagesDisplayDialog
                 dialogTitle={"Imágenes del producto"}
@@ -156,19 +156,16 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
                     </Grid>
 
                     <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ofertas</Grid>
-
-                        <IconButton onClick={() => setShowOffers((e) => !e)}>
-                            {(showOffers)
-                                ? < ExpandLessOutlined />
-                                : <ExpandMoreOutlined />
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades restantes de total:</Grid>
+                        <Grid item container xs={true}>
+                            {
+                                `${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units}`
                             }
-                        </IconButton>
+                        </Grid>
                     </Grid>
 
-                    <Collapse in={showOffers} timeout="auto" unmountOnExit>
-                        <StoreListOffers />
-                    </Collapse>
+                    <StoreListOffers productStoreDepot={row.depots[0].store_depots[0]} loadDates={loadDates} showOffers={showOffers} setShowOffers={setShowOffers} />
+                        
 
                 </Grid>
             </Collapse>

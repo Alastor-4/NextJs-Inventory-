@@ -8,7 +8,6 @@ import { storeDetails } from '../../request/storeDetails';
 
 
 function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit, loadDates }) {
-console.log(storeDepot)
     const [selectedButton, setSelectedButton] = useState(storeDepot.seller_profit_percentage !== null ? false : true)
 
     const initialValues = ({

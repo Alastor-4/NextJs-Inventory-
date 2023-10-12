@@ -101,9 +101,8 @@ export async function PUT(req: Request) {
         seller_profit_quantity,
         price_discount_percentage,
         price_discount_quantity,
-
-
     } = await req.json();
+    
     const result = await prisma.store_depots.update({
         data: {
             id,
