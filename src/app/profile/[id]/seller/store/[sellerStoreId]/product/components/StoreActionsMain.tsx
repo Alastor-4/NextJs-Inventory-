@@ -34,6 +34,7 @@ import {Formik, useFormik} from "formik";
 import dayjs from "dayjs";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
+import {numberFormat} from "@/utils/generalFunctions";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -175,8 +176,6 @@ export default function StoreActionsMain({userId, storeId}) {
         setOpenImagesDialog(true)
     }
 
-    const numberFormat = (number: string) => Math.round(parseFloat(number) * 100 / 100, 2)
-
     const TableContent = ({formik}) => {
         return (
             <TableBody>
@@ -206,14 +205,14 @@ export default function StoreActionsMain({userId, storeId}) {
                             : null
 
                         const displayProductPrice = finalProductPrice
-                            ? `${finalProductPrice + " " + row.depots[0].store_depots[0].sell_price_unit}`
+                            ? `${numberFormat(finalProductPrice) + " " + row.depots[0].store_depots[0].sell_price_unit}`
                             : "sin precio"
 
                         const displayPriceDiscount = baseProductPrice
                             ? row.depots[0].store_depots[0].price_discount_percentage
-                                ? row.depots[0].store_depots[0].price_discount_percentage + " %"
+                                ? numberFormat(row.depots[0].store_depots[0].price_discount_percentage) + " %"
                                 : row.depots[0].store_depots[0].price_discount_quantity
-                                    ? row.depots[0].store_depots[0].price_discount_quantity + " " + row.depots[0].store_depots[0].sell_price_unit
+                                    ? numberFormat(row.depots[0].store_depots[0].price_discount_quantity) + " " + row.depots[0].store_depots[0].sell_price_unit
                                     : null
                             : null
 
@@ -415,12 +414,22 @@ export default function StoreActionsMain({userId, storeId}) {
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
+                                                    <Grid item xs={"auto"} sx={{fontWeight: 600}}>Distribución:</Grid>
+                                                    <Grid item xs={true}>
+                                                        {
+                                                            (baseProductPrice && sellerProfitQuantity)
+                                                                ? `Dueño: ${numberFormat(finalProductPrice - sellerProfitQuantity)} | Vendedor: ${numberFormat(sellerProfitQuantity)}`
+                                                                : "-"
+                                                        }
+                                                    </Grid>
+                                                </Grid>
+
+                                                <Grid container item spacing={1} xs={12}>
                                                     <Grid item xs={"auto"} sx={{fontWeight: 600}}>Ofertas:</Grid>
                                                     <Grid item xs={true}>
                                                         {row.depots[0].store_depots[0].offer_notes ?? "-"}
                                                     </Grid>
                                                 </Grid>
-
                                             </Grid>
                                         </Collapse>
                                     </TableCell>
