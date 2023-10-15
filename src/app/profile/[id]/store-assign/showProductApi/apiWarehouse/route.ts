@@ -31,6 +31,18 @@ export async function GET(req: Request, { params }: Params) {
                                     }
 
                                 }, {
+                                    store_depots: {
+                                        some: {
+                                            AND: [
+                                                { store_id: storeId },
+                                                { product_units: -1 }
+                                            ]
+
+                                        }
+                                    }
+                                },
+
+                                {
                                     NOT: {
                                         store_depots: {
                                             some: {}
@@ -59,6 +71,15 @@ export async function GET(req: Request, { params }: Params) {
                                 OR: [{
                                     store_depots: {
                                         some: {
+                                            AND: [
+                                                { store_id: storeId },
+                                                { product_units: -1 }
+                                            ]
+                                        }
+                                    }
+                                }, {
+                                    store_depots: {
+                                        some: {
                                             store_id: { not: storeId }
                                         }
                                     }
@@ -80,9 +101,13 @@ export async function GET(req: Request, { params }: Params) {
                 },
                 include: {
                     departments: true,
-                    depots: true,
                     characteristics: true,
-                    images: true
+                    images: true,
+                    depots: {
+                        include: {
+                            store_depots: true
+                        }
+                    }
                 }
             }
         }
@@ -93,15 +118,15 @@ export async function GET(req: Request, { params }: Params) {
 }
 
 export async function POST(req: Request) {
-    const { storeId, depotId, productUnits, productRemainingUnits, sellerProfitPercentage, is_active, offer_notes, price_discount_percentage, price_discount_quantity, sell_price, sell_price_unit, seller_profit_quantity  } = await req.json();
+    const { storeId, depotId, product_units, product_remaining_units, seller_profit_percentage, is_active, offer_notes, price_discount_percentage, price_discount_quantity, sell_price, sell_price_unit, seller_profit_quantity } = await req.json();
 
     const result = await prisma.store_depots.create({
         data: {
             store_id: storeId,
             depot_id: depotId,
-            product_units: productUnits,
-            product_remaining_units: productRemainingUnits,
-            seller_profit_percentage: sellerProfitPercentage,
+            product_units,
+            product_remaining_units,
+            seller_profit_percentage,
             seller_profit_quantity,
             is_active,
             offer_notes,

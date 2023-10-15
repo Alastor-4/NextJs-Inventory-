@@ -8,14 +8,14 @@ import {
     MenuItem,
     TextField,
 } from "@mui/material";
-import React, {useState} from "react";
-import {Formik} from "formik";
+import React, { useState } from "react";
+import { Formik } from "formik";
 import * as Yup from "yup";
 import ShowProductsStore from "@/app/profile/[id]/store-assign/components/ShowProductsStore";
 import ShowProductsWarehouse from "@/app/profile/[id]/store-assign/components/ShowProductsWarehouse"
 
 export default function StoreDepotsAssign(
-    {warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp}
+    { warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp }
 ) {
     const [selectedWarehouse, setSelectedWarehouse] = useState("")
     const [selectedStore, setSelectedStore] = useState("")
@@ -34,20 +34,23 @@ export default function StoreDepotsAssign(
 
     //initial make selected a store
     React.useEffect(() => {
+
+        const { searchParams } = new URL(window.location.href);
+        selectedStoreIdProp = searchParams.get("storeId");
+
         if (selectedStoreIdProp !== null) {
-            const index = storeListProp.find(item => item.id === selectedStoreIdProp)
-            if (index > -1) {
-                setSelectedStore(storeListProp[index])
+            const index = storeListProp.find(item => item.id === parseInt(selectedStoreIdProp))
+            if (index !== -1) {
+                setSelectedStore(index)
             }
         }
-    }, [selectedStoreIdProp, storeListProp])
 
+    }, [selectedStoreIdProp, storeListProp])
 
     const initialValues = {
         selectedWarehouse: selectedWarehouse,
         selectedStore: selectedStore,
     }
-    //ToDo: get all store_depots for every selected store
 
     const validationSchema = Yup.object({
         selectedWarehouse: Yup.object().required("seleccione un almacén"),
@@ -69,19 +72,19 @@ export default function StoreDepotsAssign(
     const showMainTable = () => {
         if (!selectedButton) {
             if (selectedStore !== '')
-                return <ShowProductsStore 
-                storeId={selectedStore.id}
-                nameStore = {selectedStore.name}
-                nameWarehouse = { selectedWarehouse.name }
+                return <ShowProductsStore
+                    storeId={selectedStore.id}
+                    nameStore={selectedStore.name}
+                    nameWarehouse={selectedWarehouse.name}
                 />
 
         } else {
             if (selectedStore !== '' && selectedWarehouse !== '')
-                return <ShowProductsWarehouse 
-                storeId={selectedStore.id} 
-                warehouseId={selectedWarehouse.id} 
-                defaultPercentage={ selectedStore.fixed_seller_profit_percentage }
-                defaultQuantity={ selectedStore.fixed_seller_profit_quantity }
+                return <ShowProductsWarehouse
+                    storeId={selectedStore.id}
+                    warehouseId={selectedWarehouse.id}
+                    defaultPercentage={selectedStore.fixed_seller_profit_percentage}
+                    defaultQuantity={selectedStore.fixed_seller_profit_quantity}
                 />
         }
     }
@@ -116,7 +119,7 @@ export default function StoreDepotsAssign(
                                         {
                                             warehouseListProp.map(item => (
                                                 <MenuItem key={item.id}
-                                                          value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
+                                                    value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
                                             ))
                                         }
                                     </TextField>
@@ -137,7 +140,7 @@ export default function StoreDepotsAssign(
                                         {
                                             storeListProp.map(item => (
                                                 <MenuItem key={item.id}
-                                                          value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
+                                                    value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
                                             ))
                                         }
                                     </TextField>
@@ -152,7 +155,7 @@ export default function StoreDepotsAssign(
                                     <Button
                                         variant={(selectedButton) ? 'contained' : 'outlined'}
                                         onClick={() => setSelectedButton((e) => true)}
-                                        sx={{ml: "10px"}}
+                                        sx={{ ml: "10px" }}
                                     >
                                         Agregar productos del almacen
                                     </Button>

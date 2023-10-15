@@ -330,11 +330,11 @@ export default function StoresMainTable() {
                                                         <Grid container columnSpacing={1}>
                                                             <Grid item > {`Servicio ${row.online_catalog ? "activo" : "inactivo"}  `}</Grid>
                                                             <Grid item>
-                                                            <Tooltip title={"Catálogo"} >
-                                                                <AutoStories
-                                                                    color={row.online_catalog ? "primary" : "disabled"}
-                                                                    fontSize="small" />
-                                                            </Tooltip>
+                                                                <Tooltip title={"Catálogo"} >
+                                                                    <AutoStories
+                                                                        color={row.online_catalog ? "primary" : "disabled"}
+                                                                        fontSize="small" />
+                                                                </Tooltip>
 
                                                             </Grid>
 
@@ -352,11 +352,11 @@ export default function StoresMainTable() {
                                                         <Grid container columnSpacing={1}>
                                                             <Grid item > {`Servicio ${row.online_reservation ? "activo" : "inactivo"}  `}</Grid>
                                                             <Grid item>
-                                                            <Tooltip title={"Reservaciones"} >
-                                                                <ShoppingCartOutlined
-                                                                    color={row.online_reservation ? "primary" : "disabled"}
-                                                                    fontSize="small" />
-                                                            </Tooltip>
+                                                                <Tooltip title={"Reservaciones"} >
+                                                                    <ShoppingCartOutlined
+                                                                        color={row.online_reservation ? "primary" : "disabled"}
+                                                                        fontSize="small" />
+                                                                </Tooltip>
 
                                                             </Grid>
 
@@ -364,6 +364,19 @@ export default function StoresMainTable() {
 
                                                     }
                                                 </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={true}>
+                                                    <Box
+                                                        sx={{ cursor: "pointer", display: "flex", alignItems: "center", color: "blue" }}
+                                                        onClick={() => router.push(`/profile/${params.id}/store-details/${row.id}`)}
+                                                    >
+                                                        Administrar Tienda
+
+                                                    </Box>
+                                                </Grid>
+
                                             </Grid>
 
 

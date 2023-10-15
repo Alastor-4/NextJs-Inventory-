@@ -233,12 +233,30 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
             loadDates();
         }
     }
-
+    // No borra el elemento de la tabla sino q cambia el valor
+    // de product_units a -1 para q no c filtre y asi conservar los datos
     const removeProduct = async (index) => {
+        const newProductStoreDepots = data[index].depots[0].store_depots[0];
+        const datos = {
+            id: newProductStoreDepots.id, 
+            storeId: newProductStoreDepots.store_id,
+            depotId: newProductStoreDepots.depot_id,
+            product_units: -1,
+            product_remaining_units: 0,
+            sell_price: newProductStoreDepots.sell_price,
+            sell_price_units: newProductStoreDepots.sell_price_units,
+            price_discount_percentage: newProductStoreDepots.price_discount_percentage,
+            price_discount_quantity: newProductStoreDepots.price_discount_quantity,
+            seller_profit_percentage: newProductStoreDepots.seller_profit_percentage,
+            seller_profit_quantity: newProductStoreDepots.seller_profit_quantity,
+            is_active: newProductStoreDepots.is_active,
+            offer_notes: newProductStoreDepots.offer_notes,
+        }
 
-        const result = await storeAssign.RemoveProductStore(params.id, data[index].depots[0].store_depots[0].id)
 
-        if (result.status === 200) {
+        const result = await storeAssign.UpdateProductStore(params.id, datos)
+
+        if (result === 200) {
             updateDepot(data[index].depots[0].store_depots[0].product_remaining_units, data[index].depots[0]);
         }
 
