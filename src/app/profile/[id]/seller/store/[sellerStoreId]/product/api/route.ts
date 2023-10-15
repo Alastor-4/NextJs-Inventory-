@@ -65,3 +65,35 @@ export async function PUT(req, res) {
     res.status(500).json({ message: "La acción de modificar isActive ha fallado" })
 }
 
+// Sell store depot one unit (default option)
+export async function PATCH(req, res) {
+    const { storeDepotId } = await req.json()
+
+    if (storeDepotId) {
+        const storeDepot = await prisma.store_depots.findUnique({where: {id: parseInt(storeDepotId)}})
+
+        if (storeDepot?.is_active && !!storeDepot.product_remaining_units) {
+            const [updatedStoreDepot] = await prisma.$transaction([
+                prisma.store_depots.update({data: {product_remaining_units: {decrement: 1}}, where: {id: storeDepot.id}}),
+
+                prisma.products_sell.create(
+                    {
+                        data: {
+                            store_depot_id: storeDepot.id,
+                            units_quantity: 1,
+                            unit_buy_price: storeDepot.sell_price,
+                            total_price: storeDepot.sell_price,
+                            payment_method: "Efectivo CUP",
+                        }
+                    }
+                )
+            ])
+
+            return NextResponse.json(updatedStoreDepot)
+        }
+
+        res.status(400).json({ message: "La acción de vender ha fallado" })
+    }
+
+    res.status(500).json({ message: "La acción de vender ha fallado" })
+}

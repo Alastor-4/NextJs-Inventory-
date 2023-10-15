@@ -161,6 +161,7 @@ export default function StoreActionsMain({userId, storeId}) {
 
     //expand description
     const [expandIndex, setExpandIndex] = React.useState(null)
+
     function handleExpandRow(index) {
         if (expandIndex === index) {
             setExpandIndex(null)
@@ -180,19 +181,41 @@ export default function StoreActionsMain({userId, storeId}) {
     async function handleToggleIsActive(e, storeDepotId) {
         e.stopPropagation()
 
-        const updatedDepot = await sellerStoreProduct.toggleIsActive(userId, storeId, storeDepotId)
+        const updatedDepot = await sellerStoreProduct.toggleIsActiveStoreDepot(userId, storeId, storeDepotId)
 
-        const newDepartments = [...allProductsByDepartment]
-        for (const allProductsByDepartmentElement of allProductsByDepartment) {
-            const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+        if (updatedDepot) {
+            const newDepartments = [...allProductsByDepartment]
+            for (const allProductsByDepartmentElement of allProductsByDepartment) {
+                const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
 
-            const productIndex = allProductsByDepartmentElement.products.findIndex(item => item.depots[0].store_depots[0].id === storeDepotId)
-            if (productIndex > -1) {
-                newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].is_active = updatedDepot.is_active
+                const productIndex = allProductsByDepartmentElement.products.findIndex(item => item.depots[0].store_depots[0].id === storeDepotId)
+                if (productIndex > -1) {
+                    newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].is_active = updatedDepot.is_active
+                }
             }
-        }
 
-        setAllProductsByDepartment(newDepartments)
+            setAllProductsByDepartment(newDepartments)
+        }
+    }
+
+    async function handleSellProduct(e, storeDepotId) {
+        e.stopPropagation()
+
+        const updatedDepot = await sellerStoreProduct.sellStoreDepotDefault(userId, storeId, storeDepotId)
+
+        if (updatedDepot) {
+            const newDepartments = [...allProductsByDepartment]
+            for (const allProductsByDepartmentElement of allProductsByDepartment) {
+                const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+
+                const productIndex = allProductsByDepartmentElement.products.findIndex(item => item.depots[0].store_depots[0].id === storeDepotId)
+                if (productIndex > -1) {
+                    newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units = updatedDepot.product_remaining_units
+                }
+            }
+
+            setAllProductsByDepartment(newDepartments)
+        }
     }
 
     const TableContent = ({formik}) => {
@@ -209,12 +232,12 @@ export default function StoreActionsMain({userId, storeId}) {
 
                         const priceDiscountQuantity = baseProductPrice
                             ? row.depots[0].store_depots[0].price_discount_percentage
-                                ? row.depots[0].store_depots[0].price_discount_percentage *  baseProductPrice / 100
+                                ? row.depots[0].store_depots[0].price_discount_percentage * baseProductPrice / 100
                                 : row.depots[0].store_depots[0].price_discount_quantity
                             : null
 
                         const finalProductPrice = priceDiscountQuantity
-                            ? ( baseProductPrice - priceDiscountQuantity )
+                            ? (baseProductPrice - priceDiscountQuantity)
                             : baseProductPrice
 
                         const sellerProfitQuantity = finalProductPrice
@@ -271,7 +294,8 @@ export default function StoreActionsMain({userId, storeId}) {
                                                             fontSize: 14,
                                                         }}
                                                     >
-                                                        <Grid container item alignItems={"center"} sx={{marginRight: "3px"}}>
+                                                        <Grid container item alignItems={"center"}
+                                                              sx={{marginRight: "3px"}}>
                                                             <Typography variant={"caption"}
                                                                         sx={{color: "white", fontWeight: "600"}}>
                                                                 {item.name.toUpperCase()}
@@ -297,7 +321,15 @@ export default function StoreActionsMain({userId, storeId}) {
                                     </TableCell>
                                     <TableCell>
                                         <Grid container columnSpacing={1}>
-                                            <Grid container item xs={8}>
+                                            <Grid
+                                                container
+                                                item
+                                                xs={
+                                                    row.depots[0].store_depots[0].is_active &&
+                                                    !!row.depots[0].store_depots[0].product_remaining_units
+                                                        ? 8
+                                                        : true
+                                                }>
                                                 <Grid item xs={12}>
                                                     {row.depots[0].store_depots[0].is_active ? "activo" : "inactivo"}
                                                 </Grid>
@@ -311,11 +343,19 @@ export default function StoreActionsMain({userId, storeId}) {
                                                 </Grid>
                                             </Grid>
 
-                                            <Grid container item xs={4}>
-                                                <IconButton color={"primary"}>
-                                                    <SellOutlined fontSize={"small"}/>
-                                                </IconButton>
-                                            </Grid>
+                                            {
+                                                row.depots[0].store_depots[0].is_active &&
+                                                !!row.depots[0].store_depots[0].product_remaining_units && (
+                                                    <Grid container item xs={4}>
+                                                        <IconButton
+                                                            color={"primary"}
+                                                            onClick={(e) => handleSellProduct(e, row.depots[0].store_depots[0].id)}
+                                                        >
+                                                            <SellOutlined fontSize={"small"}/>
+                                                        </IconButton>
+                                                    </Grid>
+                                                )
+                                            }
                                         </Grid>
                                     </TableCell>
                                 </TableRow>
@@ -327,13 +367,15 @@ export default function StoreActionsMain({userId, storeId}) {
                                                 <Grid container item spacing={1} xs={12}>
                                                     <Grid item xs={"auto"} sx={{fontWeight: 600}}>Acciones:</Grid>
                                                     <Grid item xs={"auto"}>
-                                                        <Button size={"small"} color={"primary"} variant={"outlined"}>Vender</Button>
+                                                        <Button size={"small"} color={"primary"}
+                                                                variant={"outlined"}>Vender</Button>
                                                     </Grid>
                                                     <Grid item xs={"auto"}>
                                                         <Button size={"small"} variant={"outlined"}>Transferir</Button>
                                                     </Grid>
                                                     <Grid item xs={"auto"}>
-                                                        <Button size={"small"} variant={"outlined"}>Reservaciones</Button>
+                                                        <Button size={"small"}
+                                                                variant={"outlined"}>Reservaciones</Button>
                                                     </Grid>
                                                 </Grid>
 
@@ -499,7 +541,8 @@ export default function StoreActionsMain({userId, storeId}) {
                         {
                             allProductsByDepartment.map((item, index) => (
                                 <Grid key={item.id} item xs={"auto"}>
-                                    <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
+                                    <Button variant={item.selected ? "contained" : "outlined"}
+                                            onClick={() => handleSelectFilter(index)}>
                                         <Grid container>
                                             <Grid item xs={12}>
                                                 {item.name}
@@ -521,7 +564,8 @@ export default function StoreActionsMain({userId, storeId}) {
                             <Grid container item rowSpacing={1}>
                                 <Grid item xs={12}>
                                     <Typography variant={"subtitle2"}>
-                                        Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
+                                        Puede buscar productos por nombre o descripción en los departamentos seleccionados
+                                        aquí
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12}>
