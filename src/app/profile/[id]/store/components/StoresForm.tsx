@@ -6,6 +6,7 @@ import { Formik, useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import stores from "@/app/profile/[id]/store/requests/stores";
+import WorkDays from "./WorkDays";
 
 export default function StoresForm(props) {
     const { userId, storeId, sellerUsers } = props
@@ -16,10 +17,10 @@ export default function StoresForm(props) {
     const [userSeller, setUserSeller] = React.useState("")
 
     const [sellProfit, setSellProfit] = React.useState(true);
+    const [dataWorkDays, setDataWorkDays] = React.useState([{}]);
 
     const [activeCatalogo, setActiveCatalogo] = React.useState(false);
     const [activeReservations, setActiveReservations] = React.useState(false);
-
 
     React.useEffect(() => {
         async function fetchStore(id) {
@@ -36,13 +37,32 @@ export default function StoresForm(props) {
     }, [sellerUsers, storeId, userId])
 
     React.useEffect(() => {
-
+        let newDataWorkDays = dataWorkDays;
         if (updateItem) {
-            setSellProfit( updateItem?.fixed_seller_profit_quantity !== null ? false : true)
+            setSellProfit(updateItem?.fixed_seller_profit_quantity !== null ? false : true)
             setActiveCatalogo(updateItem ? updateItem.online_catalog : false)
             setActiveReservations(updateItem ? updateItem.online_reservation : false)
+
+            updateItem.store_open_days.forEach(item => {
+                newDataWorkDays[item.week_day_number] = { ...item, activePadLock: true }
+            })
+
+        } else {
+            newDataWorkDays = [];
+            for (let i = 0; i < 7; i++) {
+                newDataWorkDays.push({
+                    id: null,
+                    week_day_number: i,
+                    day_start_time: null,
+                    day_end_time: null,
+                    store_id: null,
+                    activePadLock: false
+                })
+            }
         }
+        setDataWorkDays(newDataWorkDays)
     }, [updateItem])
+
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -341,6 +361,10 @@ export default function StoresForm(props) {
 
                         </Grid>
 
+                        <Grid item xs={12}>
+                            <WorkDays dataWorkDays={dataWorkDays} setDataWorkDays = {setDataWorkDays} />
+                        </Grid>
+
 
                         <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                             <Button
@@ -365,6 +389,7 @@ export default function StoresForm(props) {
                             </Button>
 
                         </Grid>
+
 
                     </Grid>
                 </Grid>
