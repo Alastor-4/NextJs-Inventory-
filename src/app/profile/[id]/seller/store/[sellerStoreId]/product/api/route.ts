@@ -51,3 +51,17 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
     return NextResponse.json(storeProducts)
 }
 
+// Toggle store depot isActive
+export async function PUT(req, res) {
+    const { storeDepotId } = await req.json()
+
+    if (storeDepotId) {
+        const storeDepot = await prisma.store_depots.findUnique({where: {id: parseInt(storeDepotId)}})
+        const updatedDepot = await prisma.store_depots.update({data: {is_active: !storeDepot.is_active}, where: {id: storeDepot.id}})
+
+        return NextResponse.json(updatedDepot)
+    }
+
+    res.status(500).json({ message: "La acción de modificar isActive ha fallado" })
+}
+

@@ -22,7 +22,7 @@ import {
     AddOutlined,
     ArrowLeft, ChevronRightOutlined,
     DeleteOutline,
-    EditOutlined,
+    EditOutlined, SellOutlined,
     ShareOutlined,
     VisibilityOutlined
 } from "@mui/icons-material";
@@ -35,6 +35,7 @@ import dayjs from "dayjs";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import {numberFormat} from "@/utils/generalFunctions";
+import sellerStoreProduct from "@/app/profile/[id]/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -176,6 +177,24 @@ export default function StoreActionsMain({userId, storeId}) {
         setOpenImagesDialog(true)
     }
 
+    async function handleToggleIsActive(e, storeDepotId) {
+        e.stopPropagation()
+
+        const updatedDepot = await sellerStoreProduct.toggleIsActive(userId, storeId, storeDepotId)
+
+        const newDepartments = [...allProductsByDepartment]
+        for (const allProductsByDepartmentElement of allProductsByDepartment) {
+            const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+
+            const productIndex = allProductsByDepartmentElement.products.findIndex(item => item.depots[0].store_depots[0].id === storeDepotId)
+            if (productIndex > -1) {
+                newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].is_active = updatedDepot.is_active
+            }
+        }
+
+        setAllProductsByDepartment(newDepartments)
+    }
+
     const TableContent = ({formik}) => {
         return (
             <TableBody>
@@ -277,14 +296,27 @@ export default function StoreActionsMain({userId, storeId}) {
                                         }
                                     </TableCell>
                                     <TableCell>
-                                        {
-                                            row.depots[0].store_depots[0].is_active ? "activo" : "inactivo"
-                                        } <br/>
-                                        <Switch
-                                            size={"small"}
-                                            color={"success"}
-                                            value={row.depots[0].store_depots[0].is_active}
-                                        />
+                                        <Grid container columnSpacing={1}>
+                                            <Grid container item xs={8}>
+                                                <Grid item xs={12}>
+                                                    {row.depots[0].store_depots[0].is_active ? "activo" : "inactivo"}
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Switch
+                                                        size={"small"}
+                                                        color={"success"}
+                                                        checked={row.depots[0].store_depots[0].is_active}
+                                                        onClick={(e) => handleToggleIsActive(e, row.depots[0].store_depots[0].id)}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item xs={4}>
+                                                <IconButton color={"primary"}>
+                                                    <SellOutlined fontSize={"small"}/>
+                                                </IconButton>
+                                            </Grid>
+                                        </Grid>
                                     </TableCell>
                                 </TableRow>
 
@@ -294,8 +326,14 @@ export default function StoreActionsMain({userId, storeId}) {
                                             <Grid container spacing={1} sx={{padding: "8px 26px"}}>
                                                 <Grid container item spacing={1} xs={12}>
                                                     <Grid item xs={"auto"} sx={{fontWeight: 600}}>Acciones:</Grid>
-                                                    <Grid item xs={true}>
-                                                        1 2 3 4
+                                                    <Grid item xs={"auto"}>
+                                                        <Button size={"small"} color={"primary"} variant={"outlined"}>Vender</Button>
+                                                    </Grid>
+                                                    <Grid item xs={"auto"}>
+                                                        <Button size={"small"} variant={"outlined"}>Transferir</Button>
+                                                    </Grid>
+                                                    <Grid item xs={"auto"}>
+                                                        <Button size={"small"} variant={"outlined"}>Reservaciones</Button>
                                                     </Grid>
                                                 </Grid>
 
