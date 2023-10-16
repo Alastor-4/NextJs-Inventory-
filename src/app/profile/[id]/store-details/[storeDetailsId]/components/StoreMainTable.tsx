@@ -94,7 +94,7 @@ export default function StoreMainTable() {
             dataStore()
         }
 
-    }, [storeName, setStoreName])
+    }, [storeName, setStoreName, params.id, params.storeDetailsId])
 
     function handleNavigateBack() {
         router.back()

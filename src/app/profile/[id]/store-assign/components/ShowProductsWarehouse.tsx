@@ -1,18 +1,19 @@
 "use client"
+
 import React, { useEffect, useState } from 'react'
 import storeAssign from '@/app/profile/[id]/store-assign/requests/store-assign'
 import { TableNoData } from "@/components/TableNoData";
-import { Box, Button, Card, CardContent, Checkbox, Collapse, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Card, CardContent, Collapse, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import { useParams } from 'next/navigation'
 import { Formik } from 'formik'
 import { AddOutlined, ExpandLessOutlined, ExpandMoreOutlined, VisibilityOutlined } from '@mui/icons-material';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 
 
-function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity }) {
+function ShowProductsWarehouse({ storeId, warehouseId }) {
     const params = useParams();
 
-    const [allProductbyWarehouseDepartament, setAllProductbyWarehouseDepartament] = useState(null);
+    const [allProductByWarehouseDepartment, setAllProductByWarehouseDepartment] = useState(null);
     const [data, setData] = useState();
 
     const [showDetails, setShowDetails] = useState(false)
@@ -20,28 +21,28 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
     const [openImageDialog, setOpenImageDialog] = useState(false)
     const [dialogImages, setDialogImages] = useState([]);
 
-    useEffect(()=>{
-        setAllProductbyWarehouseDepartament(null)
+    useEffect(()=> {
+        setAllProductByWarehouseDepartment(null)
     },[storeId, warehouseId])
 
     useEffect(() => {
         const Datos = async () => {
             const result = await storeAssign.allProductbyDepartmentWarehouse(params.id, storeId, warehouseId)
-            setAllProductbyWarehouseDepartament(() => result.map(data => ({
+            setAllProductByWarehouseDepartment(() => result.map(data => ({
                 ...data,
                 selected: false
             })))
         }
-        if (allProductbyWarehouseDepartament === null) Datos()
+        if (allProductByWarehouseDepartment === null) Datos()
 
-    }, [allProductbyWarehouseDepartament])
+    }, [allProductByWarehouseDepartment, params.id, storeId, warehouseId])
 
     useEffect(() => {
-        if (allProductbyWarehouseDepartament !== null) {
+        if (allProductByWarehouseDepartment !== null) {
 
             let allProducts = []
 
-            allProductbyWarehouseDepartament.forEach((departmentItem) => {
+            allProductByWarehouseDepartment.forEach((departmentItem) => {
                 if (departmentItem.selected) {
                     allProducts = [...allProducts, ...departmentItem.products]
                 }
@@ -60,13 +61,13 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
             setData(allProducts)
         }
 
-    }, [allProductbyWarehouseDepartament])
+    }, [allProductByWarehouseDepartment])
 
     async function handleSelectFilter(index: number) {
-        let filters = [...allProductbyWarehouseDepartament]
+        let filters = [...allProductByWarehouseDepartment]
         filters[index].selected = !filters[index].selected
 
-        setAllProductbyWarehouseDepartament(filters)
+        setAllProductByWarehouseDepartment(filters)
     }
 
     const DepartmentsFilter = ({ formik }) => {
@@ -80,7 +81,7 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
                     </Grid>
                     <Grid container item columnSpacing={2}>
                         {
-                            allProductbyWarehouseDepartament.map((item, index) => (
+                            allProductByWarehouseDepartment.map((item, index) => (
                                 <Grid key={item.id} item xs={"auto"}>
                                     <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
                                         <Grid container>
@@ -128,8 +129,6 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
     const initialValues = {
         searchBarValue: ""
     }
-
-
 
     const TableHeader = () => {
         const headCells = [
@@ -182,13 +181,13 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
     const loadDates = async () => {
         let newAllProductbyDepartmentWarehouse = await storeAssign.allProductbyDepartmentWarehouse(params.id, storeId, warehouseId);
     
-        let selectedDepartment = allProductbyWarehouseDepartament.filter(element => (element.selected)).map( element => element.id)
+        let selectedDepartment = allProductByWarehouseDepartment.filter(element => (element.selected)).map( element => element.id)
     
         newAllProductbyDepartmentWarehouse = newAllProductbyDepartmentWarehouse.map(element => ({
           ...element,
           selected: (selectedDepartment.includes(element.id))
         }))
-        setAllProductbyWarehouseDepartament(newAllProductbyDepartmentWarehouse);
+        setAllProductByWarehouseDepartment(newAllProductbyDepartmentWarehouse);
       }
 
 
@@ -408,8 +407,8 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
 
                             <CardContent>
                                 {
-                                    Array.isArray(allProductbyWarehouseDepartament) &&
-                                    allProductbyWarehouseDepartament.length > 0 && (
+                                    Array.isArray(allProductByWarehouseDepartment) &&
+                                    allProductByWarehouseDepartment.length > 0 && (
                                         <DepartmentsFilter formik={formik} />
                                     )
                                 }
@@ -435,4 +434,4 @@ function showProducts({ storeId, warehouseId, defaultPercentage, defaultQuantity
     )
 }
 
-export default showProducts
+export default ShowProductsWarehouse

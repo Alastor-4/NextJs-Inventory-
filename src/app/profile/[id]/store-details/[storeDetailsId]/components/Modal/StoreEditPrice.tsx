@@ -13,7 +13,7 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
         if (storeDepot.price_discount_quantity || storeDepot.price_discount_percentage) {
             setActiveDiscount(true)
         }
-    }, [setActiveDiscount])
+    }, [setActiveDiscount, storeDepot.price_discount_percentage, storeDepot.price_discount_quantity])
 
     const initialValues = ({
         price: storeDepot.sell_price,
@@ -81,7 +81,6 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
             setActiveModalPrice({ active: false, storeDepot: [] })
             loadDates();
         }
-
     }
 
     const Original = (formik) => (

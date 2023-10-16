@@ -49,7 +49,6 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
     }, [storeId])
 
     useEffect(() => {
-
         const Datos = async () => {
             const result = await storeAssign.allProductsbyDepartmentStore(params.id, storeId)
             setAllProductStore(() => result.map(data => ({
@@ -61,7 +60,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
         if (allProductStore === null) {
             Datos()
         }
-    }, [allProductStore, setAllProductStore])
+    }, [allProductStore, params.id, setAllProductStore, storeId])
 
 
     useEffect(() => {
@@ -99,7 +98,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
             setData(allProducts)
         }
 
-    }, [allProductStore])
+    }, [allProductStore, productsInputValue])
 
 
     async function handleSelectFilter(index: number) {
