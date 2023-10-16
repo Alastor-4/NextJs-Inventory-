@@ -12,5 +12,5 @@ export async function GET(req, res) {
         return NextResponse.json(store)
     }
 
-    return res.status(500).json({message: "La acción de modificar ha fallado"})
+    return new Response('La acción de modificar ha fallado', {status: 500})
 }

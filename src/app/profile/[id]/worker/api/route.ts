@@ -44,5 +44,5 @@ export async function DELETE(req, res) {
         return NextResponse.json(updatedUser)
     }
 
-    return res.status(500).json({message: "La acción de eliminar trabajador ha fallado"})
+    return new Response('La acción de eliminar trabajador ha fallado', {status: 500})
 }
