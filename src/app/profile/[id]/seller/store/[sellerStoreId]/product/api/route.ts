@@ -57,12 +57,17 @@ export async function PUT(req, res) {
 
     if (storeDepotId) {
         const storeDepot = await prisma.store_depots.findUnique({where: {id: parseInt(storeDepotId)}})
-        const updatedDepot = await prisma.store_depots.update({data: {is_active: !storeDepot.is_active}, where: {id: storeDepot.id}})
 
-        return NextResponse.json(updatedDepot)
+        if (storeDepot?.sell_price?.toString() !== "0" || (storeDepot?.sell_price?.toString() === "0" && storeDepot?.is_active)) {
+            const updatedDepot = await prisma.store_depots.update({data: {is_active: !storeDepot.is_active}, where: {id: storeDepot.id}})
+
+            return NextResponse.json(updatedDepot)
+        }
+
+        return new Response('La acción de modificar isActive ha fallado', {status: 400})
     }
 
-    res.status(500).json({ message: "La acción de modificar isActive ha fallado" })
+    return new Response('La acción de modificar isActive ha fallado', {status: 500})
 }
 
 // Sell store depot one unit (default option)
@@ -91,9 +96,7 @@ export async function PATCH(req, res) {
 
             return NextResponse.json(updatedStoreDepot)
         }
-
-        res.status(400).json({ message: "La acción de vender ha fallado" })
     }
 
-    res.status(500).json({ message: "La acción de vender ha fallado" })
+    return new Response('La acción de vender ha fallado', {status: 400})
 }

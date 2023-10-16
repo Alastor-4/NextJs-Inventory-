@@ -331,12 +331,13 @@ export default function StoreActionsMain({userId, storeId}) {
                                                         : true
                                                 }>
                                                 <Grid item xs={12}>
-                                                    {row.depots[0].store_depots[0].is_active ? "activo" : "inactivo"}
+                                                    {row.depots[0].store_depots[0].is_active ? "en venta" : "inactivo"}
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <Switch
                                                         size={"small"}
                                                         color={"success"}
+                                                        //disabled={!baseProductPrice}
                                                         checked={row.depots[0].store_depots[0].is_active}
                                                         onClick={(e) => handleToggleIsActive(e, row.depots[0].store_depots[0].id)}
                                                     />
