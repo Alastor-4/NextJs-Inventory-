@@ -21,8 +21,8 @@ import {TableNoData} from "@/components/TableNoData";
 import {
     AddOutlined,
     ArrowLeft, ChevronRightOutlined,
-    DeleteOutline,
-    EditOutlined, SellOutlined,
+    DeleteOutline, DescriptionOutlined,
+    EditOutlined, Filter1Outlined, FilterOutlined, SearchOutlined, SellOutlined,
     ShareOutlined,
     VisibilityOutlined
 } from "@mui/icons-material";
@@ -126,18 +126,13 @@ export default function StoreActionsMain({userId, storeId}) {
                 align: "left"
             },
             {
-                id: "units",
-                label: "Disponibles",
-                align: "left"
-            },
-            {
                 id: "price",
                 label: "Precio",
                 align: "left"
             },
             {
                 id: "status",
-                label: "",
+                label: "Disponibles",
                 align: "left"
             },
         ]
@@ -311,33 +306,53 @@ export default function StoreActionsMain({userId, storeId}) {
                                         }
                                     </TableCell>
                                     <TableCell>
-                                        {row.depots[0].store_depots[0].product_remaining_units}
-                                    </TableCell>
-                                    <TableCell>
-                                        <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice}/> <br/>
+                                        <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice}/>
+                                        {row.depots[0].store_depots[0].offer_notes && (
+                                            <DescriptionOutlined fontSize={"small"}/>
+                                        )}
+                                        <br/>
                                         {
                                             displayPriceDiscount && <InfoTag value={`- ${displayPriceDiscount}`}/>
                                         }
                                     </TableCell>
                                     <TableCell>
                                         <Grid container columnSpacing={1}>
+                                            <Grid container item xs={2} alignItems={"center"}>
+                                                <Box
+                                                    sx={
+                                                    {
+                                                        display: "inline-flex",
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
+                                                        padding: "2px 4px",
+                                                        color: "darkblue",
+                                                        backgroundColor: "lightgrey",
+                                                        borderRadius: "6px",
+                                                        border: "1px solid black",
+                                                        fontSize: "18px"
+                                                    }
+                                                }>
+                                                    {row.depots[0].store_depots[0].product_remaining_units}
+                                                </Box>
+                                            </Grid>
                                             <Grid
                                                 container
                                                 item
-                                                xs={
-                                                    row.depots[0].store_depots[0].is_active &&
-                                                    !!row.depots[0].store_depots[0].product_remaining_units
-                                                        ? 8
-                                                        : true
-                                                }>
-                                                <Grid item xs={12}>
-                                                    {row.depots[0].store_depots[0].is_active ? "en venta" : "inactivo"}
+                                                xs={8}
+                                            >
+                                                <Grid container item xs={12} justifyContent={"center"}>
+                                                    <Typography variant={"button"}>
+                                                        {row.depots[0].store_depots[0].is_active
+                                                            ? "en venta"
+                                                            : "inactivo"
+                                                        }
+                                                    </Typography>
                                                 </Grid>
-                                                <Grid item xs={12}>
+                                                <Grid container item xs={12} justifyContent={"center"}>
                                                     <Switch
                                                         size={"small"}
                                                         color={"success"}
-                                                        //disabled={!baseProductPrice}
+                                                        disabled={!baseProductPrice}
                                                         checked={row.depots[0].store_depots[0].is_active}
                                                         onClick={(e) => handleToggleIsActive(e, row.depots[0].store_depots[0].id)}
                                                     />
@@ -347,7 +362,7 @@ export default function StoreActionsMain({userId, storeId}) {
                                             {
                                                 row.depots[0].store_depots[0].is_active &&
                                                 !!row.depots[0].store_depots[0].product_remaining_units && (
-                                                    <Grid container item xs={4}>
+                                                    <Grid container item xs={2}>
                                                         <IconButton
                                                             color={"primary"}
                                                             onClick={(e) => handleSellProduct(e, row.depots[0].store_depots[0].id)}
@@ -538,7 +553,7 @@ export default function StoreActionsMain({userId, storeId}) {
                             Seleccione departamentos para encontrar el producto que busca
                         </Typography>
                     </Grid>
-                    <Grid container item columnSpacing={2}>
+                    <Grid container item columnSpacing={2} sx={{backgroundColor: "lightgray"}}>
                         {
                             allProductsByDepartment.map((item, index) => (
                                 <Grid key={item.id} item xs={"auto"}>
@@ -575,6 +590,7 @@ export default function StoreActionsMain({userId, storeId}) {
                                         placeholder="Buscar producto..."
                                         size={"small"}
                                         fullWidth
+                                        InputProps={{startAdornment: <SearchOutlined sx={{color: "gray"}}/>}}
                                         {...formik.getFieldProps("searchBarValue")}
                                     />
                                 </Grid>
