@@ -21,7 +21,7 @@ import {TableNoData} from "@/components/TableNoData";
 import {
     AddOutlined,
     ArrowLeft, ChevronRightOutlined,
-    DeleteOutline,
+    DeleteOutline, DescriptionOutlined,
     EditOutlined, SellOutlined,
     ShareOutlined,
     VisibilityOutlined
@@ -306,7 +306,11 @@ export default function StoreActionsMain({userId, storeId}) {
                                         }
                                     </TableCell>
                                     <TableCell>
-                                        <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice}/> <br/>
+                                        <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice}/>
+                                        {row.depots[0].store_depots[0].offer_notes && (
+                                            <DescriptionOutlined fontSize={"small"}/>
+                                        )}
+                                        <br/>
                                         {
                                             displayPriceDiscount && <InfoTag value={`- ${displayPriceDiscount}`}/>
                                         }
@@ -318,6 +322,8 @@ export default function StoreActionsMain({userId, storeId}) {
                                                     sx={
                                                     {
                                                         display: "inline-flex",
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
                                                         padding: "2px 4px",
                                                         color: "darkblue",
                                                         backgroundColor: "lightgrey",
