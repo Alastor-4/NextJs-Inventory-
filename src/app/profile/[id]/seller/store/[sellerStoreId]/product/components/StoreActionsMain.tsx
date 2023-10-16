@@ -22,7 +22,7 @@ import {
     AddOutlined,
     ArrowLeft, ChevronRightOutlined,
     DeleteOutline, DescriptionOutlined,
-    EditOutlined, SellOutlined,
+    EditOutlined, Filter1Outlined, FilterOutlined, SearchOutlined, SellOutlined,
     ShareOutlined,
     VisibilityOutlined
 } from "@mui/icons-material";
@@ -553,7 +553,7 @@ export default function StoreActionsMain({userId, storeId}) {
                             Seleccione departamentos para encontrar el producto que busca
                         </Typography>
                     </Grid>
-                    <Grid container item columnSpacing={2}>
+                    <Grid container item columnSpacing={2} sx={{backgroundColor: "lightgray"}}>
                         {
                             allProductsByDepartment.map((item, index) => (
                                 <Grid key={item.id} item xs={"auto"}>
@@ -590,6 +590,7 @@ export default function StoreActionsMain({userId, storeId}) {
                                         placeholder="Buscar producto..."
                                         size={"small"}
                                         fullWidth
+                                        InputProps={{startAdornment: <SearchOutlined sx={{color: "gray"}}/>}}
                                         {...formik.getFieldProps("searchBarValue")}
                                     />
                                 </Grid>
