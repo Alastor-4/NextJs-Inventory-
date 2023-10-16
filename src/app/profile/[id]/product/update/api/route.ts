@@ -12,5 +12,5 @@ export async function GET(req, res) {
         return NextResponse.json(product)
     }
 
-    return res.status(500).json({message: "La acción de obtener detalles ha fallado"})
+    return new Response('La acción de obtener detalles ha fallado', {status: 500})
 }

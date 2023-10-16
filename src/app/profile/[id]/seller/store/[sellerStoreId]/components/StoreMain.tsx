@@ -24,7 +24,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/stores";
+import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/sellerStore";
 import Link from "next/link";
 
 dayjs.extend(isBetween)

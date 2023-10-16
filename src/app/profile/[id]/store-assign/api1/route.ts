@@ -20,7 +20,7 @@ export async function GET(request: Request, {params}: { params: { id: string } }
         return NextResponse.json(warehouseDepots)
     }
 
-    return res.status(500).json({message: "La acción de obtener los depósitos ha fallado"})
+    return new Response('La acción de obtener los depósitos ha fallado', {status: 500})
 }
 
 // Create new user store
@@ -69,5 +69,5 @@ export async function DELETE(req, res) {
         return NextResponse.json(deletedStore)
     }
 
-    return res.status(500).json({message: "La acción de eliminar ha fallado"})
+    return new Response('La acción de eliminar ha fallado', {status: 500})
 }
