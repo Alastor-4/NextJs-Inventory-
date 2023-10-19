@@ -6,7 +6,7 @@ import {
     Box, Button,
     Card,
     CardContent,
-    Checkbox, CircularProgress, Collapse,
+    Checkbox, Chip, CircularProgress, Collapse,
     Divider, Grid,
     IconButton, Switch,
     Table,
@@ -21,7 +21,7 @@ import {TableNoData} from "@/components/TableNoData";
 import {
     AddOutlined,
     ArrowLeft, ChevronRightOutlined,
-    DeleteOutline, DescriptionOutlined,
+    DeleteOutline, DescriptionOutlined, DoubleArrowOutlined,
     EditOutlined, Filter1Outlined, FilterOutlined, SearchOutlined, SellOutlined,
     ShareOutlined,
     VisibilityOutlined
@@ -320,18 +320,18 @@ export default function StoreActionsMain({userId, storeId}) {
                                             <Grid container item xs={2} alignItems={"center"}>
                                                 <Box
                                                     sx={
-                                                    {
-                                                        display: "inline-flex",
-                                                        justifyContent: "center",
-                                                        alignItems: "center",
-                                                        padding: "2px 4px",
-                                                        color: "darkblue",
-                                                        backgroundColor: "lightgrey",
-                                                        borderRadius: "6px",
-                                                        border: "1px solid black",
-                                                        fontSize: "18px"
-                                                    }
-                                                }>
+                                                        {
+                                                            display: "inline-flex",
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            padding: "2px 4px",
+                                                            color: "darkblue",
+                                                            backgroundColor: "lightgrey",
+                                                            borderRadius: "6px",
+                                                            border: "1px solid black",
+                                                            fontSize: "18px"
+                                                        }
+                                                    }>
                                                     {row.depots[0].store_depots[0].product_remaining_units}
                                                 </Box>
                                             </Grid>
@@ -544,55 +544,133 @@ export default function StoreActionsMain({userId, storeId}) {
         setAllProductsByDepartment(filters)
     }
 
+    const initialValues = {
+        searchBarValue: "",
+        enVentaFilter: false,
+        inactivoFilter: false,
+        retiradoFilter: false,
+        sinPrecioFilter: false,
+        conDescuentoFilter: false,
+        conOfertasFilter: false,
+        sinDisponibilidadFilter: false,
+        disponibilidad10Filter: false,
+        disponibilidad20Filter: false,
+    }
+
     const DepartmentsFilter = ({formik}) => {
+        const {
+            enVentaFilter,
+            inactivoFilter,
+            retiradoFilter,
+            sinPrecioFilter,
+            conDescuentoFilter,
+            conOfertasFilter,
+            sinDisponibilidadFilter,
+            disponibilidad10Filter,
+            disponibilidad20Filter
+        } = formik.values
+
         return (
-            <Card variant={"outlined"} sx={{padding: "15px"}}>
-                <Grid container rowSpacing={2}>
-                    <Grid item>
-                        <Typography variant={"subtitle2"}>
-                            Seleccione departamentos para encontrar el producto que busca
-                        </Typography>
-                    </Grid>
-                    <Grid container item columnSpacing={2} sx={{backgroundColor: "lightgray"}}>
-                        {
-                            allProductsByDepartment.map((item, index) => (
-                                <Grid key={item.id} item xs={"auto"}>
-                                    <Button variant={item.selected ? "contained" : "outlined"}
-                                            onClick={() => handleSelectFilter(index)}>
-                                        <Grid container>
-                                            <Grid item xs={12}>
-                                                {item.name}
+            <Card variant={"outlined"} sx={{padding: "10px"}}>
+                <Grid container>
+                    <Grid item container sx={{backgroundColor: "lightgray", padding: "10px 15px 15px 15px"}}>
+                        <Grid item xs={12}>
+                            <Typography variant={"subtitle1"}>
+                                Seleccione departamentos para encontrar el producto deseado
+                            </Typography>
+                        </Grid>
+                        <Grid container item columnSpacing={2} sx={{mt: "8px"}}>
+                            {
+                                allProductsByDepartment.map((item, index) => (
+                                    <Grid key={item.id} item xs={"auto"}>
+                                        <Button variant={item.selected ? "contained" : "outlined"}
+                                                onClick={() => handleSelectFilter(index)}>
+                                            <Grid container>
+                                                <Grid item xs={12}>
+                                                    {item.name}
+                                                </Grid>
+                                                <Grid container item xs={12} justifyContent={"center"}>
+                                                    <Typography variant={"caption"}>
+                                                        {item.products.length} productos
+                                                    </Typography>
+                                                </Grid>
                                             </Grid>
-                                            <Grid container item xs={12} justifyContent={"center"}>
-                                                <Typography variant={"caption"}>
-                                                    {item.products.length} productos
-                                                </Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </Button>
-                                </Grid>
-                            ))
-                        }
+                                        </Button>
+                                    </Grid>
+                                ))
+                            }
+                        </Grid>
                     </Grid>
 
                     {
                         data?.length > 0 && (
-                            <Grid container item rowSpacing={1}>
-                                <Grid item xs={12}>
-                                    <Typography variant={"subtitle2"}>
-                                        Puede buscar productos por nombre o descripción en los departamentos seleccionados
-                                        aquí
-                                    </Typography>
+                            <Grid container item rowSpacing={2} sx={{mt: "5px", p: "15px"}}>
+                                <Grid container item rowSpacing={1}>
+                                    <Grid item xs={12}>
+                                        <Typography variant={"subtitle2"} sx={{display: "flex", alignItems: "center"}}>
+                                            <ChevronRightOutlined/> Puede buscar productos por nombre o descripción en los
+                                            departamentos seleccionados
+                                            aquí
+                                        </Typography>
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            name={"handleChangeSearchBarValue"}
+                                            placeholder="Buscar producto..."
+                                            size={"small"}
+                                            fullWidth
+                                            InputProps={{startAdornment: <SearchOutlined sx={{color: "gray"}}/>}}
+                                            {...formik.getFieldProps("searchBarValue")}
+                                        />
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        name={"handleChangeSearchBarValue"}
-                                        placeholder="Buscar producto..."
-                                        size={"small"}
-                                        fullWidth
-                                        InputProps={{startAdornment: <SearchOutlined sx={{color: "gray"}}/>}}
-                                        {...formik.getFieldProps("searchBarValue")}
-                                    />
+
+                                <Grid container item rowSpacing={1}>
+                                    <Grid item xs={12}>
+                                        <Typography variant={"subtitle2"} sx={{display: "flex", alignItems: "center"}}>
+                                            <ChevronRightOutlined/> O ver solo aquellos con una característica común
+                                        </Typography>
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <Chip variant={"outlined"} label={"en venta"} sx={{mx: "5px"}}
+                                              color={enVentaFilter ? "success" : "default"}
+                                              onClick={() => formik.setFieldValue("enVentaFilter", !enVentaFilter)}
+                                        />
+                                        <Chip variant={"outlined"} label={"inactivo"} sx={{mx: "5px"}}
+                                              color={inactivoFilter ? "success" : "default"}
+                                              onClick={() => formik.setFieldValue("inactivoFilter", !inactivoFilter)}
+                                        />
+                                        <Chip variant={"outlined"} label={"retirado"} sx={{mx: "5px"}}
+                                              color={retiradoFilter ? "success" : "default"}
+                                              onClick={() => formik.setFieldValue("retiradoFilter", !retiradoFilter)}
+                                        />
+                                        <Chip variant={"outlined"} label={"sin precio"} sx={{mx: "5px"}}
+                                              color={sinPrecioFilter ? "success" : "default"}
+                                              onClick={() => formik.setFieldValue("sinPrecioFilter", !sinPrecioFilter)}
+                                        />
+                                        <Chip variant={"outlined"} label={"con descuento"} sx={{mx: "5px"}}
+                                              color={conDescuentoFilter ? "success" : "default"}
+                                              onClick={() => formik.setFieldValue("conDescuentoFilter", !conDescuentoFilter)}
+                                        />
+                                        <Chip variant={"outlined"} label={"con ofertas"} sx={{mx: "5px"}}
+                                              color={conOfertasFilter ? "success" : "default"}
+                                              onClick={() => formik.setFieldValue("conOfertasFilter", !conOfertasFilter)}
+                                        />
+                                        <Chip variant={"outlined"} label={"sin disponibilidad"} sx={{mx: "5px"}}
+                                              color={sinDisponibilidadFilter ? "success" : "default"}
+                                              onClick={() => formik.setFieldValue("sinDisponibilidadFilter", !sinDisponibilidadFilter)}
+                                        />
+                                        <Chip variant={"outlined"} label={"disponibilidad < 10"} sx={{mx: "5px"}}
+                                              color={disponibilidad10Filter ? "success" : "default"}
+                                              onClick={() => formik.setFieldValue("disponibilidad10Filter", !disponibilidad10Filter)}
+                                        />
+                                        <Chip variant={"outlined"} label={"disponibilidad < 20"} sx={{mx: "5px"}}
+                                              color={disponibilidad20Filter ? "success" : "default"}
+                                              onClick={() => formik.setFieldValue("disponibilidad20Filter", !disponibilidad20Filter)}
+                                        />
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         )
@@ -601,10 +679,6 @@ export default function StoreActionsMain({userId, storeId}) {
 
             </Card>
         )
-    }
-
-    const initialValues = {
-        searchBarValue: ""
     }
 
     return (
@@ -636,7 +710,7 @@ export default function StoreActionsMain({userId, storeId}) {
                             {
                                 data?.length > 0
                                     ? (
-                                        <Table sx={{width: "100%"}} size={"small"}>
+                                        <Table sx={{width: "100%", mt: "20px"}} size={"small"}>
                                             <TableHeader/>
 
                                             <TableContent formik={formik}/>
