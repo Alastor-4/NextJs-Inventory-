@@ -26,7 +26,7 @@ import {
     DescriptionOutlined,
     DoubleArrowOutlined,
     EditOutlined,
-    Filter1Outlined,
+    Filter1Outlined, Filter4, FilterAlt, FilterAltOutlined,
     FilterOutlined,
     KeyboardArrowDown,
     KeyboardArrowRight,
@@ -592,6 +592,7 @@ export default function StoreActionsMain({userId, storeId}) {
 
     const DepartmentsFilter = ({formik}) => {
         const {
+            searchBarValue,
             enVentaFilter,
             inactivoFilter,
             retiradoFilter,
@@ -647,6 +648,9 @@ export default function StoreActionsMain({userId, storeId}) {
                                         <IconButton onClick={() => setDisplayFilterSection(!displayFilterSection)}>
                                             {displayFilterSection ? <KeyboardArrowDown fontSize={"small"}/> : <KeyboardArrowRight fontSize={"small"}/>}
                                         </IconButton>
+
+                                        <FilterAltOutlined fontSize={"small"} sx={{ml: "15px"}}/>
+                                        {(!!searchBarValue && 1) + (enVentaFilter && 1) + (inactivoFilter && 1) + (retiradoFilter && 1) + (sinPrecioFilter && 1) + (conDescuentoFilter && 1) + (conOfertasFilter && 1) + (sinDisponibilidadFilter && 1) + (disponibilidad10Filter && 1) + (disponibilidad20Filter && 1)}
                                     </Typography>
                                 </Grid>
 
