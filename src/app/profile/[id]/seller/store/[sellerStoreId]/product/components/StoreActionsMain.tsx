@@ -20,9 +20,19 @@ import {
 import {TableNoData} from "@/components/TableNoData";
 import {
     AddOutlined,
-    ArrowLeft, ChevronRightOutlined,
-    DeleteOutline, DescriptionOutlined, DoubleArrowOutlined,
-    EditOutlined, Filter1Outlined, FilterOutlined, SearchOutlined, SellOutlined,
+    ArrowLeft,
+    ChevronRightOutlined,
+    DeleteOutline,
+    DescriptionOutlined,
+    DoubleArrowOutlined,
+    EditOutlined,
+    Filter1Outlined,
+    FilterOutlined,
+    KeyboardArrowDown,
+    KeyboardArrowRight,
+    KeyboardArrowUp,
+    SearchOutlined,
+    SellOutlined,
     ShareOutlined,
     VisibilityOutlined
 } from "@mui/icons-material";
@@ -593,6 +603,8 @@ export default function StoreActionsMain({userId, storeId}) {
             disponibilidad20Filter
         } = formik.values
 
+        const [displayFilterSection, setDisplayFilterSection] = React.useState(false)
+
         return (
             <Card variant={"outlined"} sx={{padding: "10px"}}>
                 <Grid container>
@@ -631,110 +643,120 @@ export default function StoreActionsMain({userId, storeId}) {
                                 <Grid item xs={12}>
                                     <Typography variant={"subtitle1"} sx={{display: "flex", alignItems: "center"}}>
                                         Para los productos en los departamentos seleccionados
+
+                                        <IconButton onClick={() => setDisplayFilterSection(!displayFilterSection)}>
+                                            {displayFilterSection ? <KeyboardArrowDown fontSize={"small"}/> : <KeyboardArrowRight fontSize={"small"}/>}
+                                        </IconButton>
                                     </Typography>
                                 </Grid>
 
-                                <Grid container item rowSpacing={1}>
-                                    <Grid item xs={12}>
-                                        <Typography variant={"subtitle2"} sx={{display: "flex", alignItems: "center"}}>
-                                            <ChevronRightOutlined/> Puede filtrar aquellos con una característica común
-                                        </Typography>
-                                    </Grid>
+                                {
+                                    displayFilterSection && (
+                                        <>
+                                            <Grid container item rowSpacing={1}>
+                                                <Grid item xs={12}>
+                                                    <Typography variant={"subtitle2"} sx={{display: "flex", alignItems: "center"}}>
+                                                        <ChevronRightOutlined/> Puede filtrar aquellos con una característica común
+                                                    </Typography>
+                                                </Grid>
 
-                                    <Grid item xs={12}>
-                                        <Chip
-                                            variant={"outlined"}
-                                            label={"en venta"}
-                                            sx={enVentaFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
-                                            size={"small"}
-                                            color={enVentaFilter ? "primary" : "default"}
-                                            onClick={() => formik.setFieldValue("enVentaFilter", !enVentaFilter)}
-                                        />
-                                        <Chip
-                                            variant={"outlined"}
-                                            label={"inactivo"}
-                                            sx={inactivoFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
-                                            size={"small"}
-                                            color={inactivoFilter ? "primary" : "default"}
-                                            onClick={() => formik.setFieldValue("inactivoFilter", !inactivoFilter)}
-                                        />
-                                        <Chip
-                                            variant={"outlined"}
-                                            label={"retirado"}
-                                            sx={retiradoFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
-                                            size={"small"}
-                                            color={retiradoFilter ? "primary" : "default"}
-                                            onClick={() => formik.setFieldValue("retiradoFilter", !retiradoFilter)}
-                                        />
-                                        <Chip
-                                            variant={"outlined"}
-                                            label={"sin precio"}
-                                            sx={sinPrecioFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
-                                            size={"small"}
-                                            color={sinPrecioFilter ? "primary" : "default"}
-                                            onClick={() => formik.setFieldValue("sinPrecioFilter", !sinPrecioFilter)}
-                                        />
-                                        <Chip
-                                            variant={"outlined"}
-                                            label={"con descuento"}
-                                            sx={conDescuentoFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
-                                            size={"small"}
-                                            color={conDescuentoFilter ? "primary" : "default"}
-                                            onClick={() => formik.setFieldValue("conDescuentoFilter", !conDescuentoFilter)}
-                                        />
-                                        <Chip
-                                            variant={"outlined"}
-                                            label={"con ofertas"}
-                                            sx={conOfertasFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
-                                            size={"small"}
-                                            color={conOfertasFilter ? "primary" : "default"}
-                                            onClick={() => formik.setFieldValue("conOfertasFilter", !conOfertasFilter)}
-                                        />
-                                        <Chip
-                                            variant={"outlined"}
-                                            label={"sin disponibilidad"}
-                                            sx={sinDisponibilidadFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
-                                            size={"small"}
-                                            color={sinDisponibilidadFilter ? "primary" : "default"}
-                                            onClick={() => formik.setFieldValue("sinDisponibilidadFilter", !sinDisponibilidadFilter)}
-                                        />
-                                        <Chip
-                                            variant={"outlined"}
-                                            label={"disponibilidad < 10"}
-                                            sx={disponibilidad10Filter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
-                                            size={"small"}
-                                            color={disponibilidad10Filter ? "primary" : "default"}
-                                            onClick={() => formik.setFieldValue("disponibilidad10Filter", !disponibilidad10Filter)}
-                                        />
-                                        <Chip
-                                            variant={"outlined"}
-                                            label={"disponibilidad < 20"}
-                                            sx={disponibilidad20Filter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
-                                            size={"small"}
-                                            color={disponibilidad20Filter ? "primary" : "default"}
-                                            onClick={() => formik.setFieldValue("disponibilidad20Filter", !disponibilidad20Filter)}
-                                        />
-                                    </Grid>
-                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <Chip
+                                                        variant={"outlined"}
+                                                        label={"en venta"}
+                                                        sx={enVentaFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
+                                                        size={"small"}
+                                                        color={enVentaFilter ? "primary" : "default"}
+                                                        onClick={() => formik.setFieldValue("enVentaFilter", !enVentaFilter)}
+                                                    />
+                                                    <Chip
+                                                        variant={"outlined"}
+                                                        label={"inactivo"}
+                                                        sx={inactivoFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
+                                                        size={"small"}
+                                                        color={inactivoFilter ? "primary" : "default"}
+                                                        onClick={() => formik.setFieldValue("inactivoFilter", !inactivoFilter)}
+                                                    />
+                                                    <Chip
+                                                        variant={"outlined"}
+                                                        label={"retirado"}
+                                                        sx={retiradoFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
+                                                        size={"small"}
+                                                        color={retiradoFilter ? "primary" : "default"}
+                                                        onClick={() => formik.setFieldValue("retiradoFilter", !retiradoFilter)}
+                                                    />
+                                                    <Chip
+                                                        variant={"outlined"}
+                                                        label={"sin precio"}
+                                                        sx={sinPrecioFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
+                                                        size={"small"}
+                                                        color={sinPrecioFilter ? "primary" : "default"}
+                                                        onClick={() => formik.setFieldValue("sinPrecioFilter", !sinPrecioFilter)}
+                                                    />
+                                                    <Chip
+                                                        variant={"outlined"}
+                                                        label={"con descuento"}
+                                                        sx={conDescuentoFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
+                                                        size={"small"}
+                                                        color={conDescuentoFilter ? "primary" : "default"}
+                                                        onClick={() => formik.setFieldValue("conDescuentoFilter", !conDescuentoFilter)}
+                                                    />
+                                                    <Chip
+                                                        variant={"outlined"}
+                                                        label={"con ofertas"}
+                                                        sx={conOfertasFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
+                                                        size={"small"}
+                                                        color={conOfertasFilter ? "primary" : "default"}
+                                                        onClick={() => formik.setFieldValue("conOfertasFilter", !conOfertasFilter)}
+                                                    />
+                                                    <Chip
+                                                        variant={"outlined"}
+                                                        label={"sin disponibilidad"}
+                                                        sx={sinDisponibilidadFilter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
+                                                        size={"small"}
+                                                        color={sinDisponibilidadFilter ? "primary" : "default"}
+                                                        onClick={() => formik.setFieldValue("sinDisponibilidadFilter", !sinDisponibilidadFilter)}
+                                                    />
+                                                    <Chip
+                                                        variant={"outlined"}
+                                                        label={"disponibilidad < 10"}
+                                                        sx={disponibilidad10Filter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
+                                                        size={"small"}
+                                                        color={disponibilidad10Filter ? "primary" : "default"}
+                                                        onClick={() => formik.setFieldValue("disponibilidad10Filter", !disponibilidad10Filter)}
+                                                    />
+                                                    <Chip
+                                                        variant={"outlined"}
+                                                        label={"disponibilidad < 20"}
+                                                        sx={disponibilidad20Filter ? {mx: "5px", border: "2px solid", backgroundColor: "lightgray"} : {mx: "5px"}}
+                                                        size={"small"}
+                                                        color={disponibilidad20Filter ? "primary" : "default"}
+                                                        onClick={() => formik.setFieldValue("disponibilidad20Filter", !disponibilidad20Filter)}
+                                                    />
+                                                </Grid>
+                                            </Grid>
 
-                                <Grid container item rowSpacing={1}>
-                                    <Grid item xs={12}>
-                                        <Typography variant={"subtitle2"} sx={{display: "flex", alignItems: "center"}}>
-                                            <ChevronRightOutlined/> Puede buscar productos por nombre o descripción
-                                        </Typography>
-                                    </Grid>
+                                            <Grid container item rowSpacing={1}>
+                                                <Grid item xs={12}>
+                                                    <Typography variant={"subtitle2"} sx={{display: "flex", alignItems: "center"}}>
+                                                        <ChevronRightOutlined/> Puede buscar productos por nombre o descripción
+                                                    </Typography>
+                                                </Grid>
 
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            name={"handleChangeSearchBarValue"}
-                                            placeholder="Buscar producto..."
-                                            size={"small"}
-                                            fullWidth
-                                            InputProps={{startAdornment: <SearchOutlined sx={{color: "gray"}}/>}}
-                                            {...formik.getFieldProps("searchBarValue")}
-                                        />
-                                    </Grid>
-                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <TextField
+                                                        name={"handleChangeSearchBarValue"}
+                                                        placeholder="Buscar producto..."
+                                                        size={"small"}
+                                                        fullWidth
+                                                        InputProps={{startAdornment: <SearchOutlined sx={{color: "gray"}}/>}}
+                                                        {...formik.getFieldProps("searchBarValue")}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </>
+                                    )
+                                }
                             </Grid>
                         )
                     }
