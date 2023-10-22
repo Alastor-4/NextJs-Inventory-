@@ -6,7 +6,7 @@ export default async function Page() {
 
     return (
         <main>
-            <WarehousesForm ownerUsers={ownerUsers.users}/>
+            <WarehousesForm ownerUsers={ownerUsers?.users ?? []}/>
         </main>
     )
 }

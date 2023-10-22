@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client"
 
 import { AppBar, Box, Button, Card, Checkbox, Grid, MenuItem, Switch, TextField, Toolbar, Typography } from "@mui/material";

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
 // Get user store
-export async function GET(req, res) {
+export async function GET(req: Request) {
     const {searchParams} = new URL(req.url)
     const storeId = searchParams.get("storeId")
 

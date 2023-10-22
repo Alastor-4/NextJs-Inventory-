@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
 // Owner find a user to add it as worker
-export async function GET(req, res) {
+export async function GET(req: Request) {
     const {searchParams} = new URL(req.url)
     const username = searchParams.get("username") ?? ""
     const phone = searchParams.get("phone") ?? ""
@@ -18,7 +18,7 @@ export async function GET(req, res) {
 }
 
 // Make worker a new user
-export async function PUT(req, res) {
+export async function PUT(req: Request) {
     const {searchParams} = new URL(req.url)
     const ownerId = searchParams.get("ownerId")
 

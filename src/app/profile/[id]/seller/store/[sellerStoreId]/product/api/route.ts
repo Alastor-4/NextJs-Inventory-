@@ -52,14 +52,14 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
 }
 
 // Toggle store depot isActive
-export async function PUT(req, res) {
+export async function PUT(req: Request) {
     const { storeDepotId } = await req.json()
 
     if (storeDepotId) {
         const storeDepot = await prisma.store_depots.findUnique({where: {id: parseInt(storeDepotId)}})
 
         if (storeDepot?.sell_price?.toString() !== "0" || (storeDepot?.sell_price?.toString() === "0" && storeDepot?.is_active)) {
-            const updatedDepot = await prisma.store_depots.update({data: {is_active: !storeDepot.is_active}, where: {id: storeDepot.id}})
+            const updatedDepot = await prisma.store_depots.update({data: {is_active: !storeDepot?.is_active}, where: {id: storeDepot?.id}})
 
             return NextResponse.json(updatedDepot)
         }
@@ -71,7 +71,7 @@ export async function PUT(req, res) {
 }
 
 // Sell store depot one unit (default option)
-export async function PATCH(req, res) {
+export async function PATCH(req: Request) {
     const { storeDepotId } = await req.json()
 
     if (storeDepotId) {
@@ -86,7 +86,9 @@ export async function PATCH(req, res) {
                         data: {
                             store_depot_id: storeDepot.id,
                             units_quantity: 1,
+                            // @ts-ignore
                             unit_buy_price: storeDepot.sell_price,
+                            // @ts-ignore
                             total_price: storeDepot.sell_price,
                             payment_method: "Efectivo CUP",
                         }

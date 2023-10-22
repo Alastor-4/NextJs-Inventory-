@@ -19,7 +19,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // Change owner's user role
-export async function PATCH(req, res) {
+export async function PATCH(req: Request) {
     const {searchParams} = new URL(req.url)
     const userId = searchParams.get("userId")
     const {roleId} = await req.json()
@@ -34,7 +34,7 @@ export async function PATCH(req, res) {
 }
 
 // Delete owner's user
-export async function DELETE(req, res) {
+export async function DELETE(req: Request) {
     const {searchParams} = new URL(req.url)
     const userId = searchParams.get("userId")
 

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from 'db'
 
-export async function GET(req) {
+export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
-    const storeId = parseInt(searchParams.get("storeId"));
+    const storeId = parseInt(<string>searchParams.get("storeId"));
 
     const result = await prisma.departments.findMany({
         where: {
@@ -51,7 +51,7 @@ export async function GET(req) {
     })
     return NextResponse.json(result)
 }
-export async function PUT(req) {
+export async function PUT(req: Request) {
     const { id, store_id, depot_id, product_units, product_remaining_units } = await req.json();
     const data = {
         store_id: store_id,
@@ -62,9 +62,9 @@ export async function PUT(req) {
     const result = await prisma.store_depots.update({ data, where: { id: id } })
     return NextResponse.json(data)
 }
-export async function DELETE(req) {
+export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url)
-    const storeDepotId = parseInt(searchParams.get("storeDepotId"))
+    const storeDepotId = parseInt(<string>searchParams.get("storeDepotId"))
 
     const result = await prisma.store_depots.delete({ where: { id: storeDepotId } })
 

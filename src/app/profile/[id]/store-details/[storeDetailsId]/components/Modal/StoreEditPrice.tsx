@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client"
 import { Button, Card, Grid, MenuItem, Switch, TextField, Typography } from '@mui/material'
 import { Formik } from 'formik'

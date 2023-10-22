@@ -1,7 +1,7 @@
 import {Box} from "@mui/material";
 import {CreditCardOutlined, ErrorOutlined, InfoOutlined} from "@mui/icons-material";
 
-export const MoneyInfoTag = ({value, errorColor}) => {
+export const MoneyInfoTag = ({value, errorColor}: any) => {
     return (
         <Box
             sx={
@@ -30,7 +30,7 @@ export const MoneyInfoTag = ({value, errorColor}) => {
 }
 
 
-export const InfoTag = ({value, color, icon}) => {
+export const InfoTag = ({value, color, icon}: any) => {
     return (
         <Box
             sx={

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, VisibilityOutlined} from '@mui/icons-material'
 import {Box, Collapse, Grid, IconButton, Switch, Typography} from '@mui/material'
 import React, {useEffect, useState} from 'react'

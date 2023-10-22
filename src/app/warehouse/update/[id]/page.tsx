@@ -5,7 +5,7 @@ export default async function Page() {
     const ownerUsers = await prisma.roles.findUnique({where: {name: "store_owner"}, include: {users: true}})
     return (
         <main>
-            <WarehousesForm ownerUsers={ownerUsers.users}/>
+            <WarehousesForm ownerUsers={ownerUsers?.users ?? []}/>
         </main>
     )
 }

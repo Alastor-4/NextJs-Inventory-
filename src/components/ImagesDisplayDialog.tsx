@@ -1,7 +1,6 @@
 import {
     Avatar,
-    Box,
-    Button, Chip,
+    Button,
     Dialog,
     DialogActions,
     DialogContent,
@@ -10,7 +9,7 @@ import {
 import React from "react";
 import {Circle, CircleOutlined, ControlPoint, FormatListBulletedOutlined} from "@mui/icons-material";
 
-export default function ImagesDisplayDialog(props) {
+export default function ImagesDisplayDialog(props: any) {
     const {open, setOpen, dialogTitle, images} = props
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
@@ -45,7 +44,7 @@ export default function ImagesDisplayDialog(props) {
                     {
                         images.length > 1 && (
                             <Grid container item xs={12} justifyContent={"center"}>
-                                {images.map((item, index) => (
+                                {images.map((item: any, index: number) => (
                                     <React.Fragment key={item.id}>
                                         {
                                             imageIndex === index ? (

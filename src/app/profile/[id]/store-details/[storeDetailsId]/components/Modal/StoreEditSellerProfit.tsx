@@ -1,11 +1,10 @@
+// @ts-nocheck
 "use client"
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import React, { useState } from 'react'
 import { Button, Card, Grid, MenuItem, TextField } from '@mui/material';
 import { storeDetails } from '../../request/storeDetails';
-
-
 
 function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit, loadDates }) {
 console.log(storeDepot)
