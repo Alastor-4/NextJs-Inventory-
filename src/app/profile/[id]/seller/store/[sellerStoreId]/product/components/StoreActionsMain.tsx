@@ -645,7 +645,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
             totalPrice: Yup.number(),
             paymentMethod: Yup.string(),
         })
-    })
+    });
 
     const DepartmentsFilter = ({formik}: any) => {
         const {
