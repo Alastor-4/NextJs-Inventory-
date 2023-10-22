@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client"
 
 import React from "react";
@@ -48,20 +47,20 @@ import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import {numberFormat} from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/profile/[id]/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
-export default function StoreActionsMain({userId, storeId}) {
+export default function StoreActionsMain({userId, storeId}: {userId: string, storeId: string}) {
     const router = useRouter()
 
-    const [data, setData] = React.useState(null)
-    const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
+    const [data, setData] = React.useState<null | any[]>(null)
+    const [allProductsByDepartment, setAllProductsByDepartment] = React.useState<any[]>([])
 
     //ToDo: use global isLoading
     const isLoading = false
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${userId}/seller/store/${storeId}/product/api`).then((data) => setAllProductsByDepartment(data.map(item => ({
+        fetcher(`/profile/${userId}/seller/store/${storeId}/product/api`).then((data) => setAllProductsByDepartment(data.map((item: any) => ({
             ...item,
             selected: false
         }))))
@@ -69,9 +68,9 @@ export default function StoreActionsMain({userId, storeId}) {
 
     React.useEffect(() => {
         if (allProductsByDepartment.length) {
-            let allProducts = []
+            let allProducts: any[] = []
 
-            allProductsByDepartment.forEach((departmentItem) => {
+            allProductsByDepartment.forEach((departmentItem: any) => {
                 if (departmentItem.selected) {
                     allProducts = [...allProducts, ...departmentItem.products]
                 }
@@ -87,6 +86,7 @@ export default function StoreActionsMain({userId, storeId}) {
                 return 0
             })
 
+            // @ts-ignore
             setData(allProducts)
         }
 
@@ -166,9 +166,9 @@ export default function StoreActionsMain({userId, storeId}) {
     }
 
     //expand description
-    const [expandIndex, setExpandIndex] = React.useState(null)
+    const [expandIndex, setExpandIndex] = React.useState<null | number>(null)
 
-    function handleExpandRow(index) {
+    function handleExpandRow(index: number) {
         if (expandIndex === index) {
             setExpandIndex(null)
         } else {
@@ -177,14 +177,14 @@ export default function StoreActionsMain({userId, storeId}) {
     }
 
     const [openImageDialog, setOpenImagesDialog] = React.useState(false)
-    const [dialogImages, setDialogImages] = React.useState([])
+    const [dialogImages, setDialogImages] = React.useState<any[]>([])
 
-    function handleOpenImagesDialog(images) {
+    function handleOpenImagesDialog(images: any[]) {
         setDialogImages(images)
         setOpenImagesDialog(true)
     }
 
-    async function handleToggleIsActive(e, storeDepotId) {
+    async function handleToggleIsActive(e: any, storeDepotId: number) {
         e.stopPropagation()
 
         const updatedDepot = await sellerStoreProduct.toggleIsActiveStoreDepot(userId, storeId, storeDepotId)
@@ -194,7 +194,7 @@ export default function StoreActionsMain({userId, storeId}) {
             for (const allProductsByDepartmentElement of allProductsByDepartment) {
                 const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
 
-                const productIndex = allProductsByDepartmentElement.products.findIndex(item => item.depots[0].store_depots[0].id === storeDepotId)
+                const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === storeDepotId)
                 if (productIndex > -1) {
                     newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].is_active = updatedDepot.is_active
                 }
@@ -204,7 +204,7 @@ export default function StoreActionsMain({userId, storeId}) {
         }
     }
 
-    async function handleSellProduct(e, storeDepotId) {
+    async function handleSellProduct(e: any, storeDepotId: number) {
         e.stopPropagation()
 
         const updatedDepot = await sellerStoreProduct.sellStoreDepotDefault(userId, storeId, storeDepotId)
@@ -214,7 +214,7 @@ export default function StoreActionsMain({userId, storeId}) {
             for (const allProductsByDepartmentElement of allProductsByDepartment) {
                 const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
 
-                const productIndex = allProductsByDepartmentElement.products.findIndex(item => item.depots[0].store_depots[0].id === storeDepotId)
+                const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === storeDepotId)
                 if (productIndex > -1) {
                     newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units = updatedDepot.product_remaining_units
                 }
@@ -224,7 +224,7 @@ export default function StoreActionsMain({userId, storeId}) {
         }
     }
 
-    const TableContent = ({formik}) => {
+    const TableContent = ({formik}: {formik: any}) => {
         const {
             searchBarValue,
             enVentaFilter,
@@ -240,7 +240,7 @@ export default function StoreActionsMain({userId, storeId}) {
 
         return (
             <TableBody>
-                {data.filter(
+                {data?.filter(
                     item =>
                         (!searchBarValue || (searchBarValue && (item.name.toUpperCase().includes(searchBarValue.toUpperCase()) || item.description.toUpperCase().includes(searchBarValue.toUpperCase())))) &&
                         (!enVentaFilter || (enVentaFilter && item.depots[0].store_depots[0].is_active)) &&
@@ -261,12 +261,12 @@ export default function StoreActionsMain({userId, storeId}) {
 
                         const priceDiscountQuantity = baseProductPrice
                             ? row.depots[0].store_depots[0].price_discount_percentage
-                                ? row.depots[0].store_depots[0].price_discount_percentage * baseProductPrice / 100
+                                ? row.depots[0].store_depots[0].price_discount_percentage * parseFloat(String(baseProductPrice)) / 100
                                 : row.depots[0].store_depots[0].price_discount_quantity
                             : null
 
-                        const finalProductPrice = priceDiscountQuantity
-                            ? (baseProductPrice - priceDiscountQuantity)
+                        const finalProductPrice = baseProductPrice && priceDiscountQuantity
+                            ? (parseFloat(String(baseProductPrice)) - priceDiscountQuantity)
                             : baseProductPrice
 
                         const sellerProfitQuantity = finalProductPrice
@@ -276,7 +276,7 @@ export default function StoreActionsMain({userId, storeId}) {
                             : null
 
                         const displayProductPrice = finalProductPrice
-                            ? `${numberFormat(finalProductPrice) + " " + row.depots[0].store_depots[0].sell_price_unit}`
+                            ? `${numberFormat(String(finalProductPrice)) + " " + row.depots[0].store_depots[0].sell_price_unit}`
                             : "sin precio"
 
                         const displayPriceDiscount = baseProductPrice
@@ -310,7 +310,7 @@ export default function StoreActionsMain({userId, storeId}) {
                                     </TableCell>
                                     <TableCell>
                                         {row.characteristics.length > 0
-                                            ? row.characteristics.map(item => (
+                                            ? row.characteristics.map((item: any) => (
                                                     <Grid
                                                         key={item.id}
                                                         sx={{
@@ -466,7 +466,7 @@ export default function StoreActionsMain({userId, storeId}) {
                                                           sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>Características:</Grid>
                                                     <Grid item xs={true} sx={{display: "flex", alignItems: "center"}}>
                                                         {row.characteristics.length > 0
-                                                            ? row.characteristics.map(item => (
+                                                            ? row.characteristics.map((item: any) => (
                                                                     <Grid
                                                                         key={item.id}
                                                                         sx={{
@@ -547,8 +547,8 @@ export default function StoreActionsMain({userId, storeId}) {
                                                     <Grid item xs={"auto"} sx={{fontWeight: 600}}>Distribución:</Grid>
                                                     <Grid item xs={true}>
                                                         {
-                                                            (baseProductPrice && sellerProfitQuantity)
-                                                                ? `Dueño: ${numberFormat(finalProductPrice - sellerProfitQuantity)} | Vendedor: ${numberFormat(sellerProfitQuantity)}`
+                                                            (baseProductPrice && sellerProfitQuantity && finalProductPrice)
+                                                                ? `Dueño: ${numberFormat(String(finalProductPrice - sellerProfitQuantity))} | Vendedor: ${numberFormat(sellerProfitQuantity)}`
                                                                 : "-"
                                                         }
                                                     </Grid>
@@ -591,7 +591,7 @@ export default function StoreActionsMain({userId, storeId}) {
         disponibilidad20Filter: false,
     }
 
-    const DepartmentsFilter = ({formik}) => {
+    const DepartmentsFilter = ({formik}: any) => {
         const {
             searchBarValue,
             enVentaFilter,
@@ -640,7 +640,7 @@ export default function StoreActionsMain({userId, storeId}) {
                     </Grid>
 
                     {
-                        data?.length > 0 && (
+                        data && data.length > 0 && (
                             <Grid container item rowSpacing={2} sx={{mt: "5px", p: "15px"}}>
                                 <Grid item xs={12}>
                                     <Typography variant={"subtitle1"} sx={{display: "flex", alignItems: "center"}}>
@@ -798,7 +798,7 @@ export default function StoreActionsMain({userId, storeId}) {
                             }
 
                             {
-                                data?.length > 0
+                                data && data.length > 0
                                     ? (
                                         <Table sx={{width: "100%", mt: "20px"}} size={"small"}>
                                             <TableHeader/>

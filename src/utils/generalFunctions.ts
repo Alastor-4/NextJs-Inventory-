@@ -1,1 +1,1 @@
-export const numberFormat = (number: string) => (Math.round(parseFloat(number.toString()) * 100) / 100).toFixed(2)
+export const numberFormat = (number: string) => parseFloat((Math.round(parseFloat(number.toString()) * 100) / 100).toFixed(2))
