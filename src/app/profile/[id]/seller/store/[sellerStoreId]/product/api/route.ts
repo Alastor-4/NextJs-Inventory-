@@ -102,3 +102,40 @@ export async function PATCH(req: Request) {
 
     return new Response('La acción de vender ha fallado', {status: 400})
 }
+
+// Sell store depot any unit quantity (manual option)
+export async function POST(req: Request) {
+    const { storeDepotId, unitsQuantity, unitBuyPrice, totalPrice, paymentMethod } = await req.json()
+
+    const parseUnitsQuantity = parseInt(unitsQuantity)
+    const parseUnitBuyPrice = parseFloat(unitBuyPrice)
+    const parseTotalPrice = parseFloat(totalPrice)
+
+    if (storeDepotId) {
+        const storeDepot = await prisma.store_depots.findUnique({where: {id: parseInt(storeDepotId)}})
+
+        if (storeDepot?.is_active && storeDepot.product_remaining_units && storeDepot.product_remaining_units > parseUnitsQuantity) {
+            const [updatedStoreDepot] = await prisma.$transaction([
+                prisma.store_depots.update({data: {product_remaining_units: {decrement: parseUnitsQuantity}}, where: {id: storeDepot.id}}),
+
+                prisma.products_sell.create(
+                    {
+                        data: {
+                            store_depot_id: storeDepot.id,
+                            units_quantity: parseUnitsQuantity,
+                            // @ts-ignore
+                            unit_buy_price: parseUnitBuyPrice,
+                            // @ts-ignore
+                            total_price: parseTotalPrice,
+                            payment_method: paymentMethod,
+                        }
+                    }
+                )
+            ])
+
+            return NextResponse.json(updatedStoreDepot)
+        }
+    }
+
+    return new Response('La acción de vender ha fallado', {status: 400})
+}

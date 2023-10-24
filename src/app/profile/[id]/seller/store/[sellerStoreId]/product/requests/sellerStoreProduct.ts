@@ -26,6 +26,20 @@ const sellerStoreProduct = {
         return false
     },
 
+    sellStoreDepotManual: async function ({userId, sellerStoreId, storeDepotId, unitsQuantity, unitBuyPrice, totalPrice, paymentMethod}) {
+        try {
+            const response = await apiRequest.post(
+                url(userId, sellerStoreId),
+                {storeDepotId, unitsQuantity, unitBuyPrice, totalPrice, paymentMethod}
+            )
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
 }
 
 export default sellerStoreProduct;

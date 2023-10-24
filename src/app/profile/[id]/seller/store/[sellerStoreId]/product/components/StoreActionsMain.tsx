@@ -6,47 +6,44 @@ import {
     Box, Button,
     Card,
     CardContent,
-    Checkbox, Chip, CircularProgress, Collapse,
-    Divider, Grid,
-    IconButton, Switch,
+    Chip,
+    Collapse,
+    Grid,
+    IconButton,
+    MenuItem,
+    Switch,
     Table,
     TableBody,
     TableCell,
     TableHead,
-    TableRow, TextField,
+    TableRow,
+    TextField,
     Toolbar,
     Typography
 } from "@mui/material";
 import {TableNoData} from "@/components/TableNoData";
 import {
-    AddOutlined,
     ArrowLeft,
+    CancelOutlined,
     ChevronRightOutlined,
-    DeleteOutline,
-    DescriptionOutlined, Done,
-    DoubleArrowOutlined,
+    DescriptionOutlined,
+    Done,
     EditOutlined,
-    Filter1Outlined, Filter4, FilterAlt, FilterAltOutlined,
-    FilterOutlined,
+    FilterAltOutlined,
     KeyboardArrowDown,
     KeyboardArrowRight,
-    KeyboardArrowUp,
     SearchOutlined,
     SellOutlined,
-    ShareOutlined,
     VisibilityOutlined
 } from "@mui/icons-material";
-import Link from "next/link";
-import {useParams, useRouter} from "next/navigation";
-import products from "@/app/profile/[id]/product/requests/products";
+import {useRouter} from "next/navigation";
 import * as Yup from "yup";
-import {Formik, useFormik} from "formik";
-import dayjs from "dayjs";
+import {Formik} from "formik";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import {numberFormat} from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/profile/[id]/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
-import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
+import UpdateValueDialog from "@/components/UpdateValueDialog";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -425,6 +422,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                                                         size={"small"}
                                                                         color={"primary"}
                                                                         variant={"outlined"}
+                                                                        onClick={() => handleOpenSellProduct(row, formik)}
                                                                     >
                                                                         Vender
                                                                     </Button>
@@ -629,6 +627,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
         disponibilidad20Filter: false,
 
         productSell: {
+            maxUnitsQuantity: "1",
             unitsQuantity: "1",
             unitBuyPrice: "",
             totalPrice: "",
@@ -638,14 +637,17 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
 
     const validationSchema = Yup.object({
         productSell: Yup.object({
+            maxUnitsQuantity: Yup.number(),
             unitsQuantity: Yup
                 .number()
-                .min(1, "cantidad mayor que 0"),
+                .required("especifíque cantidad")
+                .min(1, "cantidad mayor que 0")
+                .max(Yup.ref("maxUnitsQuantity"), "cantidad mayor que 0"),
             unitBuyPrice: Yup.number(),
             totalPrice: Yup.number(),
             paymentMethod: Yup.string(),
         })
-    });
+    })
 
     const DepartmentsFilter = ({formik}: any) => {
         const {
@@ -867,73 +869,173 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
         )
     }
 
-    // const ProductSellForm = ({formik}) => {
-    //     async function productsSell() {
-    //         const updatedDepot = await warehouseDepots.updateUnitsDepot(
-    //             {
-    //                 ownerId,
-    //                 warehouseId: warehouseDetails.id,
-    //                 depotId: selected.depots[0].id,
-    //                 productTotalUnits: formik.values.updateTotalUnitsQuantity,
-    //                 productTotalRemainingUnits: formik.values.updateRemainingUnitsQuantity,
-    //             }
-    //         )
-    //
-    //         if (updatedDepot?.data?.id) {
-    //             const newDepots = [...depositByDepartment]
-    //
-    //             for (const departmentItem of depositByDepartment) {
-    //                 const departmentIndex = newDepots.indexOf(departmentItem)
-    //
-    //                 const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.data.id)
-    //                 if (updatedIndex > -1) {
-    //                     newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_units = updatedDepot.data.product_total_units
-    //                     newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units
-    //
-    //                     setDepositByDepartment(newDepots)
-    //
-    //                     break
-    //                 }
-    //             }
-    //
-    //             setDisplayUpdateUnitsForm(false)
-    //         }
-    //     }
-    //
-    //     return (
-    //         <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
-    //             <Grid container item spacing={2}>
-    //                 <Grid item>
-    //                     <TextField
-    //                         name={"unitsQuantity"}
-    //                         label="Cantidad"
-    //                         size={"small"}
-    //                         {...formik.getFieldProps("productSell.unitsQuantity")}
-    //                         error={formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity}
-    //                         helperText={(formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity) && formik.errors.updateTotalUnitsQuantity}
-    //                     />
-    //                 </Grid>
-    //
-    //                 <Grid item>
-    //                     <TextField
-    //                         name={"updateRemainingUnitsQuantity"}
-    //                         label="Unidades restantes"
-    //                         size={"small"}
-    //                         {...formik.getFieldProps("updateRemainingUnitsQuantity")}
-    //                         error={formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity}
-    //                         helperText={(formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity) && formik.errors.updateRemainingUnitsQuantity}
-    //                     />
-    //                 </Grid>
-    //
-    //                 <Grid item>
-    //                     <IconButton color={"primary"} onClick={productsSell}>
-    //                         <Done/>
-    //                     </IconButton>
-    //                 </Grid>
-    //             </Grid>
-    //         </Card>
-    //     )
-    // }
+    const [displayProductSellForm, setDisplayProductSellForm] = React.useState(false)
+    const [selectedProductSellRow, setSelectedProductSellRow] = React.useState(false)
+    function handleOpenSellProduct(row: any, formik: any) {
+        formik.setFieldValue("productSell.maxUnitsQuantity", row.depots[0].store_depots[0].product_remaining_units)
+
+        setSelectedProductSellRow(row)
+        setDisplayProductSellForm(true)
+    }
+
+    const ProductSellForm = ({formik, selectedRow, closeForm}: {formik: any, selectedRow: any, closeForm: any}) => {
+        async function productsSell() {
+            let data = {
+                userId,
+                sellerStoreId: storeId,
+                storeDepotId: selectedRow.depots[0].store_depots[0].id,
+                unitsQuantity: formik.values.productSell.unitsQuantity,
+                unitBuyPrice: selectedRow.depots[0].store_depots[0].sell_price,
+                totalPrice: selectedRow.depots[0].store_depots[0].sell_price * formik.values.productSell.unitsQuantity,
+                paymentMethod: formik.values.productSell.paymentMethod,
+            }
+
+            if (formik.values.productSell.unitBuyPrice && formik.values.productSell.totalPrice) {
+                data.unitBuyPrice = formik.values.productSell.unitBuyPrice
+                data.totalPrice = formik.values.productSell.totalPrice
+            }
+
+            const updatedDepot = await sellerStoreProduct.sellStoreDepotManual(data)
+
+            if (updatedDepot) {
+                const newDepartments = [...allProductsByDepartment]
+                for (const allProductsByDepartmentElement of allProductsByDepartment) {
+                    const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+
+                    const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === selectedRow.depots[0].store_depots[0].id)
+                    if (productIndex > -1) {
+                        newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units = updatedDepot.product_remaining_units
+                    }
+                }
+
+                setAllProductsByDepartment(newDepartments)
+            }
+
+            formik.resetForm()
+            closeForm()
+        }
+
+        const paymentMethods = ["Efectivo CUP", "Transferencia CUP", "Efectivo USD", "Transferencia MLC", "Otro"]
+
+        const [displayEditPrices, setDisplayEditPrices] = React.useState(false)
+
+        function handleCancelEditPrices () {
+            formik.setFieldValue("productSell.unitBuyPrice", "")
+            formik.setFieldValue("productSell.totalPrice", "")
+
+            setDisplayEditPrices(false)
+        }
+
+        return (
+            <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
+                <Grid container item spacing={3}>
+                    <Grid item xs={12}>
+                        <TextField
+                            name={"unitsQuantity"}
+                            label="Cantidad"
+                            size={"small"}
+                            type={"number"}
+                            fullWidth
+                            {...formik.getFieldProps("productSell.unitsQuantity")}
+                            error={formik.errors.productSell?.unitsQuantity && formik.touched.productSell?.unitsQuantity}
+                            helperText={(formik.errors.productSell?.unitsQuantity && formik.touched.productSell?.unitsQuantity) && formik.errors.productSell.unitsQuantity}
+                        />
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <TextField
+                            name={"paymentMethod"}
+                            label="Método de pago"
+                            size={"small"}
+                            fullWidth
+                            select
+                            {...formik.getFieldProps("productSell.paymentMethod")}
+                            error={formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod}
+                            helperText={(formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod) && formik.errors.productSell.paymentMethod}
+                        >
+                            {
+                                paymentMethods.map(item => (<MenuItem value={item} key={item}>{item}</MenuItem>))
+                            }
+                        </TextField>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Card variant={"outlined"} sx={{padding: "8px"}}>
+                            <Grid container columnSpacing={2}>
+                                {
+                                    displayEditPrices
+                                        ? (
+                                            <>
+                                                <Grid container item xs={8} rowSpacing={2}>
+                                                    <Grid item xs={12}>
+                                                        <TextField
+                                                            name={"unitBuyPrice"}
+                                                            label="Precio por unidad"
+                                                            size={"small"}
+                                                            fullWidth
+                                                            {...formik.getFieldProps("productSell.unitBuyPrice")}
+                                                            error={formik.errors.productSell?.unitBuyPrice && formik.touched.productSell?.unitBuyPrice}
+                                                            helperText={(formik.errors.productSell?.unitBuyPrice && formik.touched.productSell?.unitBuyPrice) && formik.errors.productSell.unitBuyPrice}
+                                                        />
+                                                    </Grid>
+
+                                                    <Grid item xs={12}>
+                                                        <TextField
+                                                            name={"totalPrice"}
+                                                            label="Precio total"
+                                                            size={"small"}
+                                                            fullWidth
+                                                            {...formik.getFieldProps("productSell.totalPrice")}
+                                                            error={formik.errors.productSell?.totalPrice && formik.touched.productSell?.totalPrice}
+                                                            helperText={(formik.errors.productSell?.totalPrice && formik.touched.productSell?.totalPrice) && formik.errors.productSell.totalPrice}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+
+                                                <Grid container item xs={4} justifyContent={"center"} alignItems={"center"}>
+                                                    <IconButton onClick={handleCancelEditPrices}>
+                                                        <CancelOutlined/>
+                                                    </IconButton>
+                                                </Grid>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Grid container item xs={8} rowSpacing={2}>
+                                                    <Grid item xs={12}>
+                                                        Precio por unidad: {selectedRow.depots[0].store_depots[0].sell_price + " " + selectedRow.depots[0].store_depots[0].sell_price_unit}
+                                                    </Grid>
+
+                                                    <Grid item xs={12}>
+                                                        Precio total: {
+                                                        !formik.errors.productSell?.unitsQuantity
+                                                            ? numberFormat(String(formik.values.productSell.unitsQuantity * selectedRow.depots[0].store_depots[0].sell_price)) + " " + selectedRow.depots[0].store_depots[0].sell_price_unit
+                                                            : "-"
+                                                    }
+                                                    </Grid>
+                                                </Grid>
+
+                                                <Grid container item xs={4} justifyContent={"center"} alignItems={"center"}>
+                                                    <IconButton onClick={() => setDisplayEditPrices(true)}>
+                                                        <EditOutlined/>
+                                                    </IconButton>
+                                                </Grid>
+                                            </>
+                                        )
+                                }
+
+                            </Grid>
+                        </Card>
+                    </Grid>
+
+                    <Grid container item justifyContent={"flex-end"}>
+                        <IconButton color={"primary"} disabled={!!formik.errors.productSell} onClick={productsSell}>
+                            <Done/>
+                        </IconButton>
+                    </Grid>
+                </Grid>
+            </Card>
+        )
+    }
 
 
     return (
@@ -953,6 +1055,18 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                             setOpen={setOpenImagesDialog}
                             images={dialogImages}
                         />
+
+                        <UpdateValueDialog
+                            dialogTitle={"Vender producto"}
+                            open={displayProductSellForm}
+                            setOpen={setDisplayProductSellForm}
+                        >
+                            <ProductSellForm
+                                formik={formik}
+                                selectedRow={selectedProductSellRow}
+                                closeForm={() => setDisplayProductSellForm(false)}
+                            />
+                        </UpdateValueDialog>
 
                         <CustomToolbar/>
 
