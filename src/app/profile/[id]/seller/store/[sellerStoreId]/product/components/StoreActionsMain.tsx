@@ -130,11 +130,6 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                 align: "left"
             },
             {
-                id: "characteristics",
-                label: "Características",
-                align: "left"
-            },
-            {
                 id: "price",
                 label: "Precio",
                 align: "left"
@@ -305,37 +300,6 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                         </TableCell>
                                         <TableCell>
                                             {row?.departments?.name ?? "-"}
-                                        </TableCell>
-                                        <TableCell>
-                                            {row.characteristics.length > 0
-                                                ? row.characteristics.map((item: any) => (
-                                                        <Grid
-                                                            key={item.id}
-                                                            sx={{
-                                                                display: "inline-flex",
-                                                                margin: "3px",
-                                                                backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                                padding: "2px 4px",
-                                                                borderRadius: "5px 2px 2px 2px",
-                                                                border: "1px solid rgba(130, 130, 130)",
-                                                                fontSize: 14,
-                                                            }}
-                                                        >
-                                                            <Grid container item alignItems={"center"}
-                                                                  sx={{marginRight: "3px"}}>
-                                                                <Typography variant={"caption"}
-                                                                            sx={{color: "white", fontWeight: "600"}}>
-                                                                    {item.name.toUpperCase()}
-                                                                </Typography>
-                                                            </Grid>
-                                                            <Grid container item alignItems={"center"}
-                                                                  sx={{color: "rgba(16,27,44,0.8)"}}>
-                                                                {item.value}
-                                                            </Grid>
-                                                        </Grid>
-                                                    )
-                                                ) : "-"
-                                            }
                                         </TableCell>
                                         <TableCell>
                                             <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice}/>
@@ -642,7 +606,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                 .number()
                 .required("especifíque cantidad")
                 .min(1, "cantidad mayor que 0")
-                .max(Yup.ref("maxUnitsQuantity"), "cantidad mayor que 0"),
+                .max(Yup.ref("maxUnitsQuantity"), "cantidad superior a la cantidad disponible"),
             unitBuyPrice: Yup.number(),
             totalPrice: Yup.number(),
             paymentMethod: Yup.string(),
@@ -869,8 +833,8 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
         )
     }
 
-    const [displayProductSellForm, setDisplayProductSellForm] = React.useState(false)
-    const [selectedProductSellRow, setSelectedProductSellRow] = React.useState(false)
+    const [displayProductSellForm, setDisplayProductSellForm] = React.useState<boolean>(false)
+    const [selectedProductSellRow, setSelectedProductSellRow] = React.useState<any>(null)
     function handleOpenSellProduct(row: any, formik: any) {
         formik.setFieldValue("productSell.maxUnitsQuantity", row.depots[0].store_depots[0].product_remaining_units)
 
@@ -1057,7 +1021,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                         />
 
                         <UpdateValueDialog
-                            dialogTitle={"Vender producto"}
+                            dialogTitle={`Vender producto "${selectedProductSellRow?.name ?? ''}"`}
                             open={displayProductSellForm}
                             setOpen={setDisplayProductSellForm}
                         >
