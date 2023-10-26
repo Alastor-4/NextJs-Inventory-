@@ -2,7 +2,7 @@ import {NextResponse} from 'next/server'
 import {prisma} from "db";
 
 // Get all warehouse depots
-export async function GET(request: Request, {params}: { params: { id: string } }, res) {
+export async function GET(request: Request, {params}: { params: { id: string } }) {
     const {searchParams} = new URL(request.url)
 
     const warehouseId = searchParams.get("warehouseId")
@@ -20,11 +20,11 @@ export async function GET(request: Request, {params}: { params: { id: string } }
         return NextResponse.json(warehouseDepots)
     }
 
-    return res.status(500).json({message: "La acción de obtener los depósitos ha fallado"})
+    return new Response('La acción de obtener los depósitos ha fallado', {status: 500})
 }
 
 // Create new user store
-export async function POST(req, res) {
+export async function POST(req: Request) {
     const {ownerId, name, description, slogan, address, sellerUserId} = await req.json()
 
     const newStore = await prisma.stores.create({
@@ -42,7 +42,7 @@ export async function POST(req, res) {
 }
 
 // Update user store
-export async function PUT(req, res) {
+export async function PUT(req: Request) {
     const {storeId, name, description, slogan, address, sellerUserId} = await req.json()
 
     const updatedStore = await prisma.stores.update({
@@ -59,7 +59,7 @@ export async function PUT(req, res) {
 }
 
 // Delete user store
-export async function DELETE(req, res) {
+export async function DELETE(req: Request) {
     const {searchParams} = new URL(req.url)
     const storeId = searchParams.get("storeId")
 
@@ -69,5 +69,5 @@ export async function DELETE(req, res) {
         return NextResponse.json(deletedStore)
     }
 
-    return res.status(500).json({message: "La acción de eliminar ha fallado"})
+    return new Response('La acción de eliminar ha fallado', {status: 500})
 }

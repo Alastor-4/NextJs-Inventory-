@@ -1,3 +1,4 @@
+// @ts-nocheck
 import apiRequest from "@/api"
 
 const url = "/role/api"

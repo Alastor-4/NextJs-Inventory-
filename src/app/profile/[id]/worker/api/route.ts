@@ -19,7 +19,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // Change owner's user role
-export async function PATCH(req, res) {
+export async function PATCH(req: Request) {
     const {searchParams} = new URL(req.url)
     const userId = searchParams.get("userId")
     const {roleId} = await req.json()
@@ -34,7 +34,7 @@ export async function PATCH(req, res) {
 }
 
 // Delete owner's user
-export async function DELETE(req, res) {
+export async function DELETE(req: Request) {
     const {searchParams} = new URL(req.url)
     const userId = searchParams.get("userId")
 
@@ -44,5 +44,5 @@ export async function DELETE(req, res) {
         return NextResponse.json(updatedUser)
     }
 
-    return res.status(500).json({message: "La acción de eliminar trabajador ha fallado"})
+    return new Response('La acción de eliminar trabajador ha fallado', {status: 500})
 }

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
 // Get role details
-export async function GET(req, res) {
+export async function GET(req: Request) {
     const {searchParams} = new URL(req.url)
     const roleId = searchParams.get("roleId")
 
@@ -12,5 +12,5 @@ export async function GET(req, res) {
         return NextResponse.json(role)
     }
 
-    return res.status(500).json({message: "La acción de modificar ha fallado"})
+    return new Response('La acción de modificar ha fallado', {status: 500})
 }

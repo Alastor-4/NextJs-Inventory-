@@ -25,7 +25,7 @@ export async function PUT(request: Request, { params }: { params: { sellerStoreI
     const storeId = parseInt(params.sellerStoreId)
 
     const store = await prisma.stores.findUnique({where: {id: storeId}})
-    const updatedStore = await prisma.stores.update({data: {auto_open_time: !store.auto_open_time}, where: {id: storeId}})
+    const updatedStore = await prisma.stores.update({data: {auto_open_time: !store?.auto_open_time}, where: {id: storeId}})
 
     return NextResponse.json(updatedStore)
 }
@@ -35,7 +35,7 @@ export async function PATCH(request: Request, { params }: { params: { sellerStor
     const storeId = parseInt(params.sellerStoreId)
 
     const store = await prisma.stores.findUnique({where: {id: storeId}})
-    const updatedStore = await prisma.stores.update({data: {auto_reservation_time: !store.auto_reservation_time}, where: {id: storeId}})
+    const updatedStore = await prisma.stores.update({data: {auto_reservation_time: !store?.auto_reservation_time}, where: {id: storeId}})
 
     return NextResponse.json(updatedStore)
 }

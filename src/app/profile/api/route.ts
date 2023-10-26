@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
 // Get all user
-export async function GET(req, res) {
+export async function GET() {
     const users = await prisma.users.findMany({include: {roles: true}})
 
     return NextResponse.json(users)
 }
 
 // Verify user
-export async function PUT(req, res) {
+export async function PUT(req: Request) {
     const {searchParams} = new URL(req.url)
     const userId = searchParams.get("userId")
 
@@ -23,7 +23,7 @@ export async function PUT(req, res) {
 }
 
 // activate/deactivate user
-export async function PATCH(req, res) {
+export async function PATCH(req: Request) {
     const {searchParams} = new URL(req.url)
     const userId = searchParams.get("userId")
     const {isActive} = await req.json()
@@ -38,7 +38,7 @@ export async function PATCH(req, res) {
 }
 
 // Delete user
-export async function DELETE(req, res) {
+export async function DELETE(req: Request) {
     const {searchParams} = new URL(req.url)
     const userId = searchParams.get("userId")
 
