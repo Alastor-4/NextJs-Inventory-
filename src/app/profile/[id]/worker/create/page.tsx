@@ -1,6 +1,6 @@
 import WorkersForm from "@/app/profile/[id]/worker/components/WorkersForm";
 
-export default async function Page({params}: {params: {id: string}}) {
+export default async function Page({params}) {
     const ownerId = params.id
 
     return (

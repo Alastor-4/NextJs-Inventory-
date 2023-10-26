@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {Box} from "@mui/material";
 import {InfoOutlined} from "@mui/icons-material";
 

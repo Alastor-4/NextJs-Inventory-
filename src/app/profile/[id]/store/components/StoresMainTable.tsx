@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client"
 
 import React from "react";
@@ -41,7 +40,7 @@ export default function StoresMainTable() {
     //get initial data
     React.useEffect(() => {
         fetcher(`/profile/${params.id}/store/api`).then((data) => setData(data))
-    }, [params.id])
+    }, [])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)

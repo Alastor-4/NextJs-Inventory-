@@ -3,7 +3,7 @@ import {prisma} from "db";
 import dayjs from "dayjs";
 
 // Get today store product sells
-export async function GET(req: Request, { params }: { params: { id: string, sellerStoreId: string } }) {
+export async function GET(request: Request, { params }: { params: { id: string, sellerStoreId: string } }) {
     const storeId = parseInt(params.sellerStoreId)
 
     const todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
@@ -26,3 +26,5 @@ export async function GET(req: Request, { params }: { params: { id: string, sell
 
     return NextResponse.json(store)
 }
+
+

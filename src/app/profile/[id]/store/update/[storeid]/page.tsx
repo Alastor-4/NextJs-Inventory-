@@ -2,7 +2,7 @@ import StoresForm from "@/app/profile/[id]/store/components/StoresForm";
 import {prisma} from "db";
 
 
-export default async function Page({params}: {params: {id: string, storeid: string}}) {
+export default async function Page({params}) {
     const userId = params.id;
     const storeId = params.storeid;
 

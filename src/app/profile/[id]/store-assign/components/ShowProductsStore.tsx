@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client"
 
 import React, { useEffect, useState } from 'react'
@@ -50,6 +49,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
     }, [storeId])
 
     useEffect(() => {
+
         const Datos = async () => {
             const result = await storeAssign.allProductsbyDepartmentStore(params.id, storeId)
             setAllProductStore(() => result.map(data => ({
@@ -61,7 +61,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
         if (allProductStore === null) {
             Datos()
         }
-    }, [allProductStore, params.id, setAllProductStore, storeId])
+    }, [allProductStore, setAllProductStore])
 
 
     useEffect(() => {
@@ -99,7 +99,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
             setData(allProducts)
         }
 
-    }, [allProductStore, productsInputValue])
+    }, [allProductStore])
 
 
     async function handleSelectFilter(index: number) {

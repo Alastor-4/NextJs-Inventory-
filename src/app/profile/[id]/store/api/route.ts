@@ -11,7 +11,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // Create new user store
-export async function POST(req: Request) {
+export async function POST(req, res) {
     const { ownerId, name, description, slogan, address, sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity, online_catalog, online_reservation } = await req.json()
 
     const newStore = await prisma.stores.create({ data: { owner_id: ownerId, name, description, slogan, address, seller_user_id: sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity, online_catalog, online_reservation } })
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 }
 
 // Update user store
-export async function PUT(req: Request) {
+export async function PUT(req, res) {
     const { storeId, name, description, slogan, address, sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity, online_catalog, online_reservation } = await req.json()
 
     const updatedStore = await prisma.stores.update({ data: { name, description, slogan, address, seller_user_id: sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity, online_catalog, online_reservation }, where: { id: storeId } })
@@ -29,7 +29,7 @@ export async function PUT(req: Request) {
 }
 
 // Delete user store
-export async function DELETE(req: Request) {
+export async function DELETE(req, res) {
     const { searchParams } = new URL(req.url)
     const storeId = searchParams.get("storeId")
 
@@ -39,5 +39,5 @@ export async function DELETE(req: Request) {
         return NextResponse.json(deletedStore)
     }
 
-    return new Response('La acción de eliminar ha fallado', {status: 500})
+    return res.status(500).json({ message: "La acción de eliminar ha fallado" })
 }

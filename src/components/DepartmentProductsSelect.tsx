@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
     Button,
     Card,
@@ -18,7 +17,7 @@ import {Formik} from "formik";
 import {TableNoData} from "@/components/TableNoData";
 
 export default function DepartmentProductsSelect(
-    {departmentProductsList, setDepartmentProductsList, selectedProduct, setSelectedProduct}: any
+    {departmentProductsList, setDepartmentProductsList, selectedProduct, setSelectedProduct}
 ) {
     const [data, setData] = React.useState([])
 

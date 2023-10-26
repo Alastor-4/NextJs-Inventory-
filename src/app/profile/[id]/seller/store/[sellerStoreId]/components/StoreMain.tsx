@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client"
 
 import React from "react";
@@ -25,9 +24,8 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/sellerStore";
+import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/stores";
 import Link from "next/link";
-import {numberFormat} from "@/utils/generalFunctions";
 
 dayjs.extend(isBetween)
 
@@ -65,7 +63,7 @@ export default function StoreMain() {
                     depotsRemainingUnitsTotal += item.product_remaining_units
                     if (!item.product_remaining_units) depotsNotRemainingUnitsTotal++
                     if (!item.is_active) depotsNotActiveTotal++
-                    if (item.sell_price.toString() === "0") depotsWithoutPriceTotal++
+                    if (!item.sell_price) depotsWithoutPriceTotal++
                     if (item.price_discount_percentage || item.price_discount_quantity) depotsWithDiscountTotal++
                 })
 
@@ -400,7 +398,7 @@ export default function StoreMain() {
                                         Total vendido:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        $ {numberFormat(productSellsStats.sellsAmountTotal)}
+                                        $ {productSellsStats.sellsAmountTotal}
                                     </Grid>
                                 </Grid>
 
@@ -410,7 +408,7 @@ export default function StoreMain() {
                                         Desglose:
                                     </Grid>
                                     <Grid item xs={true}>
-                                        $ {numberFormat(productSellsStats.sellsAmountTotal - productSellsStats.sellerProfitTotal)} del dueño | $ {numberFormat(productSellsStats.sellerProfitTotal)} del vendedor
+                                        $ {productSellsStats.sellsAmountTotal - productSellsStats.sellerProfitTotal} del dueño | $ {productSellsStats.sellerProfitTotal} del vendedor
                                     </Grid>
                                 </Grid>
                             </Grid>

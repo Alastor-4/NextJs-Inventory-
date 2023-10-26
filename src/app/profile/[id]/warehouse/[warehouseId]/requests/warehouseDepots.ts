@@ -1,4 +1,3 @@
-// @ts-nocheck
 import apiRequest from "@/api"
 
 const url = (ownerId: string, warehouseId: string) => `/profile/${ownerId}/warehouse/${warehouseId}/api`

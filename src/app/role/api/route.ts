@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
 // Get all user roles
-export async function GET() {
+export async function GET(req, res) {
     const roles = await prisma.roles.findMany()
 
     return NextResponse.json(roles)
 }
 
 // Create new user roles
-export async function POST(req: Request) {
+export async function POST(req, res) {
     const {name, description} = await req.json()
 
     const newRole = await prisma.roles.create({data: {name, description}})
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 }
 
 // Update user role
-export async function PUT(req: Request) {
+export async function PUT(req, res) {
     const {roleId, name, description} = await req.json()
 
     const updatedRole = await prisma.roles.update({data: {name, description}, where: {id: roleId}})
@@ -27,7 +27,7 @@ export async function PUT(req: Request) {
 }
 
 // Delete user role
-export async function DELETE(req: Request) {
+export async function DELETE(req, res) {
     const {searchParams} = new URL(req.url)
     const roleId = searchParams.get("roleId")
 
@@ -37,5 +37,5 @@ export async function DELETE(req: Request) {
         return NextResponse.json(deletedRole)
     }
 
-    return new Response('La acción de eliminar ha fallado', {status: 500})
+    return res.status(500).json({message: "La acción de eliminar ha fallado"})
 }

@@ -2,7 +2,7 @@ import {NextResponse} from 'next/server'
 import {prisma} from "db";
 
 // Get all products without depots in warehouse
-export async function GET(req: Request, {params}: { params: { id: string, warehouseId: string } }) {
+export async function GET(request: Request, {params}: { params: { id: string, warehouseId: string } }) {
     const ownerId = params.id
     const warehouseId = params.warehouseId
 

@@ -3,7 +3,7 @@ import {prisma} from "db";
 
 const getData = () => prisma.departments.findMany()
 
-export default async function Page({params}: {params: {id: string}}) {
+export default async function Page({params}) {
     const userId = params.id
     const departments = await getData()
 

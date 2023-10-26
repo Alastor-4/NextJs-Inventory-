@@ -13,19 +13,19 @@ export default function Home() {
                 <Grid container item xs={12}>
                     <Grid item xs={3}>
                         <Link href={"/role"}>
-                            Roles{' -->>'}
+                            Roles{' '}-->>
                         </Link>
                     </Grid>
 
                     <Grid item xs={3}>
                         <Link href={"/user"}>
-                            Users{' -->>'}
+                            Users{' '}-->>
                         </Link>
                     </Grid>
 
                     <Grid item xs={3}>
                         <Link href={"/warehouse"}>
-                            Warehouses{' -->>'}
+                            Warehouses{' '}-->>
                         </Link>
                     </Grid>
 
@@ -36,7 +36,7 @@ export default function Home() {
                             rel="noopener noreferrer"
                         >
                             <h2>
-                                Deploy{' -->>'}
+                                Deploy{' '}-->>
                             </h2>
                             <p>
                                 Instantly deploy your Next.js site.

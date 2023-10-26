@@ -1,4 +1,3 @@
-// @ts-nocheck
 import apiRequest from "@/api"
 
 const url = "/user/api"

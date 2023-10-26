@@ -20,32 +20,27 @@ export async function GET(request: Request, { params }: { params: { id: string }
     return NextResponse.json(departments)
 }
 
-declare type Data = any
 // Create new user product
-export async function POST(req: Request) {
+export async function POST(req: Request, res) {
     const {userId, name, description, departmentId, buyPrice, characteristics, images} = await req.json()
 
-    let createObj = {
-        data: {
+    let createObj = {data: {
             owner_id: userId ? parseInt(userId) : null,
             name,
             description: description ? description : null,
             department_id: departmentId ? parseInt(departmentId) : null,
             buy_price: buyPrice ? parseFloat(buyPrice) : null,
-        }
-    }
+        }}
 
     if (characteristics) {
-        // @ts-ignore
         createObj.data.characteristics = {createMany: {data: characteristics}}
-        // @ts-ignore
+
         createObj.include = {characteristics: true}
     }
 
     if (images) {
-        // @ts-ignore
         createObj.data.images = {createMany: {data: images}}
-        // @ts-ignore
+
         createObj.include = createObj.include ? { ...createObj.include, images: true} : { images: true }
     }
 
@@ -55,7 +50,7 @@ export async function POST(req: Request) {
 }
 
 // Update user product
-export async function PUT(req: Request) {
+export async function PUT(req, res) {
     const {
         id,
         name,
@@ -80,16 +75,16 @@ export async function PUT(req: Request) {
     }
 
     if (deletedImages) {
-        await utapi.deleteFiles(deletedImages.map((item: { fileKey: string }) => item.fileKey))
-        await prisma.images.deleteMany({where: {id: {in: deletedImages.map((item: { id: number }) => item.id)}}})
+        await utapi.deleteFiles(deletedImages.map(item => item.fileKey))
+        await prisma.images.deleteMany({where: {id: {in: deletedImages.map(item => item.id)}}})
     }
 
     if (characteristics) {
-        await prisma.characteristics.createMany({data: characteristics.map((item: any) => ({...item, product_id: id}))})
+        await prisma.characteristics.createMany({data: characteristics.map(item => ({...item, product_id: id}))})
     }
 
     if (images) {
-        await prisma.images.createMany({data: images.map((item: any) => ({...item, product_id: id}))})
+        await prisma.images.createMany({data: images.map(item => ({...item, product_id: id}))})
     }
 
     const updatedProduct = await prisma.products.update(
@@ -101,8 +96,8 @@ export async function PUT(req: Request) {
 }
 
 // Insert metadata from already uploaded images to a user product
-export async function PATCH(req: Request) {
-    const {productId, name, description, departmentId, buyPrice} = await req.json()
+export async function PATCH(req, res) {
+    const {productId, addProductImages, deleteProductImages} = await req.json()
     //sync product images
     const updatedProduct = await prisma.products.update({data: {name, description, department_id: parseInt(departmentId), buy_price: parseFloat(buyPrice)}, where: {id: parseInt(productId)}})
 
@@ -110,7 +105,7 @@ export async function PATCH(req: Request) {
 }
 
 // Delete user role
-export async function DELETE(req: Request) {
+export async function DELETE(req, res) {
     const {searchParams} = new URL(req.url)
     const productId = searchParams.get("productId")
 
@@ -120,5 +115,5 @@ export async function DELETE(req: Request) {
         return NextResponse.json(deletedProduct)
     }
 
-    return new Response('La acción de eliminar ha fallado', {status: 500})
+    return res.status(500).json({message: "La acción de eliminar ha fallado"})
 }

@@ -28,7 +28,7 @@ export async function GET(request: Request, {params}: { params: { id: string } }
 }
 
 // Send depot units from warehouse to store
-export async function PUT(req: Request) {
+export async function PUT(req, res) {
     const {ownerId, depotId, storeDepotId, storeId, moveUnitQuantity} = await req.json()
 
     try {
@@ -38,7 +38,7 @@ export async function PUT(req: Request) {
         if (ownerId && depotId) {
             const depot = await prisma.depots.findUnique({where: {id: parseInt(depotId)}})
 
-            if (depot?.product_total_remaining_units && (parseInt(moveUnitQuantity) <= depot.product_total_remaining_units)) {
+            if (parseInt(moveUnitQuantity) <= depot.product_total_remaining_units) {
                 updatedDepot = await prisma.depots.update(
                     {
                         data: {product_total_remaining_units: {decrement: parseInt(moveUnitQuantity)}},
@@ -67,14 +67,11 @@ export async function PUT(req: Request) {
                         product_remaining_units: moveUnitQuantity,
                     }
 
-                    if (parentStore?.fixed_seller_profit_percentage) {
-                        // @ts-ignore
+                    if (parentStore.seller_profit_percentage)
                         data.seller_profit_percentage = parentStore.fixed_seller_profit_percentage
-                    }
-                    if (parentStore?.fixed_seller_profit_quantity) {
-                        // @ts-ignore
+
+                    if (parentStore.seller_profit_quantity)
                         data.seller_profit_quantity = parentStore.fixed_seller_profit_quantity
-                    }
 
                     updatedStoreDepot = await prisma.store_depots.create({data: data})
                 }
@@ -92,14 +89,14 @@ export async function PUT(req: Request) {
 }
 
 // Send depot units from store to warehouse
-export async function PATCH(req: Request) {
+export async function PATCH(req, res) {
     const {ownerId, depotId, storeDepotId, moveUnitQuantity} = await req.json()
 
     try {
         if (ownerId && depotId && storeDepotId) {
             const storeDepot = await prisma.store_depots.findUnique({where: {id: parseInt(storeDepotId)}})
 
-            if (storeDepot?.product_remaining_units && (parseInt(moveUnitQuantity) <= storeDepot.product_remaining_units)) {
+            if (parseInt(moveUnitQuantity) <= storeDepot.product_remaining_units) {
                 const updatedStoreDepot = await prisma.store_depots.update(
                     {
                         data: {product_remaining_units: {decrement: parseInt(moveUnitQuantity)}},

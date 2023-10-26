@@ -1,12 +1,10 @@
-// @ts-nocheck
-
 import {prisma} from "db";
 import UserProfileMain from "@/app/profile/components/UserProfileMain";
 
-export default async function Page({params}: {params: {id: number}}) {
+export default async function Page({params}) {
     const userId = parseInt(params.id)
     const userDetails = await prisma.users.findUnique({where: {id: userId}, include: {roles: true}})
-    const userRole = userDetails?.roles?.name ?? "user"
+    const userRole = userDetails.roles?.name ?? "user"
 
     let ownerWarehouses = null
     let ownerStores = null

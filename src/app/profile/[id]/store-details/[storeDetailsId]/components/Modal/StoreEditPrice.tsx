@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client"
 import { Button, Card, Grid, MenuItem, Switch, TextField, Typography } from '@mui/material'
 import { Formik } from 'formik'
@@ -16,7 +15,7 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
         if (storeDepot.price_discount_quantity || storeDepot.price_discount_percentage) {
             setActiveDiscount(true)
         }
-    }, [setActiveDiscount, storeDepot.price_discount_percentage, storeDepot.price_discount_quantity])
+    }, [setActiveDiscount])
 
     useEffect( () => {
         setActivePercentage( storeDepot.price_discount_percentage ? true : false ) 
@@ -96,6 +95,7 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
             setActiveModalPrice({ active: false, storeDepot: [] })
             loadDates();
         }
+
     }
 
     const Original = (formik) => (

@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client"
 
 import React from "react";
@@ -12,6 +11,7 @@ import {
     Divider, Fade, Grid,
     IconButton,
     Modal,
+    Switch,
     Tab,
     Table,
     TableBody,
@@ -23,7 +23,7 @@ import {
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined } from "@mui/icons-material";
+import { AddOutlined, ArrowLeft, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined } from "@mui/icons-material";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { Formik } from "formik";
@@ -41,12 +41,12 @@ export default function StoreMainTable() {
 
     const [data, setData] = React.useState(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
-    const [storeName, setStoreName] = React.useState('')
+    const [dataStore, setDataStore] = React.useState('')
 
     const [showDetails, setShowDetails] = React.useState('')
     const [activeModalPrice, setActiveModalPrice] = React.useState({ active: false, storeDepot: [] })
-    //const [isActive, setIsActive] = React.useState()
-    
+    //const [productActive, setProductActive] = React.useState(null)
+
 
     //ToDo: use global isLoading
     const isLoading = false
@@ -87,19 +87,42 @@ export default function StoreMainTable() {
 
     //Get Store name
     React.useEffect(() => {
-        const dataStore = async () => {
-            const newStoreName = await stores.storeDetails(params.id, params.storeDetailsId);
-            setStoreName(newStoreName.name);
+        const getDataStore = async () => {
+            const newdataStore = await stores.storeDetails(params.id, params.storeDetailsId);
+            setDataStore(newdataStore);
         }
-        if (storeName === '') {
-            dataStore()
+        if (dataStore === '') {
+            getDataStore()
         }
 
-    }, [storeName, setStoreName, params.id, params.storeDetailsId])
+    }, [dataStore, setDataStore])
 
     function handleNavigateBack() {
         router.back()
     }
+    // active - noActive
+    const updateProductActive = async (product) => {
+        const data = {
+            id: product.id,
+            store_id: product.store_id,
+            depot_id: product.depot_id,
+            product_units: product.product_units,
+            product_remaining_units: product.product_remaining_units,
+            seller_profit_percentage: product.seller_profit_percentage,
+            is_active: !product.is_active,
+            offer_notes: product.offer_notes,
+            sell_price: product.sell_price,
+            sell_price_unit: product.sell_price_unit,
+            seller_profit_quantity: product.seller_profit_quantity,
+            price_discount_percentage: product.price_discount_percentage,
+            price_discount_quantity: product.price_discount_quantity,
+        }
+        const response = await storeDetails.update(params.id, product.id, data)
+        if (response === 200) {
+            loadDates();
+        }
+    }
+
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -117,7 +140,7 @@ export default function StoreMainTable() {
                             color: "white",
                         }}
                     >
-                        {storeName}
+                        {dataStore.name}
                     </Typography>
                 </Box>
 
@@ -127,11 +150,11 @@ export default function StoreMainTable() {
                             ? <CircularProgress size={24} color={"inherit"} />
                             : (
                                 <>
-                                    <Link href={`/profile/${params.id}/product/create`}>
-                                        <IconButton color={"inherit"}>
-                                            <AddOutlined />
-                                        </IconButton>
-                                    </Link>
+
+                                    <IconButton color={"inherit"} onClick={() => router.push(`/profile/${params.id}/store-assign?storeId=${dataStore.id}`)} >
+                                        <ShareOutlined fontSize={"small"} />
+                                    </IconButton>
+
                                 </>
                             )
                     }
@@ -160,6 +183,11 @@ export default function StoreMainTable() {
             {
                 id: "units",
                 label: "Unidades",
+                align: "left"
+            },
+            {
+                id: "Active",
+                label: "Disponible",
                 align: "left"
             },
             {
@@ -194,14 +222,22 @@ export default function StoreMainTable() {
         let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
 
         return <>
-            <Typography
-                display={"inline"}
-                color={price !== priceProductStore ? "forestgreen" : "black"}
-            >{`${price} ${currency}`}</Typography>
+            <Typography display={"inline"} >
+                {`${price} `}
+                <small>{` ${currency}  `}</small>
+                <small>
+                    {pricePorcentage || discountQuantity
+                        ? <s>{`  ${priceProductStore} ${currency}  `}</s>
+                        : ""
+                    }
+
+                </small>
+
+            </Typography>
 
         </>
     }
-    //limegreen
+
     const loadDates = async () => {
         let newAllProductsbyDepartment = await storeDetails.getAllProductsByDepartament(params.id, params.storeDetailsId);
 
@@ -213,7 +249,6 @@ export default function StoreMainTable() {
         }))
         setAllProductsByDepartment(newAllProductsbyDepartment);
     }
-    const changeBackground = (color) => (color) ? 'limegreen' : "rgb(220,20,60)"
 
     const TableContent = ({ formik }) => {
         return (
@@ -231,10 +266,6 @@ export default function StoreMainTable() {
 
                                             <div>
                                                 <Grid item container >
-                                                    <Grid item alignSelf={"flex-end"}>
-                                                        <Box width={8} height={8} borderRadius={"100%"} sx={{ backgroundColor: changeBackground(row.depots[0].store_depots[0].is_active), marginBottom: '4px', marginRight: "2px" }}  ></Box>
-                                                    </Grid>
-
                                                     <Grid>
                                                         {row.name}
                                                     </Grid>
@@ -271,8 +302,38 @@ export default function StoreMainTable() {
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>
-                                            {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
+                                            <Grid container columnSpacing={1}>
+
+                                                <Grid item>
+                                                    {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
+                                                </Grid>
+
+                                                <Grid item>
+                                                    <IconButton sx={{ padding: 0 }} size="small" color="primary"
+                                                        onClick={() => setActiveModalPrice({ active: true, storeDepot: row.depots[0].store_depots[0] })}>
+                                                        <AddOutlined fontSize="small" />
+                                                    </IconButton>
+                                                </Grid>
+
+                                                <Grid item>
+                                                    <IconButton sx={{ padding: 0 }} size="small" color="primary"
+                                                        onClick={() => setActiveModalPrice({ active: true, storeDepot: row.depots[0].store_depots[0] })}>
+                                                        <EditOutlined fontSize="small" />
+                                                    </IconButton>
+                                                </Grid>
+
+                                            </Grid>
                                         </TableCell>
+
+                                        <TableCell>
+                                            <Switch
+                                                size='small'
+                                                checked={row.depots[0].store_depots[0].is_active}
+                                                color={'success'}
+                                                onChange={() => updateProductActive(row.depots[0].store_depots[0])}
+                                            />
+                                        </TableCell>
+
                                         <TableCell style={{ padding: 0 }} colSpan={5}>
                                             <Tooltip title={"Details"}>
                                                 <IconButton

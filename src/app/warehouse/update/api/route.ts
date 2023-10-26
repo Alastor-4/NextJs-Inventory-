@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
 // User details
-export async function GET(req: Request) {
+export async function GET(req, res) {
     const {searchParams} = new URL(req.url)
     const warehouseId = searchParams.get("warehouseId")
 
@@ -16,7 +16,7 @@ export async function GET(req: Request) {
 }
 
 // Change user role
-export async function PATCH(req: Request) {
+export async function PATCH(req, res) {
     const {warehouseId, ownerId, name, description, address} = await req.json()
 
     if (warehouseId) {
