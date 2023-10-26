@@ -261,19 +261,33 @@ model store_collections {
 }
 
 model products_reservation {
-  id                 Int             @id @default(autoincrement())
-  store_depot_id     Int
-  units_quantity     Int
-  payment_method     String?         @db.VarChar(255)
-  created_at         DateTime        @default(now()) @db.Timestamp(0)
-  requesting_user_id Int
-  status             String          @db.VarChar(100)
-  request_delivery   Boolean         @default(false)
-  delivery_notes     String?         @db.Text
-  store_depots       store_depots    @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "products_reservation_depot_FK")
-  users              users           @relation(fields: [requesting_user_id], references: [id], onUpdate: Restrict, map: "products_reservation_user_FK")
-  products_sell      products_sell[]
+  id                   Int                    @id @default(autoincrement())
+  store_depot_id       Int
+  units_quantity       Int
+  payment_method       String?                @db.VarChar(255)
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  requesting_user_id   Int
+  status               String                 @db.VarChar(100)
+  request_delivery     Boolean                @default(false)
+  delivery_notes       String?                @db.Text
+  status_description   String                 @db.Text
+  store_depots         store_depots           @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "products_reservation_depot_FK")
+  users                users                  @relation(fields: [requesting_user_id], references: [id], onUpdate: Restrict, map: "products_reservation_user_FK")
+  products_sell        products_sell[]
+  reservation_messages reservation_messages[]
 
   @@index([requesting_user_id], map: "products_reservation_user_FK")
   @@index([store_depot_id], map: "store_depot_id")
+}
+
+model reservation_messages {
+  id                     Int                  @id @default(autoincrement())
+  sender                 String               @db.VarChar(100)
+  message                String               @db.Text
+  was_read               Boolean?             @default(false)
+  product_reservation_id Int
+  created_at             DateTime?            @default(now()) @db.Timestamp(0)
+  products_reservation   products_reservation @relation(fields: [product_reservation_id], references: [id], onUpdate: Restrict, map: "reservation_messages_FK")
+
+  @@index([product_reservation_id], map: "reservation_messages_FK")
 }
