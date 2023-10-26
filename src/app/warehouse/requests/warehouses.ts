@@ -1,3 +1,4 @@
+// @ts-nocheck
 import apiRequest from "@/api"
 
 const url = "/warehouse/api"

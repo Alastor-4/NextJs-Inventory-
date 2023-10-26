@@ -44,7 +44,7 @@ export async function GET(request: Request, { params }: { params: { id: string, 
 }
 
 // Create warehouse depot
-export async function POST(req, res) {
+export async function POST(req: Request) {
     const {warehouseId, productId, insertedById, productTotalUnits} = await req.json()
 
     const createdDepot = await prisma.depots.create(
@@ -63,7 +63,7 @@ export async function POST(req, res) {
 }
 
 // Add new units to a depot
-export async function PUT(req, res) {
+export async function PUT(req: Request) {
     const {ownerId, depotId, newUnits} = await req.json()
 
     if (ownerId && depotId) {
@@ -81,7 +81,7 @@ export async function PUT(req, res) {
 }
 
 // Update new units to a depot
-export async function PATCH(req, res) {
+export async function PATCH(req: Request) {
     const {ownerId, depotId, productTotalUnits, productTotalRemainingUnits} = await req.json()
 
     if (ownerId && depotId) {
@@ -99,7 +99,7 @@ export async function PATCH(req, res) {
 }
 
 // Delete warehouse depot
-export async function DELETE(req, res) {
+export async function DELETE(req: Request) {
     const {searchParams} = new URL(req.url)
     const depotId = searchParams.get("depotId")
 
@@ -109,5 +109,5 @@ export async function DELETE(req, res) {
         return NextResponse.json(deletedDepot)
     }
 
-    return res.status(500).json({message: "La acción de eliminar depósito ha fallado"})
+    return new Response('La acción de eliminar depósito ha fallado', {status: 500})
 }

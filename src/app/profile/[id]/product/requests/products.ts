@@ -1,5 +1,5 @@
+// @ts-nocheck
 import apiRequest from "@/api"
-import {headers} from "next/headers";
 
 const url = (userId) => `/profile/${userId}/product/api`
 const updateUrl = (userId) => `/profile/${userId}/product/update/api`

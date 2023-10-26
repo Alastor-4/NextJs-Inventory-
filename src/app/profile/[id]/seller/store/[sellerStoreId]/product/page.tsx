@@ -1,6 +1,6 @@
 import StoreActionsMain from "@/app/profile/[id]/seller/store/[sellerStoreId]/product/components/StoreActionsMain"
 
-export default function Page({params}) {
+export default function Page({params}: {params: {id: string, sellerStoreId: string}}) {
     const userId = params.id
     const storeId = params.sellerStoreId
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client"
 
 import {
@@ -22,7 +23,7 @@ import {AddOutlined, Cancel, Close, DeleteOutline, Done} from "@mui/icons-materi
 import {useDropzone} from "react-dropzone";
 import {useUploadThing} from "@/app/api/uploadthing/utils";
 
-export default function ProductsForm(props) {
+export default function ProductsForm(props: any) {
     const {userId, departments} = props
 
     const [updateItem, setUpdateItem] = React.useState()
@@ -34,12 +35,12 @@ export default function ProductsForm(props) {
     const [department, setDepartment] = React.useState("")
     
     React.useEffect(() => {
-        async function fetchProduct(id) {
+        async function fetchProduct(id: string) {
             const product = await products.productDetails(userId, id)
             setUpdateItem(product)
 
             if (product?.departments?.id) {
-                const index = departments.findIndex(item => item.id === product.departments.id)
+                const index = departments.findIndex((item: { id: any; }) => item.id === product.departments.id)
                 if (index > -1) {
                     setDepartment(departments[index])
                 }
