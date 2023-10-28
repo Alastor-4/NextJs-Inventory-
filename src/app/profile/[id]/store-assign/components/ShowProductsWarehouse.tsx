@@ -9,45 +9,47 @@ import { AddOutlined, ExpandLessOutlined, ExpandMoreOutlined, VisibilityOutlined
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 
 
-function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaultQuantity }) {
+function showProductsWarehouse(props: any) {
+
+    const { storeId, warehouseId, defaultPercentage, defaultQuantity } = props
     const params = useParams();
 
-    const [allProductbyWarehouseDepartament, setAllProductbyWarehouseDepartament] = useState(null);
-    const [data, setData] = useState();
+    const [allProductByWarehouseDepartament, setAllProductByWarehouseDepartament] = useState<any>(null);
+    const [data, setData] = useState<any>();
 
-    const [showDetails, setShowDetails] = useState(false)
+    const [showDetails, setShowDetails] = useState<any>(false)
 
     const [openImageDialog, setOpenImageDialog] = useState(false)
     const [dialogImages, setDialogImages] = useState([]);
 
-    useEffect(()=>{
-        setAllProductbyWarehouseDepartament(null)
-    },[storeId, warehouseId])
+    useEffect(() => {
+        setAllProductByWarehouseDepartament(null)
+    }, [storeId, warehouseId])
 
     useEffect(() => {
         const Datos = async () => {
             const result = await storeAssign.allProductbyDepartmentWarehouse(params.id, storeId, warehouseId)
-            setAllProductbyWarehouseDepartament(() => result.map(data => ({
+            setAllProductByWarehouseDepartament(() => result.map((data: Object) => ({
                 ...data,
                 selected: false
             })))
         }
-        if (allProductbyWarehouseDepartament === null) Datos()
+        if (allProductByWarehouseDepartament === null) Datos()
 
-    }, [allProductbyWarehouseDepartament])
+    }, [allProductByWarehouseDepartament, params.id, storeId, warehouseId])
 
     useEffect(() => {
-        if (allProductbyWarehouseDepartament !== null) {
+        if (allProductByWarehouseDepartament !== null) {
 
-            let allProducts = []
+            let allProducts: any = []
 
-            allProductbyWarehouseDepartament.forEach((departmentItem) => {
+            allProductByWarehouseDepartament.forEach((departmentItem:any) => {
                 if (departmentItem.selected) {
                     allProducts = [...allProducts, ...departmentItem.products]
                 }
             })
 
-            allProducts.sort((a, b) => {
+            allProducts.sort((a: any, b: any ) => {
                 if (a.name < b.name)
                     return -1
 
@@ -60,17 +62,17 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
             setData(allProducts)
         }
 
-        
-    }, [allProductbyWarehouseDepartament])
+
+    }, [allProductByWarehouseDepartament])
 
     async function handleSelectFilter(index: number) {
-        let filters = [...allProductbyWarehouseDepartament]
+        let filters = [...allProductByWarehouseDepartament]
         filters[index].selected = !filters[index].selected
 
-        setAllProductbyWarehouseDepartament(filters)
+        setAllProductByWarehouseDepartament(filters)
     }
 
-    const DepartmentsFilter = ({ formik }) => {
+    const DepartmentsFilter = ( { formik  } : { formik: any } ) => {
         return (
             <Card variant={"outlined"} sx={{ padding: "15px" }}>
                 <Grid container rowSpacing={2}>
@@ -81,7 +83,7 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
                     </Grid>
                     <Grid container item columnSpacing={2}>
                         {
-                            allProductbyWarehouseDepartament.map((item, index) => (
+                            allProductByWarehouseDepartament.map((item: any, index: number) => (
                                 <Grid key={item.id} item xs={"auto"}>
                                     <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
                                         <Grid container>
@@ -182,30 +184,30 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
 
     const loadDates = async () => {
         let newAllProductbyDepartmentWarehouse = await storeAssign.allProductbyDepartmentWarehouse(params.id, storeId, warehouseId);
-    
-        let selectedDepartment = allProductbyWarehouseDepartament.filter(element => (element.selected)).map( element => element.id)
-    
-        newAllProductbyDepartmentWarehouse = newAllProductbyDepartmentWarehouse.map(element => ({
-          ...element,
-          selected: (selectedDepartment.includes(element.id))
+
+        let selectedDepartment = allProductByWarehouseDepartament.filter((element: any) => (element.selected)).map((element:any) => element.id)
+
+        newAllProductbyDepartmentWarehouse = newAllProductbyDepartmentWarehouse.map((element:any) => ({
+            ...element,
+            selected: (selectedDepartment.includes(element.id))
         }))
-        setAllProductbyWarehouseDepartament(newAllProductbyDepartmentWarehouse);
-      }
+        setAllProductByWarehouseDepartament(newAllProductbyDepartmentWarehouse);
+    }
 
 
     // Se Agrega a los Depositos de la Tienda y da la orden de eliminar
-    const addStoreDepot = async (row: Object) => {
+    const addStoreDepot = async (row: any) => {
         let productStoreDepot = row.depots[0].store_depots[0]
         let response;
 
-        if( productStoreDepot?.product_units ){
-         
-          productStoreDepot.product_units = 0;
-          productStoreDepot.is_active = true;  
-         
-           response = await storeAssign.UpdateProductStore(params.id, productStoreDepot);
+        if (productStoreDepot?.product_units) {
 
-        }else {
+            productStoreDepot.product_units = 0;
+            productStoreDepot.is_active = true;
+
+            response = await storeAssign.UpdateProductStore(params.id, productStoreDepot);
+
+        } else {
             const datos = {
                 storeId: parseInt(storeId),
                 depotId: parseInt(row.depots[0].id),
@@ -218,9 +220,9 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
                 seller_profit_percentage: defaultPercentage ?? null,
                 seller_profit_quantity: defaultQuantity ?? null,
                 is_active: true,
-                offer_notes:null,
+                offer_notes: null,
             }
-           response = await storeAssign.postProductToStoreDepot(params.id, datos);
+            response = await storeAssign.postProductToStoreDepot(params.id, datos);
         }
 
         if (response === 200) {
@@ -232,42 +234,42 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
 
     }
 
-    function handleOpenImagesDialog(images) {
+    function handleOpenImagesDialog(images: any) {
         setDialogImages(images)
         setOpenImageDialog(true)
     }
 
-    const TableContent = ({ formik }) => {
+    const TableContent = ({ formik } : { formik : any }) => {
         return (
             <TableBody>
                 {data.filter(
-                    item =>
+                    (item: any) =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                            (row, index) => (
+                            (row: any, index: number) => (
                                 <React.Fragment key={row.id}>
-                                <TableRow
-                                    key={row.id}
-                                    hover
-                                    tabIndex={-1}
-                                >
-                                    <TableCell>
-                                        {row.name}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row?.departments?.name ?? "-"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {row.depots[0].product_total_remaining_units}
-                                    </TableCell>
+                                    <TableRow
+                                        key={row.id}
+                                        hover
+                                        tabIndex={-1}
+                                    >
+                                        <TableCell>
+                                            {row.name}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row?.departments?.name ?? "-"}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.depots[0].product_total_remaining_units}
+                                        </TableCell>
 
-                                    <TableCell>
-                                        <IconButton color={"primary"} onClick={() => addStoreDepot(row)} >
-                                            <AddOutlined />
-                                        </IconButton>
-                                    </TableCell>
+                                        <TableCell>
+                                            <IconButton color={"primary"} onClick={() => addStoreDepot(row)} >
+                                                <AddOutlined />
+                                            </IconButton>
+                                        </TableCell>
 
 
-                                    <TableCell style={{ padding: 0 }} colSpan={5}>
+                                        <TableCell style={{ padding: 0 }} colSpan={5}>
                                             <Tooltip title={"Details"}>
                                                 <IconButton
                                                     size={"small"}
@@ -286,10 +288,10 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
                                         </TableCell>
 
 
-                                </TableRow>
+                                    </TableRow>
 
 
-                                <TableRow >
+                                    <TableRow >
 
                                         <TableCell style={{ padding: 0 }} colSpan={5}>
 
@@ -331,7 +333,7 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
                                                             <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
                                                             <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                                 {row.characteristics.length > 0
-                                                                    ? row.characteristics.map(item => (
+                                                                    ? row.characteristics.map((item: any) => (
                                                                         <Grid
                                                                             key={item.id}
                                                                             sx={{
@@ -416,8 +418,8 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
                 {
                     (formik) => (
                         <Card variant={"outlined"}>
-                        
-                        <ImagesDisplayDialog
+
+                            <ImagesDisplayDialog
                                 dialogTitle={"Imágenes del producto"}
                                 open={openImageDialog}
                                 setOpen={setOpenImageDialog}
@@ -427,8 +429,8 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
 
                             <CardContent>
                                 {
-                                    Array.isArray(allProductbyWarehouseDepartament) &&
-                                    allProductbyWarehouseDepartament.length > 0 && (
+                                    Array.isArray(allProductByWarehouseDepartament) &&
+                                    allProductByWarehouseDepartament.length > 0 && (
                                         <DepartmentsFilter formik={formik} />
                                     )
                                 }

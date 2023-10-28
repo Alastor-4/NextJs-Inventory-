@@ -4,14 +4,16 @@ import { keyframes } from '@emotion/react'
 import React, { useState } from 'react'
 import StoreModalDefault from '../../store-details/[storeDetailsId]/components/Modal/StoreModalDefault'
 
-function WorkDays({ dataWorkDays, setDataWorkDays }) {
+function WorkDays( props : any) {
     
+    const { dataWorkDays, setDataWorkDays } = props
+
     const weekDays = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo',]
    
-    const [activeCheckbox, setActiveCheckbox] = useState()
+    const [activeCheckbox, setActiveCheckbox] = useState< number | null  >()
     const [activeModalSchedule, setActiveModalSchedule] = useState(false)
     
-    const changePadLock = ( ind ) =>{
+    const changePadLock = ( ind : number ) =>{
 
         /*const newDataWorkDays = [...dataWorkDays]
         newDataWorkDays[ind].activePadLock = !newDataWorkDays[ind].activePadLock

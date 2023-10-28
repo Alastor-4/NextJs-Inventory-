@@ -33,20 +33,20 @@ import StoreModalPrice from "./Modal/StoreModalPrice"
 import StoreEditPrice from "./Modal/StoreEditPrice";
 import { storeDetails } from "../request/storeDetails";
 import StoreModalDefault from "./Modal/StoreModalDefault";
-import StoreAddUnits from "./Modal/StoreAddUnits";
+//import StoreAddUnits from "./Modal/StoreAddUnits";
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
+const fetcher = (url: any) => fetch(url).then((res) => res.json())
 
 
 export default function StoreMainTable() {
     const params = useParams()
     const router = useRouter()
 
-    const [data, setData] = React.useState(null)
+    const [data, setData] = React.useState<any>(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
-    const [dataStore, setDataStore] = React.useState('')
+    const [dataStore, setDataStore] = React.useState<any>('')
 
-    const [showDetails, setShowDetails] = React.useState('')
+    const [showDetails, setShowDetails] = React.useState<any>('')
     const [activeModalPrice, setActiveModalPrice] = React.useState({ active: false, storeDepot: [] })
     const [activeModalAddUnits, setActiveModalAddUnits] = React.useState(false)
     const [activeModalEditTotalUnits, setActiveModalEditTotalUnits] = React.useState(false)
@@ -57,7 +57,7 @@ export default function StoreMainTable() {
     //get initial data
     React.useEffect(() => {
         fetcher(`/profile/${params.id}/store-details/${params.storeDetailsId}/api`).then((data) =>
-            setAllProductsByDepartment(data.map(item => ({
+            setAllProductsByDepartment(data.map((item : any) => ({
                 ...item,
                 selected: false
             }))))
@@ -65,15 +65,15 @@ export default function StoreMainTable() {
 
     React.useEffect(() => {
         if (allProductsByDepartment.length) {
-            let allProducts = []
+            let allProducts: any = []
 
-            allProductsByDepartment.forEach((departmentItem) => {
+            allProductsByDepartment.forEach((departmentItem : any) => {
                 if (departmentItem.selected) {
                     allProducts = [...allProducts, ...departmentItem.products]
                 }
             })
 
-            allProducts.sort((a, b) => {
+            allProducts.sort((a: any, b: any) => {
                 if (a.name < b.name)
                     return -1
 
@@ -104,7 +104,7 @@ export default function StoreMainTable() {
         router.back()
     }
     // active - noActive
-    const updateProductActive = async (product) => {
+    const updateProductActive = async (product: any) => {
         const data = {
             id: product.id,
             store_id: product.store_id,
@@ -219,7 +219,7 @@ export default function StoreMainTable() {
         )
     }
 
-    const showPrice = (priceProductStore, discountQuantity, discountPorcentage, currency) => {
+    const showPrice = (priceProductStore: any, discountQuantity: any, discountPorcentage: any, currency: any) => {
         let pricePorcentage = (discountPorcentage !== null) ? discountPorcentage * priceProductStore / 100 : null;
 
         let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
@@ -244,22 +244,22 @@ export default function StoreMainTable() {
     const loadDates = async () => {
         let newAllProductsbyDepartment = await storeDetails.getAllProductsByDepartament(params.id, params.storeDetailsId);
 
-        let selectedDepartment = allProductsByDepartment.filter(element => (element.selected)).map(element => element.id)
+        let selectedDepartment = allProductsByDepartment.filter((element: any) => (element.selected)).map((element: any) => element.id)
 
-        newAllProductsbyDepartment = newAllProductsbyDepartment.map(element => ({
+        newAllProductsbyDepartment = newAllProductsbyDepartment.map((element: any) => ({
             ...element,
             selected: (selectedDepartment.includes(element.id))
         }))
         setAllProductsByDepartment(newAllProductsbyDepartment);
     }
 
-    const TableContent = ({ formik }) => {
+    const TableContent = ({ formik } : { formik: any }) => {
         return (
             <TableBody>
                 {data.filter(
-                    item =>
+                    (item: any) =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                            (row, index) => (
+                            (row: any, index: number) => (
                                 <React.Fragment key={row.id}>
                                     <TableRow
                                         hover
@@ -383,13 +383,13 @@ export default function StoreMainTable() {
     }
 
     async function handleSelectFilter(index: number) {
-        let filters = [...allProductsByDepartment]
+        let filters : any = [...allProductsByDepartment]
         filters[index].selected = !filters[index].selected
 
         setAllProductsByDepartment(filters)
     }
 
-    const DepartmentsFilter = ({ formik }) => {
+    const DepartmentsFilter = ({ formik }: {formik: any}) => {
         return (
             <Card variant={"outlined"} sx={{ padding: "15px" }}>
                 <Grid container rowSpacing={2}>
@@ -400,7 +400,7 @@ export default function StoreMainTable() {
                     </Grid>
                     <Grid container item columnSpacing={2}>
                         {
-                            allProductsByDepartment.map((item, index) => (
+                            allProductsByDepartment.map((item: any, index: number) => (
                                 <Grid key={item.id} item xs={"auto"}>
                                     <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
                                         <Grid container>

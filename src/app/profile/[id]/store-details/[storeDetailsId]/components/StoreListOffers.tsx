@@ -7,8 +7,8 @@ import StoreModalDefault from './Modal/StoreModalDefault';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 
-function StoreListOffers({ productStoreDepot, loadDates, showOffers, setShowOffers }) {
-
+function StoreListOffers( props : any ) {
+ const { productStoreDepot, loadDates, showOffers, setShowOffers } = props;
   const params = useParams()
 
   
@@ -16,14 +16,14 @@ function StoreListOffers({ productStoreDepot, loadDates, showOffers, setShowOffe
 
   const [activeModalCreateOffer, setActiveModalCreateOffer] = useState(false)
   const [activeModalEditOffer, setActiveModalEditOffer] = useState(false);
-  const [indexEditOffer, setIndexEditOffer] = useState()
+  const [indexEditOffer, setIndexEditOffer] = useState<any>()
 
   const refreshAndShowOffers = () => {
     if (showOffers) loadDates();
     setShowOffers(!showOffers);
   }
   // Update offer_notes (bd)
-  const updateOfferNotesBd = async (newOffers) => {
+  const updateOfferNotesBd = async (newOffers : Array<String> ) => {
     productStoreDepot.offer_notes = newOffers.join('||');
 
     const response = await storeDetails.update(params.id, params.storeDetails, productStoreDepot)
@@ -34,7 +34,7 @@ function StoreListOffers({ productStoreDepot, loadDates, showOffers, setShowOffe
   }
 
   // Componente para editar cada nota ( create and update )
-  function EditOffer({ notes }) {
+  function EditOffer({ notes } : { notes : String}) {
 
     const setValidationSchema = (
       Yup.object({
@@ -44,8 +44,8 @@ function StoreListOffers({ productStoreDepot, loadDates, showOffers, setShowOffe
       })
     )
 
-    const handleSubmit = (value) => {
-      let newOffers = [...offers]
+    const handleSubmit = (value : any) => {
+      let newOffers: any  = [...offers]
 
       if (activeModalCreateOffer) {
 
@@ -68,7 +68,7 @@ function StoreListOffers({ productStoreDepot, loadDates, showOffers, setShowOffe
           onSubmit={handleSubmit}
         >
           {
-            (formik) =>
+            (formik : any) =>
               <Card variant='outlined' sx={{ padding: '20px' }}>
 
                 <form onSubmit={formik.handleSubmit}>
@@ -94,7 +94,7 @@ function StoreListOffers({ productStoreDepot, loadDates, showOffers, setShowOffe
   }
 
 
-  const removeOffer = async (ind) => {
+  const removeOffer = async (ind : number) => {
     let newOffers = [...offers];
     newOffers.splice(ind, 1);
 
@@ -154,7 +154,7 @@ function StoreListOffers({ productStoreDepot, loadDates, showOffers, setShowOffe
             ? (
               <Stack>
                 {offers.length > 0
-                  ? offers.map((item, index) => (
+                  ? offers.map((item: any, index: number) => (
                     <Grid container
                       key={index}
                       sx={{

@@ -66,7 +66,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
 
     useEffect(() => {
         if (allProductStore !== null) {
-
+            
             let allProducts = []
 
             allProductStore.forEach((departmentItem) => {
@@ -99,7 +99,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
             setData(allProducts)
         }
 
-    }, [allProductStore, productsInputValue])
+    }, [allProductStore, setData])
 
 
     async function handleSelectFilter(index: number) {

@@ -1,11 +1,11 @@
 import React from 'react'
 import apiRequest from '@/api'
 
-const url = (userId, storeId) => `/profile/${userId}/store-details/${storeId}/api`
+const url = (userId: any, storeId: any) => `/profile/${userId}/store-details/${storeId}/api`
 
 export const storeDetails = {
 
-    getAllProductsByDepartament: async function (userId, storeId){
+    getAllProductsByDepartament: async function (userId:any, storeId: any){
         try {
             const response = await apiRequest.get(url(userId, storeId))
             return response.data
@@ -16,7 +16,7 @@ export const storeDetails = {
     },
 
     
-    update: async function (userId, storeId, data) {
+    update: async function (userId: any, storeId: any, data: Object) {
         try {
             const response = await apiRequest.put(url(userId, storeId), data)
             return response.status

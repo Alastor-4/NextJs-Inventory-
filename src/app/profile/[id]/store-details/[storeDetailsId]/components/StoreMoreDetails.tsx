@@ -6,8 +6,9 @@ import StoreEditSellerProfit from '@/app/profile/[id]/store-details/[storeDetail
 import StoreModalDefault from './Modal/StoreModalDefault'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import { storeDetails } from '../request/storeDetails'
-function StoreMoreDetails({ userId, details, show, loadDates, row }) {
+function StoreMoreDetails(props: any) {
 
+    const { userId, details, show, loadDates, row } = props
 
     const [showOffers, setShowOffers] = useState(false)
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
@@ -21,7 +22,7 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
         return `${details.seller_profit_quantity} ${details.sell_price_unit}`
     }
 
-    function handleOpenImagesDialog(images) {
+    function handleOpenImagesDialog(images: any) {
         setDialogImages(images)
         setOpenImageDialog(true)
     }
@@ -87,7 +88,7 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
                         <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
                         <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                             {row.characteristics.length > 0
-                                ? row.characteristics.map(item => (
+                                ? row.characteristics.map((item: any) => (
                                     <Grid
                                         key={item.id}
                                         sx={{
