@@ -35,9 +35,8 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
 
     const [allProductStore, setAllProductStore] = useState(null);
     const [data, setData] = useState()
-    const [productsInputValue, setProductsInputValue] = useState([]);
 
-    const [activeManageQuantity, setactiveManageQuantity] = useState(false);
+    const [activeManageQuantity, setActiveManageQuantity] = useState(false);
     const [showDetails, setShowDetails] = useState();
 
     const [openImageDialog, setOpenImageDialog] = useState(false)
@@ -66,7 +65,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
 
     useEffect(() => {
         if (allProductStore !== null) {
-            
+
             let allProducts = []
 
             allProductStore.forEach((departmentItem) => {
@@ -85,17 +84,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                 return 0
             })
 
-            let newMap = new Map()
 
-            productsInputValue.forEach(element => newMap.set(element.id, element.value));
-
-            const newProductsInputValue = allProducts.map(element => ({
-                id: element.id,
-                value: (newMap.has(element.id)) ? newMap.get(element.id) : '0'
-            })
-            )
-
-            setProductsInputValue(newProductsInputValue);
             setData(allProducts)
         }
 
@@ -238,7 +227,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
     const removeProduct = async (index) => {
         const newProductStoreDepots = data[index].depots[0].store_depots[0];
         const datos = {
-            id: newProductStoreDepots.id, 
+            id: newProductStoreDepots.id,
             storeId: newProductStoreDepots.store_id,
             depotId: newProductStoreDepots.depot_id,
             product_units: -1,
@@ -303,7 +292,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                                                 <Grid item>
 
                                                     <IconButton sx={{ padding: 0 }} size='small' onClick={() => {
-                                                        setactiveManageQuantity(true)
+                                                        setActiveManageQuantity(true)
                                                         setSelectedProduct(row)
                                                     }}
                                                     >
@@ -489,14 +478,14 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                             <ModalStoreAssing
                                 dialogTitle={"Administrar la cantidad del producto"}
                                 open={activeManageQuantity}
-                                setOpen={setactiveManageQuantity}
+                                setOpen={setActiveManageQuantity}
                             >
                                 <ManageQuantity
                                     nameStore={nameStore}
                                     nameWarehouse={nameWarehouse}
                                     productDetails={selectedProduct}
                                     updateDepot={updateDepot}
-                                    setactiveManageQuantity={setactiveManageQuantity}
+                                    setActiveManageQuantity={setActiveManageQuantity}
                                 />
                             </ModalStoreAssing>
 

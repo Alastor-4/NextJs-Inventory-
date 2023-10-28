@@ -19,14 +19,14 @@ export async function GET(req: Request) {
                             },
                             {
                                 OR: [{
-                                    NOT:{
+                                    NOT: {
                                         store_depots: {
                                             some: {
-                                                store_id: storeId 
+                                                store_id: storeId
                                             }
                                         }
                                     }
-                                    
+
                                 }, {
                                     NOT: {
                                         store_depots: {
@@ -89,7 +89,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     const { storeId, depotId, productUnits, productRemainingUnits, sellerProfitPercentage } = await req.json();
-    
+
     const result = await prisma.store_depots.create({
         data: {
             store_id: storeId,

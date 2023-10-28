@@ -84,7 +84,7 @@ export async function PUT(req: Request) {
     return NextResponse.json(result)
 }
 
-export async function DELETE(req: Requesr) {
+export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url)
     const storeDepotId = parseInt(<string>searchParams.get("storeDepotId"))
 

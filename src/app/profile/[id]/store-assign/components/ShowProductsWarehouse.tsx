@@ -43,13 +43,13 @@ function showProductsWarehouse(props: any) {
 
             let allProducts: any = []
 
-            allProductByWarehouseDepartament.forEach((departmentItem:any) => {
+            allProductByWarehouseDepartament.forEach((departmentItem: any) => {
                 if (departmentItem.selected) {
                     allProducts = [...allProducts, ...departmentItem.products]
                 }
             })
 
-            allProducts.sort((a: any, b: any ) => {
+            allProducts.sort((a: any, b: any) => {
                 if (a.name < b.name)
                     return -1
 
@@ -72,7 +72,7 @@ function showProductsWarehouse(props: any) {
         setAllProductByWarehouseDepartament(filters)
     }
 
-    const DepartmentsFilter = ( { formik  } : { formik: any } ) => {
+    const DepartmentsFilter = ({ formik }: { formik: any }) => {
         return (
             <Card variant={"outlined"} sx={{ padding: "15px" }}>
                 <Grid container rowSpacing={2}>
@@ -185,9 +185,9 @@ function showProductsWarehouse(props: any) {
     const loadDates = async () => {
         let newAllProductbyDepartmentWarehouse = await storeAssign.allProductbyDepartmentWarehouse(params.id, storeId, warehouseId);
 
-        let selectedDepartment = allProductByWarehouseDepartament.filter((element: any) => (element.selected)).map((element:any) => element.id)
+        let selectedDepartment = allProductByWarehouseDepartament.filter((element: any) => (element.selected)).map((element: any) => element.id)
 
-        newAllProductbyDepartmentWarehouse = newAllProductbyDepartmentWarehouse.map((element:any) => ({
+        newAllProductbyDepartmentWarehouse = newAllProductbyDepartmentWarehouse.map((element: any) => ({
             ...element,
             selected: (selectedDepartment.includes(element.id))
         }))
@@ -239,7 +239,7 @@ function showProductsWarehouse(props: any) {
         setOpenImageDialog(true)
     }
 
-    const TableContent = ({ formik } : { formik : any }) => {
+    const TableContent = ({ formik }: { formik: any }) => {
         return (
             <TableBody>
                 {data.filter(

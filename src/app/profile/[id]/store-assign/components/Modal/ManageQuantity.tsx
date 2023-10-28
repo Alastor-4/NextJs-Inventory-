@@ -7,7 +7,7 @@ import React, { useState } from 'react'
 import storeAssign from '../../requests/store-assign'
 import { useParams } from 'next/navigation'
 
-function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot, setactiveManageQuantity }) {
+function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot, setActiveManageQuantity }) {
 
   const [swap, setSwap] = useState(false)
 
@@ -36,14 +36,14 @@ function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot,
   )
 
   const handleSubmit = async (values) => {
-   
+
     let productStoreDepots = productDetails.depots[0].store_depots[0];
     let productDepots = productDetails.depots[0];
 
     if (!swap) {
-      
+
       productStoreDepots.product_remaining_units += parseInt(values.units)
-     
+
       productStoreDepots.product_units += parseInt(values.units)
 
     } else productStoreDepots.product_remaining_units -= parseInt(values.units)
@@ -51,11 +51,11 @@ function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot,
     const result = await storeAssign.UpdateProductStore(params.id, productStoreDepots)
 
     if (result === 200) {
-      (!swap )
-      ? updateDepot(-parseInt(values.units), productDepots)
-      : updateDepot(parseInt(values.units), productDepots)
+      (!swap)
+        ? updateDepot(-parseInt(values.units), productDepots)
+        : updateDepot(parseInt(values.units), productDepots)
     }
-    setactiveManageQuantity(false);
+    setActiveManageQuantity(false);
   }
 
   return (
@@ -77,7 +77,7 @@ function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot,
 
           </Grid>
 
-          
+
           <Grid item container justifyContent={"space-evenly"}>
 
             <Stack spacing={1} margin={1}>
@@ -89,8 +89,8 @@ function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot,
             </Stack>
 
             <Grid item margin={1}>
-      
-              <IconButton onClick={() => setSwap(!swap)} sx={{ boxShadow:"0px 1px 2px 0px black" }}>
+
+              <IconButton onClick={() => setSwap(!swap)} sx={{ boxShadow: "0px 1px 2px 0px black" }}>
                 <SwapHoriz color='primary' />
               </IconButton>
 
@@ -128,7 +128,7 @@ function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot,
               </form>
             )
             }
-            
+
           </Formik>
 
         </Grid>

@@ -35,7 +35,6 @@ export default function StoreDepotsAssign(
 
     //initial make selected a store
     React.useEffect(() => {
-
         const { searchParams } = new URL(window.location.href);
         selectedStoreIdProp = searchParams.get("storeId");
 
@@ -49,8 +48,8 @@ export default function StoreDepotsAssign(
     }, [selectedStoreIdProp, storeListProp])
 
     const initialValues = {
-        selectedWarehouse: selectedWarehouse,
-        selectedStore: selectedStore,
+        selectedWarehouse: selectedWarehouse ?? '',
+        selectedStore: selectedStore ?? '',
     }
 
     const validationSchema = Yup.object({
