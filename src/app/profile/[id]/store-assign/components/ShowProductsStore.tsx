@@ -435,8 +435,6 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                                                         </Grid>
 
 
-
-
                                                         <Grid container item spacing={1} xs={12}>
                                                             <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades restantes:</Grid>
                                                             <Grid item xs={true}>

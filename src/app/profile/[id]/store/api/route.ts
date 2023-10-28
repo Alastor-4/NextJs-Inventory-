@@ -39,5 +39,5 @@ export async function DELETE(req: Request) {
         return NextResponse.json(deletedStore)
     }
 
-    return new Response('La acción de eliminar ha fallado', {status: 500})
+    return new Response('La acción de eliminar ha fallado', { status: 500 })
 }

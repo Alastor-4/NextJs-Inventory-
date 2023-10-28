@@ -28,6 +28,7 @@ import { useParams, useRouter } from "next/navigation";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
+
 export default function StoresMainTable() {
     const [data, setData] = React.useState(null)
     const [showDetails, setShowDetails] = React.useState(false)

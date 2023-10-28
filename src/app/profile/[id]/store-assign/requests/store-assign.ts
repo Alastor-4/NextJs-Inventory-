@@ -77,4 +77,5 @@ const storeAssign = {
     }
 }
 
+
 export default storeAssign;

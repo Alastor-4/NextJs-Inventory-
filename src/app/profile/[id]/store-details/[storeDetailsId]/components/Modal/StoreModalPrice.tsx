@@ -17,6 +17,7 @@ export default function StoreModalPrice(props) {
     };
 
 
+    
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>{dialogTitle}</DialogTitle>

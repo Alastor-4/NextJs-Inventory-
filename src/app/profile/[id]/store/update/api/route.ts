@@ -14,3 +14,5 @@ export async function GET(req: Request) {
 
     return new Response('La acción de modificar ha fallado', {status: 500})
 }
+
+

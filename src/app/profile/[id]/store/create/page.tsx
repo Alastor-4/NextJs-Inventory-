@@ -8,6 +8,7 @@ export default async function Page({params}: {params: {id: string}}) {
     return (
         <main>
             <StoresForm userId={userId} sellerUsers={sellerUsers}/>
+       
         </main>
     )
 }
