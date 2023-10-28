@@ -11,6 +11,7 @@ function StoreListOffers({ productStoreDepot, loadDates, showOffers, setShowOffe
 
   const params = useParams()
 
+  
   const [offers, setOffers] = useState(productStoreDepot.offer_notes !== null ? productStoreDepot.offer_notes.split('||') : [])
 
   const [activeModalCreateOffer, setActiveModalCreateOffer] = useState(false)

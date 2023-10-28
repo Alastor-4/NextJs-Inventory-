@@ -55,6 +55,7 @@ export async function PUT(req, res) {
         }, where: {id: storeId}
     })
 
+    
     return NextResponse.json(updatedStore)
 }
 

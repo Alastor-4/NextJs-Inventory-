@@ -127,6 +127,7 @@ function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot,
               </form>
             )
             }
+            
           </Formik>
 
         </Grid>

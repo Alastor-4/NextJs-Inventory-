@@ -80,6 +80,7 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
         </>
     )
 
+    
     const editQuantity = (formik) => (
         <>
             <Grid container gap={1}>

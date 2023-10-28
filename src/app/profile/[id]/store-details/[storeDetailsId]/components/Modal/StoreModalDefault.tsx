@@ -16,6 +16,8 @@ export default function StoreModalDefault(props) {
     };
 
 
+
+    
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>{dialogTitle}</DialogTitle>

@@ -15,6 +15,7 @@ export const storeDetails = {
         return false     
     },
 
+    
     update: async function (userId, storeId, data) {
         try {
             const response = await apiRequest.put(url(userId, storeId), data)

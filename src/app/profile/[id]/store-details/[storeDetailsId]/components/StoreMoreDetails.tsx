@@ -70,7 +70,8 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
                                     <small>
                                         {` ${row.description}`}
                                     </small>
-                                )
+  
+  )
                             }
                         </Grid>
                     </Grid>
@@ -141,7 +142,7 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ganancia del vendedor por producto:</Grid>
                         <Grid item container xs={true}>
-                            
+
                             <Grid item>
                                 {showSellerProfit()}
                             </Grid>
@@ -151,7 +152,7 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
                                     <EditOutlined fontSize="small" />
                                 </IconButton>
                             </Grid>
-                        
+
                         </Grid>
                     </Grid>
 
@@ -165,7 +166,7 @@ function StoreMoreDetails({ userId, details, show, loadDates, row }) {
                     </Grid>
 
                     <StoreListOffers productStoreDepot={row.depots[0].store_depots[0]} loadDates={loadDates} showOffers={showOffers} setShowOffers={setShowOffers} />
-                        
+
 
                 </Grid>
             </Collapse>

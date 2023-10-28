@@ -60,6 +60,7 @@ function showProductsWarehouse({ storeId, warehouseId, defaultPercentage, defaul
             setData(allProducts)
         }
 
+        
     }, [allProductbyWarehouseDepartament])
 
     async function handleSelectFilter(index: number) {

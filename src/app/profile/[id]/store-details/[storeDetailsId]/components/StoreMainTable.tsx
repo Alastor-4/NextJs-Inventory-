@@ -32,8 +32,11 @@ import StoreMoreDetails from "./StoreMoreDetails";
 import StoreModalPrice from "./Modal/StoreModalPrice"
 import StoreEditPrice from "./Modal/StoreEditPrice";
 import { storeDetails } from "../request/storeDetails";
+import StoreModalDefault from "./Modal/StoreModalDefault";
+import StoreAddUnits from "./Modal/StoreAddUnits";
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
+
 
 export default function StoreMainTable() {
     const params = useParams()
@@ -45,8 +48,8 @@ export default function StoreMainTable() {
 
     const [showDetails, setShowDetails] = React.useState('')
     const [activeModalPrice, setActiveModalPrice] = React.useState({ active: false, storeDepot: [] })
-    //const [productActive, setProductActive] = React.useState(null)
-
+    const [activeModalAddUnits, setActiveModalAddUnits] = React.useState(false)
+    const [activeModalEditTotalUnits, setActiveModalEditTotalUnits] = React.useState(false)
 
     //ToDo: use global isLoading
     const isLoading = false
@@ -301,6 +304,7 @@ export default function StoreMainTable() {
                                                 <EditOutlined fontSize="small" />
                                             </IconButton>
                                         </TableCell>
+
                                         <TableCell>
                                             <Grid container columnSpacing={1}>
 
@@ -467,6 +471,13 @@ export default function StoreMainTable() {
                                 <StoreEditPrice userId={params.id} storeDepot={activeModalPrice.storeDepot} setActiveModalPrice={setActiveModalPrice} loadDates={loadDates} />
                             </StoreModalPrice>
 
+                            <StoreModalDefault
+                            dialogTitle={"Administrar unidades"}
+                            open={activeModalAddUnits}
+                            setOpen={setActiveModalAddUnits}
+                            > 
+                            
+                            </StoreModalDefault>
                         </>
 
                         <CardContent>
