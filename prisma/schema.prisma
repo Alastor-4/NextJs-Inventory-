@@ -267,10 +267,11 @@ model products_reservation {
   payment_method       String?                @db.VarChar(255)
   created_at           DateTime               @default(now()) @db.Timestamp(0)
   requesting_user_id   Int
-  status               String                 @db.VarChar(100)
+  status_id            Int
   request_delivery     Boolean                @default(false)
   delivery_notes       String?                @db.Text
   status_description   String                 @db.Text
+  reservation_status   reservation_status     @relation(fields: [status_id], references: [id], onUpdate: Restrict, map: "products_reservation_FK")
   store_depots         store_depots           @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "products_reservation_depot_FK")
   users                users                  @relation(fields: [requesting_user_id], references: [id], onUpdate: Restrict, map: "products_reservation_user_FK")
   products_sell        products_sell[]
@@ -278,6 +279,7 @@ model products_reservation {
 
   @@index([requesting_user_id], map: "products_reservation_user_FK")
   @@index([store_depot_id], map: "store_depot_id")
+  @@index([status_id], map: "products_reservation_FK")
 }
 
 model reservation_messages {
@@ -290,4 +292,13 @@ model reservation_messages {
   products_reservation   products_reservation @relation(fields: [product_reservation_id], references: [id], onUpdate: Restrict, map: "reservation_messages_FK")
 
   @@index([product_reservation_id], map: "reservation_messages_FK")
+}
+
+model reservation_status {
+  id                   Int                    @id @default(autoincrement())
+  code                 Int                    @db.TinyInt
+  name                 String                 @db.VarChar(100)
+  description          String                 @db.VarChar(255)
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  products_reservation products_reservation[]
 }
