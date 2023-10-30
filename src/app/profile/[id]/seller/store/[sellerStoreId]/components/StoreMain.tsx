@@ -310,7 +310,9 @@ export default function StoreMain() {
 
         return (
             <Card variant={"outlined"}>
-                <CardHeader title={"Reservaciones"}/>
+                <Link href={`/profile/${userId}/seller/store/${sellerStoreId}/reservation`}>
+                    <CardHeader title={"Reservaciones"}/>
+                </Link>
 
                 <CardContent>
                     {
