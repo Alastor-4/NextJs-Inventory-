@@ -23,7 +23,7 @@ function StoreMoreDetails(props: any) {
 
         const valuePercentage = (details.seller_profit_percentage) ? (details.seller_profit_percentage * price / 100).toFixed(2) : null;
         if (valuePercentage) return `${details.seller_profit_percentage}%  (${valuePercentage} ${details.sell_price_unit})`
-        return `${details.seller_profit_quantity} ${details.sell_price_unit}`
+        return `${details.seller_profit_quantity} CUP`
     }
 
     function handleOpenImagesDialog(images: any) {
