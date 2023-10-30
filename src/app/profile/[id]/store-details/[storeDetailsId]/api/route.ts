@@ -60,7 +60,7 @@ export async function GET(req: Request, { params }: Params) {
                 //producto
                 include: {
                     depots: {
-                        select: {
+                        include: {
                             store_depots: {
                                 where: {
                                     AND: [

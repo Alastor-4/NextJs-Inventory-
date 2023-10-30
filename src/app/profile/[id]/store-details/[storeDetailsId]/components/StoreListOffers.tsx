@@ -7,11 +7,11 @@ import StoreModalDefault from './Modal/StoreModalDefault';
 import { Formik } from 'formik';
 import * as Yup from 'yup'
 
-function StoreListOffers( props : any ) {
- const { productStoreDepot, loadDates, showOffers, setShowOffers } = props;
+function StoreListOffers(props: any) {
+  const { productStoreDepot, loadDates, showOffers, setShowOffers } = props;
   const params = useParams()
 
-  
+
   const [offers, setOffers] = useState(productStoreDepot.offer_notes !== null ? productStoreDepot.offer_notes.split('||') : [])
 
   const [activeModalCreateOffer, setActiveModalCreateOffer] = useState(false)
@@ -23,7 +23,7 @@ function StoreListOffers( props : any ) {
     setShowOffers(!showOffers);
   }
   // Update offer_notes (bd)
-  const updateOfferNotesBd = async (newOffers : Array<String> ) => {
+  const updateOfferNotesBd = async (newOffers: Array<String>) => {
     productStoreDepot.offer_notes = newOffers.join('||');
 
     const response = await storeDetails.update(params.id, params.storeDetails, productStoreDepot)
@@ -34,7 +34,7 @@ function StoreListOffers( props : any ) {
   }
 
   // Componente para editar cada nota ( create and update )
-  function EditOffer({ notes } : { notes : String}) {
+  function EditOffer({ notes }: { notes: String }) {
 
     const setValidationSchema = (
       Yup.object({
@@ -44,8 +44,8 @@ function StoreListOffers( props : any ) {
       })
     )
 
-    const handleSubmit = (value : any) => {
-      let newOffers: any  = [...offers]
+    const handleSubmit = (value: any) => {
+      let newOffers: any = [...offers]
 
       if (activeModalCreateOffer) {
 
@@ -68,7 +68,7 @@ function StoreListOffers( props : any ) {
           onSubmit={handleSubmit}
         >
           {
-            (formik : any) =>
+            (formik: any) =>
               <Card variant='outlined' sx={{ padding: '20px' }}>
 
                 <form onSubmit={formik.handleSubmit}>
@@ -94,7 +94,7 @@ function StoreListOffers( props : any ) {
   }
 
 
-  const removeOffer = async (ind : number) => {
+  const removeOffer = async (ind: number) => {
     let newOffers = [...offers];
     newOffers.splice(ind, 1);
 
@@ -153,56 +153,59 @@ function StoreListOffers( props : any ) {
           offers.length !== 0
             ? (
               <Stack>
-                {offers.length > 0
-                  ? offers.map((item: any, index: number) => (
-                    <Grid container
-                      key={index}
-                      sx={{
-                        display: "inline-flex",
-                        margin: "3px",
-                        backgroundColor: "rgba(170, 170, 170, 0.8)",
-                        padding: "2px 4px",
-                        borderRadius: "5px 2px 2px 2px",
-                        border: "1px solid rgba(130, 130, 130)",
-                        fontSize: 14,
-                      }}
-                      onClick={() => {
-                        setActiveModalEditOffer(true)
-                        setIndexEditOffer(index)
-                      }}
-                    >
-                      <Grid item sx={{ marginRight: "8px" }} >
-                        <Typography variant={"caption"}
-                          sx={{ color: "white", fontWeight: "600" }}>
-                          {`${index + 1} -- `}
-                        </Typography>
+                {
+                  offers.length > 0
+                    ? offers.map((item: any, index: number) => (
+                      <Grid container
+                        key={index}
+                        sx={{
+                          // display: "inline-flex",
+                          width: 'fit-content',
+                          margin: "3px",
+                          backgroundColor: "rgba(170, 170, 170, 0.8)",
+                          padding: "2px 4px",
+                          borderRadius: "5px 2px 2px 2px",
+                          border: "1px solid rgba(130, 130, 130)",
+                          fontSize: 14,
+                        }}
+                        onClick={() => {
+                          setActiveModalEditOffer(true)
+                          setIndexEditOffer(index)
+                        }}
+                      >
+                        <Grid item sx={{ marginRight: "8px" }} >
+                          <Typography variant={"caption"}
+                            sx={{ color: "white", fontWeight: "600" }}>
+                            {`${index + 1} -- `}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item
+                          textAlign={"center"}
+                          sx={{ color: "rgba(16,27,44,0.8)" }}>
+                          {`${item}`}
+                        </Grid>
+
+                        <Grid item sx={{ marginLeft: "3px" }}  >
+                          <CloseOutlined
+                            fontSize={"small"}
+                            color='secondary'
+                            sx={{ cursor: "pointer" }}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              removeOffer(index)
+                            }}
+                          />
+
+                        </Grid>
+
                       </Grid>
-
-                      <Grid item
-                        textAlign={"center"}
-                        sx={{ color: "rgba(16,27,44,0.8)" }}>
-                        {`${item}`}
-                      </Grid>
-
-                      <Grid item sx={{ marginLeft: "3px" }}  >
-                        <CloseOutlined
-                          fontSize={"small"}
-                          color='secondary'
-                          sx={{ cursor: "pointer" }}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            removeOffer(index)
-                          }}
-                        />
-
-                      </Grid>
-
-                    </Grid>
-                  )
-                  ) : "-"
+                    )
+                    ) : "-"
                 }
-
               </Stack>
+
+
             )
             : (
               'No hay ofertas'

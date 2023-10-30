@@ -6,13 +6,10 @@ import {
     Box, Button,
     Card,
     CardContent,
-    Checkbox, CircularProgress,
-    Collapse,
-    Divider, Fade, Grid,
+    CircularProgress,
+    Grid,
     IconButton,
-    Modal,
     Switch,
-    Tab,
     Table,
     TableBody,
     TableCell,
@@ -23,8 +20,7 @@ import {
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined } from "@mui/icons-material";
-import Link from "next/link";
+import { AddOutlined, ArrowLeft, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined, SwapHoriz } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import { Formik } from "formik";
 import stores from "@/app/profile/[id]/store/requests/stores"
@@ -33,6 +29,7 @@ import StoreModalPrice from "./Modal/StoreModalPrice"
 import StoreEditPrice from "./Modal/StoreEditPrice";
 import { storeDetails } from "../request/storeDetails";
 import StoreModalDefault from "./Modal/StoreModalDefault";
+import TransferUnits from "./Modal/TransferUnits";
 //import StoreAddUnits from "./Modal/StoreAddUnits";
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json())
@@ -42,14 +39,19 @@ export default function StoreMainTable() {
     const params = useParams()
     const router = useRouter()
 
+    // Guardan datos de bd
     const [data, setData] = React.useState<any>(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
     const [dataStore, setDataStore] = React.useState<any>('')
 
+    // Se usan habilitar modales o detalles
     const [showDetails, setShowDetails] = React.useState<any>('')
     const [activeModalPrice, setActiveModalPrice] = React.useState({ active: false, storeDepot: [] })
-    const [activeModalAddUnits, setActiveModalAddUnits] = React.useState(false)
-    const [activeModalEditTotalUnits, setActiveModalEditTotalUnits] = React.useState(false)
+    const [activeModalTransferUnits, setActiveModalTransferUnits] = React.useState(false);
+
+    // Almacena los datos de la row q hacen falta para los modal
+    // modal q la usan:  TransferUnits
+    const [selectedRowData, setSelectedRowData] = React.useState<any>(null);
 
     //ToDo: use global isLoading
     const isLoading = false
@@ -57,7 +59,7 @@ export default function StoreMainTable() {
     //get initial data
     React.useEffect(() => {
         fetcher(`/profile/${params.id}/store-details/${params.storeDetailsId}/api`).then((data) =>
-            setAllProductsByDepartment(data.map((item : any) => ({
+            setAllProductsByDepartment(data.map((item: any) => ({
                 ...item,
                 selected: false
             }))))
@@ -67,7 +69,7 @@ export default function StoreMainTable() {
         if (allProductsByDepartment.length) {
             let allProducts: any = []
 
-            allProductsByDepartment.forEach((departmentItem : any) => {
+            allProductsByDepartment.forEach((departmentItem: any) => {
                 if (departmentItem.selected) {
                     allProducts = [...allProducts, ...departmentItem.products]
                 }
@@ -220,7 +222,7 @@ export default function StoreMainTable() {
     }
 
     const showPrice = (priceProductStore: any, discountQuantity: any, discountPorcentage: any, currency: any) => {
-        let pricePorcentage = (discountPorcentage !== null) ? discountPorcentage * priceProductStore / 100 : null;
+        let pricePorcentage = (discountPorcentage !== null) ? (discountPorcentage * priceProductStore / 100).toFixed(2) : null;
 
         let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
 
@@ -253,7 +255,7 @@ export default function StoreMainTable() {
         setAllProductsByDepartment(newAllProductsbyDepartment);
     }
 
-    const TableContent = ({ formik } : { formik: any }) => {
+    const TableContent = ({ formik }: { formik: any }) => {
         return (
             <TableBody>
                 {data.filter(
@@ -300,7 +302,7 @@ export default function StoreMainTable() {
                                             }
 
                                             <IconButton size="small" color="primary"
-                                                onClick={() => setActiveModalPrice({ active: true, storeDepot: row.depots[0].store_depots[0] })}>
+                                                onClick={() => setActiveModalPrice({ active: true, storeDepot: { ...row.depots[0].store_depots[0] } })}>
                                                 <EditOutlined fontSize="small" />
                                             </IconButton>
                                         </TableCell>
@@ -314,8 +316,11 @@ export default function StoreMainTable() {
 
                                                 <Grid item>
                                                     <IconButton sx={{ padding: 0 }} size="small" color="primary"
-                                                        onClick={() => setActiveModalPrice({ active: true, storeDepot: row.depots[0].store_depots[0] })}>
-                                                        <AddOutlined fontSize="small" />
+                                                        onClick={() => {
+                                                            setActiveModalTransferUnits(true);
+                                                            setSelectedRowData(row.depots[0])
+                                                        }}>
+                                                        <SwapHoriz fontSize="small" />
                                                     </IconButton>
                                                 </Grid>
 
@@ -343,12 +348,12 @@ export default function StoreMainTable() {
                                                 <IconButton
                                                     size={"small"}
                                                     sx={{ m: "3px" }}
-                                                    onClick={(e) => setShowDetails((showDetails !== index) ? index : '')}
+                                                    onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
                                                 >
                                                     {
 
 
-                                                        (showDetails !== index)
+                                                        (showDetails !== row.id)
                                                             ? <ExpandMoreOutlined />
                                                             : <ExpandLessOutlined />
                                                     }
@@ -363,11 +368,11 @@ export default function StoreMainTable() {
 
                                         <TableCell style={{ padding: 0 }} colSpan={5}>
 
-                                            {showDetails === index && (
+                                            {showDetails === row.id && (
                                                 <StoreMoreDetails
                                                     userId={params.id}
                                                     details={row.depots[0].store_depots[0]}
-                                                    show={(showDetails === index)}
+                                                    show={(showDetails === row.id)}
                                                     loadDates={loadDates}
                                                     row={row}
                                                 />
@@ -383,13 +388,13 @@ export default function StoreMainTable() {
     }
 
     async function handleSelectFilter(index: number) {
-        let filters : any = [...allProductsByDepartment]
+        let filters: any = [...allProductsByDepartment]
         filters[index].selected = !filters[index].selected
 
         setAllProductsByDepartment(filters)
     }
 
-    const DepartmentsFilter = ({ formik }: {formik: any}) => {
+    const DepartmentsFilter = ({ formik }: { formik: any }) => {
         return (
             <Card variant={"outlined"} sx={{ padding: "15px" }}>
                 <Grid container rowSpacing={2}>
@@ -472,11 +477,17 @@ export default function StoreMainTable() {
                             </StoreModalPrice>
 
                             <StoreModalDefault
-                            dialogTitle={"Administrar unidades"}
-                            open={activeModalAddUnits}
-                            setOpen={setActiveModalAddUnits}
-                            > 
-                            
+                                dialogTitle={"Transferir unidades"}
+                                open={activeModalTransferUnits}
+                                setOpen={setActiveModalTransferUnits}
+                            >
+                                <TransferUnits 
+                                nameStore={ dataStore.name } 
+                                storeDepot={ selectedRowData?.store_depots[0] }  
+                                productId={ selectedRowData?.product_id }
+                                setActiveTransferUnits ={ setActiveModalTransferUnits }  
+                                loadDates = {loadDates}
+                                />
                             </StoreModalDefault>
                         </>
 
