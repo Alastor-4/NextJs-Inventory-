@@ -20,7 +20,7 @@ import {
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined, SwapHoriz } from "@mui/icons-material";
+import { ArrowLeft, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined, SwapHoriz } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import { Formik } from "formik";
 import stores from "@/app/profile/[id]/store/requests/stores"
@@ -30,7 +30,7 @@ import StoreEditPrice from "./Modal/StoreEditPrice";
 import { storeDetails } from "../request/storeDetails";
 import StoreModalDefault from "./Modal/StoreModalDefault";
 import TransferUnits from "./Modal/TransferUnits";
-//import StoreAddUnits from "./Modal/StoreAddUnits";
+import StoreEditUnits from "./Modal/StoreEditUnits";
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json())
 
@@ -40,7 +40,7 @@ export default function StoreMainTable() {
     const router = useRouter()
 
     // Guardan datos de bd
-    const [data, setData] = React.useState<any>(null)
+    const [data, setData] = React.useState<any>([])
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
     const [dataStore, setDataStore] = React.useState<any>('')
 
@@ -48,10 +48,11 @@ export default function StoreMainTable() {
     const [showDetails, setShowDetails] = React.useState<any>('')
     const [activeModalPrice, setActiveModalPrice] = React.useState({ active: false, storeDepot: [] })
     const [activeModalTransferUnits, setActiveModalTransferUnits] = React.useState(false);
+    const [activeModalEditUnits, setActiveModalEditUnits] = React.useState(false);
 
-    // Almacena los datos de la row q hacen falta para los modal
-    // modal q la usan:  TransferUnits
-    const [selectedRowData, setSelectedRowData] = React.useState<any>(null);
+    // Almacena el ind de la row seleccionada
+    // modal q la usan:  TransferUnits , StoreEditUnits
+    const [selectedRowInd, setSelectedRowInd] = React.useState<any>(null);
 
     //ToDo: use global isLoading
     const isLoading = false
@@ -318,7 +319,7 @@ export default function StoreMainTable() {
                                                     <IconButton sx={{ padding: 0 }} size="small" color="primary"
                                                         onClick={() => {
                                                             setActiveModalTransferUnits(true);
-                                                            setSelectedRowData(row.depots[0])
+                                                            setSelectedRowInd(index)
                                                         }}>
                                                         <SwapHoriz fontSize="small" />
                                                     </IconButton>
@@ -326,8 +327,10 @@ export default function StoreMainTable() {
 
                                                 <Grid item>
                                                     <IconButton sx={{ padding: 0 }} size="small" color="primary"
-                                                        onClick={() => setActiveModalPrice({ active: true, storeDepot: row.depots[0].store_depots[0] })}>
-                                                        <EditOutlined fontSize="small" />
+                                                        onClick={() => {
+                                                            setActiveModalEditUnits(true);
+                                                            setSelectedRowInd(index)
+                                                        }}>                                                        <EditOutlined fontSize="small" />
                                                     </IconButton>
                                                 </Grid>
 
@@ -477,16 +480,28 @@ export default function StoreMainTable() {
                             </StoreModalPrice>
 
                             <StoreModalDefault
+                                dialogTitle={"Modificar unidades"}
+                                open={activeModalTransferUnits ? false : activeModalEditUnits}
+                                setOpen={setActiveModalEditUnits}
+                            >
+                                <StoreEditUnits
+                                    dataRow={data[selectedRowInd]?.depots[0].store_depots[0]}
+                                    setActiveModalEditUnits={setActiveModalEditUnits}
+                                    setActiveModalTransferUnits={setActiveModalTransferUnits}
+                                    loadDates={loadDates} />
+                            </StoreModalDefault>
+
+                            <StoreModalDefault
                                 dialogTitle={"Transferir unidades"}
                                 open={activeModalTransferUnits}
                                 setOpen={setActiveModalTransferUnits}
                             >
-                                <TransferUnits 
-                                nameStore={ dataStore.name } 
-                                storeDepot={ selectedRowData?.store_depots[0] }  
-                                productId={ selectedRowData?.product_id }
-                                setActiveTransferUnits ={ setActiveModalTransferUnits }  
-                                loadDates = {loadDates}
+                                <TransferUnits
+                                    nameStore={dataStore.name}
+                                    storeDepot={data[selectedRowInd]?.depots[0].store_depots[0]}
+                                    productId={data[selectedRowInd]?.depots[0].product_id}
+                                    setActiveTransferUnits={setActiveModalTransferUnits}
+                                    loadDates={loadDates}
                                 />
                             </StoreModalDefault>
                         </>
