@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client"
 
 import React from "react";
@@ -26,11 +25,10 @@ import { AddOutlined, ArrowLeft, AutoStories, DeleteOutline, EditOutlined, Expan
 import stores from "@/app/profile/[id]/store/requests/stores";
 import { useParams, useRouter } from "next/navigation";
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function StoresMainTable() {
-    const [data, setData] = React.useState(null)
+    const [data, setData] = React.useState<any>(null)
     const [showDetails, setShowDetails] = React.useState(false)
 
     const params = useParams()
@@ -42,12 +40,12 @@ export default function StoresMainTable() {
     //get initial data
     React.useEffect(() => {
         fetcher(`/profile/${params.id}/store/api`).then((data) => setData(data))
-    }, [params.id])
+    }, [])
 
     //table selected item
-    const [selected, setSelected] = React.useState(null)
+    const [selected, setSelected] = React.useState<any>(null)
 
-    const handleSelectItem = (item) => {
+    const handleSelectItem = (item: any) => {
         if (selected && (selected.id === item.id)) {
             setSelected(null)
         } else {
@@ -184,7 +182,7 @@ export default function StoresMainTable() {
     const TableContent = () => {
         return (
             <TableBody>
-                {data.map((row, index) => (
+                {data.map((row: any, index: any) => (
                     <React.Fragment key={row.id}>
                         <TableRow
                             key={row.id}
