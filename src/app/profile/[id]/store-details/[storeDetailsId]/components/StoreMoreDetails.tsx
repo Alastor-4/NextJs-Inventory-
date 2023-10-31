@@ -16,10 +16,14 @@ function StoreMoreDetails(props: any) {
     const [openImageDialog, setOpenImageDialog] = useState(false);
     const [dialogImages, setDialogImages] = useState([])
 
-    const showSellerProfit = () => {
-        const valuePercentage = (details.seller_profit_percentage) ? details.seller_profit_percentage * details.sell_price / 100 : null;
+    const showSellerProfit = (priceProductStore: any, discountQuantity: any, discountPorcentage: any) => {
+        let pricePorcentage = (discountPorcentage !== null) ? (discountPorcentage * priceProductStore / 100).toFixed(2) : null;
+
+        let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
+
+        const valuePercentage = (details.seller_profit_percentage) ? (details.seller_profit_percentage * price / 100).toFixed(2) : null;
         if (valuePercentage) return `${details.seller_profit_percentage}%  (${valuePercentage} ${details.sell_price_unit})`
-        return `${details.seller_profit_quantity} ${details.sell_price_unit}`
+        return `${details.seller_profit_quantity} CUP`
     }
 
     function handleOpenImagesDialog(images: any) {
@@ -71,8 +75,8 @@ function StoreMoreDetails(props: any) {
                                     <small>
                                         {` ${row.description}`}
                                     </small>
-  
-  )
+
+                                )
                             }
                         </Grid>
                     </Grid>
@@ -145,7 +149,11 @@ function StoreMoreDetails(props: any) {
                         <Grid item container xs={true}>
 
                             <Grid item>
-                                {showSellerProfit()}
+                                {showSellerProfit(
+                                    row.depots[0].store_depots[0].sell_price,
+                                    row.depots[0].store_depots[0].price_discount_quantity,
+                                    row.depots[0].store_depots[0].price_discount_percentage
+                                )}
                             </Grid>
 
                             <Grid item>

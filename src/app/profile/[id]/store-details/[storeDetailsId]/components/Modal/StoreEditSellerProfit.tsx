@@ -47,7 +47,7 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
         }
 
         const request = await storeDetails.update(userId, storeDepot.id, data);
-        if( request === 200){
+        if (request === 200) {
             setActiveModalSellerProfit(false)
             loadDates()
         }
@@ -79,7 +79,7 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
         </>
     )
 
-    
+
     const editQuantity = (formik) => (
         <>
             <Grid container gap={1}>
@@ -99,7 +99,7 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
                     select
                     value={storeDepot.sell_price_unit}
                 >
-                    <MenuItem value={storeDepot.sell_price_unit} >{storeDepot.sell_price_unit}</MenuItem>
+                    <MenuItem value={storeDepot.sell_price_unit} >CUP</MenuItem>
                 </TextField>
             </Grid>
         </>

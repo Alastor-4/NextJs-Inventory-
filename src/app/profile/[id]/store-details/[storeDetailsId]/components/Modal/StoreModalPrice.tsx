@@ -10,10 +10,10 @@ import {
 import React from "react";
 
 export default function StoreModalPrice(props) {
-    const {open, setOpen, dialogTitle} = props
+    const { open, setOpen, dialogTitle } = props
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
-        setOpen({ active:false, storeDepot:[] });
+        setOpen({ active: false, storeDepot: [] });
     };
 
 
@@ -30,6 +30,6 @@ export default function StoreModalPrice(props) {
             </DialogActions>
         </Dialog>
     )
- }
+}
 
 
