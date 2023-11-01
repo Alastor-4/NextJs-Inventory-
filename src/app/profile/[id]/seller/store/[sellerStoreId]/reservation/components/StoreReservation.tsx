@@ -162,6 +162,25 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
         }
     }
 
+    async function setCanceledStatus(e: any, productReservationId: number) {
+        e.stopPropagation()
+
+        const response = await sellerStoreReservations.setCanceledStatus(userId, storeId, productReservationId)
+
+        if (response) {
+            if (data?.length) {
+                const newData = [...data]
+
+                const reservationIndex = data.findIndex((item: any) => item.id === productReservationId)
+                if (reservationIndex > -1) {
+                    newData[reservationIndex] = response
+                }
+
+                setData(newData)
+            }
+        }
+    }
+
     const reservationStatusColors = {
         1: "warning",
         2: "error",
@@ -322,7 +341,7 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                                     <Done/>
                                                                 </IconButton>
 
-                                                                <IconButton color={"error"} sx={{ml: "5px"}}>
+                                                                <IconButton color={"error"} onClick={(e) => setCanceledStatus(e, row.id)}>
                                                                     <CancelOutlined/>
                                                                 </IconButton>
                                                             </>

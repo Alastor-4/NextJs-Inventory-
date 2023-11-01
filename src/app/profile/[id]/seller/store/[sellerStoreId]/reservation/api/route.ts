@@ -97,3 +97,46 @@ export async function PUT(req: Request) {
 
     return new Response('La acción sobre la reservación ha fallado', {status: 500})
 }
+
+// Change reservation status to "Cancelado"
+export async function PATCH(req: Request) {
+    const { productReservationId } = await req.json()
+
+    if (productReservationId) {
+        const newStatus = await prisma.reservation_status.findFirst({where: {code: 2}})
+
+        if (newStatus) {
+            const updatedReservation = await prisma.products_reservation.update(
+                {
+                    data: {status_id: newStatus.id},
+                    where: {id: parseInt(productReservationId)},
+                    include: {
+                        store_depots: {
+                            include: {
+                                depots: {
+                                    include: {
+                                        products: {
+                                            include: {
+                                                departments: true,
+                                                characteristics: true,
+                                                images: true,
+                                            },
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        reservation_messages: true,
+                        reservation_status: true,
+                    }
+                }
+            )
+
+            return NextResponse.json(updatedReservation)
+        }
+
+        return new Response('La acción sobre la reservación ha fallado', {status: 400})
+    }
+
+    return new Response('La acción sobre la reservación ha fallado', {status: 500})
+}

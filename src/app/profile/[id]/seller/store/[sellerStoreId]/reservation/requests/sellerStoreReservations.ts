@@ -15,6 +15,17 @@ const sellerStoreReservations = {
         return false
     },
 
+    setCanceledStatus: async function (userId, sellerStoreId, productReservationId) {
+        try {
+            const response = await apiRequest.patch(url(userId, sellerStoreId), {productReservationId})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
 }
 
 export default sellerStoreReservations;
