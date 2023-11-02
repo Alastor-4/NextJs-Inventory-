@@ -132,7 +132,17 @@ async function main() {
             {
                 code: 4,
                 name: 'Vendido',
-                description: 'El producto de esta reservacion ha sido Vendido',
+                description: 'El producto de esta reservacion ha sido Vendido.',
+            },
+            {
+                code: 5,
+                name: 'En camino',
+                description: 'El producto reservado está De Camino a ser entregado.',
+            },
+            {
+                code: 6,
+                name: 'Entregado',
+                description: 'El producto reservado fue Entregado.',
             },
         ],
     })
