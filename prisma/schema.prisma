@@ -270,7 +270,7 @@ model products_reservation {
   status_id            Int
   request_delivery     Boolean                @default(false)
   delivery_notes       String?                @db.Text
-  status_description   String                 @db.Text
+  status_description   String?                @db.Text
   reservation_status   reservation_status     @relation(fields: [status_id], references: [id], onUpdate: Restrict, map: "products_reservation_FK")
   store_depots         store_depots           @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "products_reservation_depot_FK")
   users                users                  @relation(fields: [requesting_user_id], references: [id], onUpdate: Restrict, map: "products_reservation_user_FK")
