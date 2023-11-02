@@ -16,7 +16,7 @@ export default function StoresForm(props: any) {
 
     const [updateItem, setUpdateItem] = React.useState<any>()
     const [userSeller, setUserSeller] = React.useState("")
-    console.log(updateItem)
+    
     const [sellProfit, setSellProfit] = React.useState(true);
     const [dataWorkDays, setDataWorkDays] = React.useState([{}]);
 
@@ -133,11 +133,8 @@ export default function StoresForm(props: any) {
             online_catalog: activeCatalogo,
             online_reservation: activeReservations
         }
-        console.log(typeof dataWorkDays[2])
-        const response = await openDaysStores.create(userId, dataWorkDays[2])
-        console.log(response);
 
-        /*let response
+        let response: any
 
         if (updateItem) {
             response = await stores.update(userId, data)
@@ -145,16 +142,24 @@ export default function StoresForm(props: any) {
             response = await stores.create(userId, data)
         }
 
-        let openDaysResponse;
-        dataWorkDays.forEach( item => {
-            if( item.id !== null ){
+        let openDaysResponse: any;
+        dataWorkDays.forEach(async (item: any) => {
+            if (item.id !== null) {
                 item.activePadLock
-               ? openDaysResponse = await 
+                    ? openDaysResponse = await openDaysStores.update(userId, item)
+                    : openDaysResponse = await openDaysStores.delete(userId, item.id)
+            } else
+                if (item.activePadLock)
+                    openDaysResponse = await openDaysStores.create(userId, item)
+
+            // Verificar si hay algun error
+            if (openDaysResponse !== 200) {
+                ///Error
             }
-        })   
+        })
 
 
-        if (response.status === 200) {
+       /* if (response.status === 200) {
             router.push(`/profile/${userId}/store`)
         } else {
             //ToDo: catch validation errors
