@@ -103,12 +103,27 @@ export async function PATCH(req: Request) {
     const { productReservationId } = await req.json()
 
     if (productReservationId) {
-        const newStatus = await prisma.reservation_status.findFirst({where: {code: 2}})
+        const canceledStatus = await prisma.reservation_status.findFirst({where: {code: 2}})
 
-        if (newStatus) {
+        const reservation = await prisma.products_reservation.findUnique(
+            {
+                where: {id: parseInt(productReservationId)},
+                include: {reservation_status: true}
+            }
+        )
+        const reservationStatusCode = reservation?.reservation_status.code
+
+        if (canceledStatus && reservationStatusCode) {
+            //when reservation has status "Reservado" or "En camanino" restore previouslly reseved items
+            if (reservationStatusCode === 3 || reservationStatusCode === 5) {
+                await prisma.store_depots.update({
+                    data: {product_remaining_units: {increment: reservation.units_quantity}},
+                    where: {id: reservation.store_depot_id}})
+            }
+
             const updatedReservation = await prisma.products_reservation.update(
                 {
-                    data: {status_id: newStatus.id},
+                    data: {status_id: canceledStatus.id},
                     where: {id: parseInt(productReservationId)},
                     include: {
                         store_depots: {

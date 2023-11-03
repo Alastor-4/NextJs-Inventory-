@@ -22,7 +22,7 @@ import {TableNoData} from "@/components/TableNoData";
 import {
     ArrowLeft,
     CancelOutlined,
-    DeliveryDiningOutlined,
+    DeliveryDiningOutlined, DeliveryDiningTwoTone,
     DescriptionOutlined,
     Done,
     SellOutlined,
@@ -186,6 +186,8 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
         2: "error",
         3: "info",
         4: "success",
+        5: "secondary",
+        6: "success",
     }
 
     const TableContent = () => {
@@ -319,7 +321,7 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                                 sx={
                                                                     {
                                                                         ml: "5px",
-                                                                        backgroundColor: "info.main",
+                                                                        backgroundColor: "lightslategray",
                                                                         color: "white",
                                                                         cursor: "default"
                                                                     }
@@ -350,9 +352,37 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
 
                                                     {
                                                         row.reservation_status.code === 3 && (
-                                                            <IconButton color={"success"}>
-                                                                <SellOutlined/>
-                                                            </IconButton>
+                                                            <>
+                                                                {
+                                                                    row.request_delivery && (
+                                                                        <IconButton color={"warning"}>
+                                                                            <DeliveryDiningOutlined/>
+                                                                        </IconButton>
+                                                                    )
+                                                                }
+
+                                                                <IconButton color={"success"}>
+                                                                    <SellOutlined/>
+                                                                </IconButton>
+
+                                                                <IconButton color={"error"} onClick={(e) => setCanceledStatus(e, row.id)}>
+                                                                    <CancelOutlined/>
+                                                                </IconButton>
+                                                            </>
+                                                        )
+                                                    }
+
+                                                    {
+                                                        row.reservation_status.code === 5 && (
+                                                            <>
+                                                                <IconButton color={"success"} onClick={(e) => setReservedStatus(e, row.store_depots.id, row.id)}>
+                                                                    <DeliveryDiningTwoTone/>
+                                                                </IconButton>
+
+                                                                <IconButton color={"error"} onClick={(e) => setCanceledStatus(e, row.id)}>
+                                                                    <CancelOutlined/>
+                                                                </IconButton>
+                                                            </>
                                                         )
                                                     }
                                                 </Grid>
