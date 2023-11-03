@@ -304,7 +304,9 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                     <Grid container item xs={12} justifyContent={"center"} alignItems={"center"}>
                                                         <Chip
                                                             label={
-                                                                row.units_quantity + " | " + row.reservation_status.name
+                                                                row.reservation_status.code === 1
+                                                                    ? row.reservation_status.name + " (" + row.units_quantity + ")"
+                                                                    : row.units_quantity + " | " + row.reservation_status.name
                                                             }
                                                             size={"small"}
                                                             //@ts-ignore

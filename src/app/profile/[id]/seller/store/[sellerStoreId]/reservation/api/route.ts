@@ -64,7 +64,10 @@ export async function PUT(req: Request) {
 
                 prisma.products_reservation.update(
                     {
-                        data: {status_id: newStatus.id},
+                        data: {
+                            status_id: newStatus.id,
+                            status_description: "Producto reservado en la tienda"
+                        },
                         where: {id: productReservation.id},
                         include: {
                             store_depots: {
@@ -123,7 +126,71 @@ export async function PATCH(req: Request) {
 
             const updatedReservation = await prisma.products_reservation.update(
                 {
-                    data: {status_id: canceledStatus.id},
+                    data: {
+                        status_id: canceledStatus.id,
+                        status_description: "Reservación cancelada por la tienda"
+                    },
+                    where: {id: parseInt(productReservationId)},
+                    include: {
+                        store_depots: {
+                            include: {
+                                depots: {
+                                    include: {
+                                        products: {
+                                            include: {
+                                                departments: true,
+                                                characteristics: true,
+                                                images: true,
+                                            },
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        reservation_messages: true,
+                        reservation_status: true,
+                    }
+                }
+            )
+
+            return NextResponse.json(updatedReservation)
+        }
+
+        return new Response('La acción sobre la reservación ha fallado', {status: 400})
+    }
+
+    return new Response('La acción sobre la reservación ha fallado', {status: 500})
+}
+
+// Change reservation status to "En camino" when requested delivery reservation
+export async function POST(req: Request) {
+    const { productReservationId } = await req.json()
+
+    if (productReservationId) {
+        const enCaminoStatus = await prisma.reservation_status.findFirst({where: {code: 5}})
+
+        const reservation = await prisma.products_reservation.findUnique(
+            {
+                where: {id: parseInt(productReservationId)},
+                include: {reservation_status: true}
+            }
+        )
+        const reservationStatusCode = reservation?.reservation_status.code
+
+        if (enCaminoStatus && reservationStatusCode) {
+            //when reservation has status "Reservado" or "En camanino" restore previouslly reseved items
+            if (reservationStatusCode === 3 || reservationStatusCode === 5) {
+                await prisma.store_depots.update({
+                    data: {product_remaining_units: {increment: reservation.units_quantity}},
+                    where: {id: reservation.store_depot_id}})
+            }
+
+            const updatedReservation = await prisma.products_reservation.update(
+                {
+                    data: {
+                        status_id: enCaminoStatus.id,
+                        status_description: "Reservación cancelada por la tienda"
+                    },
                     where: {id: parseInt(productReservationId)},
                     include: {
                         store_depots: {
