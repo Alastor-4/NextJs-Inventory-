@@ -2,18 +2,22 @@
 "use client"
 
 import {
+    AppBar, Box,
     Button,
     Card,
-    CardContent,
-    Grid,
+    CardContent, CircularProgress, Divider,
+    Grid, IconButton,
     MenuItem,
-    TextField,
+    TextField, Toolbar, Typography,
 } from "@mui/material";
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import ShowProductsStore from "@/app/profile/[id]/store-assign/components/ShowProductsStore";
 import ShowProductsWarehouse from "@/app/profile/[id]/store-assign/components/ShowProductsWarehouse"
+import {AddOutlined, ArrowLeft, DeleteOutline, ShareOutlined} from "@mui/icons-material";
+import Link from "next/link";
+import {router} from "next/client";
 
 export default function StoreDepotsAssign(
     { warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp }
@@ -89,6 +93,33 @@ export default function StoreDepotsAssign(
         }
     }
 
+    function handleNavigateBack() {
+        router.back()
+    }
+
+    const CustomToolbar = () => (
+        <AppBar position={"static"} variant={"elevation"} color={"primary"}>
+            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
+                <Box sx={{display: "flex", alignItems: "center"}}>
+                    <IconButton color={"inherit"} sx={{mr: "10px"}} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"}/>
+                    </IconButton>
+                    <Typography
+                        variant="h6"
+                        noWrap
+                        sx={{
+                            fontWeight: 700,
+                            letterSpacing: ".2rem",
+                            color: "white",
+                        }}
+                    >
+                        Distribuir productos
+                    </Typography>
+                </Box>
+            </Toolbar>
+        </AppBar>
+    )
+
     return (
         <Formik
             initialValues={initialValues}
@@ -101,6 +132,8 @@ export default function StoreDepotsAssign(
             {
                 (formik) => (
                     <Card variant={"outlined"}>
+                        <CustomToolbar/>
+
                         <CardContent>
                             <Grid container rowSpacing={2} direction={"column"}>
                                 <Grid item xs={12}>
