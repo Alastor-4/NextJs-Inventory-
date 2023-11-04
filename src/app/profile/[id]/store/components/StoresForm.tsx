@@ -6,21 +6,26 @@ import { Formik, useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import stores from "@/app/profile/[id]/store/requests/stores";
-import WorkDays from "./WorkDays";
-import { openDaysStores } from "../requests/openDaysStores";
+import WorkDays from "../../../../../components/WorkDays";
+import { openDaysStores } from "../../../../../request/openDaysStores";
 
 export default function StoresForm(props: any) {
     const { userId, storeId, sellerUsers } = props
 
     const router = useRouter()
 
+    //Url de las api
+    const urlApiStoreOpenDays = `/profile/${userId}/store/apiOpenDays`
+    const urlApiStoreOpenReservations = `/profile/${userId}/store/apiReservations`
+
     const [updateItem, setUpdateItem] = React.useState<any>()
     const [userSeller, setUserSeller] = React.useState("")
-    console.log(updateItem)
+
     const [sellProfit, setSellProfit] = React.useState(true);
     const [dataWorkDays, setDataWorkDays] = React.useState([{}]);
+    const [dataDayReservations, setDataDayReservations] = React.useState<any>();
 
-    const [activeCatalogo, setActiveCatalogo] = React.useState(false);
+    const [activeCollection, setActiveCollection] = React.useState(false);
     const [activeReservations, setActiveReservations] = React.useState(false);
 
     React.useEffect(() => {
@@ -38,30 +43,13 @@ export default function StoresForm(props: any) {
     }, [sellerUsers, storeId, userId])
 
     React.useEffect(() => {
-        let newDataWorkDays = dataWorkDays;
         if (updateItem) {
             setSellProfit(updateItem?.fixed_seller_profit_quantity !== null ? false : true)
-            setActiveCatalogo(updateItem ? updateItem.online_catalog : false)
+            setActiveCollection(updateItem ? updateItem.online_catalog : false)
             setActiveReservations(updateItem ? updateItem.online_reservation : false)
 
-            updateItem.store_open_days.forEach((item: any) => {
-                newDataWorkDays[item.week_day_number] = { ...item, activePadLock: true }
-            })
-
-        } else {
-            newDataWorkDays = [];
-            for (let i = 0; i < 7; i++) {
-                newDataWorkDays.push({
-                    id: null,
-                    week_day_number: i,
-                    day_start_time: null,
-                    day_end_time: null,
-                    store_id: storeId,
-                    activePadLock: false
-                })
-            }
         }
-        setDataWorkDays(newDataWorkDays)
+
     }, [updateItem])
 
 
@@ -130,14 +118,11 @@ export default function StoresForm(props: any) {
             sellerUserId: values.sellerUser?.id ?? null,
             fixed_seller_profit_percentage: (sellProfit) ? parseFloat(values.valueSellProfit) : null,
             fixed_seller_profit_quantity: (!sellProfit) ? parseFloat(values.valueSellProfit) : null,
-            online_catalog: activeCatalogo,
+            online_catalog: activeCollection,
             online_reservation: activeReservations
         }
-        console.log(typeof dataWorkDays[2])
-        const response = await openDaysStores.create(userId, dataWorkDays[2])
-        console.log(response);
 
-        /*let response
+        let response: any
 
         if (updateItem) {
             response = await stores.update(userId, data)
@@ -145,20 +130,48 @@ export default function StoresForm(props: any) {
             response = await stores.create(userId, data)
         }
 
-        let openDaysResponse;
-        dataWorkDays.forEach( item => {
-            if( item.id !== null ){
+        let openDaysResponse: any;
+        dataWorkDays.forEach(async (item: any) => {
+            if (item.id !== null) {
                 item.activePadLock
-               ? openDaysResponse = await 
+                    ? openDaysResponse = await openDaysStores.update(urlApiStoreOpenDays, item)
+                    : openDaysResponse = await openDaysStores.delete(urlApiStoreOpenDays, item.id)
+            } else
+                if (item.activePadLock) {
+                    let newItem = item;
+                    newItem.store_id = response.data.id;
+                    openDaysResponse = await openDaysStores.create(urlApiStoreOpenDays, newItem)
+                }
+            // Verificar si hay algun error
+            if (openDaysResponse !== 200) {
+                ///Error
             }
-        })   
+        })
+
+        let daysReservationsResponse: any;
+        dataDayReservations.forEach(async (item: any) => {
+            if (item.id !== null) {
+                item.activePadLock
+                    ? daysReservationsResponse = await openDaysStores.update(urlApiStoreOpenReservations, item)
+                    : daysReservationsResponse = await openDaysStores.delete(urlApiStoreOpenReservations, item.id)
+            } else
+                if (item.activePadLock) {
+                    let newItem = item;
+                    newItem.store_id = response.data.id;
+                    daysReservationsResponse = await openDaysStores.create(urlApiStoreOpenReservations, newItem)
+                }
+            // Verificar si hay algun error
+            if (daysReservationsResponse !== 200) {
+                ///Error
+            }
+        })
 
 
         if (response.status === 200) {
             router.push(`/profile/${userId}/store`)
         } else {
             //ToDo: catch validation errors
-        }*/
+        }
     }
 
     const formik: any = useFormik({
@@ -216,7 +229,6 @@ export default function StoresForm(props: any) {
 
 
     )
-
 
 
     return (
@@ -349,8 +361,8 @@ export default function StoresForm(props: any) {
                             <Grid item>
                                 <Switch
                                     size="small"
-                                    checked={activeCatalogo}
-                                    onClick={() => setActiveCatalogo(!activeCatalogo)}
+                                    checked={activeCollection}
+                                    onClick={() => setActiveCollection(!activeCollection)}
                                 />
                             </Grid>
 
@@ -372,9 +384,22 @@ export default function StoresForm(props: any) {
                         </Grid>
 
                         <Grid item xs={12}>
-                            <WorkDays dataWorkDays={dataWorkDays} setDataWorkDays={setDataWorkDays} />
+                            <WorkDays
+                                title={"Horario de Atención:"}
+                                urlApi={urlApiStoreOpenDays}
+                                setFatherData={setDataWorkDays}
+                                storeId={storeId ?? null}
+                            />
                         </Grid>
 
+                        <Grid item xs={12}>
+                            <WorkDays
+                                title={"Horario de las Reservaciones:"}
+                                urlApi={urlApiStoreOpenReservations}
+                                setFatherData={setDataDayReservations}
+                                storeId={storeId ?? null}
+                            />
+                        </Grid>
 
                         <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                             <Button

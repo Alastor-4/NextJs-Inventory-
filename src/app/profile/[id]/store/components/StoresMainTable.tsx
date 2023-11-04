@@ -24,6 +24,7 @@ import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, AutoStories, DeleteOutline, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShoppingBagOutlined, ShoppingCartOutlined } from "@mui/icons-material";
 import stores from "@/app/profile/[id]/store/requests/stores";
 import { useParams, useRouter } from "next/navigation";
+import WorkDays from "@/components/WorkDays";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -33,6 +34,12 @@ export default function StoresMainTable() {
 
     const params = useParams()
     const router = useRouter()
+
+    //API
+    const urlApiStoreOpenDays = `/profile/${params.id}/store/apiOpenDays`
+    const urlApiStoreOpenReservations = `/profile/${params.id}/store/apiReservations`
+
+
 
     //ToDo: use global isLoading
     const isLoading = false
@@ -379,6 +386,29 @@ export default function StoresMainTable() {
 
                                             </Grid>
 
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={true}>
+                                                    <WorkDays
+                                                        title={"Horario de Atención:"}
+                                                        urlApi={urlApiStoreOpenDays}
+                                                        setFatherData={null}
+                                                        storeId={row.id}
+                                                    />
+                                                </Grid>
+
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={true}>
+                                                    <WorkDays
+                                                        title={"Horario de la Reservaciones:"}
+                                                        urlApi={urlApiStoreOpenReservations}
+                                                        setFatherData={null}
+                                                        storeId={row.id}
+                                                    />
+                                                </Grid>
+
+                                            </Grid>
 
                                         </Grid>
                                     </Collapse>
