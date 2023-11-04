@@ -7,7 +7,7 @@ export async function GET(res: Request) {
     const { searchParams } = new URL(res.url);
     const storeId = parseInt(<string>searchParams.get("storeId"))
 
-    const result = await prisma.store_open_days.findMany({ where: { store_id: storeId } })
+    const result = await prisma.store_reservation_days.findMany({ where: { store_id: storeId } })
 
     return NextResponse.json(result)
 }
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         store_id: parseInt(store_id)
     }
 
-    const result = await prisma.store_open_days.create({ data })
+    const result = await prisma.store_reservation_days.create({ data })
 
     return NextResponse.json(result)
 
@@ -37,7 +37,7 @@ export async function PUT(req: Request) {
         store_id: parseInt(store_id)
     }
 
-    const result = await prisma.store_open_days.update({ data, where: { id: id } })
+    const result = await prisma.store_reservation_days.update({ data, where: { id: id } })
 
     return NextResponse.json(result);
 }
@@ -46,7 +46,7 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url)
     const weekDayId = parseInt(<string>searchParams.get("id"));
 
-    const result = await prisma.store_open_days.delete({ where: { id: weekDayId } })
+    const result = await prisma.store_reservation_days.delete({ where: { id: weekDayId } })
 
     return NextResponse.json(result);
 }
