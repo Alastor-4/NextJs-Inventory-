@@ -1,30 +1,36 @@
-// @ts-nocheck
 "use client"
 
 import {
-    AppBar, Box,
+    AppBar,
+    Box,
     Button,
     Card,
-    CardContent, CircularProgress, Divider,
-    Grid, IconButton,
+    CardContent,
+    Grid,
+    IconButton,
     MenuItem,
-    TextField, Toolbar, Typography,
+    TextField,
+    Toolbar,
+    Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { Formik } from "formik";
+import { Formik, FormikProps} from "formik";
 import * as Yup from "yup";
 import ShowProductsStore from "@/app/profile/[id]/store-assign/components/ShowProductsStore";
 import ShowProductsWarehouse from "@/app/profile/[id]/store-assign/components/ShowProductsWarehouse"
-import {AddOutlined, ArrowLeft, DeleteOutline, ShareOutlined} from "@mui/icons-material";
-import Link from "next/link";
-import {router} from "next/client";
+import {ArrowLeft} from "@mui/icons-material";
+import {router} from "next/client"
+import {useSearchParams} from 'next/navigation';
 
 export default function StoreDepotsAssign(
-    { warehouseListProp, selectedWarehouseIdProp, storeListProp, selectedStoreIdProp }
+    {warehouseListProp, selectedWarehouseIdProp, storeListProp}:
+        { warehouseListProp: any[], selectedWarehouseIdProp: number, storeListProp: any[] }
 ) {
-    const [selectedWarehouse, setSelectedWarehouse] = useState("")
-    const [selectedStore, setSelectedStore] = useState("")
-    const [selectedButton, setSelectedButton] = useState(false)
+    const searchParams = useSearchParams()
+
+    const [selectedWarehouse, setSelectedWarehouse] = useState<any>("")
+    const [selectedStore, setSelectedStore] = useState<any>("")
+    const [selectedButton, setSelectedButton] = useState<boolean>(false)
 
 
     //initial make selected a warehouse
@@ -38,14 +44,12 @@ export default function StoreDepotsAssign(
     }, [selectedWarehouseIdProp, warehouseListProp])
 
     //initial make selected a store
+    const selectedStoreIdProp = searchParams.get("storeId")
     React.useEffect(() => {
-        const { searchParams } = new URL(window.location.href);
-        selectedStoreIdProp = searchParams.get("storeId");
-
-        if (selectedStoreIdProp !== null) {
-            const index = storeListProp.find(item => item.id === parseInt(selectedStoreIdProp))
-            if (index !== -1) {
-                setSelectedStore(index)
+        if (selectedStoreIdProp) {
+            const index = storeListProp.findIndex(item => item.id === parseInt(selectedStoreIdProp))
+            if (index > -1) {
+                setSelectedStore(storeListProp[index])
             }
         }
 
@@ -60,38 +64,6 @@ export default function StoreDepotsAssign(
         selectedWarehouse: Yup.object().required("seleccione un almacén"),
         selectedStore: Yup.object().required("seleccione una tienda"),
     })
-
-
-    async function handleWarehouseChange(e, formik) {
-        formik.setFieldValue("selectedWarehouse", e.target.value)
-        const warehouseId = e.target.value.id
-
-    }
-
-    function handleStoreChange(e, formik) {
-        formik.setFieldValue("selectedStore", e.target.value)
-        setSelectedStore(e.target.value);
-    }
-
-    const showMainTable = () => {
-        if (!selectedButton) {
-            if (selectedStore !== '')
-                return <ShowProductsStore
-                    storeId={selectedStore.id}
-                    nameStore={selectedStore.name}
-                    nameWarehouse={selectedWarehouse.name}
-                />
-
-        } else {
-            if (selectedStore !== '' && selectedWarehouse !== '')
-                return <ShowProductsWarehouse
-                    storeId={selectedStore.id}
-                    warehouseId={selectedWarehouse.id}
-                    defaultPercentage={selectedStore.fixed_seller_profit_percentage}
-                    defaultQuantity={selectedStore.fixed_seller_profit_quantity}
-                />
-        }
-    }
 
     function handleNavigateBack() {
         router.back()
@@ -138,21 +110,23 @@ export default function StoreDepotsAssign(
                             <Grid container rowSpacing={2} direction={"column"}>
                                 <Grid item xs={12}>
                                     <TextField
-                                        name={"selectedWarehouse"}
                                         label="Almacén"
                                         size={"small"}
                                         fullWidth
                                         select
                                         {...formik.getFieldProps("selectedWarehouse")}
-                                        value={formik.values.selectedWarehouse}
-                                        onChange={(e) => handleWarehouseChange(e, formik)}
-                                        error={formik.errors.selectedWarehouse && formik.touched.selectedWarehouse}
+                                        error={!!formik.errors.selectedWarehouse && !!formik.touched.selectedWarehouse}
+                                        // @ts-ignore
                                         helperText={(formik.errors.selectedWarehouse && formik.touched.selectedWarehouse) && formik.errors.selectedWarehouse}
                                     >
                                         {
                                             warehouseListProp.map(item => (
-                                                <MenuItem key={item.id}
-                                                    value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
+                                                <MenuItem
+                                                    key={item.id}
+                                                    value={item}
+                                                >
+                                                    {`${item.name} (${item.description ?? ''})`}
+                                                </MenuItem>
                                             ))
                                         }
                                     </TextField>
@@ -160,14 +134,13 @@ export default function StoreDepotsAssign(
 
                                 <Grid item xs={12}>
                                     <TextField
-                                        name={"selectedStore"}
                                         label="Tienda"
                                         size={"small"}
                                         fullWidth
                                         select
-                                        value={formik.values.selectedStore}
-                                        onChange={(e) => handleStoreChange(e, formik)}
-                                        error={formik.errors.selectedStore && formik.touched.selectedStore}
+                                        {...formik.getFieldProps("selectedStore")}
+                                        error={!!formik.errors.selectedStore && !!formik.touched.selectedStore}
+                                        // @ts-ignore
                                         helperText={(formik.errors.selectedStore && formik.touched.selectedStore) && formik.errors.selectedStore}
                                     >
                                         {
@@ -178,7 +151,7 @@ export default function StoreDepotsAssign(
                                         }
                                     </TextField>
                                 </Grid>
-                                <Grid item>
+                                <Grid item xs={12}>
                                     <Button
                                         variant={(!selectedButton) ? 'contained' : 'outlined'}
                                         onClick={() => setSelectedButton((e) => false)}
@@ -194,11 +167,30 @@ export default function StoreDepotsAssign(
                                     </Button>
                                 </Grid>
 
-                                <Grid item>
-                                    {showMainTable()}
-
+                                <Grid item xs={12}>
+                                    {
+                                        formik.values.selectedWarehouse && formik.values.selectedStore && (
+                                            <>
+                                                {
+                                                    selectedButton ? (
+                                                        <ShowProductsWarehouse
+                                                            storeId={formik.values.selectedStore.id}
+                                                            warehouseId={formik.values.selectedWarehouse.id}
+                                                            defaultPercentage={formik.values.selectedStore.fixed_seller_profit_percentage}
+                                                            defaultQuantity={formik.values.selectedStore.fixed_seller_profit_quantity}
+                                                        />
+                                                    ) : (
+                                                        <ShowProductsStore
+                                                            storeId={formik.values.selectedStore.id}
+                                                            nameStore={formik.values.selectedStore.name}
+                                                            nameWarehouse={formik.values.selectedWarehouse.name}
+                                                        />
+                                                    )
+                                                }
+                                            </>
+                                        )
+                                    }
                                 </Grid>
-
                             </Grid>
                         </CardContent>
                     </Card>

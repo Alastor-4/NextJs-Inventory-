@@ -42,19 +42,8 @@ const storeAssign = {
         return false
     },
 
-    RemoveProductStore: async function (userId, storeDepotId) {
-        try {
-            const response = await apiRequest.delete(showProductStoreUrl(userId), { params: { storeDepotId: storeDepotId } })
-            return response
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
-
     // Peticiones para el component ShowProductWarehouse
-    allProductbyDepartmentWarehouse: async function (userId, storeId, warehouseId) {
+    allProductByDepartmentWarehouse: async function (userId, storeId, warehouseId) {
         try {
             const response = await apiRequest.get(showProductWarehouseUrl(userId), { params: { storeId: storeId, warehouseId: warehouseId } })
             return response.data
