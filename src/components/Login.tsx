@@ -286,7 +286,7 @@ export default function Login() {
                         </Grid>
                         <Grid container item xs={12} justifyContent={"center"} textAlign={"justify"}>
                             <Typography variant={"h4"}>
-                                + Inventory
+                               Inventory+
                             </Typography>
                         </Grid>
                         <Grid container item xs={12}>
