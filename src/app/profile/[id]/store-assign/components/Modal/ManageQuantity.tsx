@@ -48,7 +48,7 @@ function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot,
 
     } else productStoreDepots.product_remaining_units -= parseInt(values.units)
 
-    const result = await storeAssign.UpdateProductStore(params.id, productStoreDepots)
+    const result = await storeAssign.updateProductStore(params.id, productStoreDepots)
 
     if (result === 200) {
       (!swap)

@@ -20,7 +20,15 @@ import {
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { ArrowLeft, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShareOutlined, SwapHoriz } from "@mui/icons-material";
+import {
+    AddOutlined,
+    ArrowLeft,
+    EditOutlined,
+    ExpandLessOutlined,
+    ExpandMoreOutlined,
+    ShareOutlined,
+    SwapHoriz
+} from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import { Formik } from "formik";
 import stores from "@/app/profile/[id]/store/requests/stores"
@@ -156,11 +164,12 @@ export default function StoreMainTable() {
                             ? <CircularProgress size={24} color={"inherit"} />
                             : (
                                 <>
-
                                     <IconButton color={"inherit"} onClick={() => router.push(`/profile/${params.id}/store-assign?storeId=${dataStore.id}`)} >
                                         <ShareOutlined fontSize={"small"} />
                                     </IconButton>
-
+                                    <IconButton color={"inherit"} >
+                                        <AddOutlined />
+                                    </IconButton>
                                 </>
                             )
                     }
