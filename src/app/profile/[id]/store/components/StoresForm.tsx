@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client"
 
 import { AppBar, Box, Button, Card, Checkbox, Grid, MenuItem, Switch, TextField, Toolbar, Typography } from "@mui/material";
@@ -7,29 +6,34 @@ import { Formik, useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import stores from "@/app/profile/[id]/store/requests/stores";
-import WorkDays from "./WorkDays";
+import WorkDays from "../../../../../components/WorkDays";
+import { openDaysStores } from "../../../../../request/openDaysStores";
 
-export default function StoresForm(props) {
+export default function StoresForm(props: any) {
     const { userId, storeId, sellerUsers } = props
 
-    
     const router = useRouter()
 
-    const [updateItem, setUpdateItem] = React.useState()
+    //Url de las api
+    const urlApiStoreOpenDays = `/profile/${userId}/store/apiOpenDays`
+    const urlApiStoreOpenReservations = `/profile/${userId}/store/apiReservations`
+
+    const [updateItem, setUpdateItem] = React.useState<any>()
     const [userSeller, setUserSeller] = React.useState("")
 
     const [sellProfit, setSellProfit] = React.useState(true);
     const [dataWorkDays, setDataWorkDays] = React.useState([{}]);
+    const [dataDayReservations, setDataDayReservations] = React.useState<any>();
 
-    const [activeCatalogo, setActiveCatalogo] = React.useState(false);
+    const [activeCollection, setActiveCollection] = React.useState(false);
     const [activeReservations, setActiveReservations] = React.useState(false);
 
     React.useEffect(() => {
-        async function fetchStore(id) {
+        async function fetchStore(id: any) {
             const store = await stores.storeDetails(userId, id)
             setUpdateItem(store)
             if (store.seller_user) {
-                const index = sellerUsers.findIndex(item => item.id === store.seller_user.id)
+                const index = sellerUsers.findIndex((item: any) => item.id === store.seller_user.id)
                 setUserSeller(index > -1 ? sellerUsers[index] : "")
             }
         }
@@ -39,30 +43,13 @@ export default function StoresForm(props) {
     }, [sellerUsers, storeId, userId])
 
     React.useEffect(() => {
-        let newDataWorkDays = dataWorkDays;
         if (updateItem) {
             setSellProfit(updateItem?.fixed_seller_profit_quantity !== null ? false : true)
-            setActiveCatalogo(updateItem ? updateItem.online_catalog : false)
+            setActiveCollection(updateItem ? updateItem.online_catalog : false)
             setActiveReservations(updateItem ? updateItem.online_reservation : false)
 
-            updateItem.store_open_days.forEach(item => {
-                newDataWorkDays[item.week_day_number] = { ...item, activePadLock: true }
-            })
-
-        } else {
-            newDataWorkDays = [];
-            for (let i = 0; i < 7; i++) {
-                newDataWorkDays.push({
-                    id: null,
-                    week_day_number: i,
-                    day_start_time: null,
-                    day_end_time: null,
-                    store_id: null,
-                    activePadLock: false
-                })
-            }
         }
-        setDataWorkDays(newDataWorkDays)
+
     }, [updateItem])
 
 
@@ -92,16 +79,13 @@ export default function StoresForm(props) {
         slogan: updateItem ? updateItem.slogan : "",
         address: updateItem ? updateItem.address : "",
         sellerUser: userSeller,
-        /* currency: sellProfit
-             ? ("%")
-             : (updateItem ? updateItem.sell_price_unit : "CUP"),*/
         valueSellProfit: sellProfit
             ? (updateItem?.fixed_seller_profit_percentage ?? 0)
             : (updateItem?.fixed_seller_profit_quantity ?? 0)
 
     }
 
-    const validationSchema = Yup.object({
+    const validationSchema = Yup.object<any>({
         name: Yup.string().required("campo requerido"),
         description: Yup.string(),
         slogan: Yup.string(),
@@ -123,7 +107,7 @@ export default function StoresForm(props) {
         //currency: Yup.object()
     })
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values: any) => {
         const data = {
             ownerId: parseInt(userId),
             storeId: parseInt(storeId),
@@ -134,17 +118,54 @@ export default function StoresForm(props) {
             sellerUserId: values.sellerUser?.id ?? null,
             fixed_seller_profit_percentage: (sellProfit) ? parseFloat(values.valueSellProfit) : null,
             fixed_seller_profit_quantity: (!sellProfit) ? parseFloat(values.valueSellProfit) : null,
-            online_catalog: activeCatalogo,
+            online_catalog: activeCollection,
             online_reservation: activeReservations
         }
 
-        let response
+        let response: any
 
         if (updateItem) {
             response = await stores.update(userId, data)
         } else {
             response = await stores.create(userId, data)
         }
+
+        let openDaysResponse: any;
+        dataWorkDays.forEach(async (item: any) => {
+            if (item.id !== null) {
+                item.activePadLock
+                    ? openDaysResponse = await openDaysStores.update(urlApiStoreOpenDays, item)
+                    : openDaysResponse = await openDaysStores.delete(urlApiStoreOpenDays, item.id)
+            } else
+                if (item.activePadLock) {
+                    let newItem = item;
+                    newItem.store_id = response.data.id;
+                    openDaysResponse = await openDaysStores.create(urlApiStoreOpenDays, newItem)
+                }
+            // Verificar si hay algun error
+            if (openDaysResponse !== 200) {
+                ///Error
+            }
+        })
+
+        let daysReservationsResponse: any;
+        dataDayReservations.forEach(async (item: any) => {
+            if (item.id !== null) {
+                item.activePadLock
+                    ? daysReservationsResponse = await openDaysStores.update(urlApiStoreOpenReservations, item)
+                    : daysReservationsResponse = await openDaysStores.delete(urlApiStoreOpenReservations, item.id)
+            } else
+                if (item.activePadLock) {
+                    let newItem = item;
+                    newItem.store_id = response.data.id;
+                    daysReservationsResponse = await openDaysStores.create(urlApiStoreOpenReservations, newItem)
+                }
+            // Verificar si hay algun error
+            if (daysReservationsResponse !== 200) {
+                ///Error
+            }
+        })
+
 
         if (response.status === 200) {
             router.push(`/profile/${userId}/store`)
@@ -153,7 +174,7 @@ export default function StoresForm(props) {
         }
     }
 
-    const formik = useFormik({
+    const formik: any = useFormik({
         initialValues: initialValues,
         validationSchema: validationSchema,
         onSubmit: handleSubmit,
@@ -161,7 +182,7 @@ export default function StoresForm(props) {
     })
 
 
-    const editPercentage = (formik) => (
+    const editPercentage = (formik: any) => (
         <Grid item container columnSpacing={1}>
             <Grid item>
                 <TextField
@@ -184,7 +205,7 @@ export default function StoresForm(props) {
 
     )
 
-    const editQuantity = (formik) => (
+    const editQuantity = (formik: any) => (
         <Grid item container columnSpacing={1}>
             <Grid item>
                 <TextField
@@ -208,7 +229,6 @@ export default function StoresForm(props) {
 
 
     )
-
 
 
     return (
@@ -283,7 +303,7 @@ export default function StoresForm(props) {
                             >
                                 <MenuItem value={""}>Ninguno</MenuItem>
                                 {
-                                    sellerUsers.map(item => (
+                                    sellerUsers.map((item: any) => (
                                         <MenuItem key={item.id} value={item}>{`${item.name} (${item.username})`}</MenuItem>
                                     ))
                                 }
@@ -341,8 +361,8 @@ export default function StoresForm(props) {
                             <Grid item>
                                 <Switch
                                     size="small"
-                                    checked={activeCatalogo}
-                                    onClick={() => setActiveCatalogo(!activeCatalogo)}
+                                    checked={activeCollection}
+                                    onClick={() => setActiveCollection(!activeCollection)}
                                 />
                             </Grid>
 
@@ -364,9 +384,22 @@ export default function StoresForm(props) {
                         </Grid>
 
                         <Grid item xs={12}>
-                            <WorkDays dataWorkDays={dataWorkDays} setDataWorkDays = {setDataWorkDays} />
+                            <WorkDays
+                                title={"Horario de Atención:"}
+                                urlApi={urlApiStoreOpenDays}
+                                setFatherData={setDataWorkDays}
+                                storeId={storeId ?? null}
+                            />
                         </Grid>
 
+                        <Grid item xs={12}>
+                            <WorkDays
+                                title={"Horario de las Reservaciones:"}
+                                urlApi={urlApiStoreOpenReservations}
+                                setFatherData={setDataDayReservations}
+                                storeId={storeId ?? null}
+                            />
+                        </Grid>
 
                         <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                             <Button
