@@ -205,7 +205,7 @@ function ShowProductsWarehouse(props: any) {
             productStoreDepot.product_units = 0;
             productStoreDepot.is_active = true;
 
-            response = await storeAssign.UpdateProductStore(params.id, productStoreDepot);
+            response = await storeAssign.updateProductStore(params.id, productStoreDepot);
 
         } else {
             const data = {

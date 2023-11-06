@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import React from "react";
 
-export default function ModalStoreAssing(props) {
+export default function ModalStoreAssign(props) {
     const { open, setOpen, dialogTitle } = props
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {

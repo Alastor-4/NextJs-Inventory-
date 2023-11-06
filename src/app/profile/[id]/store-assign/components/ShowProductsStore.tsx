@@ -3,7 +3,6 @@
 
 import React, { useEffect, useState } from 'react'
 import storeAssign from '@/app/profile/[id]/store-assign/requests/store-assign';
-import InputTableCell from '@/app/profile/[id]/store-assign/components/InputTableCell';
 import { TableNoData } from "@/components/TableNoData";
 import { useParams } from 'next/navigation';
 import {
@@ -23,14 +22,19 @@ import {
     Tooltip,
     Typography
 } from '@mui/material';
-import { EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, RemoveOutlined, VisibilityOutlined } from '@mui/icons-material';
+import {
+    EditOutlined,
+    ExpandLessOutlined,
+    ExpandMoreOutlined,
+    RemoveOutlined,
+    VisibilityOutlined
+} from '@mui/icons-material';
 import { Formik } from 'formik';
-import ModalStoreAssing from './Modal/ModalStoreAssing';
+import ModalStoreAssign from './Modal/ModalStoreAssign';
 import ManageQuantity from './Modal/ManageQuantity';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 
 function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
-
     const params = useParams()
 
     const [allProductStore, setAllProductStore] = useState(null);
@@ -49,8 +53,8 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
     }, [storeId])
 
     useEffect(() => {
-        const Datos = async () => {
-            const result = await storeAssign.allProductsbyDepartmentStore(params.id, storeId)
+        const data = async () => {
+            const result = await storeAssign.allProductsByDepartmentStore(params.id, storeId)
             setAllProductStore(() => result.map(data => ({
                 ...data,
                 selected: false
@@ -58,7 +62,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
         }
 
         if (allProductStore === null) {
-            Datos()
+            data()
         }
     }, [allProductStore, params.id, setAllProductStore, storeId])
 
@@ -105,19 +109,32 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                     <Grid item>
                         <Typography variant={"subtitle2"}>
                             Seleccione departamentos para encontrar el producto que busca
+                            <IconButton
+                                onClick={() => setDisplayFilterSection(!displayFilterSection)}
+                                sx={{ml: "5px"}}
+                            >
+                                {displayFilterSection
+                                    ? <ExpandMoreOutlined fontSize={"small"}/>
+                                    : <ExpandLessOutlined fontSize={"small"}/>
+                                }
+                            </IconButton>
                         </Typography>
                     </Grid>
                     <Grid container item columnSpacing={2}>
                         {
-                            allProductStore.map((item, index) => (
+                            displayFilterSection && allProductStore.map((item, index) => (
                                 <Grid key={item.id} item xs={"auto"}>
-                                    <Button variant={item.selected ? "contained" : "outlined"}
-                                        onClick={() => handleSelectFilter(index)}>
+                                    <Button
+                                        variant={item.selected ? "contained" : "outlined"}
+                                        onClick={() => handleSelectFilter(index)}
+                                        size={"small"}
+                                        sx={{padding: "5px 0"}}
+                                    >
                                         <Grid container>
                                             <Grid item xs={12}>
                                                 {item.name}
                                             </Grid>
-                                            <Grid container item xs={12} justifyContent={"center"}>
+                                            <Grid item xs={12}>
                                                 <Typography variant={"caption"}>
                                                     {item.products.length} productos
                                                 </Typography>
@@ -151,7 +168,6 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                         )
                     }
                 </Grid>
-
             </Card>
         )
     }
@@ -203,8 +219,8 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
             </TableHead>
         )
     }
-    const loadDates = async () => {
-        let newAllProductStore = await storeAssign.allProductsbyDepartmentStore(params.id, storeId);
+    const loadData = async () => {
+        let newAllProductStore = await storeAssign.allProductsByDepartmentStore(params.id, storeId);
 
         let selectedDepartment = allProductStore.filter(element => (element.selected)).map(element => element.id)
 
@@ -217,16 +233,16 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
 
     const updateDepot = async (addUnits, depot) => {
         depot.product_total_remaining_units += addUnits;
-        const result = await storeAssign.UpdateProductWarehouse(params.id, depot)
+        const result = await storeAssign.updateProductWarehouse(params.id, depot)
         if (result.status === 200) {
-            loadDates();
+            loadData();
         }
     }
     // No borra el elemento de la tabla sino q cambia el valor
     // de product_units a -1 para q no c filtre y asi conservar los datos
     const removeProduct = async (index) => {
         const newProductStoreDepots = data[index].depots[0].store_depots[0];
-        const datos = {
+        const updateData = {
             id: newProductStoreDepots.id,
             storeId: newProductStoreDepots.store_id,
             depotId: newProductStoreDepots.depot_id,
@@ -242,14 +258,11 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
             offer_notes: newProductStoreDepots.offer_notes,
         }
 
-
-        const result = await storeAssign.UpdateProductStore(params.id, datos)
+        const result = await storeAssign.updateProductStore(params.id, updateData)
 
         if (result === 200) {
-            updateDepot(data[index].depots[0].store_depots[0].product_remaining_units, data[index].depots[0]);
+            await updateDepot(data[index].depots[0].store_depots[0].product_remaining_units, data[index].depots[0]);
         }
-
-
     }
 
     function handleOpenImagesDialog(images) {
@@ -284,13 +297,11 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
 
                                         <TableCell>
                                             <Grid container columnSpacing={1}>
-
                                                 <Grid item >
                                                     {row.depots[0].store_depots[0].product_remaining_units}
                                                 </Grid>
 
                                                 <Grid item>
-
                                                     <IconButton sx={{ padding: 0 }} size='small' onClick={() => {
                                                         setActiveManageQuantity(true)
                                                         setSelectedProduct(row)
@@ -298,9 +309,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                                                     >
                                                         <EditOutlined fontSize="small" color='primary' />
                                                     </IconButton>
-
                                                 </Grid>
-
                                             </Grid>
                                         </TableCell>
 
@@ -425,46 +434,41 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
 
 
                                                         <Grid container item spacing={1} xs={12}>
-                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades restantes:</Grid>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades en tienda:</Grid>
                                                             <Grid item xs={true}>
                                                                 {row.depots[0].store_depots[0].product_remaining_units}
                                                             </Grid>
                                                         </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
-                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Total de unidades ingresadas:</Grid>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Total histórico de unidades ingresadas:</Grid>
                                                             <Grid item xs={true}>
                                                                 {row.depots[0].store_depots[0].product_units}
                                                             </Grid>
                                                         </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
-                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{`Unidades restantes en el almacén(${nameWarehouse}):`}</Grid>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{`Unidades en almacén (${nameWarehouse}):`}</Grid>
                                                             <Grid item xs={true}>
                                                                 {row.depots[0].product_total_remaining_units}
                                                             </Grid>
                                                         </Grid>
-
-
-
-
                                                     </Grid>
                                                 </Collapse>
                                             )
                                             }
                                         </TableCell>
                                     </TableRow>
-
                                 </React.Fragment>
                             ))}
             </TableBody>
         )
     }
 
+    const [displayFilterSection, setDisplayFilterSection] = React.useState(true)
 
     return (
         <div>
-
             <Formik
                 initialValues={initialValues}
                 onSubmit={() => {
@@ -474,8 +478,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                 {
                     (formik) => (
                         <Card variant={"outlined"}>
-
-                            <ModalStoreAssing
+                            <ModalStoreAssign
                                 dialogTitle={"Administrar la cantidad del producto"}
                                 open={activeManageQuantity}
                                 setOpen={setActiveManageQuantity}
@@ -487,8 +490,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                                     updateDepot={updateDepot}
                                     setActiveManageQuantity={setActiveManageQuantity}
                                 />
-                            </ModalStoreAssing>
-
+                            </ModalStoreAssign>
 
                             <ImagesDisplayDialog
                                 dialogTitle={"Imágenes del producto"}
@@ -497,33 +499,43 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                                 images={dialogImages}
                             />
 
-
                             <CardContent>
-                                {
-                                    Array.isArray(allProductStore) && allProductStore.length > 0 && (
-                                        <DepartmentsFilter formik={formik} />
-                                    )
-                                }
+                                <Grid container rowSpacing={2}>
+                                    <Grid container item xs={12} justifyContent={"space-between"}>
+                                        <Typography variant={"subtitle1"}>Productos en tienda</Typography>
+                                        <Button size={"small"} variant={"contained"}>
+                                            Agregar nuevo
+                                        </Button>
+                                    </Grid>
 
-                                {
-                                    data?.length > 0
-                                        ? (
-                                            <Table sx={{ width: "100%" }} size={"small"}>
-                                                <TableHeader />
-
-                                                <TableContent formik={formik} />
-                                            </Table>
-                                        ) : (
-                                            <TableNoData />
+                                    {
+                                        Array.isArray(allProductStore) && allProductStore.length > 0 && (
+                                            <Grid item xs={12}>
+                                                <DepartmentsFilter formik={formik} />
+                                            </Grid>
                                         )
-                                }
+                                    }
+
+                                    <Grid item xs={12}>
+                                        {
+                                            data?.length > 0
+                                                ? (
+                                                    <Table sx={{ width: "100%" }} size={"small"}>
+                                                        <TableHeader />
+                                                        <TableContent formik={formik} />
+                                                    </Table>
+                                                ) : (
+                                                    <TableNoData />
+                                                )
+                                        }
+                                    </Grid>
+                                </Grid>
                             </CardContent>
                         </Card>
                     )
                 }
             </Formik>
-
-        </div >
+        </div>
     )
 }
 

@@ -30,7 +30,6 @@ export default function StoreDepotsAssign(
 
     const [selectedWarehouse, setSelectedWarehouse] = useState<any>("")
     const [selectedStore, setSelectedStore] = useState<any>("")
-    const [selectedButton, setSelectedButton] = useState<boolean>(false)
 
 
     //initial make selected a warehouse
@@ -151,46 +150,18 @@ export default function StoreDepotsAssign(
                                         }
                                     </TextField>
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <Button
-                                        variant={(!selectedButton) ? 'contained' : 'outlined'}
-                                        onClick={() => setSelectedButton((e) => false)}
-                                    >
-                                        Administar Tienda
-                                    </Button>
-                                    <Button
-                                        variant={(selectedButton) ? 'contained' : 'outlined'}
-                                        onClick={() => setSelectedButton((e) => true)}
-                                        sx={{ ml: "10px" }}
-                                    >
-                                        Agregar productos del almacen
-                                    </Button>
-                                </Grid>
 
-                                <Grid item xs={12}>
-                                    {
-                                        formik.values.selectedWarehouse && formik.values.selectedStore && (
-                                            <>
-                                                {
-                                                    selectedButton ? (
-                                                        <ShowProductsWarehouse
-                                                            storeId={formik.values.selectedStore.id}
-                                                            warehouseId={formik.values.selectedWarehouse.id}
-                                                            defaultPercentage={formik.values.selectedStore.fixed_seller_profit_percentage}
-                                                            defaultQuantity={formik.values.selectedStore.fixed_seller_profit_quantity}
-                                                        />
-                                                    ) : (
-                                                        <ShowProductsStore
-                                                            storeId={formik.values.selectedStore.id}
-                                                            nameStore={formik.values.selectedStore.name}
-                                                            nameWarehouse={formik.values.selectedWarehouse.name}
-                                                        />
-                                                    )
-                                                }
-                                            </>
-                                        )
-                                    }
-                                </Grid>
+                                {
+                                    formik.values.selectedWarehouse && formik.values.selectedStore && (
+                                        <Grid item xs={12}>
+                                            <ShowProductsStore
+                                                storeId={formik.values.selectedStore.id}
+                                                nameStore={formik.values.selectedStore.name}
+                                                nameWarehouse={formik.values.selectedWarehouse.name}
+                                            />
+                                        </Grid>
+                                    )
+                                }
                             </Grid>
                         </CardContent>
                     </Card>

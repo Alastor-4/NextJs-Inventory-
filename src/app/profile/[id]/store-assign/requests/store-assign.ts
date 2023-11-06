@@ -8,8 +8,8 @@ const showProductStoreUrl = (userId) => `/profile/${userId}/store-assign/showPro
 
 
 const storeAssign = {
-    //Periciones del component ShowPoductStore
-    allProductsbyDepartmentStore: async function (userId, storeId) {
+    //Peticiones del component ShowProductStore
+    allProductsByDepartmentStore: async function (userId, storeId) {
         try {
             const response = await apiRequest.get(showProductStoreUrl(userId), { params: { storeId: storeId } })
             return response.data
@@ -20,7 +20,7 @@ const storeAssign = {
         return false
     },
 
-    UpdateProductStore: async function (userId, data) {
+    updateProductStore: async function (userId, data) {
         try {
             const response = await apiRequest.put(showProductStoreUrl(userId), data)
             return response.status
@@ -31,10 +31,9 @@ const storeAssign = {
         return false
     },
 
-    UpdateProductWarehouse: async function (userId, data) {
+    updateProductWarehouse: async function (userId, data) {
         try {
-            const response = await apiRequest.put(showProductWarehouseUrl(userId), data)
-            return response
+            return await apiRequest.put(showProductWarehouseUrl(userId), data)
         } catch (e) {
             //ToDo: notify error here
         }
