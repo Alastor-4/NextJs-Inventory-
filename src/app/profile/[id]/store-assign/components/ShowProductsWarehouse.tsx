@@ -2,19 +2,19 @@
 import React, { useEffect, useState } from 'react'
 import storeAssign from '@/app/profile/[id]/store-assign/requests/store-assign'
 import { TableNoData } from "@/components/TableNoData";
-import { Box, Button, Card, CardContent, Checkbox, Collapse, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Card, CardContent, Collapse, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import { useParams } from 'next/navigation'
 import { Formik } from 'formik'
 import { AddOutlined, ExpandLessOutlined, ExpandMoreOutlined, VisibilityOutlined } from '@mui/icons-material';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 
 
-function showProductsWarehouse(props: any) {
-
+function ShowProductsWarehouse(props: any) {
     const { storeId, warehouseId, defaultPercentage, defaultQuantity } = props
+
     const params = useParams();
 
-    const [allProductByWarehouseDepartament, setAllProductByWarehouseDepartament] = useState<any>(null);
+    const [allProductByWarehouseDepartment, setAllProductByWarehouseDepartment] = useState<any>(null);
     const [data, setData] = useState<any>();
 
     const [showDetails, setShowDetails] = useState<any>(false)
@@ -23,27 +23,29 @@ function showProductsWarehouse(props: any) {
     const [dialogImages, setDialogImages] = useState([]);
 
     useEffect(() => {
-        setAllProductByWarehouseDepartament(null)
+        setAllProductByWarehouseDepartment(null)
     }, [storeId, warehouseId])
 
     useEffect(() => {
-        const Datos = async () => {
-            const result = await storeAssign.allProductbyDepartmentWarehouse(params.id, storeId, warehouseId)
-            setAllProductByWarehouseDepartament(() => result.map((data: Object) => ({
+        const data = async () => {
+            const result = await storeAssign.allProductByDepartmentWarehouse(params.id, storeId, warehouseId)
+            setAllProductByWarehouseDepartment(() => result.map((data: Object) => ({
                 ...data,
                 selected: false
             })))
         }
-        if (allProductByWarehouseDepartament === null) Datos()
 
-    }, [allProductByWarehouseDepartament, params.id, storeId, warehouseId])
+        if (allProductByWarehouseDepartment === null)
+            data()
+
+    }, [allProductByWarehouseDepartment, params.id, storeId, warehouseId])
 
     useEffect(() => {
-        if (allProductByWarehouseDepartament !== null) {
+        if (allProductByWarehouseDepartment !== null) {
 
             let allProducts: any = []
 
-            allProductByWarehouseDepartament.forEach((departmentItem: any) => {
+            allProductByWarehouseDepartment.forEach((departmentItem: any) => {
                 if (departmentItem.selected) {
                     allProducts = [...allProducts, ...departmentItem.products]
                 }
@@ -63,13 +65,13 @@ function showProductsWarehouse(props: any) {
         }
 
 
-    }, [allProductByWarehouseDepartament])
+    }, [allProductByWarehouseDepartment])
 
     async function handleSelectFilter(index: number) {
-        let filters = [...allProductByWarehouseDepartament]
+        let filters = [...allProductByWarehouseDepartment]
         filters[index].selected = !filters[index].selected
 
-        setAllProductByWarehouseDepartament(filters)
+        setAllProductByWarehouseDepartment(filters)
     }
 
     const DepartmentsFilter = ({ formik }: { formik: any }) => {
@@ -83,7 +85,7 @@ function showProductsWarehouse(props: any) {
                     </Grid>
                     <Grid container item columnSpacing={2}>
                         {
-                            allProductByWarehouseDepartament.map((item: any, index: number) => (
+                            allProductByWarehouseDepartment.map((item: any, index: number) => (
                                 <Grid key={item.id} item xs={"auto"}>
                                     <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
                                         <Grid container>
@@ -131,8 +133,6 @@ function showProductsWarehouse(props: any) {
     const initialValues = {
         searchBarValue: ""
     }
-
-
 
     const TableHeader = () => {
         const headCells = [
@@ -183,15 +183,15 @@ function showProductsWarehouse(props: any) {
 
 
     const loadDates = async () => {
-        let newAllProductbyDepartmentWarehouse = await storeAssign.allProductbyDepartmentWarehouse(params.id, storeId, warehouseId);
+        let newAllProductByDepartmentWarehouse = await storeAssign.allProductByDepartmentWarehouse(params.id, storeId, warehouseId);
 
-        let selectedDepartment = allProductByWarehouseDepartament.filter((element: any) => (element.selected)).map((element: any) => element.id)
+        let selectedDepartment = allProductByWarehouseDepartment.filter((element: any) => (element.selected)).map((element: any) => element.id)
 
-        newAllProductbyDepartmentWarehouse = newAllProductbyDepartmentWarehouse.map((element: any) => ({
+        newAllProductByDepartmentWarehouse = newAllProductByDepartmentWarehouse.map((element: any) => ({
             ...element,
             selected: (selectedDepartment.includes(element.id))
         }))
-        setAllProductByWarehouseDepartament(newAllProductbyDepartmentWarehouse);
+        setAllProductByWarehouseDepartment(newAllProductByDepartmentWarehouse);
     }
 
 
@@ -205,10 +205,10 @@ function showProductsWarehouse(props: any) {
             productStoreDepot.product_units = 0;
             productStoreDepot.is_active = true;
 
-            response = await storeAssign.UpdateProductStore(params.id, productStoreDepot);
+            response = await storeAssign.updateProductStore(params.id, productStoreDepot);
 
         } else {
-            const datos = {
+            const data = {
                 storeId: parseInt(storeId),
                 depotId: parseInt(row.depots[0].id),
                 product_units: 0,
@@ -222,7 +222,8 @@ function showProductsWarehouse(props: any) {
                 is_active: true,
                 offer_notes: null,
             }
-            response = await storeAssign.postProductToStoreDepot(params.id, datos);
+
+            response = await storeAssign.postProductToStoreDepot(params.id, data);
         }
 
         if (response === 200) {
@@ -429,8 +430,8 @@ function showProductsWarehouse(props: any) {
 
                             <CardContent>
                                 {
-                                    Array.isArray(allProductByWarehouseDepartament) &&
-                                    allProductByWarehouseDepartament.length > 0 && (
+                                    Array.isArray(allProductByWarehouseDepartment) &&
+                                    allProductByWarehouseDepartment.length > 0 && (
                                         <DepartmentsFilter formik={formik} />
                                     )
                                 }
@@ -456,4 +457,4 @@ function showProductsWarehouse(props: any) {
     )
 }
 
-export default showProductsWarehouse
+export default ShowProductsWarehouse
