@@ -9,10 +9,10 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers';
-import {AddOutlined, Cancel, CancelOutlined, Close, DeleteOutline, RemoveDone} from "@mui/icons-material";
+import {AddOutlined, Close} from "@mui/icons-material";
 import dayjs from "dayjs";
 
-export default function StoreOpeningDays({formik}: {formik: any}) {
+export default function StoreOpeningDays({formik, valuesFieldKey}: {formik: any, valuesFieldKey: string}) {
     const daysMap = {
         1: "D",
         2: "L",
@@ -24,33 +24,33 @@ export default function StoreOpeningDays({formik}: {formik: any}) {
     }
 
     function handleToggleOpen(index: number, open: boolean) {
-        formik.setFieldValue(`openingDays.${index}.open`, !open)
+        formik.setFieldValue(`${valuesFieldKey}.${index}.open`, !open)
     }
 
     function handleSetTime(index: number, timeIndex: number, key: string, value: any) {
-        formik.setFieldValue(`openingDays.${index}.times.${timeIndex}.${key}`, value)
+        formik.setFieldValue(`${valuesFieldKey}.${index}.times.${timeIndex}.${key}`, value)
     }
 
     function handleAddTime(index: number) {
-        let openingDays = [...formik.values.openingDays]
+        let openingDays = [...formik.values[valuesFieldKey]]
 
-        let times = formik.values.openingDays[index].times
+        let times = formik.values[valuesFieldKey][index].times
         times.push({startTime: dayjs(), endTime: dayjs()})
 
         openingDays[index].times = times
 
-        formik.setFieldValue("openingDays", openingDays)
+        formik.setFieldValue(valuesFieldKey, openingDays)
     }
 
     function handleRemoveTime(index: number, timeIndex: number) {
-        let openingDays = [...formik.values.openingDays]
+        let openingDays = [...formik.values[valuesFieldKey]]
 
-        let times = formik.values.openingDays[index].times
+        let times = formik.values[valuesFieldKey][index].times
         times.splice(timeIndex, 1)
 
         openingDays[index].times = times
 
-        formik.setFieldValue("openingDays", openingDays)
+        formik.setFieldValue(valuesFieldKey, openingDays)
     }
 
     return (
@@ -62,7 +62,7 @@ export default function StoreOpeningDays({formik}: {formik: any}) {
 
                 <Grid container item xs={12} alignItems={"flex-start"} columnSpacing={1} sx={{overflowX: "auto"}}>
                     {
-                        formik.values.openingDays.map((item: any, index: number) => (
+                        formik.values[valuesFieldKey].map((item: any, index: number) => (
                             <Grid container item xs={true} justifyContent={"center"} key={index}>
                                 <Grid container rowSpacing={1}>
                                     <Grid container item xs={12} justifyContent={"center"}>

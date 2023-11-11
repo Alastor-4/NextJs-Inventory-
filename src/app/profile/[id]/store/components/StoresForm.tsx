@@ -7,13 +7,9 @@ import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import stores from "@/app/profile/[id]/store/requests/stores";
 import WorkDays from "../../../../../components/WorkDays";
-import { openDaysStores } from "../../../../../request/openDaysStores";
-import dayjs, { Dayjs } from "dayjs";
-import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
-import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {TimePicker} from "@mui/x-date-pickers";
+import { openDaysStores } from "@/request/openDaysStores";
+import dayjs from "dayjs";
 import StoreOpeningDays from "@/app/profile/[id]/store/components/StoreOpeningDays";
-import {Prisma} from ".prisma/client";
 
 
 export default function StoresForm(props: any) {
@@ -514,7 +510,10 @@ export default function StoresForm(props: any) {
                         </Grid>
 
                         <Grid item xs={12}>
-                            <StoreOpeningDays formik={formik}/>
+                            <StoreOpeningDays
+                                formik={formik}
+                                valuesFieldKey={"openingDays"}
+                            />
                         </Grid>
 
                         <Grid item container xs={12}>
