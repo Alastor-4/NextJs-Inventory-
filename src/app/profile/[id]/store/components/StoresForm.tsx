@@ -13,6 +13,7 @@ import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {TimePicker} from "@mui/x-date-pickers";
 import StoreOpeningDays from "@/app/profile/[id]/store/components/StoreOpeningDays";
+import {Prisma} from ".prisma/client";
 
 
 export default function StoresForm(props: any) {
@@ -36,6 +37,7 @@ export default function StoresForm(props: any) {
 
     const defaultStartTime = dayjs().set("hours", 9).set("minutes", 0)
     const defaultEndTime = dayjs().set("hours", 17).set("minutes", 0)
+
     const [storeOpeningDays, setStoreOpeningDays] = React.useState([
         {
             weekDayNumber: 1,
@@ -108,6 +110,7 @@ export default function StoresForm(props: any) {
             ]
         },
     ])
+
     const [storeReservationDays, setStoreReservationDays] = React.useState([
         {
             weekDayNumber: 1,
@@ -197,12 +200,18 @@ export default function StoresForm(props: any) {
 
     React.useEffect(() => {
         if (updateItem) {
-            setSellProfit(updateItem?.fixed_seller_profit_quantity !== null ? false : true)
+            setSellProfit(updateItem?.fixed_seller_profit_quantity === null)
             setActiveCollection(updateItem ? updateItem.online_catalog : false)
             setActiveReservations(updateItem ? updateItem.online_reservation : false)
 
-        }
+            if (updateItem.store_open_days) {
+                //ToDo: build storeOpeningDays array with saved values. watch out array structure
+            }
 
+            if (updateItem.store_reservation_days) {
+                //ToDo: build storeReservationDays array with saved values. watch out array structure
+            }
+        }
     }, [updateItem])
 
 
