@@ -12,7 +12,7 @@ import { TimePicker } from '@mui/x-date-pickers';
 import {AddOutlined, Close} from "@mui/icons-material";
 import dayjs from "dayjs";
 
-export default function StoreOpeningDays({formik, valuesFieldKey}: {formik: any, valuesFieldKey: string}) {
+export default function StoreOpeningDays({title, formik, valuesFieldKey}: {title: string, formik: any, valuesFieldKey: string}) {
     const daysMap = {
         1: "D",
         2: "L",
@@ -57,7 +57,7 @@ export default function StoreOpeningDays({formik, valuesFieldKey}: {formik: any,
         <Card variant={"outlined"} sx={{padding: "10px"}}>
             <Grid container rowSpacing={2}>
                 <Grid item xs={12}>
-                    <Typography variant={"subtitle1"}>Apertura de la tienda</Typography>
+                    <Typography variant={"subtitle1"}>{title}</Typography>
                 </Grid>
 
                 <Grid container item xs={12} alignItems={"flex-start"} columnSpacing={1} sx={{overflowX: "auto"}}>

@@ -1,6 +1,19 @@
 "use client"
 
-import { AppBar, Box, Button, Card, Checkbox, Grid, MenuItem, Switch, TextField, Toolbar, Typography } from "@mui/material";
+import {
+    AppBar,
+    Box,
+    Button,
+    Card,
+    Checkbox,
+    FormControl, FormControlLabel,
+    Grid,
+    MenuItem,
+    Switch,
+    TextField,
+    Toolbar,
+    Typography
+} from "@mui/material";
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup"
@@ -240,8 +253,8 @@ export default function StoresForm(props: any) {
         valueSellProfit: sellProfit
             ? (updateItem?.fixed_seller_profit_percentage ?? 0)
             : (updateItem?.fixed_seller_profit_quantity ?? 0),
-        openingDays: storeOpeningDays,
-        reservationDays: storeReservationDays,
+        openingDays: storeOpeningDays,  //store_open_days table
+        reservationDays: storeReservationDays, //store_reservation_days table
     }
 
     const validationSchema = Yup.object<any>({
@@ -263,6 +276,8 @@ export default function StoresForm(props: any) {
                     .min(0, "El minimo q puedes ingresar es 0")
                     .required("Campo obligatorio")
             ),
+        openingDays: Yup.array(),  //ToDo: make validation to selected days and times
+        reservationDays: Yup.array(),  //ToDo: make validation to selected days and times
         //currency: Yup.object()
     })
 
@@ -470,10 +485,8 @@ export default function StoresForm(props: any) {
                                     : editQuantity(formik)
                             }
 
-                            <Grid item container >
-
-                                <Grid item >
-
+                            <Grid item container>
+                                <Grid item>
                                     <Grid item container>
                                         <Grid item >
                                             <Checkbox
@@ -489,7 +502,6 @@ export default function StoresForm(props: any) {
                                 </Grid>
 
                                 <Grid item>
-
                                     <Grid item container>
                                         <Grid item >
                                             <Checkbox
@@ -502,46 +514,55 @@ export default function StoresForm(props: any) {
                                             <Typography variant="subtitle2">Cantidad</Typography>
                                         </Grid>
                                     </Grid>
-
                                 </Grid>
-
                             </Grid>
-
                         </Grid>
 
                         <Grid item xs={12}>
                             <StoreOpeningDays
+                                title={"Horario de apertura de la tienda"}
                                 formik={formik}
                                 valuesFieldKey={"openingDays"}
                             />
                         </Grid>
 
                         <Grid item container xs={12}>
-                            <Grid item>
-                                <Switch
-                                    size="small"
-                                    checked={activeCollection}
-                                    onClick={() => setActiveCollection(!activeCollection)}
-                                />
-                            </Grid>
-                            <Grid item alignSelf={"flex-end"}>Activar catálogo en línea </Grid>
-
+                            <FormControlLabel
+                                label={"Mostrar catálogo en línea"}
+                                control={
+                                    <Switch
+                                        checked={activeCollection}
+                                        onClick={() => setActiveCollection(!activeCollection)}
+                                    />
+                                }
+                            />
                         </Grid>
 
                         <Grid item container xs={12}>
-                            <Grid item>
-                                <Switch
-                                    size="small"
-                                    checked={activeReservations}
-                                    onClick={() => setActiveReservations(!activeReservations)}
-                                />
-                            </Grid>
-
-                            <Grid item alignSelf={"flex-end"}>Activar reservaciones en línea </Grid>
-
+                            <FormControlLabel
+                                label={"Permitir reservaciones en línea"}
+                                control={
+                                    <Switch
+                                        checked={activeReservations}
+                                        onClick={() => setActiveReservations(!activeReservations)}
+                                    />
+                                }
+                            />
                         </Grid>
 
-                        <Grid item xs={12}>
+                        {
+                            activeReservations && (
+                                <Grid item xs={12}>
+                                    <StoreOpeningDays
+                                        title={"Horario de reservaciones de la tienda"}
+                                        formik={formik}
+                                        valuesFieldKey={"reservationDays"}
+                                    />
+                                </Grid>
+                            )
+                        }
+
+                        {/*<Grid item xs={12}>
                             <WorkDays
                                 title={"Horario de Atención:"}
                                 urlApi={urlApiStoreOpenDays}
@@ -557,7 +578,7 @@ export default function StoresForm(props: any) {
                                 setFatherData={setDataDayReservations}
                                 storeId={storeId ?? null}
                             />
-                        </Grid>
+                        </Grid>*/}
 
                         <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                             <Button
