@@ -3,7 +3,7 @@
 import React from "react";
 import {
     AppBar,
-    Box,
+    Box, Button,
     Card,
     CardContent,
     Chip,
@@ -344,10 +344,6 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                                 <IconButton color={"info"} onClick={(e) => setReservedStatus(e, row.store_depots.id, row.id)}>
                                                                     <Done/>
                                                                 </IconButton>
-
-                                                                <IconButton color={"error"} onClick={(e) => setCanceledStatus(e, row.id)}>
-                                                                    <CancelOutlined/>
-                                                                </IconButton>
                                                             </>
                                                         )
                                                     }
@@ -366,10 +362,6 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                                 <IconButton color={"success"}>
                                                                     <SellOutlined/>
                                                                 </IconButton>
-
-                                                                <IconButton color={"error"} onClick={(e) => setCanceledStatus(e, row.id)}>
-                                                                    <CancelOutlined/>
-                                                                </IconButton>
                                                             </>
                                                         )
                                                     }
@@ -379,10 +371,6 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                             <>
                                                                 <IconButton color={"success"} onClick={(e) => setReservedStatus(e, row.store_depots.id, row.id)}>
                                                                     <DeliveryDiningTwoTone/>
-                                                                </IconButton>
-
-                                                                <IconButton color={"error"} onClick={(e) => setCanceledStatus(e, row.id)}>
-                                                                    <CancelOutlined/>
                                                                 </IconButton>
                                                             </>
                                                         )
@@ -397,8 +385,153 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                             <Collapse in={expandIndex === row.id} timeout="auto" unmountOnExit>
                                                 <Grid container spacing={1} sx={{padding: "8px 26px"}}>
                                                     <Grid item xs={12}>
-                                                        <Typography variant="subtitle1" gutterBottom component="div">
-                                                            Detalles:
+                                                        <Typography variant="subtitle1" gutterBottom component="div" sx={{textDecoration: "underline"}}>
+                                                            Acciones:
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid item xs={true}>
+                                                        {
+                                                            row.reservation_status.code === 1 && (
+                                                                <Button
+                                                                    size={"small"}
+                                                                    color={"info"}
+                                                                    variant={"outlined"}
+                                                                    startIcon={<Done fontSize={"small"}/>}
+                                                                    onClick={(e) => setReservedStatus(e, row.store_depots.id, row.id)}
+                                                                    sx={{mx: "10px"}}
+                                                                >
+                                                                    Reservar
+                                                                </Button>
+                                                            )
+                                                        }
+
+                                                        {
+                                                            row.reservation_status.code === 3 && (
+                                                                <>
+                                                                    {
+                                                                        row.request_delivery && (
+                                                                            <Button
+                                                                                size={"small"}
+                                                                                color={"warning"}
+                                                                                variant={"outlined"}
+                                                                                startIcon={<DeliveryDiningOutlined fontSize={"small"}/>}
+                                                                                //onClick={(e) => setReservedStatus(e, row.store_depots.id, row.id)}
+                                                                                sx={{mx: "10px"}}
+                                                                            >
+                                                                                Comenzar entrega
+                                                                            </Button>
+                                                                        )
+                                                                    }
+
+                                                                    <Button
+                                                                        size={"small"}
+                                                                        color={"success"}
+                                                                        variant={"outlined"}
+                                                                        startIcon={<SellOutlined fontSize={"small"}/>}
+                                                                        //onClick={(e) => setReservedStatus(e, row.store_depots.id, row.id)}
+                                                                        sx={{mx: "10px"}}
+                                                                    >
+                                                                        Vender
+                                                                    </Button>
+                                                                </>
+                                                            )
+                                                        }
+
+                                                        {
+                                                            row.reservation_status.code === 5 && (
+                                                                <Button
+                                                                    size={"small"}
+                                                                    color={"success"}
+                                                                    variant={"outlined"}
+                                                                    startIcon={<DeliveryDiningTwoTone fontSize={"small"}/>}
+                                                                    //onClick={(e) => setReservedStatus(e, row.store_depots.id, row.id)}
+                                                                    sx={{mx: "10px"}}
+                                                                >
+                                                                    Entregar
+                                                                </Button>
+                                                            )
+                                                        }
+
+                                                        {
+                                                            (row.reservation_status.code === 1 ||
+                                                            row.reservation_status.code === 3 ||
+                                                            row.reservation_status.code === 5) && (
+                                                                <Button
+                                                                    size={"small"}
+                                                                    color={"error"}
+                                                                    variant={"outlined"}
+                                                                    startIcon={<CancelOutlined fontSize={"small"}/>}
+                                                                    onClick={(e) => setCanceledStatus(e, row.id)}
+                                                                    sx={{mx: "10px"}}
+                                                                >
+                                                                    Cancelar
+                                                                </Button>
+                                                            )
+                                                        }
+                                                    </Grid>
+
+                                                    <Grid item xs={12}>
+                                                        <Typography variant="subtitle1" gutterBottom component="div" sx={{textDecoration: "underline"}}>
+                                                            Reservación:
+                                                        </Typography>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{fontWeight: 600}}>Estado:</Grid>
+                                                        <Grid item xs={true}>
+                                                            <Chip
+                                                                label={`${row.reservation_status.name} | ${row.units_quantity} Productos`}
+                                                                size={"small"}
+                                                                //@ts-ignore
+                                                                color={reservationStatusColors[row.reservation_status.code]}
+                                                                sx={{mr: "5px"}}
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"}
+                                                              sx={{fontWeight: 600}}>Usuario solicitante:</Grid>
+                                                        <Grid item xs={true}>
+                                                            {`${row.users.name} (${row.users.username})`}
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    {
+                                                        row.request_delivery && (
+                                                            <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                                                <Grid item xs={12} sx={{fontWeight: 600}}>
+                                                                    Domicilio requerido
+                                                                    <IconButton
+                                                                        size={"small"}
+                                                                        disableRipple
+                                                                        disableFocusRipple
+                                                                        disableTouchRipple
+                                                                        sx={
+                                                                            {
+                                                                                mx: "5px",
+                                                                                backgroundColor: "lightslategray",
+                                                                                color: "white",
+                                                                                cursor: "default",
+                                                                            }
+                                                                        }>
+                                                                        <DeliveryDiningOutlined fontSize={"small"}/>
+                                                                    </IconButton>
+                                                                </Grid>
+                                                                {
+                                                                    row.delivery_notes && (
+                                                                        <Grid container item xs={12} alignItems={"center"}>
+                                                                            {row.delivery_notes}
+                                                                        </Grid>
+                                                                    )
+                                                                }
+                                                            </Grid>
+                                                        )
+                                                    }
+
+                                                    <Grid item xs={12}>
+                                                        <Typography variant="subtitle1" gutterBottom component="div" sx={{textDecoration: "underline"}}>
+                                                            Producto:
                                                         </Typography>
                                                     </Grid>
 

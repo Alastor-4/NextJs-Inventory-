@@ -28,8 +28,8 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
                     }
                 }
             },
-            reservation_messages: true,
             reservation_status: true,
+            users: true,
         },
     })
 
