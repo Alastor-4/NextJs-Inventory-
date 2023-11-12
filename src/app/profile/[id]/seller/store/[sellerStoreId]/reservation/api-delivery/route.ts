@@ -24,7 +24,7 @@ export async function PUT(req: Request) {
                         status_id: enCaminoStatus.id,
                         status_description: "En camino a entregar los productos de su reservación"
                     },
-                    where: {id: parseInt(productReservationId)},
+                    where: {id: reservation.id},
                     include: {
                         store_depots: {
                             include: {

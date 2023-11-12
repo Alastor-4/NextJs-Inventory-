@@ -130,7 +130,7 @@ export async function PATCH(req: Request) {
                         status_id: canceledStatus.id,
                         status_description: "Reservación cancelada por la tienda"
                     },
-                    where: {id: parseInt(productReservationId)},
+                    where: {id: reservation.id},
                     include: {
                         store_depots: {
                             include: {
@@ -150,6 +150,69 @@ export async function PATCH(req: Request) {
                         reservation_status: true,
                         users: true,
                     }
+                }
+            )
+
+            return NextResponse.json(updatedReservation)
+        }
+
+        return new Response('La acción sobre la reservación ha fallado', {status: 400})
+    }
+
+    return new Response('La acción sobre la reservación ha fallado', {status: 500})
+}
+
+//create product sell from reservation
+export async function POST(req: Request) {
+    const { productReservationId, totalPrice } = await req.json()
+
+    if (productReservationId) {
+        const vendidoStatus = await prisma.reservation_status.findFirst({where: {code: 4}})
+
+        const reservation = await prisma.products_reservation.findUnique(
+            {
+                where: {id: parseInt(productReservationId)},
+                include: {reservation_status: true}
+            }
+        )
+        const reservationStatusCode = reservation?.reservation_status.code
+
+        //check if reservation has "Reservado" status
+        if (vendidoStatus && reservation && reservationStatusCode === 3) {
+            const updatedReservation = await prisma.products_reservation.update(
+                {
+                    data: {
+                        status_id: vendidoStatus.id,
+                        status_description: reservation.request_delivery ? "Producto vendido. No se realizó entrega a domiciclio" : "Producto vendido",
+                        products_sell: {
+                            create: {
+                                store_depot_id: reservation.store_depot_id,
+                                units_quantity: reservation.units_quantity,
+                                total_price: parseFloat(totalPrice),
+                                payment_method: reservation.payment_method
+                            }
+                        }
+                    },
+                    where: {id: reservation.id},
+                    include: {
+                        store_depots: {
+                            include: {
+                                depots: {
+                                    include: {
+                                        products: {
+                                            include: {
+                                                departments: true,
+                                                characteristics: true,
+                                                images: true,
+                                            },
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        reservation_status: true,
+                        users: true,
+                    },
                 }
             )
 
