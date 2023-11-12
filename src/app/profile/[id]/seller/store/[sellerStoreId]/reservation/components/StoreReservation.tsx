@@ -372,7 +372,10 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                             <>
                                                                 {
                                                                     row.request_delivery && (
-                                                                        <IconButton color={"warning"}>
+                                                                        <IconButton
+                                                                            color={"warning"}
+                                                                            onClick={(e) => setStartingDeliveryStatus(e, row.id)}
+                                                                        >
                                                                             <DeliveryDiningOutlined/>
                                                                         </IconButton>
                                                                     )
@@ -434,7 +437,7 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                                                 color={"warning"}
                                                                                 variant={"outlined"}
                                                                                 startIcon={<DeliveryDiningOutlined fontSize={"small"}/>}
-                                                                                onClick={(e) => setStartingDeliveryStatus(e, row.store_depots.id)}
+                                                                                onClick={(e) => setStartingDeliveryStatus(e, row.id)}
                                                                                 sx={{mx: "10px"}}
                                                                             >
                                                                                 Comenzar entrega
