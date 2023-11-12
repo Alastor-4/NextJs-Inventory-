@@ -38,6 +38,16 @@ const sellerStoreReservations = {
         return false
     },
 
+    setSellOutStatus: async function (userId, sellerStoreId, productReservationId, totalPrice) {
+        try {
+            const response = await apiRequest.post(url(userId, sellerStoreId), {productReservationId, totalPrice})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
 }
 
 export default sellerStoreReservations;
