@@ -22,7 +22,7 @@ import {TableNoData} from "@/components/TableNoData";
 import {
     ArrowLeft,
     CancelOutlined,
-    DeliveryDiningOutlined, DeliveryDiningTwoTone,
+    DeliveryDiningOutlined, DeliveryDiningSharp, DeliveryDiningTwoTone,
     DescriptionOutlined,
     Done,
     SellOutlined,
@@ -376,7 +376,7 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                                             color={"warning"}
                                                                             onClick={(e) => setStartingDeliveryStatus(e, row.id)}
                                                                         >
-                                                                            <DeliveryDiningOutlined/>
+                                                                            <DeliveryDiningSharp/>
                                                                         </IconButton>
                                                                     )
                                                                 }
@@ -392,7 +392,7 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                         row.reservation_status.code === 5 && (
                                                             <>
                                                                 <IconButton color={"success"} onClick={(e) => setReservedStatus(e, row.store_depots.id, row.id)}>
-                                                                    <DeliveryDiningTwoTone/>
+                                                                    <DeliveryDiningOutlined/>
                                                                 </IconButton>
                                                             </>
                                                         )
@@ -436,7 +436,7 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                                                 size={"small"}
                                                                                 color={"warning"}
                                                                                 variant={"outlined"}
-                                                                                startIcon={<DeliveryDiningOutlined fontSize={"small"}/>}
+                                                                                startIcon={<DeliveryDiningSharp fontSize={"small"}/>}
                                                                                 onClick={(e) => setStartingDeliveryStatus(e, row.id)}
                                                                                 sx={{mx: "10px"}}
                                                                             >
