@@ -181,6 +181,25 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
         }
     }
 
+    async function setStartingDeliveryStatus(e: any, productReservationId: number) {
+        e.stopPropagation()
+
+        const response = await sellerStoreReservations.setStartingDeliveryStatus(userId, storeId, productReservationId)
+
+        if (response) {
+            if (data?.length) {
+                const newData = [...data]
+
+                const reservationIndex = data.findIndex((item: any) => item.id === productReservationId)
+                if (reservationIndex > -1) {
+                    newData[reservationIndex] = response
+                }
+
+                setData(newData)
+            }
+        }
+    }
+
     const reservationStatusColors = {
         1: "warning",
         2: "error",
@@ -415,7 +434,7 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                                                 color={"warning"}
                                                                                 variant={"outlined"}
                                                                                 startIcon={<DeliveryDiningOutlined fontSize={"small"}/>}
-                                                                                //onClick={(e) => setReservedStatus(e, row.store_depots.id, row.id)}
+                                                                                onClick={(e) => setStartingDeliveryStatus(e, row.store_depots.id)}
                                                                                 sx={{mx: "10px"}}
                                                                             >
                                                                                 Comenzar entrega

@@ -26,6 +26,17 @@ const sellerStoreReservations = {
         return false
     },
 
+    setStartingDeliveryStatus: async function (userId, sellerStoreId, productReservationId) {
+        try {
+            const response = await apiRequest.post(url(userId, sellerStoreId), {productReservationId})
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
 }
 
 export default sellerStoreReservations;

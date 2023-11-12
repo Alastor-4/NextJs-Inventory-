@@ -85,8 +85,8 @@ export async function PUT(req: Request) {
                                     }
                                 }
                             },
-                            reservation_messages: true,
                             reservation_status: true,
+                            users: true,
                         }
                     }
                 )
@@ -147,8 +147,8 @@ export async function PATCH(req: Request) {
                                 }
                             }
                         },
-                        reservation_messages: true,
                         reservation_status: true,
+                        users: true,
                     }
                 }
             )
@@ -177,19 +177,13 @@ export async function POST(req: Request) {
         )
         const reservationStatusCode = reservation?.reservation_status.code
 
-        if (enCaminoStatus && reservationStatusCode) {
-            //when reservation has status "Reservado" or "En camanino" restore previouslly reseved items
-            if (reservationStatusCode === 3 || reservationStatusCode === 5) {
-                await prisma.store_depots.update({
-                    data: {product_remaining_units: {increment: reservation.units_quantity}},
-                    where: {id: reservation.store_depot_id}})
-            }
-
+        //check if reservation has request_delivery and "Reservado" status
+        if (enCaminoStatus && reservation?.request_delivery && reservationStatusCode === 3) {
             const updatedReservation = await prisma.products_reservation.update(
                 {
                     data: {
                         status_id: enCaminoStatus.id,
-                        status_description: "Reservación cancelada por la tienda"
+                        status_description: "En camino a entregar los productos de su reservación"
                     },
                     where: {id: parseInt(productReservationId)},
                     include: {
@@ -208,8 +202,8 @@ export async function POST(req: Request) {
                                 }
                             }
                         },
-                        reservation_messages: true,
                         reservation_status: true,
+                        users: true,
                     }
                 }
             )
