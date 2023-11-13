@@ -3,18 +3,21 @@
 import React from "react";
 import {
     AppBar,
-    Box, Button,
+    Box,
+    Button,
     Card,
     CardContent,
     Chip,
     Collapse,
     Grid,
     IconButton,
+    MenuItem,
     Table,
     TableBody,
     TableCell,
     TableHead,
     TableRow,
+    TextField,
     Toolbar,
     Typography
 } from "@mui/material";
@@ -22,9 +25,11 @@ import {TableNoData} from "@/components/TableNoData";
 import {
     ArrowLeft,
     CancelOutlined,
-    DeliveryDiningOutlined, DeliveryDiningSharp, DeliveryDiningTwoTone,
+    DeliveryDiningOutlined,
+    DeliveryDiningSharp,
+    DeliveryDiningTwoTone,
     DescriptionOutlined,
-    Done,
+    Done, EditOutlined,
     SellOutlined,
     VisibilityOutlined
 } from "@mui/icons-material";
@@ -166,6 +171,25 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
         e.stopPropagation()
 
         const response = await sellerStoreReservations.setCanceledStatus(userId, storeId, productReservationId)
+
+        if (response) {
+            if (data?.length) {
+                const newData = [...data]
+
+                const reservationIndex = data.findIndex((item: any) => item.id === productReservationId)
+                if (reservationIndex > -1) {
+                    newData[reservationIndex] = response
+                }
+
+                setData(newData)
+            }
+        }
+    }
+
+    async function setSellOutStatus(e: any, productReservationId: number, totalPrice: number) {
+        e.stopPropagation()
+
+        const response = await sellerStoreReservations.setSellOutStatus(userId, storeId, productReservationId, totalPrice)
 
         if (response) {
             if (data?.length) {
@@ -371,19 +395,19 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                         row.reservation_status.code === 3 && (
                                                             <>
                                                                 {
-                                                                    row.request_delivery && (
+                                                                    row.request_delivery ? (
                                                                         <IconButton
                                                                             color={"warning"}
                                                                             onClick={(e) => setStartingDeliveryStatus(e, row.id)}
                                                                         >
                                                                             <DeliveryDiningSharp/>
                                                                         </IconButton>
+                                                                    ) : (
+                                                                        <IconButton color={"success"}>
+                                                                            <SellOutlined/>
+                                                                        </IconButton>
                                                                     )
                                                                 }
-
-                                                                <IconButton color={"success"}>
-                                                                    <SellOutlined/>
-                                                                </IconButton>
                                                             </>
                                                         )
                                                     }
