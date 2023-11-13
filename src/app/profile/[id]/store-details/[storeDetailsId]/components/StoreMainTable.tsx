@@ -39,6 +39,8 @@ import { storeDetails } from "../request/storeDetails";
 import StoreModalDefault from "./Modal/StoreModalDefault";
 import TransferUnits from "./Modal/TransferUnits";
 import StoreEditUnits from "./Modal/StoreEditUnits";
+import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/Modal/ModalAddProductFromWarehouse.tsx";
+import AddProductFromWharehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json())
 
@@ -57,6 +59,7 @@ export default function StoreMainTable() {
     const [activeModalPrice, setActiveModalPrice] = React.useState({ active: false, storeDepot: [] })
     const [activeModalTransferUnits, setActiveModalTransferUnits] = React.useState(false);
     const [activeModalEditUnits, setActiveModalEditUnits] = React.useState(false);
+    const [activeAddProductFromWarehouse, setActiveAddProductFromWarehouse] = React.useState(false)
 
     // Almacena el ind de la row seleccionada
     // modal q la usan:  TransferUnits , StoreEditUnits
@@ -167,7 +170,7 @@ export default function StoreMainTable() {
                                     <IconButton color={"inherit"} onClick={() => router.push(`/profile/${params.id}/store-assign?storeId=${dataStore.id}`)} >
                                         <ShareOutlined fontSize={"small"} />
                                     </IconButton>
-                                    <IconButton color={"inherit"} >
+                                    <IconButton color={"inherit"} onClick={() => setActiveAddProductFromWarehouse(true)} >
                                         <AddOutlined />
                                     </IconButton>
                                 </>
@@ -513,6 +516,15 @@ export default function StoreMainTable() {
                                     loadDates={loadDates}
                                 />
                             </StoreModalDefault>
+
+                            <ModalAddProductFromWarehouse
+                                dialogTitle={"Agregar productos"}
+                                open={activeAddProductFromWarehouse}
+                                setOpen={setActiveAddProductFromWarehouse}
+                                loadData={loadDates}
+                            >
+                                <AddProductFromWharehouse dataStore={dataStore} warehouseId={null} />
+                            </ModalAddProductFromWarehouse>
                         </>
 
                         <CardContent>

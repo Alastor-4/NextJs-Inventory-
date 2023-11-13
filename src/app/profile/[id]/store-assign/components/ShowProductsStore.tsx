@@ -33,8 +33,13 @@ import { Formik } from 'formik';
 import ModalStoreAssign from './Modal/ModalStoreAssign';
 import ManageQuantity from './Modal/ManageQuantity';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
+import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
+import ModalAddProductFromWarehouse from '../addProductFromWarehouse/Modal/ModalAddProductFromWarehouse.tsx';
 
-function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
+function ShowProductsStore(props: any) {
+
+    const { storeId, nameStore, dataStore, nameWarehouse, warehouseId } = props;
+
     const params = useParams()
 
     const [allProductStore, setAllProductStore] = useState(null);
@@ -42,6 +47,8 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
 
     const [activeManageQuantity, setActiveManageQuantity] = useState(false);
     const [showDetails, setShowDetails] = useState();
+
+    const [activeAddProductFromWarehouse, setActiveAddProductFromWarehouse] = useState(false)
 
     const [openImageDialog, setOpenImageDialog] = useState(false)
     const [dialogImages, setDialogImages] = useState([]);
@@ -111,11 +118,11 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                             Seleccione departamentos para encontrar el producto que busca
                             <IconButton
                                 onClick={() => setDisplayFilterSection(!displayFilterSection)}
-                                sx={{ml: "5px"}}
+                                sx={{ ml: "5px" }}
                             >
                                 {displayFilterSection
-                                    ? <ExpandMoreOutlined fontSize={"small"}/>
-                                    : <ExpandLessOutlined fontSize={"small"}/>
+                                    ? <ExpandMoreOutlined fontSize={"small"} />
+                                    : <ExpandLessOutlined fontSize={"small"} />
                                 }
                             </IconButton>
                         </Typography>
@@ -128,7 +135,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                                         variant={item.selected ? "contained" : "outlined"}
                                         onClick={() => handleSelectFilter(index)}
                                         size={"small"}
-                                        sx={{padding: "5px 0"}}
+                                        sx={{ padding: "5px 0" }}
                                     >
                                         <Grid container>
                                             <Grid item xs={12}>
@@ -492,6 +499,15 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                                 />
                             </ModalStoreAssign>
 
+                            <ModalAddProductFromWarehouse
+                                dialogTitle={"Agregar productos"}
+                                open={activeAddProductFromWarehouse}
+                                setOpen={setActiveAddProductFromWarehouse}
+                                loadData={loadData}
+                            >
+                                <AddProductFromWarehouse dataStore={dataStore} warehouseId={warehouseId} />
+                            </ModalAddProductFromWarehouse>
+
                             <ImagesDisplayDialog
                                 dialogTitle={"Imágenes del producto"}
                                 open={openImageDialog}
@@ -503,7 +519,7 @@ function ShowProductsStore({ storeId, nameStore, nameWarehouse }) {
                                 <Grid container rowSpacing={2}>
                                     <Grid container item xs={12} justifyContent={"space-between"}>
                                         <Typography variant={"subtitle1"}>Productos en tienda</Typography>
-                                        <Button size={"small"} variant={"contained"}>
+                                        <Button size={"small"} variant={"contained"} onClick={() => setActiveAddProductFromWarehouse(true)}>
                                             Agregar nuevo
                                         </Button>
                                     </Grid>
