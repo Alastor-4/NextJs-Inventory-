@@ -532,7 +532,7 @@ function AddProductFromWharehouse(props: any) {
           onClose={() => setActiveFeedbackSuccess(false)}
         >
           <Alert severity="success" variant='filled' sx={{ width: '100%' }}>
-            This is a success message!
+            {`Se agregó el producto a la tienda ${dataStore.name}`}
           </Alert>
         </Snackbar>
 

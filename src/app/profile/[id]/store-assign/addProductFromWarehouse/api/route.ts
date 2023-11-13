@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "db"
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const storeId = await parseInt(<string>searchParams.get("storeId"));
 
