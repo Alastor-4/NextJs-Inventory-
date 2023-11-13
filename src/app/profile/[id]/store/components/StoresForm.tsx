@@ -1,13 +1,29 @@
 "use client"
 
-import { AppBar, Box, Button, Card, Checkbox, Grid, MenuItem, Switch, TextField, Toolbar, Typography } from "@mui/material";
+import {
+    AppBar,
+    Box,
+    Button,
+    Card,
+    Checkbox,
+    FormControl, FormControlLabel,
+    Grid,
+    MenuItem,
+    Switch,
+    TextField,
+    Toolbar,
+    Typography
+} from "@mui/material";
 import React from "react";
-import { Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import stores from "@/app/profile/[id]/store/requests/stores";
 import WorkDays from "../../../../../components/WorkDays";
-import { openDaysStores } from "../../../../../request/openDaysStores";
+import { openDaysStores } from "@/request/openDaysStores";
+import dayjs from "dayjs";
+import StoreOpeningDays from "@/app/profile/[id]/store/components/StoreOpeningDays";
+
 
 export default function StoresForm(props: any) {
     const { userId, storeId, sellerUsers } = props
@@ -28,6 +44,155 @@ export default function StoresForm(props: any) {
     const [activeCollection, setActiveCollection] = React.useState(false);
     const [activeReservations, setActiveReservations] = React.useState(false);
 
+    const defaultStartTime = dayjs().set("hours", 9).set("minutes", 0)
+    const defaultEndTime = dayjs().set("hours", 17).set("minutes", 0)
+
+    const [storeOpeningDays, setStoreOpeningDays] = React.useState([
+        {
+            weekDayNumber: 1,
+            open: false,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 2,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 3,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 4,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 5,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 6,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 7,
+            open: false,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+    ])
+
+    const [storeReservationDays, setStoreReservationDays] = React.useState([
+        {
+            weekDayNumber: 1,
+            open: false,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 2,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 3,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 4,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 5,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 6,
+            open: true,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+        {
+            weekDayNumber: 7,
+            open: false,
+            times: [
+                {
+                    startTime: defaultStartTime,
+                    endTime: defaultEndTime,
+                }
+            ]
+        },
+    ])
+
     React.useEffect(() => {
         async function fetchStore(id: any) {
             const store = await stores.storeDetails(userId, id)
@@ -44,12 +209,18 @@ export default function StoresForm(props: any) {
 
     React.useEffect(() => {
         if (updateItem) {
-            setSellProfit(updateItem?.fixed_seller_profit_quantity !== null ? false : true)
+            setSellProfit(updateItem?.fixed_seller_profit_quantity === null)
             setActiveCollection(updateItem ? updateItem.online_catalog : false)
             setActiveReservations(updateItem ? updateItem.online_reservation : false)
 
-        }
+            if (updateItem.store_open_days) {
+                //ToDo: build storeOpeningDays array with saved values. watch out array structure
+            }
 
+            if (updateItem.store_reservation_days) {
+                //ToDo: build storeReservationDays array with saved values. watch out array structure
+            }
+        }
     }, [updateItem])
 
 
@@ -81,8 +252,9 @@ export default function StoresForm(props: any) {
         sellerUser: userSeller,
         valueSellProfit: sellProfit
             ? (updateItem?.fixed_seller_profit_percentage ?? 0)
-            : (updateItem?.fixed_seller_profit_quantity ?? 0)
-
+            : (updateItem?.fixed_seller_profit_quantity ?? 0),
+        openingDays: storeOpeningDays,  //store_open_days table
+        reservationDays: storeReservationDays, //store_reservation_days table
     }
 
     const validationSchema = Yup.object<any>({
@@ -104,6 +276,8 @@ export default function StoresForm(props: any) {
                     .min(0, "El minimo q puedes ingresar es 0")
                     .required("Campo obligatorio")
             ),
+        openingDays: Yup.array(),  //ToDo: make validation to selected days and times
+        reservationDays: Yup.array(),  //ToDo: make validation to selected days and times
         //currency: Yup.object()
     })
 
@@ -219,17 +393,10 @@ export default function StoresForm(props: any) {
             </Grid>
 
             <Grid item alignSelf={"center"}>
-
                 <Typography variant="h6" >CUP</Typography>
-
             </Grid>
-
         </Grid>
-
-
-
     )
-
 
     return (
         <Card variant={"outlined"}>
@@ -318,10 +485,8 @@ export default function StoresForm(props: any) {
                                     : editQuantity(formik)
                             }
 
-                            <Grid item container >
-
-                                <Grid item >
-
+                            <Grid item container>
+                                <Grid item>
                                     <Grid item container>
                                         <Grid item >
                                             <Checkbox
@@ -337,7 +502,6 @@ export default function StoresForm(props: any) {
                                 </Grid>
 
                                 <Grid item>
-
                                     <Grid item container>
                                         <Grid item >
                                             <Checkbox
@@ -350,40 +514,55 @@ export default function StoresForm(props: any) {
                                             <Typography variant="subtitle2">Cantidad</Typography>
                                         </Grid>
                                     </Grid>
-
                                 </Grid>
-
                             </Grid>
-
-                        </Grid>
-
-                        <Grid item container xs={12}>
-                            <Grid item>
-                                <Switch
-                                    size="small"
-                                    checked={activeCollection}
-                                    onClick={() => setActiveCollection(!activeCollection)}
-                                />
-                            </Grid>
-
-                            <Grid item alignSelf={"flex-end"}>Activar catálogo en línea </Grid>
-
-                        </Grid>
-
-                        <Grid item container xs={12}>
-                            <Grid item>
-                                <Switch
-                                    size="small"
-                                    checked={activeReservations}
-                                    onClick={() => setActiveReservations(!activeReservations)}
-                                />
-                            </Grid>
-
-                            <Grid item alignSelf={"flex-end"}>Activar reservaciones en línea </Grid>
-
                         </Grid>
 
                         <Grid item xs={12}>
+                            <StoreOpeningDays
+                                title={"Horario de apertura de la tienda"}
+                                formik={formik}
+                                valuesFieldKey={"openingDays"}
+                            />
+                        </Grid>
+
+                        <Grid item container xs={12}>
+                            <FormControlLabel
+                                label={"Mostrar catálogo en línea"}
+                                control={
+                                    <Switch
+                                        checked={activeCollection}
+                                        onClick={() => setActiveCollection(!activeCollection)}
+                                    />
+                                }
+                            />
+                        </Grid>
+
+                        <Grid item container xs={12}>
+                            <FormControlLabel
+                                label={"Permitir reservaciones en línea"}
+                                control={
+                                    <Switch
+                                        checked={activeReservations}
+                                        onClick={() => setActiveReservations(!activeReservations)}
+                                    />
+                                }
+                            />
+                        </Grid>
+
+                        {
+                            activeReservations && (
+                                <Grid item xs={12}>
+                                    <StoreOpeningDays
+                                        title={"Horario de reservaciones de la tienda"}
+                                        formik={formik}
+                                        valuesFieldKey={"reservationDays"}
+                                    />
+                                </Grid>
+                            )
+                        }
+
+                        {/*<Grid item xs={12}>
                             <WorkDays
                                 title={"Horario de Atención:"}
                                 urlApi={urlApiStoreOpenDays}
@@ -399,7 +578,7 @@ export default function StoresForm(props: any) {
                                 setFatherData={setDataDayReservations}
                                 storeId={storeId ?? null}
                             />
-                        </Grid>
+                        </Grid>*/}
 
                         <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                             <Button

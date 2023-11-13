@@ -7,7 +7,7 @@ export async function GET(req: Request) {
     const storeId = searchParams.get("storeId")
 
     if (storeId) {
-        const store = await prisma.stores.findUnique({ where: { id: parseInt(storeId) }, include: { seller_user: true, store_open_days: true } })
+        const store = await prisma.stores.findUnique({ where: { id: parseInt(storeId) }, include: { seller_user: true, store_open_days: true, store_reservation_days: true } })
 
         return NextResponse.json(store)
     }
