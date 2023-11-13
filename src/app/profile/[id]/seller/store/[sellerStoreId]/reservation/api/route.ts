@@ -28,8 +28,8 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
                     }
                 }
             },
-            reservation_messages: true,
             reservation_status: true,
+            users: true,
         },
     })
 
@@ -85,8 +85,8 @@ export async function PUT(req: Request) {
                                     }
                                 }
                             },
-                            reservation_messages: true,
                             reservation_status: true,
+                            users: true,
                         }
                     }
                 )
@@ -130,7 +130,7 @@ export async function PATCH(req: Request) {
                         status_id: canceledStatus.id,
                         status_description: "Reservación cancelada por la tienda"
                     },
-                    where: {id: parseInt(productReservationId)},
+                    where: {id: reservation.id},
                     include: {
                         store_depots: {
                             include: {
@@ -147,8 +147,8 @@ export async function PATCH(req: Request) {
                                 }
                             }
                         },
-                        reservation_messages: true,
                         reservation_status: true,
+                        users: true,
                     }
                 }
             )
@@ -162,12 +162,12 @@ export async function PATCH(req: Request) {
     return new Response('La acción sobre la reservación ha fallado', {status: 500})
 }
 
-// Change reservation status to "En camino" when requested delivery reservation
+//create product sell from reservation
 export async function POST(req: Request) {
-    const { productReservationId } = await req.json()
+    const { productReservationId, totalPrice } = await req.json()
 
     if (productReservationId) {
-        const enCaminoStatus = await prisma.reservation_status.findFirst({where: {code: 5}})
+        const vendidoStatus = await prisma.reservation_status.findFirst({where: {code: 4}})
 
         const reservation = await prisma.products_reservation.findUnique(
             {
@@ -177,21 +177,23 @@ export async function POST(req: Request) {
         )
         const reservationStatusCode = reservation?.reservation_status.code
 
-        if (enCaminoStatus && reservationStatusCode) {
-            //when reservation has status "Reservado" or "En camanino" restore previouslly reseved items
-            if (reservationStatusCode === 3 || reservationStatusCode === 5) {
-                await prisma.store_depots.update({
-                    data: {product_remaining_units: {increment: reservation.units_quantity}},
-                    where: {id: reservation.store_depot_id}})
-            }
-
+        //check if reservation has "Reservado" status
+        if (vendidoStatus && reservation && reservationStatusCode === 3) {
             const updatedReservation = await prisma.products_reservation.update(
                 {
                     data: {
-                        status_id: enCaminoStatus.id,
-                        status_description: "Reservación cancelada por la tienda"
+                        status_id: vendidoStatus.id,
+                        status_description: reservation.request_delivery ? "Producto vendido. No se realizó entrega a domiciclio" : "Producto vendido",
+                        products_sell: {
+                            create: {
+                                store_depot_id: reservation.store_depot_id,
+                                units_quantity: reservation.units_quantity,
+                                total_price: parseFloat(totalPrice),
+                                payment_method: reservation.payment_method
+                            }
+                        }
                     },
-                    where: {id: parseInt(productReservationId)},
+                    where: {id: reservation.id},
                     include: {
                         store_depots: {
                             include: {
@@ -208,9 +210,9 @@ export async function POST(req: Request) {
                                 }
                             }
                         },
-                        reservation_messages: true,
                         reservation_status: true,
-                    }
+                        users: true,
+                    },
                 }
             )
 
