@@ -23,6 +23,7 @@ import { TableNoData } from "@/components/TableNoData";
 import {
     AddOutlined,
     ArrowLeft,
+    DescriptionOutlined,
     EditOutlined,
     ExpandLessOutlined,
     ExpandMoreOutlined,
@@ -41,6 +42,8 @@ import TransferUnits from "./Modal/TransferUnits";
 import StoreEditUnits from "./Modal/StoreEditUnits";
 import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/Modal/ModalAddProductFromWarehouse.tsx";
 import AddProductFromWharehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
+import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import { numberFormat } from "@/utils/generalFunctions";
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json())
 
@@ -234,28 +237,6 @@ export default function StoreMainTable() {
         )
     }
 
-    const showPrice = (priceProductStore: any, discountQuantity: any, discountPorcentage: any, currency: any) => {
-        let pricePorcentage = (discountPorcentage !== null) ? (discountPorcentage * priceProductStore / 100).toFixed(2) : null;
-
-        let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
-
-        return <>
-            <Typography display={"inline"} >
-                {`${price} `}
-                <small>{` ${currency}  `}</small>
-                <small>
-                    {pricePorcentage || discountQuantity
-                        ? <s>{`  ${priceProductStore} ${currency}  `}</s>
-                        : ""
-                    }
-
-                </small>
-
-            </Typography>
-
-        </>
-    }
-
     const loadDates = async () => {
         let newAllProductsbyDepartment = await storeDetails.getAllProductsByDepartament(params.id, params.storeDetailsId);
 
@@ -274,130 +255,166 @@ export default function StoreMainTable() {
                 {data.filter(
                     (item: any) =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                            (row: any, index: number) => (
-                                <React.Fragment key={row.id}>
-                                    <TableRow
-                                        hover
-                                        tabIndex={-1}
-                                    >
-                                        <TableCell>
+                            (row: any, index: number) => {
 
-                                            <div>
-                                                <Grid item container >
-                                                    <Grid>
-                                                        {row.name}
+                                const baseProductPrice = row.depots[0].store_depots[0].sell_price === "0"
+                                    ? null
+                                    : numberFormat(row.depots[0].store_depots[0].sell_price)
+
+                                const priceDiscountQuantity = baseProductPrice
+                                    ? row.depots[0].store_depots[0].price_discount_percentage
+                                        ? row.depots[0].store_depots[0].price_discount_percentage * parseFloat(String(baseProductPrice)) / 100
+                                        : row.depots[0].store_depots[0].price_discount_quantity
+                                    : null
+
+                                const finalProductPrice = baseProductPrice && priceDiscountQuantity
+                                    ? (parseFloat(String(baseProductPrice)) - priceDiscountQuantity)
+                                    : baseProductPrice
+
+                                const displayProductPrice = finalProductPrice
+                                    ? `${numberFormat(String(finalProductPrice)) + " " + row.depots[0].store_depots[0].sell_price_unit}`
+                                    : "sin precio"
+
+                                const displayPriceDiscount = baseProductPrice
+                                    ? row.depots[0].store_depots[0].price_discount_percentage
+                                        ? numberFormat(row.depots[0].store_depots[0].price_discount_percentage) + " %"
+                                        : row.depots[0].store_depots[0].price_discount_quantity
+                                            ? numberFormat(row.depots[0].store_depots[0].price_discount_quantity) + " " + row.depots[0].store_depots[0].sell_price_unit
+                                            : null
+                                    : null
+
+                                return (
+                                    <React.Fragment key={row.id}>
+                                        <TableRow
+                                            hover
+                                            tabIndex={-1}
+                                        >
+                                            <TableCell>
+
+                                                <div>
+                                                    <Grid item container >
+                                                        <Grid>
+                                                            {row.name}
+                                                        </Grid>
+
+                                                    </Grid>
+                                                    {
+                                                        row.description && (
+                                                            <small>
+                                                                {` ${row.description.slice(0, 20)}`}
+                                                            </small>
+                                                        )
+                                                    }
+                                                </div>
+
+                                            </TableCell>
+                                            <TableCell>
+                                                {row.departments?.name}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Grid container alignItems={"center"} columnGap={1}>
+
+                                                    <Grid item>
+                                                        <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice} />
+                                                        {row.depots[0].store_depots[0].offer_notes && (
+                                                            <DescriptionOutlined fontSize={"small"} />
+                                                        )}
+                                                        <br />
+                                                        {
+                                                            displayPriceDiscount && <InfoTag value={`- ${displayPriceDiscount}`} />
+                                                        }
+                                                    </Grid>
+
+                                                    <Grid item>
+                                                        <IconButton size="small" color="primary"
+                                                            onClick={() => setActiveModalPrice({ active: true, storeDepot: { ...row.depots[0].store_depots[0] } })}>
+                                                            <EditOutlined fontSize="small" />
+                                                        </IconButton>
                                                     </Grid>
 
                                                 </Grid>
-                                                {
-                                                    row.description && (
-                                                        <small>
-                                                            {` ${row.description.slice(0, 20)}`}
-                                                        </small>
-                                                    )
-                                                }
-                                            </div>
 
-                                        </TableCell>
-                                        <TableCell>
-                                            {row.departments?.name}
-                                        </TableCell>
-                                        <TableCell>
+                                            </TableCell>
 
-                                            {
-                                                showPrice(
-                                                    row.depots[0].store_depots[0].sell_price,
-                                                    row.depots[0].store_depots[0].price_discount_quantity,
-                                                    row.depots[0].store_depots[0].price_discount_percentage,
-                                                    row.depots[0].store_depots[0].sell_price_unit
-                                                )
+                                            <TableCell>
+                                                <Grid container columnSpacing={1}>
 
-                                            }
+                                                    <Grid item>
+                                                        {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
+                                                    </Grid>
 
-                                            <IconButton size="small" color="primary"
-                                                onClick={() => setActiveModalPrice({ active: true, storeDepot: { ...row.depots[0].store_depots[0] } })}>
-                                                <EditOutlined fontSize="small" />
-                                            </IconButton>
-                                        </TableCell>
+                                                    <Grid item>
+                                                        <IconButton sx={{ padding: 0 }} size="small" color="primary"
+                                                            onClick={() => {
+                                                                setActiveModalTransferUnits(true);
+                                                                setSelectedRowInd(index)
+                                                            }}>
+                                                            <SwapHoriz fontSize="small" />
+                                                        </IconButton>
+                                                    </Grid>
 
-                                        <TableCell>
-                                            <Grid container columnSpacing={1}>
+                                                    <Grid item>
+                                                        <IconButton sx={{ padding: 0 }} size="small" color="primary"
+                                                            onClick={() => {
+                                                                setActiveModalEditUnits(true);
+                                                                setSelectedRowInd(index)
+                                                            }}>                                                        <EditOutlined fontSize="small" />
+                                                        </IconButton>
+                                                    </Grid>
 
-                                                <Grid item>
-                                                    {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
                                                 </Grid>
+                                            </TableCell>
 
-                                                <Grid item>
-                                                    <IconButton sx={{ padding: 0 }} size="small" color="primary"
-                                                        onClick={() => {
-                                                            setActiveModalTransferUnits(true);
-                                                            setSelectedRowInd(index)
-                                                        }}>
-                                                        <SwapHoriz fontSize="small" />
-                                                    </IconButton>
-                                                </Grid>
-
-                                                <Grid item>
-                                                    <IconButton sx={{ padding: 0 }} size="small" color="primary"
-                                                        onClick={() => {
-                                                            setActiveModalEditUnits(true);
-                                                            setSelectedRowInd(index)
-                                                        }}>                                                        <EditOutlined fontSize="small" />
-                                                    </IconButton>
-                                                </Grid>
-
-                                            </Grid>
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <Switch
-                                                size='small'
-                                                checked={row.depots[0].store_depots[0].is_active}
-                                                color={'success'}
-                                                onChange={() => updateProductActive(row.depots[0].store_depots[0])}
-                                            />
-                                        </TableCell>
-
-                                        <TableCell style={{ padding: 0 }} colSpan={5}>
-                                            <Tooltip title={"Details"}>
-                                                <IconButton
-                                                    size={"small"}
-                                                    sx={{ m: "3px" }}
-                                                    onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
-                                                >
-                                                    {
-
-
-                                                        (showDetails !== row.id)
-                                                            ? <ExpandMoreOutlined />
-                                                            : <ExpandLessOutlined />
-                                                    }
-                                                </IconButton>
-                                            </Tooltip>
-                                        </TableCell>
-
-
-                                    </TableRow>
-
-                                    <TableRow >
-
-                                        <TableCell style={{ padding: 0 }} colSpan={5}>
-
-                                            {showDetails === row.id && (
-                                                <StoreMoreDetails
-                                                    userId={params.id}
-                                                    details={row.depots[0].store_depots[0]}
-                                                    show={(showDetails === row.id)}
-                                                    loadDates={loadDates}
-                                                    row={row}
+                                            <TableCell>
+                                                <Switch
+                                                    size='small'
+                                                    checked={row.depots[0].store_depots[0].is_active}
+                                                    color={'success'}
+                                                    onChange={() => updateProductActive(row.depots[0].store_depots[0])}
                                                 />
-                                            )
-                                            }
-                                        </TableCell>
+                                            </TableCell>
 
-                                    </TableRow>
-                                </React.Fragment>
-                            ))}
+                                            <TableCell style={{ padding: 0 }} colSpan={5}>
+                                                <Tooltip title={"Details"}>
+                                                    <IconButton
+                                                        size={"small"}
+                                                        sx={{ m: "3px" }}
+                                                        onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
+                                                    >
+                                                        {
+
+
+                                                            (showDetails !== row.id)
+                                                                ? <ExpandMoreOutlined />
+                                                                : <ExpandLessOutlined />
+                                                        }
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </TableCell>
+
+
+                                        </TableRow>
+
+                                        <TableRow >
+
+                                            <TableCell style={{ padding: 0 }} colSpan={5}>
+
+                                                {showDetails === row.id && (
+                                                    <StoreMoreDetails
+                                                        userId={params.id}
+                                                        details={row.depots[0].store_depots[0]}
+                                                        show={(showDetails === row.id)}
+                                                        loadDates={loadDates}
+                                                        row={row}
+                                                    />
+                                                )
+                                                }
+                                            </TableCell>
+
+                                        </TableRow>
+                                    </React.Fragment>
+                                )
+                            })}
             </TableBody>
         )
     }
