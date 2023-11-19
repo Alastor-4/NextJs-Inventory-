@@ -39,8 +39,8 @@ import { storeDetails } from "../request/storeDetails";
 import StoreModalDefault from "./Modal/StoreModalDefault";
 import TransferUnits from "./Modal/TransferUnits";
 import StoreEditUnits from "./Modal/StoreEditUnits";
-import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/Modal/ModalAddProductFromWarehouse.tsx";
-import AddProductFromWharehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
+import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse.tsx";
+import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json())
 
@@ -112,7 +112,7 @@ export default function StoreMainTable() {
             getDataStore()
         }
 
-    }, [dataStore, setDataStore])
+    }, [dataStore, params, setDataStore])
 
     function handleNavigateBack() {
         router.back()
@@ -234,38 +234,36 @@ export default function StoreMainTable() {
         )
     }
 
-    const showPrice = (priceProductStore: any, discountQuantity: any, discountPorcentage: any, currency: any) => {
-        let pricePorcentage = (discountPorcentage !== null) ? (discountPorcentage * priceProductStore / 100).toFixed(2) : null;
+    const showPrice = (priceProductStore: any, discountQuantity: any, discountPercentage: any, currency: any) => {
+        let pricePercentage = (discountPercentage !== null) ? (discountPercentage * priceProductStore / 100).toFixed(2) : null;
 
-        let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
+        let price = discountQuantity ?? pricePercentage ?? priceProductStore;
 
-        return <>
+        return (
             <Typography display={"inline"} >
                 {`${price} `}
                 <small>{` ${currency}  `}</small>
                 <small>
-                    {pricePorcentage || discountQuantity
+                    {pricePercentage || discountQuantity
                         ? <s>{`  ${priceProductStore} ${currency}  `}</s>
                         : ""
                     }
 
                 </small>
-
             </Typography>
-
-        </>
+        )
     }
 
     const loadDates = async () => {
-        let newAllProductsbyDepartment = await storeDetails.getAllProductsByDepartament(params.id, params.storeDetailsId);
+        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartament(params.id, params.storeDetailsId);
 
         let selectedDepartment = allProductsByDepartment.filter((element: any) => (element.selected)).map((element: any) => element.id)
 
-        newAllProductsbyDepartment = newAllProductsbyDepartment.map((element: any) => ({
+        newAllProductsByDepartment = newAllProductsByDepartment.map((element: any) => ({
             ...element,
             selected: (selectedDepartment.includes(element.id))
         }))
-        setAllProductsByDepartment(newAllProductsbyDepartment);
+        setAllProductsByDepartment(newAllProductsByDepartment);
     }
 
     const TableContent = ({ formik }: { formik: any }) => {
@@ -281,29 +279,24 @@ export default function StoreMainTable() {
                                         tabIndex={-1}
                                     >
                                         <TableCell>
-
-                                            <div>
-                                                <Grid item container >
-                                                    <Grid>
-                                                        {row.name}
-                                                    </Grid>
-
+                                            <Grid item container >
+                                                <Grid>
+                                                    {row.name}
                                                 </Grid>
-                                                {
-                                                    row.description && (
-                                                        <small>
-                                                            {` ${row.description.slice(0, 20)}`}
-                                                        </small>
-                                                    )
-                                                }
-                                            </div>
 
+                                            </Grid>
+                                            {
+                                                row.description && (
+                                                    <small>
+                                                        {` ${row.description.slice(0, 20)}`}
+                                                    </small>
+                                                )
+                                            }
                                         </TableCell>
                                         <TableCell>
                                             {row.departments?.name}
                                         </TableCell>
                                         <TableCell>
-
                                             {
                                                 showPrice(
                                                     row.depots[0].store_depots[0].sell_price,
@@ -322,7 +315,6 @@ export default function StoreMainTable() {
 
                                         <TableCell>
                                             <Grid container columnSpacing={1}>
-
                                                 <Grid item>
                                                     {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
                                                 </Grid>
@@ -345,7 +337,6 @@ export default function StoreMainTable() {
                                                         }}>                                                        <EditOutlined fontSize="small" />
                                                     </IconButton>
                                                 </Grid>
-
                                             </Grid>
                                         </TableCell>
 
@@ -366,8 +357,6 @@ export default function StoreMainTable() {
                                                     onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
                                                 >
                                                     {
-
-
                                                         (showDetails !== row.id)
                                                             ? <ExpandMoreOutlined />
                                                             : <ExpandLessOutlined />
@@ -375,26 +364,22 @@ export default function StoreMainTable() {
                                                 </IconButton>
                                             </Tooltip>
                                         </TableCell>
-
-
                                     </TableRow>
 
-                                    <TableRow >
-
-                                        <TableCell style={{ padding: 0 }} colSpan={5}>
-
-                                            {showDetails === row.id && (
-                                                <StoreMoreDetails
-                                                    userId={params.id}
-                                                    details={row.depots[0].store_depots[0]}
-                                                    show={(showDetails === row.id)}
-                                                    loadDates={loadDates}
-                                                    row={row}
-                                                />
-                                            )
+                                    <TableRow>
+                                        <TableCell style={{padding: 0}} colSpan={5}>
+                                            {
+                                                showDetails === row.id && (
+                                                    <StoreMoreDetails
+                                                        userId={params.id}
+                                                        details={row.depots[0].store_depots[0]}
+                                                        show={(showDetails === row.id)}
+                                                        loadDates={loadDates}
+                                                        row={row}
+                                                    />
+                                                )
                                             }
                                         </TableCell>
-
                                     </TableRow>
                                 </React.Fragment>
                             ))}
@@ -481,51 +466,48 @@ export default function StoreMainTable() {
                     <Card variant={"outlined"}>
                         <CustomToolbar />
 
-                        <>
+                        <StoreModalPrice
+                            dialogTitle={"Editar Precio"}
+                            open={activeModalPrice.active}
+                            setOpen={setActiveModalPrice}
+                        >
+                            <StoreEditPrice userId={params.id} storeDepot={activeModalPrice.storeDepot} setActiveModalPrice={setActiveModalPrice} loadDates={loadDates} />
+                        </StoreModalPrice>
 
-                            <StoreModalPrice
-                                dialogTitle={"Editar Precio"}
-                                open={activeModalPrice.active}
-                                setOpen={setActiveModalPrice}
-                            >
-                                <StoreEditPrice userId={params.id} storeDepot={activeModalPrice.storeDepot} setActiveModalPrice={setActiveModalPrice} loadDates={loadDates} />
-                            </StoreModalPrice>
+                        <StoreModalDefault
+                            dialogTitle={"Modificar unidades"}
+                            open={activeModalTransferUnits ? false : activeModalEditUnits}
+                            setOpen={setActiveModalEditUnits}
+                        >
+                            <StoreEditUnits
+                                dataRow={data[selectedRowInd]?.depots[0].store_depots[0]}
+                                setActiveModalEditUnits={setActiveModalEditUnits}
+                                setActiveModalTransferUnits={setActiveModalTransferUnits}
+                                loadDates={loadDates} />
+                        </StoreModalDefault>
 
-                            <StoreModalDefault
-                                dialogTitle={"Modificar unidades"}
-                                open={activeModalTransferUnits ? false : activeModalEditUnits}
-                                setOpen={setActiveModalEditUnits}
-                            >
-                                <StoreEditUnits
-                                    dataRow={data[selectedRowInd]?.depots[0].store_depots[0]}
-                                    setActiveModalEditUnits={setActiveModalEditUnits}
-                                    setActiveModalTransferUnits={setActiveModalTransferUnits}
-                                    loadDates={loadDates} />
-                            </StoreModalDefault>
+                        <StoreModalDefault
+                            dialogTitle={"Transferir unidades"}
+                            open={activeModalTransferUnits}
+                            setOpen={setActiveModalTransferUnits}
+                        >
+                            <TransferUnits
+                                nameStore={dataStore.name}
+                                storeDepot={data[selectedRowInd]?.depots[0].store_depots[0]}
+                                productId={data[selectedRowInd]?.depots[0].product_id}
+                                setActiveTransferUnits={setActiveModalTransferUnits}
+                                loadDates={loadDates}
+                            />
+                        </StoreModalDefault>
 
-                            <StoreModalDefault
-                                dialogTitle={"Transferir unidades"}
-                                open={activeModalTransferUnits}
-                                setOpen={setActiveModalTransferUnits}
-                            >
-                                <TransferUnits
-                                    nameStore={dataStore.name}
-                                    storeDepot={data[selectedRowInd]?.depots[0].store_depots[0]}
-                                    productId={data[selectedRowInd]?.depots[0].product_id}
-                                    setActiveTransferUnits={setActiveModalTransferUnits}
-                                    loadDates={loadDates}
-                                />
-                            </StoreModalDefault>
-
-                            <ModalAddProductFromWarehouse
-                                dialogTitle={"Agregar productos"}
-                                open={activeAddProductFromWarehouse}
-                                setOpen={setActiveAddProductFromWarehouse}
-                                loadData={loadDates}
-                            >
-                                <AddProductFromWharehouse dataStore={dataStore} warehouseId={null} />
-                            </ModalAddProductFromWarehouse>
-                        </>
+                        <ModalAddProductFromWarehouse
+                            dialogTitle={"Agregar productos"}
+                            open={activeAddProductFromWarehouse}
+                            setOpen={setActiveAddProductFromWarehouse}
+                            loadData={loadDates}
+                        >
+                            <AddProductFromWarehouse dataStore={dataStore} warehouseId={null} />
+                        </ModalAddProductFromWarehouse>
 
                         <CardContent>
                             {
@@ -541,8 +523,6 @@ export default function StoreMainTable() {
                                             <TableHeader />
 
                                             <TableContent formik={formik} />
-
-
                                         </Table>
                                     ) : (
                                         <TableNoData />
@@ -555,5 +535,4 @@ export default function StoreMainTable() {
             }
         </Formik>
     )
-
 }

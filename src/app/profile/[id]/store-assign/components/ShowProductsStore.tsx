@@ -34,7 +34,7 @@ import ModalStoreAssign from './Modal/ModalStoreAssign';
 import ManageQuantity from './Modal/ManageQuantity';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
-import ModalAddProductFromWarehouse from '../addProductFromWarehouse/Modal/ModalAddProductFromWarehouse.tsx';
+import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse.tsx';
 
 function ShowProductsStore(props: any) {
 
