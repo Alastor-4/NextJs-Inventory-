@@ -514,11 +514,9 @@ function AddProductFromWarehouse(props: any) {
                 values.units = 0; // reiniciar valor de cantidad inicial
 
                 setActiveFeedbackSuccess(true);
-
             } else {
                 //Error
             }
-
         } else {
             //Error
         }
@@ -526,10 +524,6 @@ function AddProductFromWarehouse(props: any) {
 
     function handleSelectDepartment(e: SelectChangeEvent) {
         setSelectedDepartments(e.target.value)
-    }
-
-    function handleUnselectDepartment(departmentIndex: number) {
-        console.log(departmentIndex)
     }
 
     const ITEM_HEIGHT = 48
