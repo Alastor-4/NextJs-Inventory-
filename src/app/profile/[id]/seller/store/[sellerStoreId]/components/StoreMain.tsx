@@ -82,7 +82,7 @@ export default function StoreMain() {
         fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/sellsApi`)
             .then((data) => {
                 setProductSells(data)
-
+                console.log(data)
                 const sellsTotal = data.length
                 let sellsDifferentProductsTotal = 0
                 let sellsUnitsTotal = 0
@@ -93,20 +93,43 @@ export default function StoreMain() {
                 let seeDepotsId = {}
 
                 data.forEach(item => {
-                    if (!seeDepotsId[item.store_depots.depot_id]) {
-                        sellsDifferentProductsTotal++
-                        seeDepotsId[item.store_depots.depot_id] = true
+                    let sellProfitQuantity = 0
+
+                    //sell from a reservation
+                    if (item.reservations) {
+                        //loop trough reservation products
+                        item.reservations.reservation_products.forEach(reservationProductItem => {
+                            if (!seeDepotsId[reservationProductItem.store_depots.depot_id]) {
+                                sellsDifferentProductsTotal++
+                                seeDepotsId[reservationProductItem.store_depots.depot_id] = true
+                            }
+
+                            sellsUnitsTotal += reservationProductItem.units_quantity
+
+                            sellProfitQuantity += reservationProductItem.store_depots.seller_profit_quantity
+                                ? reservationProductItem.store_depots.seller_profit_quantity * reservationProductItem.units_quantity
+                                : reservationProductItem.store_depots.seller_profit_percentage * reservationProductItem.price / 100
+                        })
+                    } else {
+                        //loop trough sell products
+                        item.sell_products.forEach(sellProductItem => {
+                            if (!seeDepotsId[sellProductItem.store_depots.depot_id]) {
+                                sellsDifferentProductsTotal++
+                                seeDepotsId[sellProductItem.store_depots.depot_id] = true
+                            }
+
+                            sellsUnitsTotal += sellProductItem.units_quantity
+
+                            sellProfitQuantity += sellProductItem.store_depots.seller_profit_quantity
+                                ? sellProductItem.store_depots.seller_profit_quantity * sellProductItem.units_quantity
+                                : sellProductItem.store_depots.seller_profit_percentage * sellProductItem.price / 100
+                        })
                     }
 
-                    sellsUnitsTotal += item.units_quantity
                     sellsAmountTotal += item.total_price
                     sellsUnitsReturnedTotal += item.units_returned_quantity
 
-                    const itemProfitQuantity = item.store_depots.seller_profit_quantity
-                        ? item.store_depots.seller_profit_quantity * item.units_quantity
-                        : item.store_depots.seller_profit_percentage * item.total_price / 100
-
-                    sellerProfitTotal += itemProfitQuantity
+                    sellerProfitTotal += sellProfitQuantity
                 })
 
                 setProductSellsStats({
