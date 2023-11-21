@@ -10,9 +10,9 @@ export const openDaysStores = {
         return response.data;
     },
 
-    create: async function (urlApi: string, data: Object) {
+    create: async function (urlApi: string, data: Object, storeId: any) {
 
-        const response = await apiRequest.post(urlApi, data)
+        const response = await apiRequest.post(urlApi, data, { params: { storeId: storeId } })
 
         return response.status
     },

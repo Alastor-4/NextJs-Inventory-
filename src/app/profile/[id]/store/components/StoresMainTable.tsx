@@ -11,6 +11,7 @@ import {
     Divider,
     Grid,
     IconButton,
+    Stack,
     Table,
     TableBody,
     TableCell,
@@ -24,7 +25,7 @@ import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, AutoStories, DeleteOutline, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShoppingBagOutlined, ShoppingCartOutlined } from "@mui/icons-material";
 import stores from "@/app/profile/[id]/store/requests/stores";
 import { useParams, useRouter } from "next/navigation";
-import WorkDays from "@/components/WorkDays";
+import ShowSchedule from "./ShowSchedule";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -295,14 +296,14 @@ export default function StoresMainTable() {
                                             <Grid container item spacing={1} xs={12}>
                                                 <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Slogan:</Grid>
                                                 <Grid item xs={true}>
-                                                    {row.slogan}
+                                                    {row.slogan === "" ? '-' : row.slogan}
                                                 </Grid>
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
                                                 <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Direccion:</Grid>
                                                 <Grid item xs={true}>
-                                                    {row.address}
+                                                    {row.address === "" ? '-' : row.slogan}
                                                 </Grid>
                                             </Grid>
 
@@ -388,26 +389,18 @@ export default function StoresMainTable() {
 
                                             <Grid container item spacing={1} xs={12}>
                                                 <Grid item xs={true}>
-                                                    <WorkDays
-                                                        title={"Horario de Atención:"}
-                                                        urlApi={urlApiStoreOpenDays}
-                                                        setFatherData={null}
-                                                        storeId={row.id}
-                                                    />
+                                                    <Card variant="outlined" sx={{ padding: "5px 10px 8px 10px" }}>
+                                                        <Typography variant="h6" sx={{ fontWeight: 600 }}>Horarios:</Typography>
+                                                        <Stack spacing={1}>
+
+                                                            <ShowSchedule title={"Apertura de la tienda"} schedule={row.store_open_days ?? []} />
+
+                                                            <ShowSchedule title={"Reservaciones de la tienda"} schedule={row.store_reservation_days ?? []} />
+
+                                                        </Stack>
+
+                                                    </Card>
                                                 </Grid>
-
-                                            </Grid>
-
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={true}>
-                                                    <WorkDays
-                                                        title={"Horario de la Reservaciones:"}
-                                                        urlApi={urlApiStoreOpenReservations}
-                                                        setFatherData={null}
-                                                        storeId={row.id}
-                                                    />
-                                                </Grid>
-
                                             </Grid>
 
                                         </Grid>
