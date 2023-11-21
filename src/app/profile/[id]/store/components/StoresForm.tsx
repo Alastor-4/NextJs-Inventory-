@@ -6,7 +6,7 @@ import {
     Button,
     Card,
     Checkbox,
-    FormControl, FormControlLabel,
+    FormControlLabel,
     Grid,
     MenuItem,
     Switch,
@@ -19,7 +19,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import stores from "@/app/profile/[id]/store/requests/stores";
-import WorkDays from "../../../../../components/WorkDays";
 import { openDaysStores } from "@/request/openDaysStores";
 import dayjs from "dayjs";
 import StoreOpeningDays from "@/app/profile/[id]/store/components/StoreOpeningDays";
@@ -38,158 +37,116 @@ export default function StoresForm(props: any) {
     const [userSeller, setUserSeller] = React.useState("")
 
     const [sellProfit, setSellProfit] = React.useState(true);
-    const [dataWorkDays, setDataWorkDays] = React.useState([{}]);
-    const [dataDayReservations, setDataDayReservations] = React.useState<any>();
 
     const [activeCollection, setActiveCollection] = React.useState(false);
     const [activeReservations, setActiveReservations] = React.useState(false);
 
-    const defaultStartTime = dayjs().set("hours", 9).set("minutes", 0)
-    const defaultEndTime = dayjs().set("hours", 17).set("minutes", 0)
+    const defaultStartTime = dayjs()
+    const defaultEndTime = dayjs()
 
     const [storeOpeningDays, setStoreOpeningDays] = React.useState([
         {
+            id: null,
             weekDayNumber: 1,
             open: false,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
+
         },
         {
+            id: null,
             weekDayNumber: 2,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 3,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 4,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 5,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 6,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 7,
             open: false,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
     ])
 
     const [storeReservationDays, setStoreReservationDays] = React.useState([
         {
+            id: null,
             weekDayNumber: 1,
             open: false,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
+
         },
         {
+            id: null,
             weekDayNumber: 2,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 3,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 4,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 5,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 6,
-            open: true,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            open: false,
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
         {
+            id: null,
             weekDayNumber: 7,
             open: false,
-            times: [
-                {
-                    startTime: defaultStartTime,
-                    endTime: defaultEndTime,
-                }
-            ]
+            startTime: defaultStartTime,
+            endTime: defaultEndTime,
         },
     ])
 
@@ -214,11 +171,31 @@ export default function StoresForm(props: any) {
             setActiveReservations(updateItem ? updateItem.online_reservation : false)
 
             if (updateItem.store_open_days) {
-                //ToDo: build storeOpeningDays array with saved values. watch out array structure
+
+                let newStoreOpeningDays = [...storeOpeningDays];
+
+                updateItem.store_open_days.map((dataDay: any) => {
+                    const ind = dataDay.week_day_number - 1
+                    newStoreOpeningDays[ind].id = dataDay.id
+                    newStoreOpeningDays[ind].weekDayNumber = dataDay.week_day_number
+                    newStoreOpeningDays[ind].open = true
+                    newStoreOpeningDays[ind].startTime = dayjs(dataDay.day_start_time)
+                    newStoreOpeningDays[ind].endTime = dayjs(dataDay.day_end_time)
+
+                })
             }
 
             if (updateItem.store_reservation_days) {
-                //ToDo: build storeReservationDays array with saved values. watch out array structure
+                const newStoreReservationDays = storeReservationDays
+                updateItem.store_reservation_days.map((dataDay: any) => {
+                    const ind = dataDay.week_day_number - 1
+                    newStoreReservationDays[ind].id = dataDay.id
+                    newStoreReservationDays[ind].weekDayNumber = dataDay.week_day_number
+                    newStoreReservationDays[ind].open = true
+                    newStoreReservationDays[ind].startTime = dayjs(dataDay.day_start_time)
+                    newStoreReservationDays[ind].endTime = dayjs(dataDay.day_end_time)
+
+                })
             }
         }
     }, [updateItem])
@@ -305,34 +282,34 @@ export default function StoresForm(props: any) {
         }
 
         let openDaysResponse: any;
-        dataWorkDays.forEach(async (item: any) => {
+        values.openingDays.forEach(async (item: any) => {
             if (item.id !== null) {
-                item.activePadLock
+                item.open
                     ? openDaysResponse = await openDaysStores.update(urlApiStoreOpenDays, item)
                     : openDaysResponse = await openDaysStores.delete(urlApiStoreOpenDays, item.id)
             } else
-                if (item.activePadLock) {
+                if (item.open) {
                     let newItem = item;
-                    newItem.store_id = response.data.id;
-                    openDaysResponse = await openDaysStores.create(urlApiStoreOpenDays, newItem)
+                    openDaysResponse = await openDaysStores.create(urlApiStoreOpenDays, newItem, response.data.id)
                 }
             // Verificar si hay algun error
             if (openDaysResponse !== 200) {
                 ///Error
             }
+
+
         })
 
         let daysReservationsResponse: any;
-        dataDayReservations.forEach(async (item: any) => {
+        values.reservationDays.forEach(async (item: any) => {
             if (item.id !== null) {
-                item.activePadLock
+                item.open
                     ? daysReservationsResponse = await openDaysStores.update(urlApiStoreOpenReservations, item)
                     : daysReservationsResponse = await openDaysStores.delete(urlApiStoreOpenReservations, item.id)
             } else
-                if (item.activePadLock) {
+                if (item.open) {
                     let newItem = item;
-                    newItem.store_id = response.data.id;
-                    daysReservationsResponse = await openDaysStores.create(urlApiStoreOpenReservations, newItem)
+                    daysReservationsResponse = await openDaysStores.create(urlApiStoreOpenReservations, newItem, response.data.id)
                 }
             // Verificar si hay algun error
             if (daysReservationsResponse !== 200) {
@@ -561,24 +538,6 @@ export default function StoresForm(props: any) {
                                 </Grid>
                             )
                         }
-
-                        {/*<Grid item xs={12}>
-                            <WorkDays
-                                title={"Horario de Atención:"}
-                                urlApi={urlApiStoreOpenDays}
-                                setFatherData={setDataWorkDays}
-                                storeId={storeId ?? null}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <WorkDays
-                                title={"Horario de las Reservaciones:"}
-                                urlApi={urlApiStoreOpenReservations}
-                                setFatherData={setDataDayReservations}
-                                storeId={storeId ?? null}
-                            />
-                        </Grid>*/}
 
                         <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                             <Button

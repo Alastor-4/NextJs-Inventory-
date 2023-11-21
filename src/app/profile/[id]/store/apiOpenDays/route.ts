@@ -13,12 +13,16 @@ export async function GET(res: Request) {
 }
 
 export async function POST(req: Request) {
-    const { day_start_time, week_day_number, day_end_time, store_id } = await req.json()
+    const { weekDayNumber, startTime, endTime } = await req.json()
+
+    const { searchParams } = new URL(req.url);
+    const storeId = await parseInt(<string>searchParams.get("storeId"))
+
     const data = {
-        week_day_number,
-        day_start_time: dayjs(day_start_time).toDate(),
-        day_end_time: dayjs(day_end_time).toDate(),
-        store_id: parseInt(store_id)
+        week_day_number: weekDayNumber,
+        day_start_time: dayjs(startTime).toDate(),
+        day_end_time: dayjs(endTime).toDate(),
+        store_id: storeId
     }
 
     const result = await prisma.store_open_days.create({ data })
@@ -28,13 +32,12 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
-    const { id, day_start_time, week_day_number, day_end_time, store_id } = await req.json()
+    const { id, weekDayNumber, startTime, endTime } = await req.json()
 
     const data = {
-        week_day_number,
-        day_start_time: dayjs(day_start_time).toDate(),
-        day_end_time: dayjs(day_end_time).toDate(),
-        store_id: parseInt(store_id)
+        week_day_number: weekDayNumber,
+        day_start_time: dayjs(startTime).toDate(),
+        day_end_time: dayjs(endTime).toDate(),
     }
 
     const result = await prisma.store_open_days.update({ data, where: { id: id } })
