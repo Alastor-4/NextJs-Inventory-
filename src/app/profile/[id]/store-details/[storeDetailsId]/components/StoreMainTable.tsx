@@ -40,7 +40,7 @@ import { storeDetails } from "../request/storeDetails";
 import StoreModalDefault from "./Modal/StoreModalDefault";
 import TransferUnits from "./Modal/TransferUnits";
 import StoreEditUnits from "./Modal/StoreEditUnits";
-import ModalAddProductFromWarehouse from "@/app/profile/[id]/store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse";
+import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse";
 import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
 import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import { numberFormat } from "@/utils/generalFunctions";

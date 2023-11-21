@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Alert,
     Box,
@@ -24,19 +24,19 @@ import {
     Typography
 } from '@mui/material';
 import requestWarehouse from '../request/requestWarehouse';
-import {useParams} from 'next/navigation';
+import { useParams } from 'next/navigation';
 import {
     ExpandLessOutlined,
     ExpandMoreOutlined,
     VisibilityOutlined
 } from '@mui/icons-material';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
-import {TableNoData} from '@/components/TableNoData';
-import {Formik} from 'formik';
+import { TableNoData } from '@/components/TableNoData';
+import { Formik } from 'formik';
 import * as Yup from "yup"
 
 function AddProductFromWarehouse(props: any) {
-    const {dataStore, warehouseId} = props
+    const { dataStore, warehouseId } = props
 
     const params = useParams()
 
@@ -84,7 +84,7 @@ function AddProductFromWarehouse(props: any) {
         let oldSelectedDepartments = new Map()
 
         selectedDepartments.forEach((ind: any) => {
-            oldSelectedDepartments.set(ind.departmentName, true)
+            oldSelectedDepartments.set(dataProductsByDepartment[ind].departmentName, true)
         })
 
         let cont = 0;
@@ -127,7 +127,7 @@ function AddProductFromWarehouse(props: any) {
             verifyingSelectedDepartments(departments)
 
             departments.forEach((depots: any, key: any) => {
-                newDataProductsByDepartment.push({departmentName: key, depots: depots})
+                newDataProductsByDepartment.push({ departmentName: key, depots: depots })
             })
 
             setDataProductsByDepartment(newDataProductsByDepartment);
@@ -153,9 +153,8 @@ function AddProductFromWarehouse(props: any) {
     // almacena los datos de los productos de ese departamento
     useEffect(() => {
         let newData: any = [];
-
         selectedDepartments.forEach((element: any) => {
-            newData = [...newData, ...element.depots]
+            newData = [...newData, ...dataProductsByDepartment[element].depots]
         })
 
         newData.sort((a: any, b: any) => {
@@ -237,12 +236,12 @@ function AddProductFromWarehouse(props: any) {
                                 selected={selectedDepot === index}
                             >
                                 <TableCell>
-                                    <Checkbox size='small' checked={selectedDepot === index}/>
+                                    <Checkbox size='small' checked={selectedDepot === index} />
                                 </TableCell>
 
                                 <TableCell>
                                     {row.products.name}
-                                    <br/>
+                                    <br />
                                     {
                                         row.products.description && (
                                             <small>
@@ -261,25 +260,25 @@ function AddProductFromWarehouse(props: any) {
                                         row.products.images.length
                                             ? (
                                                 <IconButton size='small'
-                                                            onClick={() => handleOpenImagesDialog(row.products.image)}>
-                                                    <VisibilityOutlined color='primary' fontSize='small'/>
+                                                    onClick={() => handleOpenImagesDialog(row.products.image)}>
+                                                    <VisibilityOutlined color='primary' fontSize='small' />
                                                 </IconButton>
                                             )
                                             : "no"
                                     }
                                 </TableCell>
 
-                                <TableCell style={{padding: 0}} colSpan={5}>
+                                <TableCell style={{ padding: 0 }} colSpan={5}>
                                     <Tooltip title={"Details"}>
                                         <IconButton
                                             size={"small"}
-                                            sx={{m: "3px"}}
+                                            sx={{ m: "3px" }}
                                             onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
                                         >
                                             {
                                                 (showDetails !== row.id)
-                                                    ? <ExpandMoreOutlined/>
-                                                    : <ExpandLessOutlined/>
+                                                    ? <ExpandMoreOutlined />
+                                                    : <ExpandLessOutlined />
                                             }
                                         </IconButton>
                                     </Tooltip>
@@ -287,10 +286,10 @@ function AddProductFromWarehouse(props: any) {
                             </TableRow>
 
                             <TableRow>
-                                <TableCell style={{padding: 0}} colSpan={5}>
+                                <TableCell style={{ padding: 0 }} colSpan={5}>
                                     {showDetails === row.id && (
                                         <Collapse in={showDetails === row.id} timeout="auto" unmountOnExit>
-                                            <Grid container spacing={1} sx={{padding: "8px 26px"}}>
+                                            <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
                                                 <Grid item xs={12}>
                                                     <Typography variant="subtitle1" gutterBottom component="div">
                                                         Detalles:
@@ -298,7 +297,7 @@ function AddProductFromWarehouse(props: any) {
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{fontWeight: 600}}>Nombre:</Grid>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
                                                     <Grid item xs={true}>
                                                         {row.products.name}
                                                         {
@@ -312,7 +311,7 @@ function AddProductFromWarehouse(props: any) {
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{fontWeight: 600}}>Departamento:</Grid>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
                                                     <Grid item xs={true}>
                                                         {row.products.departments.name}
                                                     </Grid>
@@ -324,44 +323,44 @@ function AddProductFromWarehouse(props: any) {
                                                         display: "flex",
                                                         alignItems: "center"
                                                     }}>Características:</Grid>
-                                                    <Grid item xs={true} sx={{display: "flex", alignItems: "center"}}>
+                                                    <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                         {row.products.characteristics.length > 0
                                                             ? row.products.characteristics.map((item: any) => (
-                                                                    <Grid
-                                                                        key={item.id}
-                                                                        sx={{
-                                                                            display: "inline-flex",
-                                                                            margin: "3px",
-                                                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                                            padding: "2px 4px",
-                                                                            borderRadius: "5px 2px 2px 2px",
-                                                                            border: "1px solid rgba(130, 130, 130)",
-                                                                            fontSize: 14,
-                                                                        }}
-                                                                    >
-                                                                        <Grid container item alignItems={"center"}
-                                                                              sx={{marginRight: "3px"}}>
-                                                                            <Typography variant={"caption"}
-                                                                                        sx={{
-                                                                                            color: "white",
-                                                                                            fontWeight: "600"
-                                                                                        }}>
-                                                                                {item.name.toUpperCase()}
-                                                                            </Typography>
-                                                                        </Grid>
-                                                                        <Grid container item alignItems={"center"}
-                                                                              sx={{color: "rgba(16,27,44,0.8)"}}>
-                                                                            {item.value}
-                                                                        </Grid>
+                                                                <Grid
+                                                                    key={item.id}
+                                                                    sx={{
+                                                                        display: "inline-flex",
+                                                                        margin: "3px",
+                                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                                        padding: "2px 4px",
+                                                                        borderRadius: "5px 2px 2px 2px",
+                                                                        border: "1px solid rgba(130, 130, 130)",
+                                                                        fontSize: 14,
+                                                                    }}
+                                                                >
+                                                                    <Grid container item alignItems={"center"}
+                                                                        sx={{ marginRight: "3px" }}>
+                                                                        <Typography variant={"caption"}
+                                                                            sx={{
+                                                                                color: "white",
+                                                                                fontWeight: "600"
+                                                                            }}>
+                                                                            {item.name.toUpperCase()}
+                                                                        </Typography>
                                                                     </Grid>
-                                                                )
+                                                                    <Grid container item alignItems={"center"}
+                                                                        sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                                        {item.value}
+                                                                    </Grid>
+                                                                </Grid>
+                                                            )
                                                             ) : "-"
                                                         }
                                                     </Grid>
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{fontWeight: 600}}>Imágenes:</Grid>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
                                                     <Grid item xs={true}>
                                                         {
                                                             row.products.images.length > 0
@@ -378,7 +377,7 @@ function AddProductFromWarehouse(props: any) {
                                                                         {row.images.length}
 
                                                                         <VisibilityOutlined fontSize={"small"}
-                                                                                            sx={{ml: "5px"}}/>
+                                                                            sx={{ ml: "5px" }} />
                                                                     </Box>
                                                                 ) : "no"
                                                         }
@@ -386,7 +385,7 @@ function AddProductFromWarehouse(props: any) {
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{fontWeight: 600}}>Unidades en el
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades en el
                                                         almacén:</Grid>
                                                     <Grid item xs={true}>
                                                         {row.product_total_remaining_units}
@@ -424,7 +423,6 @@ function AddProductFromWarehouse(props: any) {
         newDataDepotsWarehouses[selectedWarehouse].depots = newDataDepotsWarehouses[selectedWarehouse].depots.filter((element: any) => element.id !== data[ind].id)
 
         setDataDepotsWarehouse(newDataDepotsWarehouses)
-        setSelectedDepot(undefined)
     }
 
     // Al agregar un producto se comprueba si existen datos de este dentro de la tienda:
@@ -451,7 +449,7 @@ function AddProductFromWarehouse(props: any) {
                 offer_notes: null,
                 price_discount_percentage: null,
                 price_discount_quantity: null,
-                sell_price: data[ind].products.buy_price,
+                sell_price: data[ind].products.buy_price ?? "0",
                 sell_price_unit: "CUP"
             }
 
@@ -548,23 +546,23 @@ function AddProductFromWarehouse(props: any) {
 
             <Snackbar
                 open={activeFeedBackSuccess}
-                anchorOrigin={{vertical: 'top', horizontal: 'center'}}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 autoHideDuration={6000}
                 onClose={() => setActiveFeedbackSuccess(false)}
             >
-                <Alert severity="success" variant='filled' sx={{width: '100%'}}>
+                <Alert severity="success" variant='filled' sx={{ width: '100%' }}>
                     {`Se agregó el producto a la tienda ${dataStore.name}`}
                 </Alert>
             </Snackbar>
 
             <Formik
-                initialValues={{units: 0}}
+                initialValues={{ units: 0 }}
                 validationSchema={setValidationSchema}
                 onSubmit={handleSubmit}
             >
                 {
                     (formik: any) => (
-                        <form onSubmit={formik.handleSubmit} style={{width: "100%"}}>
+                        <form onSubmit={formik.handleSubmit} style={{ width: "100%" }}>
                             <Grid container rowSpacing={2}>
                                 <Grid item xs={12}>
                                     <TextField
@@ -596,12 +594,12 @@ function AddProductFromWarehouse(props: any) {
                                         onChange={handleSelectDepartment}
                                         MenuProps={MenuProps}
                                         renderValue={(selected: any) => (
-                                            <Box sx={{display: "flex", flexWrap: "wrap", gap: 0.5}}>
+                                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                                                 {
                                                     selected.map((item: any) => (
                                                         <Chip
-                                                            key={item.departmentName}
-                                                            label={item.departmentName}
+                                                            key={item}
+                                                            label={dataProductsByDepartment[item].departmentName}
                                                             variant='outlined'
                                                             size={"small"}
                                                         />
@@ -612,7 +610,7 @@ function AddProductFromWarehouse(props: any) {
                                     >
                                         {
                                             dataProductsByDepartment.map((element: any, index: any) => (
-                                                <MenuItem key={index} value={element}>{element.departmentName}</MenuItem>
+                                                <MenuItem key={index} value={index}>{element.departmentName}</MenuItem>
                                             ))
                                         }
                                     </Select>
@@ -646,17 +644,17 @@ function AddProductFromWarehouse(props: any) {
                                 </Grid>
 
                                 <Grid item xs={12}>
-                                    <Card variant='outlined' sx={{width: 1}}>
+                                    <Card variant='outlined' sx={{ width: 1 }}>
                                         <Grid container>
                                             {
                                                 data?.length > 0
                                                     ? (
-                                                        <Table sx={{width: "100%"}} size={"small"}>
-                                                            <TableHeader/>
-                                                            <TableContent/>
+                                                        <Table sx={{ width: "100%" }} size={"small"}>
+                                                            <TableHeader />
+                                                            <TableContent />
                                                         </Table>
                                                     ) : (
-                                                        <TableNoData/>
+                                                        <TableNoData />
                                                     )
                                             }
                                         </Grid>
