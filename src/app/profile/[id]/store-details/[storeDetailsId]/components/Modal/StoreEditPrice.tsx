@@ -1,6 +1,14 @@
 // @ts-nocheck
 "use client"
-import { Button, Card, Grid, MenuItem, Switch, TextField, Typography } from '@mui/material'
+import {
+    Button,
+    Card,
+    Grid,
+    InputAdornment,
+    MenuItem,
+    Switch,
+    TextField,
+} from '@mui/material'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
 import React, { useEffect, useState } from 'react'
@@ -149,6 +157,9 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
                         value={formik.values.discount}
                         error={formik.errors.discount && formik.touched.discount}
                         helperText={(formik.errors.discount && formik.touched.discount) && formik.errors.discount}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start">-</InputAdornment>
+                        }}
                         onChange={(e) => {
                             activeDiscount
                                 ? storeDepot.price_discount_quantity = e.target.value
