@@ -16,7 +16,7 @@ import {
     Snackbar,
     Table,
     TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
     TableRow,
     TextField,
@@ -616,7 +616,7 @@ function AddProductFromWarehouse(props: any) {
                                     </Select>
                                 </Grid>
 
-                                <Grid item container columnSpacing={1}>
+                                <Grid item container columnSpacing={1} alignItems={"center"}>
                                     <Grid item xs={4} md={3}>
                                         <TextField
                                             name={"units"}
@@ -630,17 +630,16 @@ function AddProductFromWarehouse(props: any) {
                                         />
                                     </Grid>
 
-                                    {
-                                        selectedDepot !== undefined && (
-                                            <Grid container item xs={true} justifyContent={"center"}>
-                                                <Button
-                                                    variant='contained'
-                                                    size='small'
-                                                    type='submit'
-                                                >Agregar Producto</Button>
-                                            </Grid>
-                                        )
-                                    }
+                                    <Grid container item xs={true} justifyContent={"center"}>
+                                        <Button
+                                            variant='contained'
+                                            size='small'
+                                            type='submit'
+                                            disabled={selectedDepot === undefined}
+                                        >
+                                            Agregar Producto
+                                        </Button>
+                                    </Grid>
                                 </Grid>
 
                                 <Grid item xs={12}>
@@ -649,10 +648,12 @@ function AddProductFromWarehouse(props: any) {
                                             {
                                                 data?.length > 0
                                                     ? (
-                                                        <Table sx={{ width: "100%" }} size={"small"}>
-                                                            <TableHeader />
-                                                            <TableContent />
-                                                        </Table>
+                                                        <TableContainer sx={{width: "100%", maxHeight: "450px"}}>
+                                                            <Table sx={{ width: "100%" }} size={"small"}>
+                                                                <TableHeader />
+                                                                <TableContent />
+                                                            </Table>
+                                                        </TableContainer>
                                                     ) : (
                                                         <TableNoData />
                                                     )

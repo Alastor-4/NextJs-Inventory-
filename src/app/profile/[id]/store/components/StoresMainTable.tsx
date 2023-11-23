@@ -365,8 +365,13 @@ export default function StoresMainTable() {
                                             </Grid>
 
                                             <Grid item xs={12}>
-                                                <Button variant={"outlined"} color={"info"}>Administrar
-                                                    productos</Button>
+                                                <Button
+                                                    variant={"outlined"}
+                                                    color={"info"}
+                                                    onClick={() => router.push(`/profile/${params.id}/store-details/${row.id}`)}
+                                                >
+                                                    Administrar productos
+                                                </Button>
                                             </Grid>
 
                                             <Grid container item rowSpacing={1} xs={12}>
