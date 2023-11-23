@@ -27,7 +27,7 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/sellerStore";
 import Link from "next/link";
-import {numberFormat} from "@/utils/generalFunctions";
+import {daysMap, numberFormat} from "@/utils/generalFunctions";
 
 dayjs.extend(isBetween)
 
@@ -166,16 +166,6 @@ export default function StoreMain() {
             </Toolbar>
         </AppBar>
     )
-
-    const daysMap = {
-        0: "Domingo",
-        1: "Lunes",
-        2: "Martes",
-        3: "Miércoles",
-        4: "Jueves",
-        5: "Viernes",
-        6: "Sábado",
-    }
 
     const [autoOpenTime, setAutoOpenTime] = React.useState(true)
     React.useEffect(() => {
