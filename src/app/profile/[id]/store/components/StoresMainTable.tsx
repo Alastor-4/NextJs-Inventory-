@@ -3,7 +3,7 @@
 import React from "react";
 import {
     AppBar,
-    Box,
+    Box, Button,
     Card,
     CardContent,
     Checkbox, CircularProgress,
@@ -22,10 +22,21 @@ import {
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft, AutoStories, DeleteOutline, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, ShoppingBagOutlined, ShoppingCartOutlined } from "@mui/icons-material";
+import {
+    AddOutlined,
+    ArrowLeft,
+    AutoStories,
+    ChevronRightOutlined,
+    DeleteOutline,
+    EditOutlined,
+    ExpandLessOutlined,
+    ExpandMoreOutlined,
+    ShoppingCartOutlined
+} from "@mui/icons-material";
 import stores from "@/app/profile/[id]/store/requests/stores";
 import { useParams, useRouter } from "next/navigation";
-import ShowSchedule from "./ShowSchedule";
+import {daysMap} from "@/utils/generalFunctions";
+import dayjs from "dayjs";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -36,19 +47,13 @@ export default function StoresMainTable() {
     const params = useParams()
     const router = useRouter()
 
-    //API
-    const urlApiStoreOpenDays = `/profile/${params.id}/store/apiOpenDays`
-    const urlApiStoreOpenReservations = `/profile/${params.id}/store/apiReservations`
-
-
-
     //ToDo: use global isLoading
     const isLoading = false
 
     //get initial data
     React.useEffect(() => {
         fetcher(`/profile/${params.id}/store/api`).then((data) => setData(data))
-    }, [])
+    }, [params.id])
 
     //table selected item
     const [selected, setSelected] = React.useState<any>(null)
@@ -121,11 +126,9 @@ export default function StoresMainTable() {
                                         )
                                     }
 
-
                                     <IconButton color={"inherit"} onClick={handleCreate} >
                                         <AddOutlined />
                                     </IconButton>
-
                                 </>
                             )
                     }
@@ -252,8 +255,6 @@ export default function StoresMainTable() {
                                         }}
                                     >
                                         {
-
-
                                             (showDetails !== index)
                                                 ? <ExpandMoreOutlined />
                                                 : <ExpandLessOutlined />
@@ -261,17 +262,14 @@ export default function StoresMainTable() {
                                     </IconButton>
                                 </Tooltip>
                             </TableCell>
-
                         </TableRow>
 
 
                         <TableRow >
-
                             <TableCell style={{ padding: 0 }} colSpan={5}>
-
                                 {showDetails === index && (
                                     <Collapse in={showDetails === index} timeout="auto" unmountOnExit>
-                                        <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
+                                        <Grid container spacing={1} sx={{padding: "8px 26px"}}>
                                             <Grid item xs={12}>
                                                 <Typography variant="subtitle1" gutterBottom component="div">
                                                     Detalles:
@@ -280,7 +278,7 @@ export default function StoresMainTable() {
 
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Nombre:</Grid>
                                                 <Grid item xs={true}>
                                                     {row.name}
                                                     {
@@ -294,21 +292,21 @@ export default function StoresMainTable() {
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Slogan:</Grid>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Slogan:</Grid>
                                                 <Grid item xs={true}>
                                                     {row.slogan === "" ? '-' : row.slogan}
                                                 </Grid>
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Direccion:</Grid>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Direccion:</Grid>
                                                 <Grid item xs={true}>
                                                     {row.address === "" ? '-' : row.slogan}
                                                 </Grid>
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{`Vendedor(a):`}</Grid>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>{`Vendedor(a):`}</Grid>
                                                 <Grid item xs={true}>
                                                     {
                                                         (row.seller_user)
@@ -320,7 +318,8 @@ export default function StoresMainTable() {
 
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ganacia del vendedor por defecto:</Grid>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Ganacia del vendedor por
+                                                    defecto:</Grid>
                                                 <Grid item xs={true}>
                                                     {
                                                         (row.fixed_seller_profit_percentage)
@@ -331,86 +330,119 @@ export default function StoresMainTable() {
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Catálogo en línea:</Grid>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Catálogo en línea:</Grid>
                                                 <Grid item xs={true}>
-                                                    {
-
-                                                        <Grid container columnSpacing={1}>
-                                                            <Grid item > {`Servicio ${row.online_catalog ? "activo" : "inactivo"}  `}</Grid>
-                                                            <Grid item>
-                                                                <Tooltip title={"Catálogo"} >
-                                                                    <AutoStories
-                                                                        color={row.online_catalog ? "primary" : "disabled"}
-                                                                        fontSize="small" />
-                                                                </Tooltip>
-
-                                                            </Grid>
-
+                                                    <Grid container columnSpacing={1}>
+                                                        <Grid
+                                                            item> {`Servicio ${row.online_catalog ? "activo" : "inactivo"}  `}</Grid>
+                                                        <Grid item>
+                                                            <Tooltip title={"Catálogo"}>
+                                                                <AutoStories
+                                                                    color={row.online_catalog ? "primary" : "disabled"}
+                                                                    fontSize="small"/>
+                                                            </Tooltip>
                                                         </Grid>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
 
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Reservaciones en
+                                                    línea:</Grid>
+                                                <Grid item xs={true}>
+                                                    <Grid container columnSpacing={1}>
+                                                        <Grid
+                                                            item>{`Servicio ${row.online_reservation ? "activo" : "inactivo"}`}</Grid>
+                                                        <Grid item>
+                                                            <Tooltip title={"Reservaciones"}>
+                                                                <ShoppingCartOutlined
+                                                                    color={row.online_reservation ? "primary" : "disabled"}
+                                                                    fontSize="small"/>
+                                                            </Tooltip>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid item xs={12}>
+                                                <Button
+                                                    variant={"outlined"}
+                                                    color={"info"}
+                                                    onClick={() => router.push(`/profile/${params.id}/store-details/${row.id}`)}
+                                                >
+                                                    Administrar productos
+                                                </Button>
+                                            </Grid>
+
+                                            <Grid container item rowSpacing={1} xs={12}>
+                                                <Grid item xs={12}>
+                                                    <Typography variant="subtitle1" sx={{fontWeight: 600}}>Horario de
+                                                        apertura:</Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    {
+                                                        row.store_open_days.length ? (
+                                                            row.store_open_days.map((openItem: any) => (
+                                                                <Grid container item spacing={1} xs={12}
+                                                                      key={openItem.id}>
+                                                                    <Grid item xs={"auto"} sx={{
+                                                                        fontWeight: 600,
+                                                                        display: "flex",
+                                                                        alignItems: "center"
+                                                                    }}>
+                                                                        <ChevronRightOutlined fontSize={"small"}/>
+                                                                        {/*@ts-ignore*/}
+                                                                        {daysMap[openItem.week_day_number]}:
+                                                                    </Grid>
+                                                                    <Grid item xs={true}>
+                                                                        De {openItem?.day_start_time ? dayjs(openItem.day_start_time).format("hh:mm A") : "-"} a {openItem?.day_end_time ? dayjs(openItem.day_end_time).format("hh:mm A") : "-"}
+                                                                    </Grid>
+                                                                </Grid>
+                                                            ))
+                                                        ) : "no especificado"
                                                     }
                                                 </Grid>
                                             </Grid>
 
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Reservaciones en línea:</Grid>
-                                                <Grid item xs={true}>
-                                                    {
-
-                                                        <Grid container columnSpacing={1}>
-                                                            <Grid item > {`Servicio ${row.online_reservation ? "activo" : "inactivo"}  `}</Grid>
-                                                            <Grid item>
-                                                                <Tooltip title={"Reservaciones"} >
-                                                                    <ShoppingCartOutlined
-                                                                        color={row.online_reservation ? "primary" : "disabled"}
-                                                                        fontSize="small" />
-                                                                </Tooltip>
-
-                                                            </Grid>
-
+                                            {
+                                                row.online_reservation && (
+                                                    <Grid container item rowSpacing={1} xs={12}>
+                                                        <Grid item xs={12}>
+                                                            <Typography variant="subtitle1" sx={{fontWeight: 600}}>Horario de
+                                                                reservaciones:</Typography>
                                                         </Grid>
-
-                                                    }
-                                                </Grid>
-                                            </Grid>
-
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={true}>
-                                                    <Box
-                                                        sx={{ cursor: "pointer", display: "flex", alignItems: "center", color: "blue" }}
-                                                        onClick={() => router.push(`/profile/${params.id}/store-details/${row.id}`)}
-                                                    >
-                                                        Administrar Tienda
-
-                                                    </Box>
-                                                </Grid>
-
-                                            </Grid>
-
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={true}>
-                                                    <Card variant="outlined" sx={{ padding: "5px 10px 8px 10px" }}>
-                                                        <Typography variant="h6" sx={{ fontWeight: 600 }}>Horarios:</Typography>
-                                                        <Stack spacing={1}>
-
-                                                            <ShowSchedule title={"Apertura de la tienda"} schedule={row.store_open_days ?? []} />
-
-                                                            <ShowSchedule title={"Reservaciones de la tienda"} schedule={row.store_reservation_days ?? []} />
-
-                                                        </Stack>
-
-                                                    </Card>
-                                                </Grid>
-                                            </Grid>
-
+                                                        <Grid item xs={12}>
+                                                            {
+                                                                row.store_reservation_days.length ? (
+                                                                    row.store_reservation_days.map((openItem: any) => (
+                                                                        <Grid container item spacing={1} xs={12}
+                                                                              key={openItem.id}>
+                                                                            <Grid item xs={"auto"} sx={{
+                                                                                fontWeight: 600,
+                                                                                display: "flex",
+                                                                                alignItems: "center"
+                                                                            }}>
+                                                                                <ChevronRightOutlined fontSize={"small"}/>
+                                                                                {/*@ts-ignore*/}
+                                                                                {daysMap[openItem.week_day_number]}:
+                                                                            </Grid>
+                                                                            <Grid item xs={true}>
+                                                                                De {openItem?.day_start_time ? dayjs(openItem.day_start_time).format("hh:mm A") : "-"} a {openItem?.day_end_time ? dayjs(openItem.day_end_time).format("hh:mm A") : "-"}
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                    ))
+                                                                ) : "no especificado"
+                                                            }
+                                                        </Grid>
+                                                    </Grid>
+                                                )
+                                            }
                                         </Grid>
                                     </Collapse>
                                 )
                                 }
                             </TableCell>
-
                         </TableRow>
-
                     </React.Fragment>
                 ))}
             </TableBody>

@@ -8,18 +8,9 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { TimePicker } from '@mui/x-date-pickers';
+import {daysMap} from "@/utils/generalFunctions";
 
 export default function StoreOpeningDays({ title, formik, valuesFieldKey }: { title: string, formik: any, valuesFieldKey: string }) {
-    const daysMap = {
-        1: "D",
-        2: "L",
-        3: "M",
-        4: "X",
-        5: "J",
-        6: "V",
-        7: "S",
-    }
-
     function handleToggleOpen(index: number, open: boolean) {
         formik.setFieldValue(`${valuesFieldKey}.${index}.open`, !open)
     }
@@ -48,7 +39,6 @@ export default function StoreOpeningDays({ title, formik, valuesFieldKey }: { ti
                                                         display: "inline-flex",
                                                         alignItems: "center",
                                                         justifyContent: "center",
-                                                        //border: "1px solid darkblue",
                                                         borderRadius: "50%",
                                                         width: "43px",
                                                         height: "43px",
@@ -70,7 +60,7 @@ export default function StoreOpeningDays({ title, formik, valuesFieldKey }: { ti
                                             onClick={() => handleToggleOpen(index, item.open)}
                                         >
                                             {/*@ts-ignore*/}
-                                            {daysMap[item.weekDayNumber]}
+                                            {daysMap[item.weekDayNumber][0]}
                                         </Box>
                                     </Grid>
 
@@ -79,11 +69,9 @@ export default function StoreOpeningDays({ title, formik, valuesFieldKey }: { ti
                                             <Grid item xs={12}>
                                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                                     <Grid container rowSpacing={2}>
-
                                                         <Grid container item xs={12} >
                                                             <Card variant={"outlined"} sx={{ padding: "10px 5px 5px 5px" }}>
                                                                 <Grid container rowSpacing={1}>
-
                                                                     <Grid container item xs={12} justifyContent={"center"}>
                                                                         <TimePicker
                                                                             label={"Desde"}
@@ -102,8 +90,6 @@ export default function StoreOpeningDays({ title, formik, valuesFieldKey }: { ti
                                                                 </Grid>
                                                             </Card>
                                                         </Grid>
-
-
                                                     </Grid>
                                                 </LocalizationProvider>
                                             </Grid>

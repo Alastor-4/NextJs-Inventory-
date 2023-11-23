@@ -44,7 +44,7 @@ export default function StoresForm(props: any) {
     const defaultStartTime = dayjs()
     const defaultEndTime = dayjs()
 
-    const [storeOpeningDays, setStoreOpeningDays] = React.useState([
+    const [storeOpeningDays] = React.useState([
         {
             id: null,
             weekDayNumber: 1,
@@ -97,7 +97,7 @@ export default function StoresForm(props: any) {
         },
     ])
 
-    const [storeReservationDays, setStoreReservationDays] = React.useState([
+    const [storeReservationDays] = React.useState([
         {
             id: null,
             weekDayNumber: 1,
@@ -171,7 +171,6 @@ export default function StoresForm(props: any) {
             setActiveReservations(updateItem ? updateItem.online_reservation : false)
 
             if (updateItem.store_open_days) {
-
                 let newStoreOpeningDays = [...storeOpeningDays];
 
                 updateItem.store_open_days.map((dataDay: any) => {
@@ -181,7 +180,6 @@ export default function StoresForm(props: any) {
                     newStoreOpeningDays[ind].open = true
                     newStoreOpeningDays[ind].startTime = dayjs(dataDay.day_start_time)
                     newStoreOpeningDays[ind].endTime = dayjs(dataDay.day_end_time)
-
                 })
             }
 
@@ -194,12 +192,10 @@ export default function StoresForm(props: any) {
                     newStoreReservationDays[ind].open = true
                     newStoreReservationDays[ind].startTime = dayjs(dataDay.day_start_time)
                     newStoreReservationDays[ind].endTime = dayjs(dataDay.day_end_time)
-
                 })
             }
         }
     }, [updateItem])
-
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -331,7 +327,6 @@ export default function StoresForm(props: any) {
         onSubmit: handleSubmit,
         enableReinitialize: true,
     })
-
 
     const editPercentage = (formik: any) => (
         <Grid item container columnSpacing={1}>
