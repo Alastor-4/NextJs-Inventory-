@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import {
-    Alert,
     Box,
     Button,
     Card,
@@ -13,7 +12,6 @@ import {
     MenuItem,
     Select,
     SelectChangeEvent,
-    Snackbar,
     Table,
     TableBody,
     TableCell, TableContainer,
@@ -34,6 +32,7 @@ import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import { TableNoData } from '@/components/TableNoData';
 import { Formik } from 'formik';
 import * as Yup from "yup"
+import {notifyError, notifySuccess} from "@/utils/generalFunctions";
 
 function AddProductFromWarehouse(props: any) {
     const { dataStore, warehouseId } = props
@@ -49,9 +48,6 @@ function AddProductFromWarehouse(props: any) {
     const [selectedDepot, setSelectedDepot] = useState<any>();
 
     const [showDetails, setShowDetails] = useState('')
-
-    const [activeFeedBackSuccess, setActiveFeedbackSuccess] = useState(false);
-    const [activeFeedBackError, setActiveFeedbackError] = useState(false);
 
     const [openImageDialog, setOpenImageDialog] = useState(false)
     const [dialogImages, setDialogImages] = useState([]);
@@ -273,7 +269,7 @@ function AddProductFromWarehouse(props: any) {
                                         <IconButton
                                             size={"small"}
                                             sx={{ m: "3px" }}
-                                            onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
+                                            onClick={() => setShowDetails((showDetails !== row.id) ? row.id : '')}
                                         >
                                             {
                                                 (showDetails !== row.id)
@@ -511,12 +507,12 @@ function AddProductFromWarehouse(props: any) {
                 setSelectedDepot(undefined) // dejar de seleccionar el deposito
                 values.units = 0; // reiniciar valor de cantidad inicial
 
-                setActiveFeedbackSuccess(true);
+                notifySuccess("Producto agregado a la tienda")
             } else {
-                //Error
+                notifyError("Error al agregar el producto a la tienda")
             }
         } else {
-            //Error
+            notifyError("Error al agregar el producto a la tienda")
         }
     }
 
@@ -543,17 +539,6 @@ function AddProductFromWarehouse(props: any) {
                 setOpen={setOpenImageDialog}
                 images={dialogImages}
             />
-
-            <Snackbar
-                open={activeFeedBackSuccess}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                autoHideDuration={6000}
-                onClose={() => setActiveFeedbackSuccess(false)}
-            >
-                <Alert severity="success" variant='filled' sx={{ width: '100%' }}>
-                    {`Se agregó el producto a la tienda ${dataStore.name}`}
-                </Alert>
-            </Snackbar>
 
             <Formik
                 initialValues={{ units: 0 }}

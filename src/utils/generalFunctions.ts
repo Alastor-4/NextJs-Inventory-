@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import {enqueueSnackbar} from "notistack";
 
 export const numberFormat = (number: string) => parseFloat((Math.round(parseFloat(number.toString()) * 100) / 100).toFixed(2))
 
@@ -13,3 +14,7 @@ export const daysMap = {
     6: "Viernes",
     7: "Sábado",
 }
+
+export const notifySuccess = (message: string) => enqueueSnackbar(message, {variant: "success"})
+export const notifyError = (message: string) => enqueueSnackbar(message, {variant: "error"})
+export const notifyWarning = (message: string) => enqueueSnackbar(message, {variant: "warning"})

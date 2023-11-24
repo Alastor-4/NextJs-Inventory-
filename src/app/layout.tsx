@@ -1,6 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Roboto_Serif } from 'next/font/google'
+import ClientLayout from "@/app/clientLayout";
 
 const roboto = Roboto_Serif({ subsets: ['latin'] })
 
@@ -16,7 +17,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`p-4 ${roboto.className}`}>{children}</body>
+      <body className={`p-4 ${roboto.className}`}>
+      <ClientLayout>
+          {children}
+      </ClientLayout>
+      </body>
     </html>
   )
 }
