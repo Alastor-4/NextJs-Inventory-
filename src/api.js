@@ -1,4 +1,5 @@
 import axios from "axios"
+import {startLoading, stopLoading} from "@/app/store/store"
 
 const apiRequest = axios.create({
     headers: {
@@ -9,31 +10,25 @@ const apiRequest = axios.create({
 
 apiRequest.interceptors.request.use(
     config => {
-        // const token = Vue.$cookies.get('authToken');
-        // if (token) {
-        //   config.headers.common.Authorization = `Bearer ${token}`
-        // }
-        // if (!store.state.isLoading && store.state.useLoading) {
-        //   store.commit('SET_LOADING', true)
-        // }
+        startLoading()
 
         return config
     },
     error => {
-        // store.commit('SET_LOADING', false)
+        stopLoading()
+
         return Promise.reject(error)
     },
 );
 
 apiRequest.interceptors.response.use(
     (response) => {
-        //store.commit('SET_LOADING', false)
+        stopLoading()
+
         return response
     },
     async (error) => {
-        // setTimeout(() => {
-        //     store.commit('SET_LOADING', false)
-        // }, 1000)
+        stopLoading()
 
         return Promise.reject(error)
 

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import apiRequest from "@/api"
+import {notifyError} from "@/utils/generalFunctions";
 
 const url = (userId) => `/profile/${userId}/product/api`
 const updateUrl = (userId) => `/profile/${userId}/product/update/api`
@@ -42,7 +43,7 @@ const products = {
         try {
             return await apiRequest.post(url(userId), data)
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Ha ocurrido un error creando el producto")
         }
 
         return false
