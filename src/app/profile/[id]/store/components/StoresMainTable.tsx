@@ -35,10 +35,8 @@ import {
 } from "@mui/icons-material";
 import stores from "@/app/profile/[id]/store/requests/stores";
 import { useParams, useRouter } from "next/navigation";
-import {daysMap} from "@/utils/generalFunctions";
+import { daysMap } from "@/utils/generalFunctions";
 import dayjs from "dayjs";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function StoresMainTable() {
     const [data, setData] = React.useState<any>(null)
@@ -52,8 +50,14 @@ export default function StoresMainTable() {
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${params.id}/store/api`).then((data) => setData(data))
-    }, [params.id])
+        const getData = async () => {
+            const newData = await stores.allUserStores(params.id);
+            setData(newData);
+        }
+        if (data === null) {
+            getData();
+        }
+    }, [params.id, data])
 
     //table selected item
     const [selected, setSelected] = React.useState<any>(null)
@@ -269,7 +273,7 @@ export default function StoresMainTable() {
                             <TableCell style={{ padding: 0 }} colSpan={5}>
                                 {showDetails === index && (
                                     <Collapse in={showDetails === index} timeout="auto" unmountOnExit>
-                                        <Grid container spacing={1} sx={{padding: "8px 26px"}}>
+                                        <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
                                             <Grid item xs={12}>
                                                 <Typography variant="subtitle1" gutterBottom component="div">
                                                     Detalles:
@@ -278,7 +282,7 @@ export default function StoresMainTable() {
 
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Nombre:</Grid>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
                                                 <Grid item xs={true}>
                                                     {row.name}
                                                     {
@@ -292,21 +296,21 @@ export default function StoresMainTable() {
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Slogan:</Grid>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Slogan:</Grid>
                                                 <Grid item xs={true}>
                                                     {row.slogan === "" ? '-' : row.slogan}
                                                 </Grid>
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Direccion:</Grid>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Direccion:</Grid>
                                                 <Grid item xs={true}>
                                                     {row.address === "" ? '-' : row.slogan}
                                                 </Grid>
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>{`Vendedor(a):`}</Grid>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{`Vendedor(a):`}</Grid>
                                                 <Grid item xs={true}>
                                                     {
                                                         (row.seller_user)
@@ -318,7 +322,7 @@ export default function StoresMainTable() {
 
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Ganacia del vendedor por
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ganacia del vendedor por
                                                     defecto:</Grid>
                                                 <Grid item xs={true}>
                                                     {
@@ -330,7 +334,7 @@ export default function StoresMainTable() {
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Catálogo en línea:</Grid>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Catálogo en línea:</Grid>
                                                 <Grid item xs={true}>
                                                     <Grid container columnSpacing={1}>
                                                         <Grid
@@ -339,7 +343,7 @@ export default function StoresMainTable() {
                                                             <Tooltip title={"Catálogo"}>
                                                                 <AutoStories
                                                                     color={row.online_catalog ? "primary" : "disabled"}
-                                                                    fontSize="small"/>
+                                                                    fontSize="small" />
                                                             </Tooltip>
                                                         </Grid>
                                                     </Grid>
@@ -347,7 +351,7 @@ export default function StoresMainTable() {
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Reservaciones en
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Reservaciones en
                                                     línea:</Grid>
                                                 <Grid item xs={true}>
                                                     <Grid container columnSpacing={1}>
@@ -357,7 +361,7 @@ export default function StoresMainTable() {
                                                             <Tooltip title={"Reservaciones"}>
                                                                 <ShoppingCartOutlined
                                                                     color={row.online_reservation ? "primary" : "disabled"}
-                                                                    fontSize="small"/>
+                                                                    fontSize="small" />
                                                             </Tooltip>
                                                         </Grid>
                                                     </Grid>
@@ -376,7 +380,7 @@ export default function StoresMainTable() {
 
                                             <Grid container item rowSpacing={1} xs={12}>
                                                 <Grid item xs={12}>
-                                                    <Typography variant="subtitle1" sx={{fontWeight: 600}}>Horario de
+                                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Horario de
                                                         apertura:</Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
@@ -384,13 +388,13 @@ export default function StoresMainTable() {
                                                         row.store_open_days.length ? (
                                                             row.store_open_days.map((openItem: any) => (
                                                                 <Grid container item spacing={1} xs={12}
-                                                                      key={openItem.id}>
+                                                                    key={openItem.id}>
                                                                     <Grid item xs={"auto"} sx={{
                                                                         fontWeight: 600,
                                                                         display: "flex",
                                                                         alignItems: "center"
                                                                     }}>
-                                                                        <ChevronRightOutlined fontSize={"small"}/>
+                                                                        <ChevronRightOutlined fontSize={"small"} />
                                                                         {/*@ts-ignore*/}
                                                                         {daysMap[openItem.week_day_number]}:
                                                                     </Grid>
@@ -408,7 +412,7 @@ export default function StoresMainTable() {
                                                 row.online_reservation && (
                                                     <Grid container item rowSpacing={1} xs={12}>
                                                         <Grid item xs={12}>
-                                                            <Typography variant="subtitle1" sx={{fontWeight: 600}}>Horario de
+                                                            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Horario de
                                                                 reservaciones:</Typography>
                                                         </Grid>
                                                         <Grid item xs={12}>
@@ -416,13 +420,13 @@ export default function StoresMainTable() {
                                                                 row.store_reservation_days.length ? (
                                                                     row.store_reservation_days.map((openItem: any) => (
                                                                         <Grid container item spacing={1} xs={12}
-                                                                              key={openItem.id}>
+                                                                            key={openItem.id}>
                                                                             <Grid item xs={"auto"} sx={{
                                                                                 fontWeight: 600,
                                                                                 display: "flex",
                                                                                 alignItems: "center"
                                                                             }}>
-                                                                                <ChevronRightOutlined fontSize={"small"}/>
+                                                                                <ChevronRightOutlined fontSize={"small"} />
                                                                                 {/*@ts-ignore*/}
                                                                                 {daysMap[openItem.week_day_number]}:
                                                                             </Grid>

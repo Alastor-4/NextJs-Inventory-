@@ -63,6 +63,7 @@ function AddProductFromWarehouse(props: any) {
 
         const getDataSpecificWarehouse = async () => {
             const newDataDepotsWarehouses = await requestWarehouse.getWarehouseWithTheirDepots(params.id, dataStore.id, warehouseId)
+            loadDepartamentsFromSelectedWarehouse(0, newDataDepotsWarehouses);
             setDataDepotsWarehouse(newDataDepotsWarehouses);
             setSelectedWarehouse(0);
         }
