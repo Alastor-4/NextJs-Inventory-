@@ -32,7 +32,7 @@ import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import { TableNoData } from '@/components/TableNoData';
 import { Formik } from 'formik';
 import * as Yup from "yup"
-import {notifyError, notifySuccess} from "@/utils/generalFunctions";
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 
 function AddProductFromWarehouse(props: any) {
     const { dataStore, warehouseId } = props
@@ -75,14 +75,13 @@ function AddProductFromWarehouse(props: any) {
 
     // Puede pasar que q se oculte el último depósito
     // existente de un departamento seleccionado,por lo
-    //q se deseleccionada
+    //q se deselecciona
     const verifyingSelectedDepartments = (departments: any) => {
         let oldSelectedDepartments = new Map()
 
         selectedDepartments.forEach((ind: any) => {
             oldSelectedDepartments.set(dataProductsByDepartment[ind].departmentName, true)
         })
-
         let cont = 0;
         let newSelectedDepartments: any = [];
 
@@ -94,8 +93,8 @@ function AddProductFromWarehouse(props: any) {
         })
 
         setSelectedDepartments(newSelectedDepartments);
+        return newSelectedDepartments;
     }
-
     /*
      Al seleccionar un nuevo departamento se cargan los datos
      de dataProductsByDepartment q no es mas q todos los productos
@@ -106,29 +105,31 @@ function AddProductFromWarehouse(props: any) {
        depots: [] => depots -> product
      }
      para asi mantenerlos organizados por departamentos */
-    useEffect(() => {
-        if (selectedWarehouse !== "") {
-            let departments = new Map();
+    const loadDepartamentsFromSelectedWarehouse = (indWarehouse: number, mirrorDataDepotsWarehouses: any) => {
+        let departments = new Map();
 
-            dataDepotsWarehouses[0].depots.forEach((depot: any) => {
-                const nameDepartment = depot.products.departments.name;
+        mirrorDataDepotsWarehouses[indWarehouse].depots.forEach((depot: any) => {
+            const nameDepartment = depot.products.departments.name;
 
-                const newContent = !departments.has(nameDepartment) ? [] : departments.get(nameDepartment)
+            const newContent = !departments.has(nameDepartment) ? [] : departments.get(nameDepartment)
 
-                departments.set(nameDepartment, [...newContent, depot])
-            })
+            departments.set(nameDepartment, [...newContent, depot])
+        })
 
-            let newDataProductsByDepartment: any = [];
+        let newDataProductsByDepartment: any = [];
 
-            verifyingSelectedDepartments(departments)
+        const newSelectedDepartments = verifyingSelectedDepartments(departments)
 
-            departments.forEach((depots: any, key: any) => {
-                newDataProductsByDepartment.push({ departmentName: key, depots: depots })
-            })
+        departments.forEach((depots: any, key: any) => {
+            newDataProductsByDepartment.push({ departmentName: key, depots: depots })
+        })
 
-            setDataProductsByDepartment(newDataProductsByDepartment);
-        }
-    }, [selectedWarehouse, dataDepotsWarehouses])
+
+        loadDepotsFromSelectedDepartments(newSelectedDepartments, newDataProductsByDepartment);
+
+        setDataProductsByDepartment(newDataProductsByDepartment);
+
+    }
 
     // Es q siempre este seleccionado el elemento deseado
     // y q ninguna organizacion de elementos influya
@@ -145,12 +146,12 @@ function AddProductFromWarehouse(props: any) {
         }
     }
 
-    // AL seleccionar departamentos se va actulizando data la cual
+    // AL seleccionar departamentos se va actualizando data la cual
     // almacena los datos de los productos de ese departamento
-    useEffect(() => {
+    const loadDepotsFromSelectedDepartments = (newSelectedDepartments: any, mirrorDataProductsByDepartment: any) => {
         let newData: any = [];
-        selectedDepartments.forEach((element: any) => {
-            newData = [...newData, ...dataProductsByDepartment[element].depots]
+        newSelectedDepartments.forEach((element: any) => {
+            newData = [...newData, ...mirrorDataProductsByDepartment[element].depots]
         })
 
         newData.sort((a: any, b: any) => {
@@ -161,7 +162,7 @@ function AddProductFromWarehouse(props: any) {
         verifyingSelectedDepot(newData)
 
         setData(newData)
-    }, [selectedDepartments])
+    }
 
     const TableHeader = () => {
         const headCells = [
@@ -418,6 +419,8 @@ function AddProductFromWarehouse(props: any) {
         let newDataDepotsWarehouses = [...dataDepotsWarehouses];
         newDataDepotsWarehouses[selectedWarehouse].depots = newDataDepotsWarehouses[selectedWarehouse].depots.filter((element: any) => element.id !== data[ind].id)
 
+        loadDepartamentsFromSelectedWarehouse(selectedWarehouse, newDataDepotsWarehouses)// cargas los datos de los depositos que aun esten seleccionados
+
         setDataDepotsWarehouse(newDataDepotsWarehouses)
     }
 
@@ -517,6 +520,7 @@ function AddProductFromWarehouse(props: any) {
     }
 
     function handleSelectDepartment(e: SelectChangeEvent) {
+        loadDepotsFromSelectedDepartments(e.target.value, dataProductsByDepartment)
         setSelectedDepartments(e.target.value)
     }
 
@@ -557,10 +561,13 @@ function AddProductFromWarehouse(props: any) {
                                         size='small'
                                         select
                                         value={selectedWarehouse}
-                                        onChange={(e) => setSelectedWarehouse(e.target.value)}
+                                        onChange={(e) => {
+                                            loadDepartamentsFromSelectedWarehouse(parseInt(e.target.value), dataDepotsWarehouses)
+                                            setSelectedWarehouse(e.target.value)
+                                        }}
                                     >
                                         {
-                                            dataDepotsWarehouses.map((warehouse: any, index: any) => (
+                                            dataDepotsWarehouses.map((warehouse: any, index: number) => (
                                                 <MenuItem key={index} value={index}>{warehouse.name}</MenuItem>
                                             ))
                                         }
@@ -633,7 +640,7 @@ function AddProductFromWarehouse(props: any) {
                                             {
                                                 data?.length > 0
                                                     ? (
-                                                        <TableContainer sx={{width: "100%", maxHeight: "450px"}}>
+                                                        <TableContainer sx={{ width: "100%", maxHeight: "450px" }}>
                                                             <Table sx={{ width: "100%" }} size={"small"}>
                                                                 <TableHeader />
                                                                 <TableContent />
