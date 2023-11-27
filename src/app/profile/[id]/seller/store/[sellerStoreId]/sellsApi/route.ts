@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server'
 import {prisma} from "db";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc)
 
 // Get today store product sells
 export async function GET(req: Request, { params }: { params: { id: string, sellerStoreId: string } }) {
     const storeId = parseInt(params.sellerStoreId)
 
-    const todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
+    const todayStart = dayjs.utc().set("h", 0).set("m", 0).set("s", 0)
     const todayEnd = todayStart.add(1, "day")
 
     const store = await prisma.sells.findMany(

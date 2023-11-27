@@ -41,11 +41,9 @@ import * as Yup from "yup";
 import {Formik} from "formik";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
-import {numberFormat} from "@/utils/generalFunctions";
+import {notifySuccess, notifyWarning, numberFormat} from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/profile/[id]/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function StoreActionsMain({userId, storeId}: { userId: string, storeId: string }) {
     const router = useRouter()
@@ -53,15 +51,21 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
     const [data, setData] = React.useState<null | any[]>(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState<any[]>([])
 
-    //ToDo: use global isLoading
-    const isLoading = false
-
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${userId}/seller/store/${storeId}/product/api`).then((data) => setAllProductsByDepartment(data.map((item: any) => ({
-            ...item,
-            selected: false
-        }))))
+        async function loadInitialData(userId: string, storeId: string) {
+            const response = await sellerStoreProduct.allProductByDepartments(userId, storeId)
+            if (response) {
+                setAllProductsByDepartment(response.map((item: any) => ({
+                    ...item,
+                    selected: false
+                })))
+            }
+        }
+
+        if (userId && storeId) {
+            loadInitialData(userId, storeId)
+        }
     }, [userId, storeId])
 
     React.useEffect(() => {
@@ -194,6 +198,12 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
             }
 
             setAllProductsByDepartment(newDepartments)
+
+            if (updatedDepot.is_active) {
+                notifySuccess("Producto en venta ahora")
+            } else {
+                notifyWarning("Producto quitado de la venta")
+            }
         }
     }
 
@@ -214,6 +224,8 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
             }
 
             setAllProductsByDepartment(newDepartments)
+
+            notifySuccess("Nueva venta del producto creada")
         }
     }
 

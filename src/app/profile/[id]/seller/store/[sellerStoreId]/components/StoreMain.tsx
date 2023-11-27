@@ -45,9 +45,6 @@ export default function StoreMain() {
     const userId = params.id
     const sellerStoreId = params.sellerStoreId
 
-    //ToDo: use global isLoading
-    const isLoading = false
-
     //get initial storeDetails
     React.useEffect(() => {
         fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/api`)
@@ -82,7 +79,6 @@ export default function StoreMain() {
         fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/sellsApi`)
             .then((data) => {
                 setProductSells(data)
-                console.log(data)
                 const sellsTotal = data.length
                 let sellsDifferentProductsTotal = 0
                 let sellsUnitsTotal = 0
