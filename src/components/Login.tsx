@@ -278,44 +278,19 @@ export default function Login() {
             <Card variant={"elevation"} sx={loginPageStyles.card}>
                 <Grid container sx={loginPageStyles.cardContainer}>
                     <Grid container item sx={loginPageStyles.leftColumnContainer}>
-                        <Grid container item xs={12} justifyContent={"center"} alignItems={"center"}>
+                        <Grid container item xs={12} justifyContent={"center"} alignItems={"center"} sx={{pt: "20px"}}>
                             <Avatar
                                 src="/logo200.png"
                                 sx={{width: "200px", height: "200px"}}
                             />
                         </Grid>
-                        <Grid container item xs={12} justifyContent={"center"} textAlign={"justify"}>
-                            <Typography variant={"h4"}>
-                               Inventory+
-                            </Typography>
-                        </Grid>
                         <Grid container item xs={12}>
                             <Grid container item xs={"auto"} alignItems={"center"} sx={{p: 1}}>
                                 <KeyboardDoubleArrowRightOutlined />
                             </Grid>
                             <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
                                 <Typography variant={"body1"}>
-                                    Inventario online
-                                </Typography>
-                            </Grid>
-                        </Grid>
-                        <Grid container item xs={12}>
-                            <Grid container item xs={"auto"} alignItems={"center"} sx={{p: 1}}>
-                                <KeyboardDoubleArrowRightOutlined />
-                            </Grid>
-                            <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
-                                <Typography variant={"body1"}>
-                                    Gestión de productos
-                                </Typography>
-                            </Grid>
-                        </Grid>
-                        <Grid container item xs={12}>
-                            <Grid container item xs={"auto"} alignItems={"center"} sx={{p: 1}}>
-                                <KeyboardDoubleArrowRightOutlined />
-                            </Grid>
-                            <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
-                                <Typography variant={"body1"}>
-                                    Gestión almacenes y tiendas
+                                    Gestión de productos y tiendas
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -326,6 +301,26 @@ export default function Login() {
                             <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
                                 <Typography variant={"body1"}>
                                     Catálogo online
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        <Grid container item xs={12}>
+                            <Grid container item xs={"auto"} alignItems={"center"} sx={{p: 1}}>
+                                <KeyboardDoubleArrowRightOutlined />
+                            </Grid>
+                            <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
+                                <Typography variant={"body1"}>
+                                    Reservaciones online
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                        <Grid container item xs={12}>
+                            <Grid container item xs={"auto"} alignItems={"center"} sx={{p: 1}}>
+                                <KeyboardDoubleArrowRightOutlined />
+                            </Grid>
+                            <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
+                                <Typography variant={"body1"}>
+                                    Venta online y presencial
                                 </Typography>
                             </Grid>
                         </Grid>
