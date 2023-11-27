@@ -27,11 +27,9 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/sellerStore";
 import Link from "next/link";
-import {daysMap, numberFormat} from "@/utils/generalFunctions";
+import {daysMap, notifySuccess, notifyWarning, numberFormat} from "@/utils/generalFunctions";
 
 dayjs.extend(isBetween)
-
-const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function StoreMain() {
     const [storeDetails, setStoreDetails] = React.useState(null)
@@ -45,20 +43,25 @@ export default function StoreMain() {
     const userId = params.id
     const sellerStoreId = params.sellerStoreId
 
-    //get initial storeDetails
+    //get initial store and sells details and compute stats
     React.useEffect(() => {
-        fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/api`)
-            .then((data) => {
-                setStoreDetails(data)
+        async function loadStatsData() {
+            const p1 = stores.storeDetails(userId, sellerStoreId)
+            const p2 = stores.storeSellsDetails(userId, sellerStoreId)
 
-                const depotsTotal = data.store_depots.length
+            const [storeDetailsResponse, storeSellsResponse] = await Promise.all([p1, p2])
+
+            if (storeDetailsResponse) {
+                setStoreDetails(storeDetailsResponse)
+
+                const depotsTotal = storeDetailsResponse.store_depots.length
                 let depotsRemainingUnitsTotal = 0
                 let depotsNotRemainingUnitsTotal = 0
                 let depotsNotActiveTotal = 0
                 let depotsWithoutPriceTotal = 0
                 let depotsWithDiscountTotal = 0
 
-                data.store_depots.forEach(item => {
+                storeDetailsResponse.store_depots.forEach(item => {
                     depotsRemainingUnitsTotal += item.product_remaining_units
                     if (!item.product_remaining_units) depotsNotRemainingUnitsTotal++
                     if (!item.is_active) depotsNotActiveTotal++
@@ -74,12 +77,11 @@ export default function StoreMain() {
                     depotsWithoutPriceTotal,
                     depotsWithDiscountTotal,
                 })
-            })
+            }
 
-        fetcher(`/profile/${userId}/seller/store/${sellerStoreId}/sellsApi`)
-            .then((data) => {
-                setProductSells(data)
-                const sellsTotal = data.length
+            if (storeSellsResponse) {
+                setProductSells(storeSellsResponse)
+                const sellsTotal = storeSellsResponse.length
                 let sellsDifferentProductsTotal = 0
                 let sellsUnitsTotal = 0
                 let sellsAmountTotal = 0
@@ -88,7 +90,7 @@ export default function StoreMain() {
 
                 let seeDepotsId = {}
 
-                data.forEach(item => {
+                storeSellsResponse.forEach(item => {
                     let sellProfitQuantity = 0
 
                     //sell from a reservation
@@ -136,8 +138,12 @@ export default function StoreMain() {
                     sellsUnitsReturnedTotal,
                     sellerProfitTotal,
                 })
-            })
+            }
+        }
 
+        if (sellerStoreId && userId) {
+            loadStatsData()
+        }
     }, [sellerStoreId, userId])
 
     const CustomToolbar = () => (
@@ -178,6 +184,12 @@ export default function StoreMain() {
         storeData.auto_open_time = updatedStore.auto_open_time
 
         setStoreDetails(storeData)
+
+        if (updatedStore.auto_open_time) {
+            notifySuccess("La tienda abre automáticamente en los horarios establecidos")
+        } else {
+            notifyWarning("La tienda permanecerá cerrada hasta que no vuelva a cambiar esta opción")
+        }
     }
 
     const [autoReservationTime, setAutoReservationTime] = React.useState(true)
@@ -195,6 +207,12 @@ export default function StoreMain() {
         storeData.auto_reservation_time = updatedStore.auto_reservation_time
 
         setStoreDetails(storeData)
+
+        if (updatedStore.auto_reservation_time) {
+            notifySuccess("La tienda recibe reservaciones automáticamente en los horarios establecidos")
+        } else {
+            notifyWarning("La tienda permanecerá sin recibir reservaciones hasta que no vuelva a cambiar esta opción")
+        }
     }
 
     function checkOpenCondition() {
