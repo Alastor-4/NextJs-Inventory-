@@ -5,7 +5,7 @@ import {
     AppBar,
     Box, Button,
     Card,
-    CardContent,
+    CardContent, Checkbox,
     Chip,
     Collapse,
     Grid,
@@ -14,7 +14,7 @@ import {
     Switch,
     Table,
     TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
     TableRow,
     TextField,
@@ -148,6 +148,11 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
         return (
             <TableHead>
                 <TableRow>
+                    <TableCell
+                        align={"left"}
+                        padding={'checkbox'}
+                    />
+
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
@@ -225,8 +230,23 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
 
             setAllProductsByDepartment(newDepartments)
 
-            notifySuccess("Nueva venta del producto creada")
+            notifySuccess("Vendida una unidad del producto")
         }
+    }
+
+    function handleSelectItem(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, row: any) {
+        e.stopPropagation()
+
+        let newSelected = [...selected]
+        const rowIndex = selected.findIndex(item => item.id === row.id)
+
+        if (rowIndex > -1) {
+            newSelected.splice(rowIndex, 1)
+        } else {
+            newSelected.push(row)
+        }
+
+        setSelected(newSelected)
     }
 
     const TableContent = ({formik}: { formik: any }) => {
@@ -297,9 +317,17 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                     <TableRow
                                         hover
                                         tabIndex={-1}
-                                        selected={row.id === expandIndex}
+                                        selected={!!selected.find((item: any) => item.id === row.id)}
                                         onClick={() => handleExpandRow(row.id)}
                                     >
+                                        <TableCell>
+                                            <Checkbox
+                                                size='small'
+                                                checked={!!selected.find((item: any) => item.id === row.id)}
+                                                onClick={(e) => handleSelectItem(e, row)}
+                                            />
+                                        </TableCell>
+
                                         <TableCell>
                                             {row.name} <br/>
                                             {
@@ -845,6 +873,9 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
         )
     }
 
+    //selected products
+    const [selected, setSelected] =  React.useState<any[]>([])
+
     const [displayProductSellForm, setDisplayProductSellForm] = React.useState<boolean>(false)
     const [selectedProductSellRow, setSelectedProductSellRow] = React.useState<any>(null)
     function handleOpenSellProduct(row: any, formik: any) {
@@ -1056,11 +1087,12 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                             {
                                 data && data.length > 0
                                     ? (
-                                        <Table sx={{width: "100%", mt: "20px"}} size={"small"}>
-                                            <TableHeader/>
-
-                                            <TableContent formik={formik}/>
-                                        </Table>
+                                        <TableContainer sx={{ width: "100%", maxHeight: "500px", mt: "20px" }}>
+                                            <Table sx={{width: "100%"}} size={"small"}>
+                                                <TableHeader/>
+                                                <TableContent formik={formik}/>
+                                            </Table>
+                                        </TableContainer>
                                     ) : (
                                         <TableNoData/>
                                     )
