@@ -38,7 +38,10 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
                     departments: true,
                     depots: {
                         include: {
-                            store_depots: true
+                            store_depots: {
+                                where: {store_id: storeId},
+                                include: {product_offers: true}
+                            }
                         }
                     },
                     characteristics: true,

@@ -18,3 +18,26 @@ export const daysMap = {
 export const notifySuccess = (message: string) => enqueueSnackbar(message, {variant: "success"})
 export const notifyError = (message: string) => enqueueSnackbar(message, {variant: "error"})
 export const notifyWarning = (message: string) => enqueueSnackbar(message, {variant: "warning"})
+
+//return offer price per unit from first applicable offer found. return false if no applicable offer found
+export function evaluateOffers(offerItems: any[], itemsQuantity: number): number | false {
+    const evaluate = (compareFunction: string, compareQuantity: number, itemsQuantity: number): boolean => {
+        switch (compareFunction) {
+            case "=":
+                return itemsQuantity === compareQuantity
+
+            case ">":
+                return itemsQuantity > compareQuantity
+
+            default:
+                return false
+        }
+    }
+
+    const foundApplicableOfferIndex = offerItems.findIndex(item => evaluate(item.compare_function, item.compare_units_quantity, itemsQuantity))
+
+    if(foundApplicableOfferIndex > -1)
+        return offerItems[foundApplicableOfferIndex].price_per_unit
+
+    return false
+}
