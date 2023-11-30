@@ -1,7 +1,7 @@
 import { EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, VisibilityOutlined } from '@mui/icons-material'
 import { Box, Collapse, Grid, IconButton, Switch, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import StoreListOffers from './StoreListOffers'
+import StoreListOffers from './offers/components/StoreListOffers'
 import StoreEditSellerProfit from '@/app/profile/[id]/store-details/[storeDetailsId]/components/Modal/StoreEditSellerProfit'
 import StoreModalDefault from './Modal/StoreModalDefault'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
@@ -10,7 +10,6 @@ function StoreMoreDetails(props: any) {
 
     const { userId, details, show, loadDates, row } = props
 
-    const [showOffers, setShowOffers] = useState(false)
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
 
     const [openImageDialog, setOpenImageDialog] = useState(false);
@@ -30,8 +29,6 @@ function StoreMoreDetails(props: any) {
         setDialogImages(images)
         setOpenImageDialog(true)
     }
-
-
 
 
     return (
@@ -174,7 +171,11 @@ function StoreMoreDetails(props: any) {
                         </Grid>
                     </Grid>
 
-                    <StoreListOffers productStoreDepot={row.depots[0].store_depots[0]} loadDates={loadDates} showOffers={showOffers} setShowOffers={setShowOffers} />
+                    <StoreListOffers
+                        priceProduct={row.depots[0].store_depots[0].sell_price}
+                        currency={row.depots[0].store_depots[0].sell_price_unit}
+                        storeDepotId={row.depots[0].store_depots[0].id}
+                    />
 
 
                 </Grid>
