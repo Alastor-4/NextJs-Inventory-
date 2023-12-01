@@ -1,4 +1,4 @@
-// @ts-nocheck
+//@ts-nocheck
 "use client"
 
 import React from "react";
@@ -18,15 +18,13 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import {TableNoData} from "@/components/TableNoData";
-import {AddOutlined, ArrowLeft, DeleteOutline, EditOutlined} from "@mui/icons-material";
+import { TableNoData } from "@/components/TableNoData";
+import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import Link from "next/link";
-import {useParams, useRouter} from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import products from "@/app/profile/[id]/product/requests/products";
 import * as Yup from "yup";
-import {Formik, useFormik} from "formik";
-
-const fetcher = (url) => fetch(url).then((res) => res.json())
+import { Formik, useFormik } from "formik";
 
 export default function ProductsMainTable() {
     const params = useParams()
@@ -40,10 +38,15 @@ export default function ProductsMainTable() {
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${params.id}/product/api`).then((data) => setAllProductsByDepartment(data.map(item => ({
-            ...item,
-            selected: false
-        }))))
+        const getAllProductsByDepartment = async () => {
+            const newAllProductsByDepartment = await products.allUserProductDepartments(params.id);
+            setAllProductsByDepartment(newAllProductsByDepartment.map((item: any) => ({
+                ...item,
+                selected: false
+            })))
+        }
+        getAllProductsByDepartment()
+
     }, [params.id])
 
     React.useEffect(() => {
@@ -92,7 +95,7 @@ export default function ProductsMainTable() {
             const updatedProducts = await products.allUserProductDepartments(params.id)
 
             if (updatedProducts) {
-                setAllProductsByDepartment(updatedProducts.map(item => ({...item, selected: selectedFilters.includes(item.id)})))
+                setAllProductsByDepartment(updatedProducts.map(item => ({ ...item, selected: selectedFilters.includes(item.id) })))
             }
         }
     }
@@ -107,10 +110,10 @@ export default function ProductsMainTable() {
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
-                <Box sx={{display: "flex", alignItems: "center"}}>
-                    <IconButton color={"inherit"} sx={{mr: "10px"}} onClick={handleNavigateBack}>
-                        <ArrowLeft fontSize={"large"}/>
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"} />
                     </IconButton>
                     <Typography
                         variant="h6"
@@ -125,32 +128,32 @@ export default function ProductsMainTable() {
                     </Typography>
                 </Box>
 
-                <Box sx={{display: "flex"}}>
+                <Box sx={{ display: "flex" }}>
                     {
                         isLoading
-                            ? <CircularProgress size={24} color={"inherit"}/>
+                            ? <CircularProgress size={24} color={"inherit"} />
                             : (
                                 <>
                                     {
                                         selected && (
-                                            <Box sx={{display: "flex"}}>
+                                            <Box sx={{ display: "flex" }}>
                                                 <IconButton color={"inherit"} onClick={handleUpdate}>
-                                                    <EditOutlined fontSize={"small"}/>
+                                                    <EditOutlined fontSize={"small"} />
                                                 </IconButton>
 
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"}/>
+                                                    <DeleteOutline fontSize={"small"} />
                                                 </IconButton>
 
                                                 <Divider orientation="vertical" variant="middle" flexItem
-                                                         sx={{borderRight: "2px solid white", mx: "5px"}}/>
+                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
                                             </Box>
                                         )
                                     }
 
                                     <Link href={`/profile/${params.id}/product/create`}>
                                         <IconButton color={"inherit"}>
-                                            <AddOutlined/>
+                                            <AddOutlined />
                                         </IconButton>
                                     </Link>
                                 </>
@@ -214,71 +217,71 @@ export default function ProductsMainTable() {
         )
     }
 
-    const TableContent = ({formik}) => {
+    const TableContent = ({ formik }) => {
         return (
             <TableBody>
                 {data.filter(
                     item =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                         item.description.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                    row => (
-                        <TableRow
-                            key={row.id}
-                            hover
-                            tabIndex={-1}
-                            selected={selected && (row.id === selected.id)}
-                            onClick={() => handleSelectItem(row)}
-                        >
-                            <TableCell>
-                                <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
-                            </TableCell>
-                            <TableCell>
-                                {row.name}
-                            </TableCell>
-                            <TableCell>
-                                {row.description ?? "-"}
-                            </TableCell>
-                            <TableCell>
-                                {row?.departments?.name ?? "-"}
-                            </TableCell>
-                            <TableCell>
-                                {row.characteristics.length > 0
-                                    ? row.characteristics.map(item => (
-                                            <Grid
-                                                key={item.id}
-                                                sx={{
-                                                    display: "inline-flex",
-                                                    margin: "3px",
-                                                    backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                    padding: "2px 4px",
-                                                    borderRadius: "5px 2px 2px 2px",
-                                                    border: "1px solid rgba(130, 130, 130)",
-                                                    fontSize: 14,
-                                                }}
-                                            >
-                                                <Grid container item alignItems={"center"} sx={{marginRight: "3px"}}>
-                                                    <Typography variant={"caption"}
-                                                                sx={{color: "white", fontWeight: "600"}}>
-                                                        {item.name.toUpperCase()}
-                                                    </Typography>
+                            row => (
+                                <TableRow
+                                    key={row.id}
+                                    hover
+                                    tabIndex={-1}
+                                    selected={selected && (row.id === selected.id)}
+                                    onClick={() => handleSelectItem(row)}
+                                >
+                                    <TableCell>
+                                        <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.description ?? "-"}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row?.departments?.name ?? "-"}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.characteristics.length > 0
+                                            ? row.characteristics.map(item => (
+                                                <Grid
+                                                    key={item.id}
+                                                    sx={{
+                                                        display: "inline-flex",
+                                                        margin: "3px",
+                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                        padding: "2px 4px",
+                                                        borderRadius: "5px 2px 2px 2px",
+                                                        border: "1px solid rgba(130, 130, 130)",
+                                                        fontSize: 14,
+                                                    }}
+                                                >
+                                                    <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
+                                                        <Typography variant={"caption"}
+                                                            sx={{ color: "white", fontWeight: "600" }}>
+                                                            {item.name.toUpperCase()}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid container item alignItems={"center"}
+                                                        sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                        {item.value}
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid container item alignItems={"center"}
-                                                      sx={{color: "rgba(16,27,44,0.8)"}}>
-                                                    {item.value}
-                                                </Grid>
-                                            </Grid>
-                                        )
-                                    ) : "-"
-                                }
-                            </TableCell>
-                            <TableCell>
-                                {
-                                    row.images.length > 0
-                                        ? `${row.images.length} imagen(es)` : "-"
-                                }
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                                            )
+                                            ) : "-"
+                                        }
+                                    </TableCell>
+                                    <TableCell>
+                                        {
+                                            row.images.length > 0
+                                                ? `${row.images.length} imagen(es)` : "-"
+                                        }
+                                    </TableCell>
+                                </TableRow>
+                            ))}
             </TableBody>
         )
     }
@@ -290,9 +293,9 @@ export default function ProductsMainTable() {
         setAllProductsByDepartment(filters)
     }
 
-    const DepartmentsFilter = ({formik}) => {
+    const DepartmentsFilter = ({ formik }) => {
         return (
-            <Card variant={"outlined"} sx={{padding: "15px"}}>
+            <Card variant={"outlined"} sx={{ padding: "15px" }}>
                 <Grid container rowSpacing={2}>
                     <Grid item>
                         <Typography variant={"subtitle2"}>
@@ -360,25 +363,25 @@ export default function ProductsMainTable() {
             {
                 (formik) => (
                     <Card variant={"outlined"}>
-                        <CustomToolbar/>
+                        <CustomToolbar />
 
                         <CardContent>
                             {
                                 allProductsByDepartment.length > 0 && (
-                                    <DepartmentsFilter formik={formik}/>
+                                    <DepartmentsFilter formik={formik} />
                                 )
                             }
 
                             {
                                 data?.length > 0
                                     ? (
-                                        <Table sx={{width: "100%"}} size={"small"}>
-                                            <TableHeader/>
+                                        <Table sx={{ width: "100%" }} size={"small"}>
+                                            <TableHeader />
 
-                                            <TableContent formik={formik}/>
+                                            <TableContent formik={formik} />
                                         </Table>
                                     ) : (
-                                        <TableNoData/>
+                                        <TableNoData />
                                     )
                             }
                         </CardContent>

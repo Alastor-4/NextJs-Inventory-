@@ -1,4 +1,4 @@
-// @ts-nocheck
+//@ts-nocheck
 "use client"
 
 import React from "react";
@@ -23,7 +23,7 @@ import {
     Tooltip,
     Typography
 } from "@mui/material";
-import {TableNoData} from "@/components/TableNoData";
+import { TableNoData } from "@/components/TableNoData";
 import {
     Add,
     AddOutlined,
@@ -38,19 +38,17 @@ import {
     VisibilityOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
-import {Formik} from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import tableStyles from "@/assets/styles/tableStyles";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 export default function UserWarehouseMainTable(props) {
-    const {ownerId, warehouseDetails} = props
+    const { ownerId, warehouseDetails } = props
 
     const [data, setData] = React.useState([])
     const [depositByDepartment, setDepositByDepartment] = React.useState([])
@@ -141,7 +139,16 @@ export default function UserWarehouseMainTable(props) {
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${ownerId}/warehouse/${warehouseDetails.id}/api`).then((data) => setDepositByDepartment(data.map(item => ({...item, selected: false}))))
+        const getDepositByDepartament = async () => {
+            const newDepositByDepartment = await warehouseDepots.allDepots(ownerId, warehouseDetails.id);
+            setDepositByDepartment(newDepositByDepartment.map((item: any) => (
+                {
+                    ...item,
+                    selected: false
+                })))
+        }
+
+        getDepositByDepartament();
     }, [ownerId, warehouseDetails])
 
     //table selected item
@@ -159,7 +166,7 @@ export default function UserWarehouseMainTable(props) {
         if (response) {
             setSelected(null)
             const allDepots = await warehouseDepots.allDepots(ownerId, warehouseDetails.id)
-            if (allDepots) setDepositByDepartment(allDepots.map(item => ({...item, selected: false})))
+            if (allDepots) setDepositByDepartment(allDepots.map(item => ({ ...item, selected: false })))
         }
     }
 
@@ -173,10 +180,10 @@ export default function UserWarehouseMainTable(props) {
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
-                <Box sx={{display: "flex", alignItems: "center"}}>
-                    <IconButton color={"inherit"} sx={{mr: "10px"}} onClick={handleNavigateBack}>
-                        <ArrowLeft fontSize={"large"}/>
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"} />
                     </IconButton>
                     <Typography
                         variant="h6"
@@ -191,32 +198,32 @@ export default function UserWarehouseMainTable(props) {
                     </Typography>
                 </Box>
 
-                <Box sx={{display: "flex"}}>
+                <Box sx={{ display: "flex" }}>
                     {
                         isLoading
-                            ? <CircularProgress size={24} color={"inherit"}/>
+                            ? <CircularProgress size={24} color={"inherit"} />
                             : (
                                 <>
                                     {
                                         selected && (
-                                            <Box sx={{display: "flex"}}>
+                                            <Box sx={{ display: "flex" }}>
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"}/>
+                                                    <DeleteOutline fontSize={"small"} />
                                                 </IconButton>
 
                                                 <Divider orientation="vertical" variant="middle" flexItem
-                                                         sx={{borderRight: "2px solid white", mx: "5px"}}/>
+                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
                                             </Box>
                                         )
                                     }
 
                                     <IconButton color={"inherit"} onClick={handleStoreAssign}>
-                                        <ShareOutlined fontSize={"small"}/>
+                                        <ShareOutlined fontSize={"small"} />
                                     </IconButton>
 
                                     <Link href={`/profile/${ownerId}/warehouse/${warehouseDetails.id}/create`}>
                                         <IconButton color={"inherit"}>
-                                            <AddOutlined/>
+                                            <AddOutlined />
                                         </IconButton>
                                     </Link>
                                 </>
@@ -234,8 +241,8 @@ export default function UserWarehouseMainTable(props) {
         setDepositByDepartment(filters)
     }
 
-    const DepartmentsFilter = ({formik}) => (
-        <Card variant={"outlined"} sx={{padding: "15px"}}>
+    const DepartmentsFilter = ({ formik }) => (
+        <Card variant={"outlined"} sx={{ padding: "15px" }}>
             <Grid container rowSpacing={2}>
                 <Grid item>
                     <Typography variant={"subtitle2"}>
@@ -247,7 +254,7 @@ export default function UserWarehouseMainTable(props) {
                         depositByDepartment.map((item, index) => (
                             <Grid key={item.id} item xs={"auto"}>
                                 <Button variant={item.selected ? "contained" : "outlined"}
-                                        onClick={() => handleSelectFilter(index)}>
+                                    onClick={() => handleSelectFilter(index)}>
                                     <Grid container>
                                         <Grid item xs={12}>
                                             {item.name}
@@ -294,7 +301,7 @@ export default function UserWarehouseMainTable(props) {
     const [storeDepotUpdateIndex, setStoreDepotUpdateIndex] = React.useState(null)
     const [storeDepotUpdateName, setStoreDepotUpdateName] = React.useState("")
 
-    const NewUnitsQuantityForm = ({formik}) => {
+    const NewUnitsQuantityForm = ({ formik }) => {
         async function handleNewUnitsAdd() {
             const updatedDepot = await warehouseDepots.increaseUnitsDepot(
                 {
@@ -327,7 +334,7 @@ export default function UserWarehouseMainTable(props) {
         }
 
         return (
-            <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
+            <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
                 <Grid container item spacing={2}>
                     <Grid item>
                         <TextField
@@ -342,7 +349,7 @@ export default function UserWarehouseMainTable(props) {
 
                     <Grid item>
                         <IconButton color={"primary"} onClick={handleNewUnitsAdd}>
-                            <Done/>
+                            <Done />
                         </IconButton>
                     </Grid>
                 </Grid>
@@ -350,7 +357,7 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
-    const UpdateUnitsQuantityForm = ({formik}) => {
+    const UpdateUnitsQuantityForm = ({ formik }) => {
         async function handleUpdateUnits() {
             const updatedDepot = await warehouseDepots.updateUnitsDepot(
                 {
@@ -384,7 +391,7 @@ export default function UserWarehouseMainTable(props) {
         }
 
         return (
-            <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
+            <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
                 <Grid container item spacing={2}>
                     <Grid item>
                         <TextField
@@ -410,7 +417,7 @@ export default function UserWarehouseMainTable(props) {
 
                     <Grid item>
                         <IconButton color={"primary"} onClick={handleUpdateUnits}>
-                            <Done/>
+                            <Done />
                         </IconButton>
                     </Grid>
                 </Grid>
@@ -418,8 +425,8 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
-    const UpdateStoreDepotQuantityForm = ({formik}) => {
-        const {warehouseQuantity, storeQuantity, moveQuantity} = formik.values.productStoreDepotDistribution
+    const UpdateStoreDepotQuantityForm = ({ formik }) => {
+        const { warehouseQuantity, storeQuantity, moveQuantity } = formik.values.productStoreDepotDistribution
 
         function updateLocalData(updatedDepot, updatedStoreDepot) {
             const newDepots = [...depositByDepartment]
@@ -491,7 +498,7 @@ export default function UserWarehouseMainTable(props) {
         }
 
         return (
-            <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
+            <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
                 <Grid container item spacing={2}>
                     <Grid item xs={12}>
                         Mover de almacén hacia tienda: {warehouseQuantity} disponibles
@@ -520,10 +527,10 @@ export default function UserWarehouseMainTable(props) {
                         <IconButton
                             color={"primary"}
                             onClick={handleMoveToStore}
-                            sx={{ml: "10px"}}
+                            sx={{ ml: "10px" }}
                             disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity}
                         >
-                            <Done/>
+                            <Done />
                         </IconButton>
                     </Grid>
 
@@ -531,7 +538,7 @@ export default function UserWarehouseMainTable(props) {
                         storeQuantity && (
                             <>
                                 <Grid item xs={12}>
-                                   <Divider flexItem sx={{width: 1}}/>
+                                    <Divider flexItem sx={{ width: 1 }} />
                                 </Grid>
 
                                 <Grid item xs={12}>
@@ -561,10 +568,10 @@ export default function UserWarehouseMainTable(props) {
                                     <IconButton
                                         color={"secondary"}
                                         onClick={handleMoveToWarehouse}
-                                        sx={{ml: "10px"}}
+                                        sx={{ ml: "10px" }}
                                         disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity}
                                     >
-                                        <Done/>
+                                        <Done />
                                     </IconButton>
                                 </Grid>
                             </>
@@ -651,7 +658,7 @@ export default function UserWarehouseMainTable(props) {
     //expand description
     const [expandIndex, setExpandIndex] = React.useState(null)
 
-    const TableContent = ({formik}) => {
+    const TableContent = ({ formik }) => {
         function handleOpenNewUnitsForm(e, row) {
             e.stopPropagation()
 
@@ -711,232 +718,232 @@ export default function UserWarehouseMainTable(props) {
                     item =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                         item?.description?.toUpperCase()?.includes(formik.values.searchBarValue.toUpperCase())).map(
-                    (row, index) => (
-                        <React.Fragment key={row.id}>
-                            <TableRow
-                                hover
-                                tabIndex={-1}
-                                selected={selected && (row.id === selected.id)}
-                                onClick={() => handleSelectItem(row)}
-                                sx={tableStyles.row}
-                            >
-                                <TableCell>
-                                    <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
-                                </TableCell>
-                                <TableCell>
-                                    <div>
-                                        {row.name} <br/>
-                                        {
-                                            row.description && (
-                                                <small>
-                                                    {` ${row.description.slice(0, 20)}`}
-                                                </small>
-                                            )
-                                        }
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    {row.departments?.name ?? "-"}
-                                </TableCell>
-                                <TableCell>
-                                    {row.depots[0].product_total_remaining_units ?? "-"} de {row.depots[0].product_total_units ?? "-"}
-
-                                    <IconButton
-                                        color={"inherit"}
-                                        onClick={(e) => handleOpenNewUnitsForm(e, row)}
-                                        sx={{ml: "10px"}}
+                            (row, index) => (
+                                <React.Fragment key={row.id}>
+                                    <TableRow
+                                        hover
+                                        tabIndex={-1}
+                                        selected={selected && (row.id === selected.id)}
+                                        onClick={() => handleSelectItem(row)}
+                                        sx={tableStyles.row}
                                     >
-                                        <Add fontSize={"small"}/>
-                                    </IconButton>
-
-                                    <IconButton
-                                        color={"inherit"}
-                                        onClick={(e) => handleOpenUpdateUnitsForm(e, row)}
-                                        sx={{ml: "5px"}}
-                                    >
-                                        <EditOutlined fontSize={"small"}/>
-                                    </IconButton>
-                                </TableCell>
-                                <TableCell>
-                                    {dayjs(row.depots[0].created_at).format("DD/MM/YYYY HH:MM")}
-
-                                    <Box sx={tableStyles.actionColumn}>
-                                        <Tooltip title={"Details"}>
-                                            <IconButton
-                                                size={"small"}
-                                                sx={{m: "3px"}}
-                                                onClick={(e) => handleExpand(e, index)}
-                                            >
+                                        <TableCell>
+                                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <div>
+                                                {row.name} <br />
                                                 {
-                                                    expandIndex === index
-                                                        ? <ExpandLessOutlined/>
-                                                        : <ExpandMoreOutlined/>
+                                                    row.description && (
+                                                        <small>
+                                                            {` ${row.description.slice(0, 20)}`}
+                                                        </small>
+                                                    )
                                                 }
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.departments?.name ?? "-"}
+                                        </TableCell>
+                                        <TableCell>
+                                            {row.depots[0].product_total_remaining_units ?? "-"} de {row.depots[0].product_total_units ?? "-"}
+
+                                            <IconButton
+                                                color={"inherit"}
+                                                onClick={(e) => handleOpenNewUnitsForm(e, row)}
+                                                sx={{ ml: "10px" }}
+                                            >
+                                                <Add fontSize={"small"} />
                                             </IconButton>
-                                        </Tooltip>
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
 
-                            <TableRow>
-                                <TableCell style={{padding: 0}} colSpan={5}>
-                                    <Collapse in={expandIndex === index} timeout="auto" unmountOnExit>
-                                        <Grid container spacing={1} sx={{padding: "8px 26px"}}>
-                                            <Grid item xs={12}>
-                                                <Typography variant="subtitle1" gutterBottom component="div">
-                                                    Detalles:
-                                                </Typography>
-                                            </Grid>
+                                            <IconButton
+                                                color={"inherit"}
+                                                onClick={(e) => handleOpenUpdateUnitsForm(e, row)}
+                                                sx={{ ml: "5px" }}
+                                            >
+                                                <EditOutlined fontSize={"small"} />
+                                            </IconButton>
+                                        </TableCell>
+                                        <TableCell>
+                                            {dayjs(row.depots[0].created_at).format("DD/MM/YYYY HH:MM")}
 
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Producto:</Grid>
-                                                <Grid item xs={true}>
-                                                    {row.name}
-                                                    {
-                                                        row.description && (
-                                                            <small>
-                                                                {` ${row.description}`}
-                                                            </small>
-                                                        )
-                                                    }
-                                                </Grid>
-                                            </Grid>
+                                            <Box sx={tableStyles.actionColumn}>
+                                                <Tooltip title={"Details"}>
+                                                    <IconButton
+                                                        size={"small"}
+                                                        sx={{ m: "3px" }}
+                                                        onClick={(e) => handleExpand(e, index)}
+                                                    >
+                                                        {
+                                                            expandIndex === index
+                                                                ? <ExpandLessOutlined />
+                                                                : <ExpandMoreOutlined />
+                                                        }
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
 
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Departamento:</Grid>
-                                                <Grid item xs={true}>{row.departments?.name ?? "-"}</Grid>
-                                            </Grid>
+                                    <TableRow>
+                                        <TableCell style={{ padding: 0 }} colSpan={5}>
+                                            <Collapse in={expandIndex === index} timeout="auto" unmountOnExit>
+                                                <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
+                                                    <Grid item xs={12}>
+                                                        <Typography variant="subtitle1" gutterBottom component="div">
+                                                            Detalles:
+                                                        </Typography>
+                                                    </Grid>
 
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"}
-                                                      sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>Características:</Grid>
-                                                <Grid item xs={true} sx={{display: "flex", alignItems: "center"}}>
-                                                    {row.characteristics.length > 0
-                                                        ? row.characteristics.map(item => (
-                                                                <Grid
-                                                                    key={item.id}
-                                                                    sx={{
-                                                                        display: "inline-flex",
-                                                                        margin: "3px",
-                                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                                        padding: "2px 4px",
-                                                                        borderRadius: "5px 2px 2px 2px",
-                                                                        border: "1px solid rgba(130, 130, 130)",
-                                                                        fontSize: 14,
-                                                                    }}
-                                                                >
-                                                                    <Grid container item alignItems={"center"}
-                                                                          sx={{marginRight: "3px"}}>
-                                                                        <Typography variant={"caption"}
-                                                                                    sx={{color: "white", fontWeight: "600"}}>
-                                                                            {item.name.toUpperCase()}
-                                                                        </Typography>
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Producto:</Grid>
+                                                        <Grid item xs={true}>
+                                                            {row.name}
+                                                            {
+                                                                row.description && (
+                                                                    <small>
+                                                                        {` ${row.description}`}
+                                                                    </small>
+                                                                )
+                                                            }
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
+                                                        <Grid item xs={true}>{row.departments?.name ?? "-"}</Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"}
+                                                            sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
+                                                        <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
+                                                            {row.characteristics.length > 0
+                                                                ? row.characteristics.map(item => (
+                                                                    <Grid
+                                                                        key={item.id}
+                                                                        sx={{
+                                                                            display: "inline-flex",
+                                                                            margin: "3px",
+                                                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                                            padding: "2px 4px",
+                                                                            borderRadius: "5px 2px 2px 2px",
+                                                                            border: "1px solid rgba(130, 130, 130)",
+                                                                            fontSize: 14,
+                                                                        }}
+                                                                    >
+                                                                        <Grid container item alignItems={"center"}
+                                                                            sx={{ marginRight: "3px" }}>
+                                                                            <Typography variant={"caption"}
+                                                                                sx={{ color: "white", fontWeight: "600" }}>
+                                                                                {item.name.toUpperCase()}
+                                                                            </Typography>
+                                                                        </Grid>
+                                                                        <Grid container item alignItems={"center"}
+                                                                            sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                                            {item.value}
+                                                                        </Grid>
                                                                     </Grid>
-                                                                    <Grid container item alignItems={"center"}
-                                                                          sx={{color: "rgba(16,27,44,0.8)"}}>
-                                                                        {item.value}
+                                                                )
+                                                                ) : "-"
+                                                            }
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio de compra:</Grid>
+                                                        <Grid item xs={true}>{row.buy_price ?? "-"}</Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
+                                                        <Grid item xs={true}>
+                                                            {
+                                                                row.images.length > 0
+                                                                    ? (
+                                                                        <Box
+                                                                            sx={{ cursor: "pointer", display: "inline-flex", alignItems: "center", color: "blue" }}
+                                                                            onClick={() => handleOpenImagesDialog(row.images)}
+                                                                        >
+                                                                            {row.images.length}
+
+                                                                            <VisibilityOutlined fontSize={"small"}
+                                                                                sx={{ ml: "5px" }} />
+                                                                        </Box>
+                                                                    ) : "no"
+                                                            }
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Creación:</Grid>
+                                                        <Grid item xs={true}>
+                                                            {`${dayjs(row.depots[0].created_at).format("DD/MM/YYYY HH:MM")} por ${row.depots[0].inserted_by_id}`}
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades restantes de
+                                                            total:</Grid>
+                                                        <Grid item xs={true}>
+                                                            {row.depots[0].product_total_remaining_units ?? "-"} de {row.depots[0].product_total_units ?? "-"}
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"}>
+                                                            {
+                                                                row.storesDistribution ? (
+                                                                    <Box sx={{ display: "inline-flex", fontWeight: 600 }}>Distribución
+                                                                        del producto</Box>
+                                                                ) : (
+                                                                    <Box
+                                                                        sx={{ cursor: "pointer", display: "flex", alignItems: "center", color: "blue" }}
+                                                                        onClick={() => handleLoadStoresDistribution(row.depots[0])}
+                                                                    >
+                                                                        Ver distribución del producto
+                                                                        <ShareOutlined fontSize={"small"} sx={{ ml: "5px" }} />
+                                                                    </Box>
+                                                                )
+                                                            }
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    {
+                                                        row.storesDistribution && (
+                                                            row.storesDistribution.map((item, storeIndex) => (
+                                                                <Grid container item spacing={1} xs={12} key={item.id}>
+                                                                    <Grid item xs={"auto"}
+                                                                        sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                                                        <ChevronRightOutlined fontSize={"small"} />
+                                                                        {item.name}:
+                                                                    </Grid>
+                                                                    <Grid item xs={true}>
+                                                                        {
+                                                                            item.store_depots.length > 0
+                                                                                ? `Total ${item.store_depots[0].product_units} | ${item.store_depots[0].product_remaining_units} Restantes`
+                                                                                : "no asignado"
+                                                                        }
+
+                                                                        <IconButton
+                                                                            size={"small"}
+                                                                            sx={{ ml: "10px" }}
+                                                                            onClick={
+                                                                                (e) => handleOpenUpdateStoreDepotForm(e, row, storeIndex, item.name)
+                                                                            }>
+                                                                            <EditOutlined fontSize={"small"} />
+                                                                        </IconButton>
                                                                     </Grid>
                                                                 </Grid>
-                                                            )
-                                                        ) : "-"
-                                                    }
-                                                </Grid>
-                                            </Grid>
-
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Precio de compra:</Grid>
-                                                <Grid item xs={true}>{row.buy_price ?? "-"}</Grid>
-                                            </Grid>
-
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Imágenes:</Grid>
-                                                <Grid item xs={true}>
-                                                    {
-                                                        row.images.length > 0
-                                                            ? (
-                                                                <Box
-                                                                    sx={{cursor: "pointer", display: "inline-flex", alignItems: "center", color: "blue"}}
-                                                                    onClick={() => handleOpenImagesDialog(row.images)}
-                                                                >
-                                                                    {row.images.length}
-
-                                                                    <VisibilityOutlined fontSize={"small"}
-                                                                                        sx={{ml: "5px"}}/>
-                                                                </Box>
-                                                            ) : "no"
-                                                    }
-                                                </Grid>
-                                            </Grid>
-
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Creación:</Grid>
-                                                <Grid item xs={true}>
-                                                    {`${dayjs(row.depots[0].created_at).format("DD/MM/YYYY HH:MM")} por ${row.depots[0].inserted_by_id}`}
-                                                </Grid>
-                                            </Grid>
-
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600}}>Unidades restantes de
-                                                    total:</Grid>
-                                                <Grid item xs={true}>
-                                                    {row.depots[0].product_total_remaining_units ?? "-"} de {row.depots[0].product_total_units ?? "-"}
-                                                </Grid>
-                                            </Grid>
-
-                                            <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"}>
-                                                    {
-                                                        row.storesDistribution ? (
-                                                            <Box sx={{display: "inline-flex", fontWeight: 600}}>Distribución
-                                                                del producto</Box>
-                                                        ) : (
-                                                            <Box
-                                                                sx={{cursor: "pointer", display: "flex", alignItems: "center", color: "blue"}}
-                                                                onClick={() => handleLoadStoresDistribution(row.depots[0])}
-                                                            >
-                                                                Ver distribución del producto
-                                                                <ShareOutlined fontSize={"small"} sx={{ml: "5px"}}/>
-                                                            </Box>
+                                                            ))
                                                         )
                                                     }
                                                 </Grid>
-                                            </Grid>
-
-                                            {
-                                                row.storesDistribution && (
-                                                    row.storesDistribution.map((item, storeIndex) => (
-                                                        <Grid container item spacing={1} xs={12} key={item.id}>
-                                                            <Grid item xs={"auto"}
-                                                                  sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                                                <ChevronRightOutlined fontSize={"small"}/>
-                                                                {item.name}:
-                                                            </Grid>
-                                                            <Grid item xs={true}>
-                                                                {
-                                                                    item.store_depots.length > 0
-                                                                        ? `Total ${item.store_depots[0].product_units} | ${item.store_depots[0].product_remaining_units} Restantes`
-                                                                        : "no asignado"
-                                                                }
-
-                                                                <IconButton
-                                                                    size={"small"}
-                                                                    sx={{ml: "10px"}}
-                                                                    onClick={
-                                                                    (e) => handleOpenUpdateStoreDepotForm(e, row, storeIndex, item.name)
-                                                                }>
-                                                                    <EditOutlined fontSize={"small"}/>
-                                                                </IconButton>
-                                                            </Grid>
-                                                        </Grid>
-                                                    ))
-                                                )
-                                            }
-                                        </Grid>
-                                    </Collapse>
-                                </TableCell>
-                            </TableRow>
-                        </React.Fragment>
-                    ))}
+                                            </Collapse>
+                                        </TableCell>
+                                    </TableRow>
+                                </React.Fragment>
+                            ))}
             </TableBody>
         )
     }
@@ -957,7 +964,7 @@ export default function UserWarehouseMainTable(props) {
                             open={displayNewUnitsForm}
                             setOpen={setDisplayNewUnitsForm}
                         >
-                            <NewUnitsQuantityForm formik={formik}/>
+                            <NewUnitsQuantityForm formik={formik} />
                         </UpdateValueDialog>
 
                         <UpdateValueDialog
@@ -965,7 +972,7 @@ export default function UserWarehouseMainTable(props) {
                             open={displayUpdateUnitsForm}
                             setOpen={setDisplayUpdateUnitsForm}
                         >
-                            <UpdateUnitsQuantityForm formik={formik}/>
+                            <UpdateUnitsQuantityForm formik={formik} />
                         </UpdateValueDialog>
 
                         <UpdateValueDialog
@@ -973,7 +980,7 @@ export default function UserWarehouseMainTable(props) {
                             open={displayUpdateDepotQuantityForm}
                             setOpen={setDisplayUpdateDepotQuantityForm}
                         >
-                            <UpdateStoreDepotQuantityForm formik={formik}/>
+                            <UpdateStoreDepotQuantityForm formik={formik} />
                         </UpdateValueDialog>
 
                         <ImagesDisplayDialog
@@ -983,14 +990,14 @@ export default function UserWarehouseMainTable(props) {
                             images={dialogImages}
                         />
 
-                        <CustomToolbar/>
+                        <CustomToolbar />
 
                         <CardContent>
                             <Grid container rowSpacing={3}>
                                 {
                                     depositByDepartment.length > 0 && (
                                         <Grid item xs={12}>
-                                            <DepartmentsFilter formik={formik}/>
+                                            <DepartmentsFilter formik={formik} />
                                         </Grid>
                                     )
                                 }
@@ -999,14 +1006,14 @@ export default function UserWarehouseMainTable(props) {
                                     data?.length > 0
                                         ? (
                                             <Grid item xs={12}>
-                                                <Table sx={{width: "100%"}} size={"small"}>
-                                                    <TableHeader/>
+                                                <Table sx={{ width: "100%" }} size={"small"}>
+                                                    <TableHeader />
 
-                                                    <TableContent formik={formik}/>
+                                                    <TableContent formik={formik} />
                                                 </Table>
                                             </Grid>
                                         ) : (
-                                            <TableNoData/>
+                                            <TableNoData />
                                         )
                                 }
                             </Grid>

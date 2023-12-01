@@ -18,15 +18,13 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import {TableNoData} from "@/components/TableNoData";
-import {AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline, EditOutlined} from "@mui/icons-material";
+import { TableNoData } from "@/components/TableNoData";
+import { AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import Link from "next/link";
-import {useParams, useRouter} from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import products from "@/app/profile/[id]/product/requests/products";
 import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
 import users from "@/app/user/requests/users";
-
-const fetcher = (url) => fetch(url).then((res) => res.json())
 
 export default function WorkersMainTable(props) {
     const { roles } = props
@@ -41,7 +39,12 @@ export default function WorkersMainTable(props) {
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${params.id}/worker/api`).then((data) => setData(data))
+        const getData = async () => {
+            const newData = await ownerUsers.allWorkers(params.id)
+            setData(newData)
+        }
+        getData();
+
     }, [params.id])
 
     //table selected item
@@ -62,7 +65,7 @@ export default function WorkersMainTable(props) {
     };
 
     function ChangeRoleDialog(props) {
-        const {open, setOpen, selected, setData, setSelected} = props
+        const { open, setOpen, selected, setData, setSelected } = props
 
         const [selectedRole, setSelectedRole] = React.useState<number | string>('');
 
@@ -88,7 +91,7 @@ export default function WorkersMainTable(props) {
         return (
             <Dialog open={open} onClose={handleClose}>
                 {/* eslint-disable-next-line react/no-unescaped-entities */}
-                <DialogTitle>Cambiar role a "{selected ? selected.username : "" }"</DialogTitle>
+                <DialogTitle>Cambiar role a "{selected ? selected.username : ""}"</DialogTitle>
                 <DialogContent>
                     <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap' }}>
                         <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
@@ -98,7 +101,7 @@ export default function WorkersMainTable(props) {
                                 id="dialog-select-label"
                                 value={selectedRole}
                                 onChange={handleChange}
-                                input={<OutlinedInput label="Rol" fullWidth/>}
+                                input={<OutlinedInput label="Rol" fullWidth />}
                                 fullWidth
                             >
                                 {
@@ -133,10 +136,10 @@ export default function WorkersMainTable(props) {
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
-                <Box sx={{display: "flex", alignItems: "center"}}>
-                    <IconButton color={"inherit"} sx={{mr: "10px"}} onClick={handleNavigateBack}>
-                        <ArrowLeft fontSize={"large"}/>
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"} />
                     </IconButton>
                     <Typography
                         variant="h6"
@@ -151,32 +154,32 @@ export default function WorkersMainTable(props) {
                     </Typography>
                 </Box>
 
-                <Box sx={{display: "flex"}}>
+                <Box sx={{ display: "flex" }}>
                     {
                         isLoading
-                            ? <CircularProgress size={24} color={"inherit"}/>
+                            ? <CircularProgress size={24} color={"inherit"} />
                             : (
                                 <>
                                     {
                                         selected && (
-                                            <Box sx={{display: "flex"}}>
+                                            <Box sx={{ display: "flex" }}>
                                                 <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
-                                                    <ChangeCircleOutlined fontSize={"small"}/>
+                                                    <ChangeCircleOutlined fontSize={"small"} />
                                                 </IconButton>
 
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"}/>
+                                                    <DeleteOutline fontSize={"small"} />
                                                 </IconButton>
 
                                                 <Divider orientation="vertical" variant="middle" flexItem
-                                                         sx={{borderRight: "2px solid white", mx: "5px"}}/>
+                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
                                             </Box>
                                         )
                                     }
 
                                     <Link href={`/profile/${params.id}/worker/create`}>
                                         <IconButton color={"inherit"}>
-                                            <AddOutlined/>
+                                            <AddOutlined />
                                         </IconButton>
                                     </Link>
                                 </>
@@ -271,7 +274,7 @@ export default function WorkersMainTable(props) {
                         onClick={() => handleSelectItem(row)}
                     >
                         <TableCell>
-                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)}/>
+                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
                         </TableCell>
                         <TableCell>
                             {row.username}
@@ -292,7 +295,7 @@ export default function WorkersMainTable(props) {
                                         size={"small"}
                                         label={row.roles.name}
                                         color={getColorByRole(row.roles.name)}
-                                        sx={{border: "1px solid lightGreen"}}
+                                        sx={{ border: "1px solid lightGreen" }}
                                     />
                                 ) : "-"
                             }
@@ -314,19 +317,19 @@ export default function WorkersMainTable(props) {
             />
 
             <Card variant={"outlined"}>
-                <CustomToolbar/>
+                <CustomToolbar />
 
                 <CardContent>
                     {
                         data?.length > 0
                             ? (
-                                <Table sx={{width: "100%"}} size={"small"}>
-                                    <TableHeader/>
+                                <Table sx={{ width: "100%" }} size={"small"}>
+                                    <TableHeader />
 
-                                    <TableContent/>
+                                    <TableContent />
                                 </Table>
                             ) : (
-                                <TableNoData/>
+                                <TableNoData />
                             )
                     }
                 </CardContent>
