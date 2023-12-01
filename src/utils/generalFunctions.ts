@@ -41,3 +41,21 @@ export function evaluateOffers(offerItems: any[], itemsQuantity: number): number
 
     return false
 }
+
+//compute price per unit using offers (if exist and apply some) and discount if exist
+export function computeDepotPricePerUnit(storeDepot: any, unitsQuantity: number): number {
+    const productOffers = storeDepot.product_offers
+    const productHasOffers = !!productOffers.length
+
+    const offersEvaluation = productHasOffers
+        ? evaluateOffers(productOffers, unitsQuantity)
+        : false
+
+    const pricePerUnitWithOffers = offersEvaluation ? offersEvaluation : storeDepot.sell_price
+
+    return storeDepot.price_discount_quantity
+        ? pricePerUnitWithOffers - storeDepot.price_discount_quantity
+        : storeDepot.price_discount_percentage
+            ? pricePerUnitWithOffers - (storeDepot.price_discount_percentage * pricePerUnitWithOffers / 100)
+            : pricePerUnitWithOffers
+}

@@ -41,7 +41,13 @@ import * as Yup from "yup";
 import {Formik} from "formik";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
-import {evaluateOffers, notifySuccess, notifyWarning, numberFormat} from "@/utils/generalFunctions";
+import {
+    computeDepotPricePerUnit,
+    evaluateOffers,
+    notifySuccess,
+    notifyWarning,
+    numberFormat
+} from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/profile/[id]/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 
@@ -903,20 +909,17 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
 
     const ProductSellForm = ({formik, closeForm}: {formik: any, closeForm: any}) => {
         async function productsSell() {
-            let data = {
-                userId,
-                sellerStoreId: storeId,
-                storeDepotId: selectedRow.depots[0].store_depots[0].id,
-                unitsQuantity: formik.values.productSell.unitsQuantity,
-                unitBuyPrice: selectedRow.depots[0].store_depots[0].sell_price,
-                totalPrice: selectedRow.depots[0].store_depots[0].sell_price * formik.values.productSell.unitsQuantity,
-                paymentMethod: formik.values.productSell.paymentMethod,
-            }
+            let productSells = []
 
-            if (formik.values.productSell.unitBuyPrice && formik.values.productSell.totalPrice) {
-                data.unitBuyPrice = formik.values.productSell.unitBuyPrice
-                data.totalPrice = formik.values.productSell.totalPrice
-            }
+            formik.values.productSell.products.forEach((item: any, index: number) => {
+                const storeDepot = selected[index].depots[0].store_depots[0]
+
+                productSells.push({
+                    store_depot_id: storeDepot.id,
+                    units_quantity: item.unitsQuantity,
+                    price: computeDepotPricePerUnit(storeDepot, item.unitsQuantity) * item.unitsQuantity
+                })
+            })
 
             const updatedDepot = await sellerStoreProduct.sellStoreDepotManual(data)
 
@@ -940,7 +943,6 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
 
         const paymentMethods = ["Efectivo CUP", "Transferencia CUP", "Efectivo USD", "Transferencia MLC", "Otro"]
 
-        const getProductsTotal = () => formik.values.productSell.products.reduce((accumulate: number, current: any) => accumulate + current.unitsQuantity, 0)
         function getTotals() {
             let totalProducts = 0
             let totalPrice = 0
@@ -949,24 +951,10 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                 totalProducts += item.unitsQuantity
 
                 const storeDepot = selected[index].depots[0].store_depots[0]
-                const productOffers = storeDepot.product_offers
-                const productHasOffers = !!productOffers.length
 
-                const offersEvaluation = productHasOffers
-                    ? evaluateOffers(productOffers, item.unitsQuantity)
-                    : false
+                const pricePerUnit = computeDepotPricePerUnit(storeDepot, item.unitsQuantity)
 
-                const pricePerUnitWithOffers = offersEvaluation
-                    ? offersEvaluation
-                    : storeDepot.sell_price
-
-                const pricePerUnit = storeDepot.price_discount_quantity
-                    ? pricePerUnitWithOffers - storeDepot.price_discount_quantity
-                    : storeDepot.price_discount_percentage
-                        ? pricePerUnitWithOffers - (storeDepot.price_discount_percentage * pricePerUnitWithOffers / 100)
-                        : pricePerUnitWithOffers
-
-                totalPrice += pricePerUnit * item.unitsQuantity
+                totalPrice += (pricePerUnit * item.unitsQuantity)
             })
 
             return {totalProducts, totalPrice}
@@ -979,22 +967,8 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                         {
                             formik.values.productSell.products.map((item: any, index: number) => {
                                 const storeDepot = selected[index].depots[0].store_depots[0]
-                                const productOffers = storeDepot.product_offers
-                                const productHasOffers = !!productOffers.length
 
-                                const offersEvaluation = productHasOffers
-                                    ? evaluateOffers(productOffers, item.unitsQuantity)
-                                    : false
-
-                                const pricePerUnitWithOffers = offersEvaluation
-                                    ? offersEvaluation
-                                    : storeDepot.sell_price
-
-                                const pricePerUnit = storeDepot.price_discount_quantity
-                                        ? pricePerUnitWithOffers - storeDepot.price_discount_quantity
-                                        : storeDepot.price_discount_percentage
-                                            ? pricePerUnitWithOffers - (storeDepot.price_discount_percentage * pricePerUnitWithOffers / 100)
-                                            : pricePerUnitWithOffers
+                                const pricePerUnit = computeDepotPricePerUnit(storeDepot, item.unitsQuantity)
 
                                 return (
                                     <Grid container item xs={12} key={selected[index].id} columnSpacing={1}>
