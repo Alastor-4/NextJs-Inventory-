@@ -158,7 +158,6 @@ function StoreMoreDetails(props: any) {
                                     <EditOutlined fontSize="small" />
                                 </IconButton>
                             </Grid>
-
                         </Grid>
                     </Grid>
 
@@ -176,11 +175,8 @@ function StoreMoreDetails(props: any) {
                         currency={row.depots[0].store_depots[0].sell_price_unit}
                         storeDepotId={row.depots[0].store_depots[0].id}
                     />
-
-
                 </Grid>
             </Collapse>
-
         </>
     )
 }

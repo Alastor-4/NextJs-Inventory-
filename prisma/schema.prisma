@@ -115,7 +115,6 @@ model store_depots {
   seller_profit_percentage  Float?                    @db.Float
   created_at                DateTime                  @default(now()) @db.Timestamp(0)
   is_active                 Boolean?                  @default(false)
-  offer_notes               String?                   @db.VarChar(255)
   sell_price                Decimal?                  @default(0.00) @db.Decimal(10, 2)
   sell_price_unit           String?                   @default("CUP") @db.VarChar(100)
   seller_profit_quantity    Float?                    @db.Float

@@ -220,7 +220,6 @@ function ShowProductsWarehouse(props: any) {
                 seller_profit_percentage: defaultPercentage ?? null,
                 seller_profit_quantity: defaultQuantity ?? null,
                 is_active: true,
-                offer_notes: null,
             }
 
             response = await storeAssign.postProductToStoreDepot(params.id, data);

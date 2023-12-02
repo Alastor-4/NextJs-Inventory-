@@ -130,7 +130,6 @@ export default function StoreMainTable() {
             product_remaining_units: product.product_remaining_units,
             seller_profit_percentage: product.seller_profit_percentage,
             is_active: !product.is_active,
-            offer_notes: product.offer_notes,
             sell_price: product.sell_price,
             sell_price_unit: product.sell_price_unit,
             seller_profit_quantity: product.seller_profit_quantity,
@@ -139,7 +138,7 @@ export default function StoreMainTable() {
         }
         const response = await storeDetails.update(params.id, product.id, data)
         if (response === 200) {
-            loadDates();
+            await loadDates();
         }
     }
 
@@ -208,7 +207,7 @@ export default function StoreMainTable() {
             },
             {
                 id: "Active",
-                label: "Disponible",
+                label: "Estado",
                 align: "left"
             },
             {
@@ -316,7 +315,7 @@ export default function StoreMainTable() {
 
                                                     <Grid item>
                                                         <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice} />
-                                                        {row.depots[0].store_depots[0].offer_notes && (
+                                                        {row.depots[0].store_depots[0]._count.product_offers > 0 && (
                                                             <DescriptionOutlined fontSize={"small"} />
                                                         )}
                                                         <br />
@@ -338,7 +337,6 @@ export default function StoreMainTable() {
 
                                             <TableCell>
                                                 <Grid container columnSpacing={1}>
-
                                                     <Grid item>
                                                         {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
                                                     </Grid>
@@ -358,20 +356,33 @@ export default function StoreMainTable() {
                                                             onClick={() => {
                                                                 setActiveModalEditUnits(true);
                                                                 setSelectedRowInd(index)
-                                                            }}>                                                        <EditOutlined fontSize="small" />
+                                                            }}>
+                                                            <EditOutlined fontSize="small" />
                                                         </IconButton>
                                                     </Grid>
-
                                                 </Grid>
                                             </TableCell>
 
                                             <TableCell>
-                                                <Switch
-                                                    size='small'
-                                                    checked={row.depots[0].store_depots[0].is_active}
-                                                    color={'success'}
-                                                    onChange={() => updateProductActive(row.depots[0].store_depots[0])}
-                                                />
+                                                <Grid container>
+                                                    <Grid container item xs={12} justifyContent={"center"}>
+                                                        <Typography variant={"button"}>
+                                                            {row.depots[0].store_depots[0].is_active
+                                                                ? "en venta"
+                                                                : "inactivo"
+                                                            }
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid container item xs={12} justifyContent={"center"}>
+                                                        <Switch
+                                                            size='small'
+                                                            checked={row.depots[0].store_depots[0].is_active}
+                                                            color={'success'}
+                                                            disabled={!baseProductPrice}
+                                                            onChange={() => updateProductActive(row.depots[0].store_depots[0])}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
                                             </TableCell>
 
                                             <TableCell style={{ padding: 0 }} colSpan={5}>
@@ -396,9 +407,7 @@ export default function StoreMainTable() {
                                         </TableRow>
 
                                         <TableRow >
-
                                             <TableCell style={{ padding: 0 }} colSpan={5}>
-
                                                 {showDetails === row.id && (
                                                     <StoreMoreDetails
                                                         userId={params.id}
@@ -407,10 +416,8 @@ export default function StoreMainTable() {
                                                         loadDates={loadDates}
                                                         row={row}
                                                     />
-                                                )
-                                                }
+                                                )}
                                             </TableCell>
-
                                         </TableRow>
                                     </React.Fragment>
                                 )

@@ -445,12 +445,6 @@ function AddProductFromWarehouse(props: any) {
                 product_remaining_units: units,
                 seller_profit_percentage: dataStore.fixed_seller_profit_percentage,
                 seller_profit_quantity: dataStore.fixed_seller_profit_quantity,
-                is_active: true,
-                offer_notes: null,
-                price_discount_percentage: null,
-                price_discount_quantity: null,
-                sell_price: data[ind].products.buy_price ?? "0",
-                sell_price_unit: "CUP"
             }
 
             request = await requestWarehouse.addProductsStoreDepots(params.id, dataRequest);
