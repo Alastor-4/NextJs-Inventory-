@@ -9,7 +9,7 @@ import {
     Chip,
     Collapse, Divider,
     Grid,
-    IconButton, List, ListItem, ListItemSecondaryAction, ListItemText,
+    IconButton,
     MenuItem,
     Switch,
     Table,
@@ -24,14 +24,12 @@ import {
 import {TableNoData} from "@/components/TableNoData";
 import {
     ArrowLeft,
-    CancelOutlined,
     ChevronRightOutlined,
     DescriptionOutlined,
     Done,
-    EditOutlined,
     FilterAltOutlined,
     KeyboardArrowDown,
-    KeyboardArrowRight, Label,
+    KeyboardArrowRight,
     SearchOutlined,
     SellOutlined,
     VisibilityOutlined
@@ -43,7 +41,6 @@ import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import {
     computeDepotPricePerUnit,
-    evaluateOffers,
     notifySuccess,
     notifyWarning,
     numberFormat
@@ -424,22 +421,6 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                                 <Grid container spacing={1} sx={{padding: "8px 26px"}}>
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{fontWeight: 600}}>Acciones:</Grid>
-                                                        {
-                                                            row.depots[0].store_depots[0].is_active &&
-                                                            !!row.depots[0].store_depots[0].product_remaining_units && (
-                                                                <Grid item xs={"auto"}>
-                                                                    <Button
-                                                                        size={"small"}
-                                                                        color={"primary"}
-                                                                        variant={"outlined"}
-                                                                        onClick={() => handleOpenSellProduct(row, formik)}
-                                                                    >
-                                                                        Vender
-                                                                    </Button>
-                                                                </Grid>
-                                                            )
-                                                        }
-
                                                         <Grid item xs={"auto"}>
                                                             <Button
                                                                 size={"small"}
@@ -641,7 +622,6 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                 {
                     maxUnitsQuantity: "1",
                     unitsQuantity: "1",
-                    computedUnitPrice: "",
                 }
             ],
             totalPrice: "",
@@ -658,9 +638,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                     .required("especifíque cantidad")
                     .min(1, "cantidad mayor que 0")
                     .max(Yup.ref("maxUnitsQuantity"), "cantidad superior a la cantidad disponible"),
-                computedUnitPrice: Yup.number().required(),
-                hasOffers: Yup.boolean(),
-            })).min(1),
+            })).required(),
             paymentMethod: Yup.string(),
         })
     })
@@ -909,32 +887,44 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
 
     const ProductSellForm = ({formik, closeForm}: {formik: any, closeForm: any}) => {
         async function productsSell() {
-            let productSells = []
+            let sellProduct: any[] = []
 
             formik.values.productSell.products.forEach((item: any, index: number) => {
                 const storeDepot = selected[index].depots[0].store_depots[0]
 
-                productSells.push({
-                    store_depot_id: storeDepot.id,
-                    units_quantity: item.unitsQuantity,
+                sellProduct.push({
+                    storeDepotId: storeDepot.id,
+                    unitsQuantity: item.unitsQuantity,
                     price: computeDepotPricePerUnit(storeDepot, item.unitsQuantity) * item.unitsQuantity
                 })
             })
 
-            const updatedDepot = await sellerStoreProduct.sellStoreDepotManual(data)
+            const totalPrice = sellProduct.reduce((accumulate, current) => accumulate + current.price, 0)
 
-            if (updatedDepot) {
-                const newDepartments = [...allProductsByDepartment]
-                for (const allProductsByDepartmentElement of allProductsByDepartment) {
-                    const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+            const sell = {paymentMethod: formik.values.productSell.paymentMethod, totalPrice: totalPrice}
 
-                    const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === selectedRow.depots[0].store_depots[0].id)
-                    if (productIndex > -1) {
-                        newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units = updatedDepot.product_remaining_units
-                    }
+            const sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(
+                {
+                    userId,
+                    sellerStoreId: storeId,
+                    sellData: sell,
+                    sellProductsData: sellProduct,
                 }
+            )
 
-                setAllProductsByDepartment(newDepartments)
+            if (sellItemResponse) {
+                notifySuccess("La venta ha sido registrada")
+                // const newDepartments = [...allProductsByDepartment]
+                // for (const allProductsByDepartmentElement of allProductsByDepartment) {
+                //     const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+                //
+                //     const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === selectedRow.depots[0].store_depots[0].id)
+                //     if (productIndex > -1) {
+                //         newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units = sellItemResponse.product_remaining_units
+                //     }
+                // }
+                //
+                // setAllProductsByDepartment(newDepartments)
             }
 
             formik.resetForm()
