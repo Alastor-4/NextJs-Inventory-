@@ -286,6 +286,7 @@ model product_offers {
   compare_function       String       @db.VarChar(100)
   price_per_unit         Float
   store_depot_id         Int
+  is_active              Boolean?     @default(true)
   created_at             DateTime     @default(now()) @db.Timestamp(0)
   store_depots           store_depots @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "NewTable_FK")
 
