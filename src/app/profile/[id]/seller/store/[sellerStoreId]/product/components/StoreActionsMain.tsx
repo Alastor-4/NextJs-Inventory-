@@ -869,7 +869,6 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
     const [displayProductSellForm, setDisplayProductSellForm] = React.useState<boolean>(false)
     function handleOpenSellProduct(formik: any) {
         let productsData: any = []
-        console.log(selected)
         selected.forEach(item => {
             const storeDepot = item.depots[0].store_depots[0]
 
@@ -913,18 +912,23 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
             )
 
             if (sellItemResponse) {
+                const newDepartments = [...allProductsByDepartment]
+
+                sellProduct.forEach(sellProductItem => {
+                    for (const allProductsByDepartmentElement of allProductsByDepartment) {
+                        const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+
+                        const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === sellProductItem.storeDepotId)
+                        if (productIndex > -1) {
+                            newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units
+                                = allProductsByDepartment[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units - sellProductItem.unitsQuantity
+                        }
+                    }
+                })
+
+                setAllProductsByDepartment(newDepartments)
+
                 notifySuccess("La venta ha sido registrada")
-                // const newDepartments = [...allProductsByDepartment]
-                // for (const allProductsByDepartmentElement of allProductsByDepartment) {
-                //     const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
-                //
-                //     const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === selectedRow.depots[0].store_depots[0].id)
-                //     if (productIndex > -1) {
-                //         newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units = sellItemResponse.product_remaining_units
-                //     }
-                // }
-                //
-                // setAllProductsByDepartment(newDepartments)
             }
 
             formik.resetForm()
