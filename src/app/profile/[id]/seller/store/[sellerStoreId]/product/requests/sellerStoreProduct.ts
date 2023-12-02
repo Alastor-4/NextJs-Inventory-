@@ -38,12 +38,9 @@ const sellerStoreProduct = {
         return false
     },
 
-    sellStoreDepotManual: async function ({userId, sellerStoreId, storeDepotId, unitsQuantity, unitBuyPrice, totalPrice, paymentMethod}) {
+    sellStoreDepotManual: async function ({userId, sellerStoreId, sellData, sellProductsData}) {
         try {
-            const response = await apiRequest.post(
-                url(userId, sellerStoreId),
-                {storeDepotId, unitsQuantity, unitBuyPrice, totalPrice, paymentMethod}
-            )
+            const response = await apiRequest.post(url(userId, sellerStoreId), {sellData, sellProductsData})
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error creando la venta de los productos. Inténtelo nuevamente")
