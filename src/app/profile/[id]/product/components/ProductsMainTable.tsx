@@ -105,7 +105,7 @@ export default function ProductsMainTable() {
     }
 
     function handleNavigateBack() {
-        router.back()
+        router.push(`/profile/${params.id}`)
     }
 
     const CustomToolbar = () => (

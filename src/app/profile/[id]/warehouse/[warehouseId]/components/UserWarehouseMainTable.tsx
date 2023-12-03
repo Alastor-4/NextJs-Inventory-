@@ -171,11 +171,11 @@ export default function UserWarehouseMainTable(props) {
     }
 
     function handleNavigateBack() {
-        router.back()
+        router.push(`/profile/${ownerId}`)
     }
 
     function handleStoreAssign() {
-        router.push(`/profile/${ownerId}/store-assign`)
+        router.push(`/profile/${ownerId}/store-assign?warehouseId=${warehouseDetails.id}`)
     }
 
     const CustomToolbar = () => (

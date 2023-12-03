@@ -22,6 +22,7 @@ import stores from "@/app/profile/[id]/store/requests/stores";
 import { openDaysStores } from "@/request/openDaysStores";
 import dayjs from "dayjs";
 import StoreOpeningDays from "@/app/profile/[id]/store/components/StoreOpeningDays";
+import { notifyError } from "@/utils/generalFunctions";
 
 
 export default function StoresForm(props: any) {
@@ -290,7 +291,7 @@ export default function StoresForm(props: any) {
                 }
             // Verificar si hay algun error
             if (openDaysResponse !== 200) {
-                ///Error
+                notifyError("Ha ocurrido un error al crear el horario de apartura de la tienda")
             }
 
 
@@ -309,7 +310,8 @@ export default function StoresForm(props: any) {
                 }
             // Verificar si hay algun error
             if (daysReservationsResponse !== 200) {
-                ///Error
+                notifyError("Ha ocurrido un error al crear el horario de reervación de la tienda")
+
             }
         })
 
@@ -318,6 +320,7 @@ export default function StoresForm(props: any) {
             router.push(`/profile/${userId}/store`)
         } else {
             //ToDo: catch validation errors
+            notifyError(`Ha ocurrido un error en la ${updateItem ? "modificación" : "creación"} de los datos de la tienda`)
         }
     }
 
@@ -540,7 +543,7 @@ export default function StoresForm(props: any) {
                                 variant={"outlined"}
                                 size={"small"}
                                 sx={{ m: 1 }}
-                                onClick={() => router.back()}
+                                onClick={() => router.push(`/profile/${userId}/store`)}
                             >
                                 Cancel
                             </Button>
