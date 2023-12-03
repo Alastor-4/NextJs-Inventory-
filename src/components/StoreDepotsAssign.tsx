@@ -3,7 +3,6 @@
 import {
     AppBar,
     Box,
-    Button,
     Card,
     CardContent,
     Grid,
@@ -14,19 +13,20 @@ import {
     Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { Formik, FormikProps } from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
 import ShowProductsStore from "@/app/profile/[id]/store-assign/components/ShowProductsStore";
-import ShowProductsWarehouse from "@/app/profile/[id]/store-assign/components/ShowProductsWarehouse"
 import { ArrowLeft } from "@mui/icons-material";
-import { router } from "next/client"
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 export default function StoreDepotsAssign(
-    { warehouseListProp, selectedWarehouseIdProp, storeListProp }:
-        { warehouseListProp: any[], selectedWarehouseIdProp: number, storeListProp: any[] }
+    { warehouseListProp, selectedWarehouseIdProp, selectedStoreIdProp, storeListProp }:
+        { warehouseListProp: any[], selectedWarehouseIdProp: number | null, selectedStoreIdProp: number | null, storeListProp: any[] }
 ) {
-    const searchParams = useSearchParams()
+    const params = useParams()
+
+    const router = useRouter()
 
     const [selectedWarehouse, setSelectedWarehouse] = useState<any>("")
     const [selectedStore, setSelectedStore] = useState<any>("")
@@ -43,10 +43,10 @@ export default function StoreDepotsAssign(
     }, [selectedWarehouseIdProp, warehouseListProp])
 
     //initial make selected a store
-    const selectedStoreIdProp = searchParams.get("storeId")
+
     React.useEffect(() => {
         if (selectedStoreIdProp) {
-            const index = storeListProp.findIndex(item => item.id === parseInt(selectedStoreIdProp))
+            const index = storeListProp.findIndex(item => item.id === selectedStoreIdProp)
             if (index > -1) {
                 setSelectedStore(storeListProp[index])
             }
@@ -65,6 +65,10 @@ export default function StoreDepotsAssign(
     })
 
     function handleNavigateBack() {
+        /*  selectedStoreIdProp
+              ? router.push(`/profile/${params.id}/store-details/${selectedStoreIdProp}`)
+              : router.push(`/profile/${params.id}/warehouse/${selectedWarehouseIdProp}`)
+  */
         router.back()
     }
 

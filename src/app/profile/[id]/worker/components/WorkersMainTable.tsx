@@ -131,7 +131,7 @@ export default function WorkersMainTable(props) {
     }
 
     function handleNavigateBack() {
-        router.back()
+        router.push(`/profile/${params.id}`)
     }
 
     const CustomToolbar = () => (

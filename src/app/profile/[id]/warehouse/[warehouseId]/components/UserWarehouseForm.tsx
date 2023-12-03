@@ -8,19 +8,19 @@ import {
     Card,
     FormHelperText,
     Grid,
-    IconButton,
     TextField,
     Toolbar,
     Typography
 } from "@mui/material";
-import React, {useState} from "react";
-import {useFormik} from "formik";
+import React, { useState } from "react";
+import { useFormik } from "formik";
 import * as Yup from "yup"
-import {useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import DepartmentProductsSelect from "@/components/DepartmentProductsSelect";
 import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
+import { notifyError } from "@/utils/generalFunctions";
 
-export default function UserWarehouseForm({ownerId, warehouseId}) {
+export default function UserWarehouseForm({ ownerId, warehouseId }) {
     const router = useRouter()
 
     const [departmentProductsList, setDepartmentProductsList] = React.useState([])
@@ -37,7 +37,7 @@ export default function UserWarehouseForm({ownerId, warehouseId}) {
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
                 <Box>
                     <Typography
                         variant="h6"
@@ -80,6 +80,7 @@ export default function UserWarehouseForm({ownerId, warehouseId}) {
             router.push(`/profile/${ownerId}/warehouse/${warehouseId}`)
         } else {
             //ToDo: catch validation errors
+            notifyError("Hay un error en la creación de depósitos")
         }
     }
 
@@ -94,10 +95,10 @@ export default function UserWarehouseForm({ownerId, warehouseId}) {
             <form onSubmit={formik.handleSubmit}>
                 <Grid container rowSpacing={2}>
                     <Grid item xs={12}>
-                        <CustomToolbar/>
+                        <CustomToolbar />
                     </Grid>
 
-                    <Grid container item rowSpacing={2} sx={{padding: "25px"}}>
+                    <Grid container item rowSpacing={2} sx={{ padding: "25px" }}>
                         <Grid item xs={12}>
                             <TextField
                                 name={"productTotalUnits"}
@@ -116,18 +117,18 @@ export default function UserWarehouseForm({ownerId, warehouseId}) {
                                 selectedProduct={formik.values.product}
                                 setSelectedProduct={(value) => formik.setFieldValue("product", value)}
                             />
-                            <FormHelperText sx={{color: "red"}}>
+                            <FormHelperText sx={{ color: "red" }}>
                                 {formik.errors.product}
                             </FormHelperText>
                         </Grid>
                     </Grid>
 
-                    <Grid container item justifyContent={"flex-end"} sx={{paddingRight: "25px"}}>
+                    <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                         <Button
                             color={"secondary"}
                             variant={"outlined"}
                             size={"small"}
-                            sx={{m: 1}}
+                            sx={{ m: 1 }}
                             onClick={() => router.push(`/profile/${ownerId}/warehouse/${warehouseId}`)}
                         >
                             Cancel
@@ -138,7 +139,7 @@ export default function UserWarehouseForm({ownerId, warehouseId}) {
                             color={"primary"}
                             variant={"outlined"}
                             size={"small"}
-                            sx={{m: 1}}
+                            sx={{ m: 1 }}
                             disabled={!formik.isValid}
                         >
                             Create
