@@ -276,7 +276,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                         (!retiradoFilter || (retiradoFilter && item.depots[0].store_depots[0].product_remaining_units === -1)) &&
                         (!sinPrecioFilter || (sinPrecioFilter && item.depots[0].store_depots[0].sell_price === "0")) &&
                         (!conDescuentoFilter || (conDescuentoFilter && (item.depots[0].store_depots[0].price_discount_percentage || item.depots[0].store_depots[0].price_discount_quantity))) &&
-                        (!conOfertasFilter || (conOfertasFilter && item.depots[0].store_depots[0].offer_notes)) &&
+                        (!conOfertasFilter || (conOfertasFilter && item.depots[0].store_depots[0].product_offers.length > 0)) &&
                         (!sinDisponibilidadFilter || (sinDisponibilidadFilter && item.depots[0].store_depots[0].product_remaining_units === 0)) &&
                         (!disponibilidad10Filter || (disponibilidad10Filter && item.depots[0].store_depots[0].product_remaining_units < 10)) &&
                         (!disponibilidad20Filter || (disponibilidad20Filter && item.depots[0].store_depots[0].product_remaining_units < 20))
@@ -346,7 +346,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                         </TableCell>
                                         <TableCell>
                                             <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice}/>
-                                            {row.depots[0].store_depots[0].offer_notes && (
+                                            {row.depots[0].store_depots[0].product_offers.length > 0 && (
                                                 <DescriptionOutlined fontSize={"small"}/>
                                             )}
                                             <br/>
@@ -584,7 +584,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{fontWeight: 600}}>Ofertas:</Grid>
                                                         <Grid item xs={true}>
-                                                            {row.depots[0].store_depots[0].offer_notes ?? "-"}
+                                                            {row.depots[0].store_depots[0].product_offers.length > 0 ? "si" :  "-"}
                                                         </Grid>
                                                     </Grid>
                                                 </Grid>

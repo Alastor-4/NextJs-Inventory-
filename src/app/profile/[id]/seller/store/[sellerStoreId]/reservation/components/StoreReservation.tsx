@@ -293,7 +293,7 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                         </TableCell>
                                         <TableCell>
                                             <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice}/>
-                                            {row.store_depots.offer_notes && (
+                                            {row.store_depots.product_offers.length > 0 && (
                                                 <DescriptionOutlined fontSize={"small"}/>
                                             )}
                                             <br/>
@@ -720,7 +720,7 @@ export default function StoreReservation({userId, storeId}: { userId: string, st
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{fontWeight: 600}}>Ofertas:</Grid>
                                                         <Grid item xs={true}>
-                                                            {row.store_depots.offer_notes ?? "-"}
+                                                            {row.store_depots.product_offers.length > 0 ? "si" :  "-"}
                                                         </Grid>
                                                     </Grid>
                                                 </Grid>

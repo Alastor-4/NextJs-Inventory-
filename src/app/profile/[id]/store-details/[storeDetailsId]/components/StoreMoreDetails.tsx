@@ -1,11 +1,10 @@
-import { EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, VisibilityOutlined } from '@mui/icons-material'
-import { Box, Collapse, Grid, IconButton, Switch, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import { EditOutlined, VisibilityOutlined } from '@mui/icons-material'
+import { Box, Collapse, Grid, IconButton, Typography } from '@mui/material'
+import React, { useState } from 'react'
 import StoreListOffers from './offers/components/StoreListOffers'
 import StoreEditSellerProfit from '@/app/profile/[id]/store-details/[storeDetailsId]/components/Modal/StoreEditSellerProfit'
 import StoreModalDefault from './Modal/StoreModalDefault'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
-import { storeDetails } from '../request/storeDetails'
 function StoreMoreDetails(props: any) {
 
     const { userId, details, show, loadDates, row } = props
@@ -144,7 +143,6 @@ function StoreMoreDetails(props: any) {
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ganancia del vendedor por producto:</Grid>
                         <Grid item container xs={true}>
-
                             <Grid item>
                                 {showSellerProfit(
                                     row.depots[0].store_depots[0].sell_price,
@@ -158,7 +156,6 @@ function StoreMoreDetails(props: any) {
                                     <EditOutlined fontSize="small" />
                                 </IconButton>
                             </Grid>
-
                         </Grid>
                     </Grid>
 
@@ -176,11 +173,8 @@ function StoreMoreDetails(props: any) {
                         currency={row.depots[0].store_depots[0].sell_price_unit}
                         storeDepotId={row.depots[0].store_depots[0].id}
                     />
-
-
                 </Grid>
             </Collapse>
-
         </>
     )
 }

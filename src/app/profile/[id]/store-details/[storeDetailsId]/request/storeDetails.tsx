@@ -82,6 +82,16 @@ export const storeDetails = {
         }
         return false
     },
+    toggleProductOffers: async function (userId: any, storeId: any, productOfferId: any) {
+        try {
+            const response = await apiRequest.patch(urlOffers(userId, storeId), { productOfferId: productOfferId })
+
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+        return false
+    },
     removeProductOffers: async function (userId: any, storeId: any, productOfferId: any) {
         try {
             const response = await apiRequest.delete(urlOffers(userId, storeId), { params: { productOfferId: productOfferId } })

@@ -262,7 +262,6 @@ function ShowProductsStore(props: any) {
             seller_profit_percentage: newProductStoreDepots.seller_profit_percentage,
             seller_profit_quantity: newProductStoreDepots.seller_profit_quantity,
             is_active: newProductStoreDepots.is_active,
-            offer_notes: newProductStoreDepots.offer_notes,
         }
 
         const result = await storeAssign.updateProductStore(params.id, updateData)

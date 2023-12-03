@@ -89,7 +89,6 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
             product_remaining_units: storeDepot.product_remaining_units,
             seller_profit_percentage: storeDepot.seller_profit_percentage,
             is_active: storeDepot.is_active,
-            offer_notes: storeDepot.offer_notes,
             sell_price: parseFloat(precioOriginal),
             sell_price_unit: values.currency,
             seller_profit_quantity: storeDepot.seller_profit_quantity,

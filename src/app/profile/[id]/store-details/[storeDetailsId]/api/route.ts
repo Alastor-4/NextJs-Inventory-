@@ -71,7 +71,8 @@ export async function GET(req: Request, { params }: Params) {
                                             product_units: { not: -1 }
                                         }
                                     ]
-                                }
+                                },
+                                include: {_count: {select: {product_offers: true}}}
                             }
                         }
                     },
@@ -95,7 +96,6 @@ export async function PUT(req: Request) {
         product_remaining_units,
         seller_profit_percentage,
         is_active,
-        offer_notes,
         sell_price,
         sell_price_unit,
         seller_profit_quantity,
@@ -114,7 +114,6 @@ export async function PUT(req: Request) {
             product_remaining_units,
             seller_profit_percentage,
             is_active,
-            offer_notes,
             sell_price,
             sell_price_unit,
             seller_profit_quantity,
