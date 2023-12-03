@@ -287,6 +287,7 @@ export default function StoreMainTable() {
                                         <TableRow
                                             hover
                                             tabIndex={-1}
+                                            onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
                                         >
                                             <TableCell>
 
@@ -390,7 +391,6 @@ export default function StoreMainTable() {
                                                     <IconButton
                                                         size={"small"}
                                                         sx={{ m: "3px" }}
-                                                        onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
                                                     >
                                                         {
 
@@ -407,7 +407,7 @@ export default function StoreMainTable() {
                                         </TableRow>
 
                                         <TableRow >
-                                            <TableCell style={{ padding: 0 }} colSpan={5}>
+                                            <TableCell style={{ padding: 0 }} colSpan={6}>
                                                 {showDetails === row.id && (
                                                     <StoreMoreDetails
                                                         userId={params.id}

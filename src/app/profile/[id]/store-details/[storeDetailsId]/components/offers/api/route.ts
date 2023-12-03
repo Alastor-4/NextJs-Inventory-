@@ -40,9 +40,25 @@ export async function PUT(req: any) {
     return NextResponse.json(result);
 }
 
+export async function PATCH(req: any) {
+    const {productOfferId} = await req.json()
+
+    const offer = await prisma.product_offers.findUnique({where: {id: productOfferId}})
+
+    if (offer) {
+        const result = await prisma.product_offers.update(
+            {data: {is_active: !offer.is_active}, where: { id: offer.id }}
+        )
+
+        return NextResponse.json(result);
+    }
+
+    return new Response('La acción de modificar oferta ha fallado', {status: 400})
+}
+
 export async function DELETE(req: any) {
     const { searchParams } = new URL(req.url)
-    const productOfferId = await parseInt(<string>(searchParams.get('productOfferId')))
+    const productOfferId = parseInt(<string>(searchParams.get('productOfferId')))
 
     const result = await prisma.product_offers.delete({ where: { id: productOfferId } })
 
