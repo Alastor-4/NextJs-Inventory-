@@ -41,9 +41,8 @@ import {
     PersonOutlined,
     StartOutlined,
 } from "@mui/icons-material";
-import users from "@/app/user/requests/users"
+import users from "../requests/users"
 import { useParams, useRouter } from "next/navigation";
-
 
 export default function UsersMainTable(props) {
     const { roles } = props
@@ -66,7 +65,7 @@ export default function UsersMainTable(props) {
         if (data === null) {
             getAllUser();
         }
-    }, [data])
+    }, [data, params.id])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
