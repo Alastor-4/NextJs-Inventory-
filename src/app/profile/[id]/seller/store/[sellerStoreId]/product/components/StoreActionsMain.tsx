@@ -3,18 +3,22 @@
 import React from "react";
 import {
     AppBar,
-    Box, Button,
+    Box,
+    Button,
     Card,
-    CardContent, Checkbox,
+    CardContent,
+    Checkbox,
     Chip,
-    Collapse, Divider,
+    Collapse,
+    Divider,
     Grid,
     IconButton,
     MenuItem,
     Switch,
     Table,
     TableBody,
-    TableCell, TableContainer,
+    TableCell,
+    TableContainer,
     TableHead,
     TableRow,
     TextField,
@@ -40,7 +44,8 @@ import {Formik} from "formik";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import {
-    computeDepotPricePerUnit, notifyError,
+    computeDepotPricePerUnit,
+    notifyError,
     notifySuccess,
     notifyWarning,
     numberFormat
@@ -48,6 +53,7 @@ import {
 import sellerStoreProduct from "@/app/profile/[id]/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import {storeDetails} from "@/app/profile/[id]/store-details/[storeDetailsId]/request/storeDetails";
+import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 
 export default function StoreActionsMain({userId, storeId}: { userId: string, storeId: string }) {
     const router = useRouter()
@@ -754,23 +760,16 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                 Seleccione departamentos para encontrar el producto deseado
                             </Typography>
                         </Grid>
-                        <Grid container item columnSpacing={2} sx={{mt: "8px"}}>
+                        <Grid container item columnSpacing={2} sx={{mt: "8px", flexWrap: "nowrap", overflowX: "auto"}}>
                             {
                                 allProductsByDepartment.map((item, index) => (
                                     <Grid key={item.id} item xs={"auto"}>
-                                        <Button variant={item.selected ? "contained" : "outlined"}
-                                                onClick={() => handleSelectFilter(index)}>
-                                            <Grid container>
-                                                <Grid item xs={12}>
-                                                    {item.name}
-                                                </Grid>
-                                                <Grid container item xs={12} justifyContent={"center"}>
-                                                    <Typography variant={"caption"}>
-                                                        {item.products.length} productos
-                                                    </Typography>
-                                                </Grid>
-                                            </Grid>
-                                        </Button>
+                                        <DepartmentCustomButton
+                                            title={item.name}
+                                            subtitle={`${item.products.length} productos`}
+                                            selected={item.selected}
+                                            onClick={() => handleSelectFilter(index)}
+                                        />
                                     </Grid>
                                 ))
                             }
