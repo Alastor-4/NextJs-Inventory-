@@ -20,9 +20,9 @@ export default function RolesForm(props) {
             setUpdateItem(rol)
         }
         if (params?.roleId !== undefined) {
-            fetchRole(params.id)
+            fetchRole(params.roleId)
         }
-    }, [params?.id, setUpdateItem])
+    }, [params?.id, params.roleId, setUpdateItem])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>

@@ -24,8 +24,6 @@ import roles from "../request/roles";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 export default function RolesMainTable() {
 
 
@@ -49,7 +47,7 @@ export default function RolesMainTable() {
         if (data === null) {
             getAllRoles();
         }
-    }, [])
+    }, [data, params.id])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
