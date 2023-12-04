@@ -61,7 +61,7 @@ export default function Login() {
                                 <Grid item xs={12}>
                                     <TextField
                                         name="username"
-                                        label="Username"
+                                        label="Usuario"
                                         size={"small"}
                                         fullWidth
                                         variant="outlined"
@@ -81,7 +81,7 @@ export default function Login() {
                                 <Grid item xs={12}>
                                     <TextField
                                         name="password"
-                                        label="Password"
+                                        label="Contraseña"
                                         size={"small"}
                                         type={showPassword ? "text" : "password"}
                                         fullWidth
@@ -116,7 +116,7 @@ export default function Login() {
                                         sx={{width: "100%"}}
                                         onClick={() => router.push("/profile/2")}
                                     >
-                                        Login
+                                        Entrar
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -180,7 +180,7 @@ export default function Login() {
                                 <Grid item xs={12}>
                                     <TextField
                                         name="username"
-                                        label="Username*"
+                                        label="Usuario*"
                                         size={"small"}
                                         fullWidth
                                         variant="outlined"
@@ -193,7 +193,7 @@ export default function Login() {
                                 <Grid item xs={12}>
                                     <TextField
                                         name="email"
-                                        label="Email*"
+                                        label="Correo*"
                                         size={"small"}
                                         fullWidth
                                         variant="outlined"
@@ -206,7 +206,7 @@ export default function Login() {
                                 <Grid item xs={12}>
                                     <TextField
                                         name="password1"
-                                        label="Password*"
+                                        label="Contraseña*"
                                         size={"small"}
                                         type={showPassword1 ? "text" : "password"}
                                         fullWidth
@@ -231,7 +231,7 @@ export default function Login() {
                                 <Grid item xs={12}>
                                     <TextField
                                         name="password2"
-                                        label="Confirm Password*"
+                                        label="Confirmar Contraseña*"
                                         size={"small"}
                                         type={showPassword2 ? "text" : "password"}
                                         fullWidth
@@ -262,7 +262,7 @@ export default function Login() {
                                         sx={{width: "100%"}}
                                         disabled={!formik.isValid}
                                     >
-                                        Create
+                                        Crear
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -334,7 +334,7 @@ export default function Login() {
                                 onClick={() => setShowSignUpForm(false)}
                                 size={"small"}
                             >
-                                Login
+                                Entrar
                             </Button>
 
                             <Divider
@@ -356,7 +356,7 @@ export default function Login() {
                                 onClick={() => setShowSignUpForm(true)}
                                 size={"small"}
                             >
-                                Sign up
+                                Registrarse
                             </Button>
                         </Grid>
 
