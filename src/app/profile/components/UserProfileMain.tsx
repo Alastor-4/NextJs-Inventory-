@@ -74,7 +74,6 @@ export default function UserProfileMain(props) {
 
     const AdminModule = () => {
         const LinksTemplate = ({ pageAddress, title }: { pageAddress: string, title: string }) => (
-
             <Link href={pageAddress}>
                 <Grid container columnSpacing={2} item xs={12} >
                     <Grid container item xs={"auto"} alignItems={"center"}>
@@ -109,7 +108,7 @@ export default function UserProfileMain(props) {
                         <Grid item>
                             <LinksTemplate
                                 pageAddress={`/profile/${userDetails.id}/admin/warehouse`}
-                                title={"Alamcenes"}
+                                title={"Almacenes"}
                             />
                         </Grid>
                     </Grid>
