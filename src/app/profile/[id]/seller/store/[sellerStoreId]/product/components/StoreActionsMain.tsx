@@ -3,18 +3,22 @@
 import React from "react";
 import {
     AppBar,
-    Box, Button,
+    Box,
+    Button,
     Card,
-    CardContent, Checkbox,
+    CardContent,
+    Checkbox,
     Chip,
-    Collapse, Divider,
+    Collapse,
+    Divider,
     Grid,
     IconButton,
     MenuItem,
     Switch,
     Table,
     TableBody,
-    TableCell, TableContainer,
+    TableCell,
+    TableContainer,
     TableHead,
     TableRow,
     TextField,
@@ -41,12 +45,15 @@ import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import {
     computeDepotPricePerUnit,
+    notifyError,
     notifySuccess,
     notifyWarning,
     numberFormat
 } from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/profile/[id]/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
+import {storeDetails} from "@/app/profile/[id]/store-details/[storeDetailsId]/request/storeDetails";
+import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 
 export default function StoreActionsMain({userId, storeId}: { userId: string, storeId: string }) {
     const router = useRouter()
@@ -266,6 +273,81 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
             disponibilidad20Filter
         } = formik.values
 
+        const handleToggleOffer = async (offerId: number, storeDepotId: number) => {
+            const response = await storeDetails.toggleProductOffers(userId, storeId, offerId)
+
+            if (response) {
+                const newDepartments = [...allProductsByDepartment]
+                for (const allProductsByDepartmentElement of allProductsByDepartment) {
+                    const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+
+                    const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === storeDepotId)
+                    if (productIndex > -1) {
+                        const offers = allProductsByDepartment[departmentIndex].products[productIndex].depots[0].store_depots[0].product_offers
+
+                        const offerIndex = offers.findIndex((item: any) => item.id === response.id)
+                        if (offerIndex > -1) {
+                            newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_offers[offerIndex] = response
+                        }
+                    }
+                }
+
+                setAllProductsByDepartment(newDepartments)
+
+                response.is_active
+                    ? notifySuccess("Oferta habilitada nuevamente")
+                    : notifyWarning("La oferta ha sido deshabilitada y no se está aplicando")
+            } else {
+                notifyError("No se ha podido cambiar el estado a la oferta")
+            }
+        }
+
+        const OfferItem = ({item, index, currency, depotId}: {item: any, index: number, currency: string, depotId: number}) => (
+            <Grid container item xs={12}>
+                <Grid
+                    container
+                    item
+                    columnSpacing={1}
+                    sx={{
+                        width: 'fit-content',
+                        backgroundColor: "lightgray",
+                        padding: "0 4px",
+                        borderRadius: "5px 2px 2px 2px",
+                        border: "1px solid",
+                        borderColor: item.is_active ? "seagreen" : "orange",
+                        fontSize: 14,
+                        cursor: "pointer",
+                        textDecorationLine: item.is_active ? "none" : "line-through",
+                    }}
+                >
+                    <Grid container item xs={"auto"} alignItems={"center"}>
+                        <Typography variant={"caption"}
+                                    sx={{color: "white", fontWeight: "600"}}>
+                            {`${index + 1} . `}
+                        </Typography>
+                    </Grid>
+
+                    <Grid container item xs={"auto"} alignItems={"center"}
+                          sx={{color: "rgba(16,27,44,0.8)"}}>
+                        {
+                            item.compare_function === '='
+                                ? `Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
+                                : `Cuando compren más de ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
+                        }
+                    </Grid>
+
+                    <Grid container item xs={"auto"} alignItems={"center"}>
+                        <Checkbox
+                            size={"small"}
+                            color={item.is_active ? "success" : "default"}
+                            checked={item.is_active}
+                            onClick={() => handleToggleOffer(item.id, depotId)}
+                        />
+                    </Grid>
+                </Grid>
+            </Grid>
+        )
+
         return (
             <TableBody>
                 {data?.filter(
@@ -327,6 +409,8 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                             <Checkbox
                                                 size='small'
                                                 checked={!!selected.find((item: any) => item.id === row.id)}
+                                                disabled={!row.depots[0].store_depots[0].is_active ||
+                                                    !row.depots[0].store_depots[0].product_remaining_units}
                                                 onClick={(e) => handleSelectItem(e, row)}
                                             />
                                         </TableCell>
@@ -582,9 +666,17 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{fontWeight: 600}}>Ofertas:</Grid>
-                                                        <Grid item xs={true}>
-                                                            {row.depots[0].store_depots[0].product_offers.length > 0 ? "si" :  "-"}
+                                                        <Grid item xs={12} sx={{fontWeight: 600}}>Ofertas:</Grid>
+                                                        <Grid container item xs={12} rowSpacing={1}>
+                                                            {row.depots[0].store_depots[0].product_offers.map((item: any, index: number) => (
+                                                                <OfferItem
+                                                                    item={item}
+                                                                    index={index}
+                                                                    currency={row.depots[0].store_depots[0].sell_price_unit}
+                                                                    depotId={row.depots[0].store_depots[0].id}
+                                                                    key={item.id}
+                                                                />
+                                                            ))}
                                                         </Grid>
                                                     </Grid>
                                                 </Grid>
@@ -668,23 +760,16 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                 Seleccione departamentos para encontrar el producto deseado
                             </Typography>
                         </Grid>
-                        <Grid container item columnSpacing={2} sx={{mt: "8px"}}>
+                        <Grid container item columnSpacing={2} sx={{mt: "8px", flexWrap: "nowrap", overflowX: "auto"}}>
                             {
                                 allProductsByDepartment.map((item, index) => (
                                     <Grid key={item.id} item xs={"auto"}>
-                                        <Button variant={item.selected ? "contained" : "outlined"}
-                                                onClick={() => handleSelectFilter(index)}>
-                                            <Grid container>
-                                                <Grid item xs={12}>
-                                                    {item.name}
-                                                </Grid>
-                                                <Grid container item xs={12} justifyContent={"center"}>
-                                                    <Typography variant={"caption"}>
-                                                        {item.products.length} productos
-                                                    </Typography>
-                                                </Grid>
-                                            </Grid>
-                                        </Button>
+                                        <DepartmentCustomButton
+                                            title={item.name}
+                                            subtitle={`${item.products.length} productos`}
+                                            selected={item.selected}
+                                            onClick={() => handleSelectFilter(index)}
+                                        />
                                     </Grid>
                                 ))
                             }

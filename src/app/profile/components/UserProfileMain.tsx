@@ -74,7 +74,6 @@ export default function UserProfileMain(props) {
 
     const AdminModule = () => {
         const LinksTemplate = ({ pageAddress, title }: { pageAddress: string, title: string }) => (
-
             <Link href={pageAddress}>
                 <Grid container columnSpacing={2} item xs={12} >
                     <Grid container item xs={"auto"} alignItems={"center"}>
@@ -92,7 +91,6 @@ export default function UserProfileMain(props) {
                 <CardHeader title={"Administrar:"} />
                 <CardContent>
                     <Grid container direction={"column"} rowGap={1}>
-
                         <Grid item>
                             <LinksTemplate
                                 pageAddress={`/profile/${userDetails.id}/admin/role`}
@@ -110,10 +108,9 @@ export default function UserProfileMain(props) {
                         <Grid item>
                             <LinksTemplate
                                 pageAddress={`/profile/${userDetails.id}/admin/warehouse`}
-                                title={"Alamcenes"}
+                                title={"Almacenes"}
                             />
                         </Grid>
-
                     </Grid>
                 </CardContent>
             </Card>
