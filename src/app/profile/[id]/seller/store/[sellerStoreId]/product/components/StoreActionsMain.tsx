@@ -403,6 +403,8 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
                                             <Checkbox
                                                 size='small'
                                                 checked={!!selected.find((item: any) => item.id === row.id)}
+                                                disabled={!row.depots[0].store_depots[0].is_active ||
+                                                    !row.depots[0].store_depots[0].product_remaining_units}
                                                 onClick={(e) => handleSelectItem(e, row)}
                                             />
                                         </TableCell>
