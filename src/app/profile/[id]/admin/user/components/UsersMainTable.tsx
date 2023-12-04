@@ -4,48 +4,68 @@
 import React from "react";
 import {
     AppBar,
+    Badge,
     Box, Button,
     Card,
     CardContent,
-    Checkbox, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
-    Divider, FormControl, Grid,
-    IconButton, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent,
+    Checkbox,
+    Chip,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    OutlinedInput,
+    Select,
     Table,
     TableBody,
     TableCell,
     TableHead,
     TableRow,
     Toolbar,
+    Tooltip,
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline, EditOutlined } from "@mui/icons-material";
-import Link from "next/link";
+import {
+    ArrowLeft,
+    ChangeCircleOutlined,
+    DeleteOutline,
+    Done,
+    PauseOutlined,
+    PersonOutlined,
+    StartOutlined,
+} from "@mui/icons-material";
+import users from "../requests/users"
 import { useParams, useRouter } from "next/navigation";
-import products from "@/app/profile/[id]/product/requests/products";
-import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
-import users from "@/app/user/requests/users";
 
-export default function WorkersMainTable(props) {
+export default function UsersMainTable(props) {
     const { roles } = props
-
-    const [data, setData] = React.useState(null)
 
     const params = useParams()
     const router = useRouter()
+
+    const [data, setData] = React.useState(null)
+
 
     //ToDo: use global isLoading
     const isLoading = false
 
     //get initial data
     React.useEffect(() => {
-        const getData = async () => {
-            const newData = await ownerUsers.allWorkers(params.id)
+        const getAllUser = async () => {
+            const newData = await users.allUsers(params.id)
             setData(newData)
         }
-        getData();
-
-    }, [params.id])
+        if (data === null) {
+            getAllUser();
+        }
+    }, [data, params.id])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -78,13 +98,18 @@ export default function WorkersMainTable(props) {
         };
 
         const handleApplyRole = async () => {
-            const response = await ownerUsers.changeRol(params.id, selected.id, selectedRole.id)
+            const response = await users.changeRol(selected.id, selectedRole.id)
             if (response) {
-                const allUsers = await ownerUsers.allWorkers(params.id)
-                if (allUsers) setData(allUsers)
+                const updatedUser = await users.userDetails(response.id)
 
-                setSelected(null)
-                setOpen(false)
+                if (updatedUser) {
+                    let newData = [...data]
+                    const updatedItemIndex = newData.findIndex(item => item.id === updatedUser.id)
+                    newData.splice(updatedItemIndex, 1, updatedUser)
+                    setData(newData)
+                    setSelected(null)
+                    setOpen(false)
+                }
             }
         }
 
@@ -122,16 +147,38 @@ export default function WorkersMainTable(props) {
     }
 
     async function handleRemove() {
-        const response = await ownerUsers.deleteWorker(selected.id)
+        const response = await users.delete(selected.id)
         if (response) {
-            const allUsers = await ownerUsers.allWorkers(params.id)
-            if (allUsers) setData(allUsers)
+            const updatedUsers = await users.allUsers()
+            if (updatedUsers) setData(updatedUsers)
+        }
+    }
+
+    async function handleVerify() {
+        const response = await users.verifyUser(selected.id)
+        if (response) {
+            let newData = [...data]
+            const updatedItemIndex = newData.findIndex(item => item.id === response.id)
+            newData[updatedItemIndex].is_verified = !newData[updatedItemIndex].is_verified
+            setData(newData)
+            setSelected(null)
+        }
+    }
+
+    async function handleToggleActive() {
+        const isActive = !selected.is_active
+        const response = await users.toggleActivateUser(selected.id, isActive)
+        if (response) {
+            let newData = [...data]
+            const updatedItemIndex = newData.findIndex(item => item.id === response.id)
+            newData[updatedItemIndex].is_active = !newData[updatedItemIndex].is_active
+            setData(newData)
             setSelected(null)
         }
     }
 
     function handleNavigateBack() {
-        router.push(`/profile/${params.id}`)
+        router.back()
     }
 
     const CustomToolbar = () => (
@@ -150,7 +197,7 @@ export default function WorkersMainTable(props) {
                             color: "white",
                         }}
                     >
-                        Trabajadores
+                        Listado de usuarios
                     </Typography>
                 </Box>
 
@@ -163,25 +210,39 @@ export default function WorkersMainTable(props) {
                                     {
                                         selected && (
                                             <Box sx={{ display: "flex" }}>
-                                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
-                                                    <ChangeCircleOutlined fontSize={"small"} />
-                                                </IconButton>
+                                                {
+                                                    !selected.is_verified
+                                                    && (
+                                                        <IconButton color={"inherit"} onClick={handleVerify}>
+                                                            <Done fontSize={"small"} />
+                                                        </IconButton>
+                                                    )
+                                                }
 
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"} />
+                                                <IconButton color={"inherit"} onClick={handleToggleActive}>
+                                                    {
+                                                        selected.is_active
+                                                            ? <PauseOutlined fontSize={"small"} />
+                                                            : <StartOutlined fontSize={"small"} />
+                                                    }
                                                 </IconButton>
 
                                                 <Divider orientation="vertical" variant="middle" flexItem
                                                     sx={{ borderRight: "2px solid white", mx: "5px" }} />
+
+                                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
+                                                    <ChangeCircleOutlined fontSize={"small"} />
+                                                </IconButton>
+
+                                                <Divider orientation="vertical" variant="middle" flexItem
+                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
+
+                                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                                    <DeleteOutline fontSize={"small"} />
+                                                </IconButton>
                                             </Box>
                                         )
                                     }
-
-                                    <Link href={`/profile/${params.id}/worker/create`}>
-                                        <IconButton color={"inherit"}>
-                                            <AddOutlined />
-                                        </IconButton>
-                                    </Link>
                                 </>
                             )
                     }
@@ -263,6 +324,7 @@ export default function WorkersMainTable(props) {
             }
         }
 
+
         return (
             <TableBody>
                 {data.map(row => (
@@ -270,14 +332,44 @@ export default function WorkersMainTable(props) {
                         key={row.id}
                         hover
                         tabIndex={-1}
-                        selected={selected && (row.id === selected.id)}
                         onClick={() => handleSelectItem(row)}
+                        selected={selected && (row.id === selected.id)}
                     >
                         <TableCell>
                             <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
                         </TableCell>
                         <TableCell>
-                            {row.username}
+                            <Tooltip title={`Usuario ${row.is_active ? 'activo' : 'inactivo'} (${row.roles?.name ?? "user"})`}>
+                                <Badge
+                                    color={row.is_active === true ? "success" : "error"}
+                                    variant={"dot"}
+                                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                                >
+                                    <PersonOutlined fontSize={"small"} />
+                                </Badge>
+                            </Tooltip>
+                            {
+                                row.is_verified
+                                    ? (<Box sx={{
+                                        display: "inline-flex",
+                                        p: "3px",
+                                        my: "8px"
+                                    }}>
+                                        {row.username}
+                                    </Box>)
+                                    : (<Tooltip title={"Usuario no verificado"}>
+                                        <Box sx={{
+                                            display: "inline-flex",
+                                            p: "3px",
+                                            my: "8px",
+                                            background: "red",
+                                            color: "white",
+                                            borderRadius: "3px"
+                                        }}>
+                                            {row.username}
+                                        </Box>
+                                    </Tooltip>)
+                            }
                         </TableCell>
                         <TableCell>
                             {row.name}
@@ -315,7 +407,6 @@ export default function WorkersMainTable(props) {
                 selected={selected}
                 setSelected={setSelected}
             />
-
             <Card variant={"outlined"}>
                 <CustomToolbar />
 

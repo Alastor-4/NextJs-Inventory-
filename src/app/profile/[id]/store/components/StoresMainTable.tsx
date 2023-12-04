@@ -84,7 +84,7 @@ export default function StoresMainTable() {
         router.push(`/profile/${params.id}/store/create`)
     }
     function handleNavigateBack() {
-        router.back()
+        router.push(`/profile/${[params.id]}`)
     }
 
     const CustomToolbar = () => (

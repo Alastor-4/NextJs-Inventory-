@@ -1,8 +1,5 @@
 // @ts-nocheck
 import apiRequest from "@/api"
-
-const url = (userId) => `/profile/${userId}/store-assign/api1`
-const updateUrl = (userId) => `/profile/${userId}/store/update/api`
 const showProductWarehouseUrl = (userId) => `/profile/${userId}/store-assign/showProductApi/apiWarehouse`
 const showProductStoreUrl = (userId) => `/profile/${userId}/store-assign/showProductApi/apiStore`
 
