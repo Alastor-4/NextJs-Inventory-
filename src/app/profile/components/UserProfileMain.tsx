@@ -92,7 +92,6 @@ export default function UserProfileMain(props) {
                 <CardHeader title={"Administrar:"} />
                 <CardContent>
                     <Grid container direction={"column"} rowGap={1}>
-
                         <Grid item>
                             <LinksTemplate
                                 pageAddress={`/profile/${userDetails.id}/admin/role`}
@@ -113,7 +112,6 @@ export default function UserProfileMain(props) {
                                 title={"Alamcenes"}
                             />
                         </Grid>
-
                     </Grid>
                 </CardContent>
             </Card>
