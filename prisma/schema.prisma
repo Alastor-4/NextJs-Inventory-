@@ -166,6 +166,7 @@ model stores {
 model users {
   id                 Int            @id @default(autoincrement())
   username           String         @unique(map: "username") @db.VarChar(255)
+  password_hash      String?        @db.VarChar(255)
   role_id            Int?
   name               String?        @db.VarChar(255)
   mail               String         @unique(map: "mail") @db.VarChar(255)
