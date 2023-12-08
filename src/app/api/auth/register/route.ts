@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import {prisma} from "db";
+import jwt from "jsonwebtoken"
 
 function checkTokenValidity(token: string) {
     const decodedData = token
@@ -49,7 +50,10 @@ export async function POST(req: Request) {
         }
     })
 
-    //ToDo: when user is created, send token to user email to allow verification process
+    //ToDo: send token to user email to allow verification process
+    const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
+    const verificationToken = jwt.sign({username: username}, jwtPrivateKey, {expiresIn: "24h"})
+    console.log("verification token", verificationToken)
 
     return NextResponse.json(
         {
