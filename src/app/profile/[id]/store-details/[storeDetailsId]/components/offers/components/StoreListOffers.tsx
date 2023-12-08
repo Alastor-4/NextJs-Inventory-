@@ -1,4 +1,4 @@
-import {AddOutlined, DeleteOutline, EditOutlined, WarningOutlined} from '@mui/icons-material';
+import { AddOutlined, DeleteOutline, EditOutlined, WarningOutlined } from '@mui/icons-material';
 import {
     Button,
     Card,
@@ -11,17 +11,17 @@ import {
     TextField,
     Typography
 } from '@mui/material'
-import React, {useEffect, useState} from 'react'
-import {storeDetails} from '../../../request/storeDetails';
-import {useParams} from 'next/navigation';
+import React, { useEffect, useState } from 'react'
+import { storeDetails } from '../../../request/storeDetails';
+import { useParams } from 'next/navigation';
 import StoreModalDefault from '../../Modal/StoreModalDefault';
-import {Formik} from 'formik';
+import { Formik } from 'formik';
 import * as Yup from 'yup'
 import StoreModalOffers from './StoreModalOffers';
-import {notifyError, notifySuccess, notifyWarning} from '@/utils/generalFunctions';
+import { notifyError, notifySuccess, notifyWarning } from '@/utils/generalFunctions';
 
 function StoreListOffers(props: any) {
-    const {priceProduct, currency, storeDepotId} = props;
+    const { priceProduct, currency, storeDepotId } = props;
     const params = useParams()
 
     const [offers, setOffers] = useState<any>([])
@@ -36,14 +36,16 @@ function StoreListOffers(props: any) {
         setOffers(newOffers)
     }
     useEffect(() => {
-        if (offers.length === 0) {
-            getDataOffers();
+        const getData = async () => {
+            const newOffers = await storeDetails.getProductOffers(params.id, params.storeDetailsId, storeDepotId)
+            setOffers(newOffers)
         }
-    }, [])
+        getData()
+    }, [params.id, params.storeDetailsId, storeDepotId])
 
     // Componente para editar cada nota ( create and update )
     function EditOffer(props: any) {
-        const {offer} = props;
+        const { offer } = props;
 
         const setInitialValues = {
             quantity: offer?.compare_units_quantity ?? 2,
@@ -102,13 +104,13 @@ function StoreListOffers(props: any) {
             >
                 {
                     (formik: any) => (
-                        <Card variant='outlined' sx={{padding: '20px', width: "100%"}}>
+                        <Card variant='outlined' sx={{ padding: '20px', width: "100%" }}>
                             <form onSubmit={formik.handleSubmit}>
                                 <Grid container direction={'column'} rowGap={2}>
                                     <Grid item container
-                                          justifyContent={"center"}
-                                          alignItems={"center"}
-                                          columnGap={1.3}
+                                        justifyContent={"center"}
+                                        alignItems={"center"}
+                                        columnGap={1.3}
                                     >
                                         <Grid item>
                                             Operacion:
@@ -177,7 +179,7 @@ function StoreListOffers(props: any) {
 
         if (response === false) {
             notifyError("No se ha podido eliminar la oferta")
-        } else getDataOffers()
+        } else await getDataOffers()
     }
 
     const handleToggleOffer = async (offerId: any) => {
@@ -203,7 +205,7 @@ function StoreListOffers(props: any) {
                 open={activeModalCreateOffer}
                 setOpen={setActiveModalCreateOffer}
             >
-                <EditOffer offers={null}/>
+                <EditOffer offers={null} />
             </StoreModalOffers>
 
             <StoreModalDefault
@@ -211,22 +213,22 @@ function StoreListOffers(props: any) {
                 open={activeModalEditOffer}
                 setOpen={setActiveModalEditOffer}
             >
-                <EditOffer offer={selectedOffer}/>
+                <EditOffer offer={selectedOffer} />
             </StoreModalDefault>
 
 
             <Grid item container xs={12}>
                 <Grid item container>
-                    <Grid item xs={"auto"} sx={{fontWeight: 600}} alignSelf={'center'}>Ofertas:</Grid>
+                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }} alignSelf={'center'}>Ofertas:</Grid>
 
                     <Grid item>
                         <IconButton
                             size='small'
                             color='primary'
                             onClick={() => setActiveModalCreateOffer(true)}
-                            sx={{ml: "10px"}}
+                            sx={{ ml: "10px" }}
                         >
-                            <AddOutlined fontSize='small'/>
+                            <AddOutlined fontSize='small' />
                         </IconButton>
                     </Grid>
                 </Grid>
@@ -257,13 +259,13 @@ function StoreListOffers(props: any) {
                                         >
                                             <Grid container item xs={"auto"} alignItems={"center"}>
                                                 <Typography variant={"caption"}
-                                                            sx={{color: "white", fontWeight: "600"}}>
+                                                    sx={{ color: "white", fontWeight: "600" }}>
                                                     {`${index + 1} . `}
                                                 </Typography>
                                             </Grid>
 
                                             <Grid container item xs={"auto"} alignItems={"center"}
-                                                  sx={{color: "rgba(16,27,44,0.8)"}}>
+                                                sx={{ color: "rgba(16,27,44,0.8)" }}>
                                                 {
                                                     item.compare_function === '='
                                                         ? `Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
@@ -281,11 +283,11 @@ function StoreListOffers(props: any) {
                                                     }}
                                                 />
 
-                                                <Divider orientation={"vertical"}/>
+                                                <Divider orientation={"vertical"} />
 
                                                 <EditOutlined
                                                     fontSize={"small"}
-                                                    sx={{cursor: "pointer", ml: "10px"}}
+                                                    sx={{ cursor: "pointer", ml: "10px" }}
                                                     onClick={async () => {
                                                         setActiveModalEditOffer(true)
                                                         setSelectedOffer(item)
@@ -295,7 +297,7 @@ function StoreListOffers(props: any) {
                                                 <DeleteOutline
                                                     fontSize={"small"}
                                                     color='error'
-                                                    sx={{cursor: "pointer", ml: "15px"}}
+                                                    sx={{ cursor: "pointer", ml: "15px" }}
                                                     onClick={async () => {
                                                         return await removeOffer(item.id)
                                                     }}
