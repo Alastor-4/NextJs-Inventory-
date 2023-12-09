@@ -1,11 +1,11 @@
 // @ts-nocheck
 
-import {prisma} from "db";
+import { prisma } from "db";
 import UserProfileMain from "@/app/profile/components/UserProfileMain";
 
-export default async function Page({params}: {params: {id: number}}) {
+export default async function Page({ params }: { params: { id: number } }) {
     const userId = parseInt(params.id)
-    const userDetails = await prisma.users.findUnique({where: {id: userId}, include: {roles: true}})
+    const userDetails = await prisma.users.findUnique({ where: { id: userId }, include: { roles: true } })
     const userRole = userDetails?.roles?.name ?? "user"
 
     let ownerWarehouses = null
@@ -16,10 +16,10 @@ export default async function Page({params}: {params: {id: number}}) {
     let sellerStores = null
 
     if (userRole === "store_owner") {
-        const ownerWarehousesPromise = prisma.warehouses.findMany({where: {owner_id: userId}})
-        const ownerStoresPromise = prisma.stores.findMany({where: {owner_id: userId}})
-        const productsCountPromise = prisma.products.count({where: {owner_id: userId}})
-        const workersCountPromise = prisma.users.count({where: {work_for_user_id: userId}})
+        const ownerWarehousesPromise = prisma.warehouses.findMany({ where: { owner_id: userId } })
+        const ownerStoresPromise = prisma.stores.findMany({ where: { owner_id: userId } })
+        const productsCountPromise = prisma.products.count({ where: { owner_id: userId } })
+        const workersCountPromise = prisma.users.count({ where: { work_for_user_id: userId } })
 
         const ownerQueries = await Promise.all([ownerWarehousesPromise, ownerStoresPromise, productsCountPromise, workersCountPromise])
         ownerWarehouses = ownerQueries[0]
@@ -30,7 +30,7 @@ export default async function Page({params}: {params: {id: number}}) {
     }
 
     if (userRole === "store_seller") {
-        sellerStores = await prisma.stores.findMany({where: {seller_user_id: userId}})
+        sellerStores = await prisma.stores.findMany({ where: { seller_user_id: userId } })
     }
 
     return (

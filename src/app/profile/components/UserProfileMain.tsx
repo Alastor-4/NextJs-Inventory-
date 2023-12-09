@@ -17,13 +17,14 @@ import {
 } from "@mui/material";
 import {
     ArrowCircleRight, ArrowCircleRightOutlined,
-    ArrowLeft, ChevronRightOutlined,
+    ArrowLeft, ChevronRightOutlined, LogoutOutlined,
 } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import userProfileStyles from "@/assets/styles/userProfileStyles"
 import Link from "next/link";
 import dayjs from "dayjs";
 import { width } from "@mui/system";
+import { signOut } from "next-auth/react";
 
 export default function UserProfileMain(props) {
     const { userDetails, userRole, ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount, sellerStores } = props
@@ -48,6 +49,17 @@ export default function UserProfileMain(props) {
                     >
                         Mi usuario
                     </Typography>
+                </Box>
+                <Box sx={{ display: "flex", color: "white" }}>
+                    <IconButton
+                        color={"inherit"}
+                        onClick={() => signOut({
+                            redirect: true,
+                            callbackUrl: '/'
+                        })}
+                    >
+                        <LogoutOutlined />
+                    </IconButton>
                 </Box>
             </Toolbar>
         </AppBar>

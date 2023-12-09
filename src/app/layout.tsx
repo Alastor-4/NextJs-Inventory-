@@ -2,6 +2,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Roboto_Serif } from 'next/font/google'
 import ClientLayout from "@/app/clientLayout";
+// import SessionAuthProvider from '@/providers/SessionAuthProvider';
+// import SnackBarContextProvider from '@/providers/SnackbarProvider';
 
 const roboto = Roboto_Serif({ subsets: ['latin'] })
 
@@ -18,9 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`p-4 ${roboto.className}`}>
-      <ClientLayout>
+        {/* <SessionAuthProvider> */}
+        {/* <SnackBarContextProvider> */}
+        <ClientLayout>
           {children}
-      </ClientLayout>
+        </ClientLayout>
+        {/* </SnackBarContextProvider> */}
+        {/* </SessionAuthProvider> */}
       </body>
     </html>
   )

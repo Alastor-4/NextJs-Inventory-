@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client"
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
     Avatar, Button,
     Card,
@@ -14,6 +14,7 @@ import {
     InfoOutlined,
     KeyboardDoubleArrowRightOutlined, PersonOutlined, VisibilityOffOutlined, VisibilityOutlined
 } from "@mui/icons-material";
+import { signIn, useSession } from "next-auth/react"
 
 //forms
 import { Formik } from "formik"
@@ -21,12 +22,19 @@ import * as Yup from 'yup';
 
 import loginPageStyles from "@/assets/styles/loginPageStyles"
 
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+    const { data, status } = useSession();
     const [showSignUpForm, setShowSignUpForm] = React.useState(false)
 
     const router = useRouter()
+
+    useEffect(() => {
+        if (data?.user.id) {
+            router.push(`/profile/${data?.user.id}`)
+        };
+    }, [data, router])
 
     const LoginForm = () => {
         const initialValues = {
@@ -49,8 +57,17 @@ export default function Login() {
         return <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={(values, { setFieldError }) => {
-                //login function
+            onSubmit={async ({ username, password }) => {
+                const responseNextAuth = await signIn('credentials', {
+                    username,
+                    password,
+                    redirect: false,
+                })
+                // if (responseNextAuth.error) {
+                //     console.log("Error", responseNextAuth.error);
+                // } else {
+                //     router.push(`profile/2`)
+                // }
             }}
         >
             {
@@ -70,7 +87,7 @@ export default function Login() {
                                         helperText={(formik.errors.username && formik.touched.username) && formik.errors.username}
                                         InputProps={{
                                             endAdornment: (
-                                                <InputAdornment position="end" sx={{mr: "6px"}}>
+                                                <InputAdornment position="end" sx={{ mr: "6px" }}>
                                                     <PersonOutlined />
                                                 </InputAdornment>
                                             ),
@@ -98,23 +115,21 @@ export default function Login() {
                                                     <IconButton size={"small"}>
                                                         {
                                                             showPassword
-                                                                ? <VisibilityOffOutlined/>
-                                                                : <VisibilityOutlined/>
+                                                                ? <VisibilityOffOutlined />
+                                                                : <VisibilityOutlined />
                                                         }
                                                     </IconButton>
                                                 </InputAdornment>
                                         }}
                                     />
                                 </Grid>
-
                                 <Grid item xs={12}>
                                     <Button
                                         color={"primary"}
                                         type="submit"
                                         variant={"contained"}
                                         size={"large"}
-                                        sx={{width: "100%"}}
-                                        onClick={() => router.push("/profile/2")}
+                                        sx={{ width: "100%" }}
                                     >
                                         Entrar
                                     </Button>
@@ -259,7 +274,7 @@ export default function Login() {
                                         type="submit"
                                         variant={"contained"}
                                         size={"large"}
-                                        sx={{width: "100%"}}
+                                        sx={{ width: "100%" }}
                                         disabled={!formik.isValid}
                                     >
                                         Crear
@@ -278,47 +293,47 @@ export default function Login() {
             <Card variant={"elevation"} sx={loginPageStyles.card}>
                 <Grid container sx={loginPageStyles.cardContainer}>
                     <Grid container item sx={loginPageStyles.leftColumnContainer}>
-                        <Grid container item xs={12} justifyContent={"center"} alignItems={"center"} sx={{pt: "20px"}}>
+                        <Grid container item xs={12} justifyContent={"center"} alignItems={"center"} sx={{ pt: "20px" }}>
                             <Avatar
                                 src="/logo200.png"
-                                sx={{width: "200px", height: "200px"}}
+                                sx={{ width: "200px", height: "200px" }}
                             />
                         </Grid>
                         <Grid container item xs={12}>
-                            <Grid container item xs={"auto"} alignItems={"center"} sx={{p: 1}}>
+                            <Grid container item xs={"auto"} alignItems={"center"} sx={{ p: 1 }}>
                                 <KeyboardDoubleArrowRightOutlined />
                             </Grid>
-                            <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
+                            <Grid container item xs={true} alignItems={"center"} sx={{ p: 1 }}>
                                 <Typography variant={"body1"}>
                                     Gestión de productos y tiendas
                                 </Typography>
                             </Grid>
                         </Grid>
                         <Grid container item xs={12}>
-                            <Grid container item xs={"auto"} alignItems={"center"} sx={{p: 1}}>
+                            <Grid container item xs={"auto"} alignItems={"center"} sx={{ p: 1 }}>
                                 <KeyboardDoubleArrowRightOutlined />
                             </Grid>
-                            <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
+                            <Grid container item xs={true} alignItems={"center"} sx={{ p: 1 }}>
                                 <Typography variant={"body1"}>
                                     Catálogo online
                                 </Typography>
                             </Grid>
                         </Grid>
                         <Grid container item xs={12}>
-                            <Grid container item xs={"auto"} alignItems={"center"} sx={{p: 1}}>
+                            <Grid container item xs={"auto"} alignItems={"center"} sx={{ p: 1 }}>
                                 <KeyboardDoubleArrowRightOutlined />
                             </Grid>
-                            <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
+                            <Grid container item xs={true} alignItems={"center"} sx={{ p: 1 }}>
                                 <Typography variant={"body1"}>
                                     Reservaciones online
                                 </Typography>
                             </Grid>
                         </Grid>
                         <Grid container item xs={12}>
-                            <Grid container item xs={"auto"} alignItems={"center"} sx={{p: 1}}>
+                            <Grid container item xs={"auto"} alignItems={"center"} sx={{ p: 1 }}>
                                 <KeyboardDoubleArrowRightOutlined />
                             </Grid>
-                            <Grid container item xs={true} alignItems={"center"} sx={{p: 1}}>
+                            <Grid container item xs={true} alignItems={"center"} sx={{ p: 1 }}>
                                 <Typography variant={"body1"}>
                                     Venta online y presencial
                                 </Typography>
@@ -327,7 +342,7 @@ export default function Login() {
                     </Grid>
 
                     <Grid container item sx={loginPageStyles.rightColumnContainer}>
-                        <Grid container item alignItems={"center"} sx={{ width: "100%", m: 3}}>
+                        <Grid container item alignItems={"center"} sx={{ width: "100%", m: 3 }}>
                             <Button
                                 color={"primary"}
                                 variant={showSignUpForm ? "text" : "outlined"}
@@ -360,7 +375,7 @@ export default function Login() {
                             </Button>
                         </Grid>
 
-                        { showSignUpForm ? <SignUpForm/> : <LoginForm /> }
+                        {showSignUpForm ? <SignUpForm /> : <LoginForm />}
                     </Grid>
                 </Grid>
             </Card>
