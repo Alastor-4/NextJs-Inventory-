@@ -7,7 +7,7 @@ import {
     Box,
     Card,
     CardContent,
-    Checkbox, CircularProgress,
+    Checkbox,
     Divider,
     IconButton,
     Table,
@@ -25,17 +25,11 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
 export default function RolesMainTable() {
-
-
     const params = useParams();
 
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
-
-
-    //ToDo: use global isLoading
-    const isLoading = false
 
     //get initial data
     React.useEffect(() => {
@@ -68,7 +62,7 @@ export default function RolesMainTable() {
     }
 
     async function handleUpdate() {
-        router.push(`/profile/${params.id}/role/update/${selected.id}`)
+        router.push(`/profile/${params.id}/admin/role/update/${selected.id}`)
     }
 
     function handleNavigateBack() {
@@ -97,35 +91,27 @@ export default function RolesMainTable() {
 
                 <Box sx={{ display: "flex" }}>
                     {
-                        isLoading
-                            ? <CircularProgress size={24} color={"inherit"} />
-                            : (
-                                <>
-                                    {
-                                        selected && (
-                                            <Box sx={{ display: "flex" }}>
-                                                <IconButton color={"inherit"} onClick={handleUpdate}>
-                                                    <EditOutlined fontSize={"small"} />
-                                                </IconButton>
+                        selected && (
+                            <Box sx={{ display: "flex" }}>
+                                <IconButton color={"inherit"} onClick={handleUpdate}>
+                                    <EditOutlined fontSize={"small"} />
+                                </IconButton>
 
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"} />
-                                                </IconButton>
+                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                    <DeleteOutline fontSize={"small"} />
+                                </IconButton>
 
-                                                <Divider orientation="vertical" variant="middle" flexItem
-                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
-                                            </Box>
-                                        )
-                                    }
-
-                                    <Link href={`/profile/${params.id}/admin/role/create`}>
-                                        <IconButton color={"inherit"}>
-                                            <AddOutlined />
-                                        </IconButton>
-                                    </Link>
-                                </>
-                            )
+                                <Divider orientation="vertical" variant="middle" flexItem
+                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                            </Box>
+                        )
                     }
+
+                    <Link href={`/profile/${params.id}/admin/role/create`}>
+                        <IconButton color={"inherit"}>
+                            <AddOutlined />
+                        </IconButton>
+                    </Link>
                 </Box>
             </Toolbar>
         </AppBar>

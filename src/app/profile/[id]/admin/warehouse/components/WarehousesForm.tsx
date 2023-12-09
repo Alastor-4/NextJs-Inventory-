@@ -71,6 +71,7 @@ export default function WarehousesForm(props) {
         if (updateItem) {
             response = await warehouses.update(
                 {
+                    userId: params.id,
                     id: updateItem.id,
                     name: values.name,
                     description: values.description,
@@ -80,6 +81,7 @@ export default function WarehousesForm(props) {
         } else {
             response = await warehouses.create(
                 {
+                    userId: params.id,
                     name: values.name,
                     description: values.description,
                     address: values.address,

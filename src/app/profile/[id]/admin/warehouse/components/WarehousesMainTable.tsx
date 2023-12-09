@@ -7,7 +7,7 @@ import {
     Box,
     Card,
     CardContent,
-    Checkbox, CircularProgress,
+    Checkbox,
     Divider,
     IconButton,
     Table,
@@ -30,9 +30,6 @@ export default function WarehousesMainTable() {
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
-
-    //ToDo: use global isLoading
-    const isLoading = false
 
     //get initial data
     React.useEffect(() => {
@@ -57,7 +54,7 @@ export default function WarehousesMainTable() {
     }
 
     async function handleRemove() {
-        const response = await warehouses.delete(selected.id)
+        const response = await warehouses.delete(params.id, selected.id)
         if (response) {
             const updatedWarehouses = await warehouses.allWarehouses()
             if (updatedWarehouses) setData(updatedWarehouses)
@@ -94,35 +91,27 @@ export default function WarehousesMainTable() {
 
                 <Box sx={{ display: "flex" }}>
                     {
-                        isLoading
-                            ? <CircularProgress size={24} color={"inherit"} />
-                            : (
-                                <>
-                                    {
-                                        selected && (
-                                            <Box sx={{ display: "flex" }}>
-                                                <IconButton color={"inherit"} onClick={handleUpdate}>
-                                                    <EditOutlined fontSize={"small"} />
-                                                </IconButton>
+                        selected && (
+                            <Box sx={{ display: "flex" }}>
+                                <IconButton color={"inherit"} onClick={handleUpdate}>
+                                    <EditOutlined fontSize={"small"} />
+                                </IconButton>
 
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"} />
-                                                </IconButton>
+                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                    <DeleteOutline fontSize={"small"} />
+                                </IconButton>
 
-                                                <Divider orientation="vertical" variant="middle" flexItem
-                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
-                                            </Box>
-                                        )
-                                    }
-
-                                    <Link href={`/profile/${params.id}/admin/warehouse/create`}>
-                                        <IconButton color={"inherit"}>
-                                            <AddOutlined />
-                                        </IconButton>
-                                    </Link>
-                                </>
-                            )
+                                <Divider orientation="vertical" variant="middle" flexItem
+                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                            </Box>
+                        )
                     }
+
+                    <Link href={`/profile/${params.id}/admin/warehouse/create`}>
+                        <IconButton color={"inherit"}>
+                            <AddOutlined />
+                        </IconButton>
+                    </Link>
                 </Box>
             </Toolbar>
         </AppBar>

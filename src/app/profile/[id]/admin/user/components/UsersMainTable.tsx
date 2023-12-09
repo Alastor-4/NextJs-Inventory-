@@ -10,7 +10,6 @@ import {
     CardContent,
     Checkbox,
     Chip,
-    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -51,10 +50,6 @@ export default function UsersMainTable(props) {
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
-
-
-    //ToDo: use global isLoading
-    const isLoading = false
 
     //get initial data
     React.useEffect(() => {
@@ -166,8 +161,9 @@ export default function UsersMainTable(props) {
     }
 
     async function handleToggleActive() {
+        console.log(selected)
         const isActive = !selected.is_active
-        const response = await users.toggleActivateUser(selected.id, isActive)
+        const response = await users.toggleActivateUser(params.id, selected.id, isActive)
         if (response) {
             let newData = [...data]
             const updatedItemIndex = newData.findIndex(item => item.id === response.id)
@@ -203,48 +199,40 @@ export default function UsersMainTable(props) {
 
                 <Box sx={{ display: "flex" }}>
                     {
-                        isLoading
-                            ? <CircularProgress size={24} color={"inherit"} />
-                            : (
-                                <>
+                        selected && (
+                            <Box sx={{ display: "flex" }}>
+                                {
+                                    !selected.is_verified
+                                    && (
+                                        <IconButton color={"inherit"} onClick={handleVerify}>
+                                            <Done fontSize={"small"} />
+                                        </IconButton>
+                                    )
+                                }
+
+                                <IconButton color={"inherit"} onClick={handleToggleActive}>
                                     {
-                                        selected && (
-                                            <Box sx={{ display: "flex" }}>
-                                                {
-                                                    !selected.is_verified
-                                                    && (
-                                                        <IconButton color={"inherit"} onClick={handleVerify}>
-                                                            <Done fontSize={"small"} />
-                                                        </IconButton>
-                                                    )
-                                                }
-
-                                                <IconButton color={"inherit"} onClick={handleToggleActive}>
-                                                    {
-                                                        selected.is_active
-                                                            ? <PauseOutlined fontSize={"small"} />
-                                                            : <StartOutlined fontSize={"small"} />
-                                                    }
-                                                </IconButton>
-
-                                                <Divider orientation="vertical" variant="middle" flexItem
-                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
-
-                                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
-                                                    <ChangeCircleOutlined fontSize={"small"} />
-                                                </IconButton>
-
-                                                <Divider orientation="vertical" variant="middle" flexItem
-                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
-
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"} />
-                                                </IconButton>
-                                            </Box>
-                                        )
+                                        selected.is_active
+                                            ? <PauseOutlined fontSize={"small"} />
+                                            : <StartOutlined fontSize={"small"} />
                                     }
-                                </>
-                            )
+                                </IconButton>
+
+                                <Divider orientation="vertical" variant="middle" flexItem
+                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+
+                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
+                                    <ChangeCircleOutlined fontSize={"small"} />
+                                </IconButton>
+
+                                <Divider orientation="vertical" variant="middle" flexItem
+                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+
+                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                    <DeleteOutline fontSize={"small"} />
+                                </IconButton>
+                            </Box>
+                        )
                     }
                 </Box>
             </Toolbar>
