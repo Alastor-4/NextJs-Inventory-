@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server'
-import {prisma} from "db";
+import { prisma } from "db";
 
 // Get store active reservations ['Pendiente', 'Reservado', 'En camino']
 export async function GET(request: Request, { params }: { params: { sellerStoreId: string } }) {
     const storeId = parseInt(params.sellerStoreId)
 
-    const storeReservations = await prisma.products_reservation.findMany({
+    const storeReservations = await prisma.reservation_products.findMany({
         where: {
-            reservation_status: {code: {in: [1, 3, 5]}},
+            reservations: {
+                reservation_status: { code: { in: [1, 3, 5] } },
+            },
             store_depots: {
                 store_id: storeId
             },
@@ -25,11 +27,17 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
                                 },
                             }
                         }
-                    }
+                    },
+                    product_offers: true,
                 }
             },
-            reservation_status: true,
-            users: true,
+            reservations: {
+                include: {
+                    reservation_status: true,
+                    users: true,
+                }
+            }
+
         },
     })
 
@@ -37,7 +45,7 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
 }
 
 // Change reservation status to "Reservado". Quantity of products are reserved too (taken off from store remaining units)
-export async function PUT(req: Request) {
+/*export async function PUT(req: Request) {
     const { storeDepotId, productReservationId } = await req.json()
 
     if (storeDepotId && productReservationId) {
@@ -223,4 +231,4 @@ export async function POST(req: Request) {
     }
 
     return new Response('La acción sobre la reservación ha fallado', {status: 500})
-}
+}*/
