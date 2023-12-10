@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials"
+import { compare, compareSync, hashSync } from "bcrypt"
 
 export const nextAuthOptions: NextAuthOptions = {
     pages: {

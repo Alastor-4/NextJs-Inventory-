@@ -25,16 +25,17 @@ import loginPageStyles from "@/assets/styles/loginPageStyles"
 import { useRouter } from "next/navigation";
 
 export default function Login() {
-    const { data, status } = useSession();
+    const { data: session } = useSession();
+
     const [showSignUpForm, setShowSignUpForm] = React.useState(false)
 
     const router = useRouter()
 
     useEffect(() => {
-        if (data?.user.id) {
-            router.push(`/profile/${data?.user.id}`)
+        if (session?.user.id) {
+            router.push(`/profile/${session?.user.id}`)
         };
-    }, [data, router])
+    }, [session, router])
 
     const LoginForm = () => {
         const initialValues = {
@@ -63,6 +64,7 @@ export default function Login() {
                     password,
                     redirect: false,
                 })
+                router.push('/profile/')
             }}
         >
             {
