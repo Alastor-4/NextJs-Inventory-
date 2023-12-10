@@ -30,11 +30,11 @@ export default function Login() {
 
     const router = useRouter()
 
-    // useEffect(() => {
-    //     if (data?.user.id) {
-    // router.push(`/profile/${data?.user.id}`)
-    // };
-    // }, [data, router])
+    useEffect(() => {
+        if (data?.user.id) {
+            router.push(`/profile/${data?.user.id}`)
+        };
+    }, [data, router])
 
     const LoginForm = () => {
         const initialValues = {
