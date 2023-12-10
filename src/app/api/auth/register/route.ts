@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import {prisma} from "db";
 import jwt from "jsonwebtoken"
+import {sendMail} from "@/mailer-service";
+import * as process from "process";
 
 // Verify user
 export async function GET(req: Request) {
@@ -69,10 +71,18 @@ export async function POST(req: Request) {
         }
     })
 
-    //ToDo: send token to user email to allow verification process
     const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
     const verificationToken = jwt.sign({username: username}, jwtPrivateKey, {expiresIn: "24h"})
-    console.log("verification token", verificationToken)
+
+    try {
+        await sendMail(
+            "Verificación de usuario",
+            newUser.mail,
+            `Visite el siguiente link para verificar su usuario ${process.env.APP_BASE_URL}/api/auth/register?token=${verificationToken}`
+            )
+    } catch (e) {
+        console.log(e)
+    }
 
     return NextResponse.json(
         {
