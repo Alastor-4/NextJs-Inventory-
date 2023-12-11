@@ -1,4 +1,4 @@
-import ProductsForm from "@/app/profile/[id]/product/components/ProductsForm";
+import ProductsForm from "@/app/inventory/product/components/ProductsForm";
 import {prisma} from "db";
 
 const getData = () => prisma.departments.findMany()

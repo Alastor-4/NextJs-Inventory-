@@ -33,7 +33,7 @@ import {
     ExpandMoreOutlined,
     ShoppingCartOutlined
 } from "@mui/icons-material";
-import stores from "@/app/profile/[id]/store/requests/stores";
+import stores from "@/app/inventory/store/requests/stores";
 import { useParams, useRouter } from "next/navigation";
 import { daysMap } from "@/utils/generalFunctions";
 import dayjs from "dayjs";
@@ -78,13 +78,13 @@ export default function StoresMainTable() {
     }
 
     function handleUpdate() {
-        router.push(`/profile/${params.id}/store/update/${selected.id}`)
+        router.push(`/inventory/store/update/${selected.id}`)
     }
     function handleCreate() {
-        router.push(`/profile/${params.id}/store/create`)
+        router.push(`/inventory/store/create`)
     }
     function handleNavigateBack() {
-        router.push(`/profile/${[params.id]}`)
+        router.push(`/inventory`)
     }
 
     const CustomToolbar = () => (
@@ -372,7 +372,7 @@ export default function StoresMainTable() {
                                                 <Button
                                                     variant={"outlined"}
                                                     color={"info"}
-                                                    onClick={() => router.push(`/profile/${params.id}/store-details/${row.id}`)}
+                                                    onClick={() => router.push(`/inventory/store-details/${row.id}`)}
                                                 >
                                                     Administrar productos
                                                 </Button>

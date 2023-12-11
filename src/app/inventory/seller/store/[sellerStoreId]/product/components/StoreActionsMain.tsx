@@ -50,9 +50,9 @@ import {
     notifyWarning,
     numberFormat
 } from "@/utils/generalFunctions";
-import sellerStoreProduct from "@/app/profile/[id]/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
+import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
-import {storeDetails} from "@/app/profile/[id]/store-details/[storeDetailsId]/request/storeDetails";
+import {storeDetails} from "@/app/inventory/store-details/[storeDetailsId]/request/storeDetails";
 import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 
 export default function StoreActionsMain({userId, storeId}: { userId: string, storeId: string }) {

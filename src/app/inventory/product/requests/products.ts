@@ -2,8 +2,8 @@
 import apiRequest from "@/api"
 import {notifyError} from "@/utils/generalFunctions";
 
-const url = (userId) => `/profile/${userId}/product/api`
-const updateUrl = (userId) => `/profile/${userId}/product/update/api`
+const url = (userId) => `/inventory/product/api`
+const updateUrl = (userId) => `/inventory/product/update/api`
 
 const products = {
     allUserProducts: async function (userId, departmentIds) {

@@ -1,8 +1,8 @@
 // @ts-nocheck
 import apiRequest from "@/api"
 
-const url = (userId, sellerStoreId) => `/profile/${userId}/seller/store/${sellerStoreId}/reservation/api`
-const urlDelivery = (userId, sellerStoreId) => `/profile/${userId}/seller/store/${sellerStoreId}/reservation/api-delivery`
+const url = (userId, sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/reservation/api`
+const urlDelivery = (userId, sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/reservation/api-delivery`
 
 const sellerStoreReservations = {
     setReservedStatus: async function (userId, sellerStoreId, storeDepotId, productReservationId) {

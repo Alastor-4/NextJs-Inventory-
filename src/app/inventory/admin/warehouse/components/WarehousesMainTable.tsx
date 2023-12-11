@@ -62,11 +62,11 @@ export default function WarehousesMainTable() {
     }
 
     async function handleUpdate() {
-        router.push(`/profile/${params.id}/admin/warehouse/update/${selected.id}`)
+        router.push(`/inventory/admin/warehouse/update/${selected.id}`)
     }
 
     function handleNavigateBack() {
-        router.push(`/profile/${params.id}`)
+        router.push(`/inventory`)
     }
 
     const CustomToolbar = () => (
@@ -107,7 +107,7 @@ export default function WarehousesMainTable() {
                         )
                     }
 
-                    <Link href={`/profile/${params.id}/admin/warehouse/create`}>
+                    <Link href={`/inventory/admin/warehouse/create`}>
                         <IconButton color={"inherit"}>
                             <AddOutlined />
                         </IconButton>

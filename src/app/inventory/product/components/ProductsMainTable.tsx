@@ -22,7 +22,7 @@ import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import products from "@/app/profile/[id]/product/requests/products";
+import products from "@/app/inventory/product/requests/products";
 import * as Yup from "yup";
 import { Formik, useFormik } from "formik";
 
@@ -101,11 +101,11 @@ export default function ProductsMainTable() {
     }
 
     async function handleUpdate() {
-        await router.push(`/profile/${params.id}/product/update/${selected.id}`)
+        await router.push(`/inventory/product/update/${selected.id}`)
     }
 
     function handleNavigateBack() {
-        router.push(`/profile/${params.id}`)
+        router.push(`/inventory`)
     }
 
     const CustomToolbar = () => (
@@ -151,7 +151,7 @@ export default function ProductsMainTable() {
                                         )
                                     }
 
-                                    <Link href={`/profile/${params.id}/product/create`}>
+                                    <Link href={`/inventory/product/create`}>
                                         <IconButton color={"inherit"}>
                                             <AddOutlined />
                                         </IconButton>

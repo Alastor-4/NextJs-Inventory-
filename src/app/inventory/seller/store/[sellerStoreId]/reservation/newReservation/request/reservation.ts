@@ -1,6 +1,6 @@
 import apiRequest from "@/api"
 
-const url = (userId: string, storeId: string) => `/profile/${userId}/seller/store/${storeId}/reservation/newReservation/api`
+const url = (userId: string, storeId: string) => `/inventory/seller/store/${storeId}/reservation/newReservation/api`
 
 export const reservation = {
     getAllReservations: async (userId: string, storeId: string) => {

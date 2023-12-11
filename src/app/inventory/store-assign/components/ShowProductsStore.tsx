@@ -2,7 +2,7 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import storeAssign from '@/app/profile/[id]/store-assign/requests/store-assign';
+import storeAssign from '@/app/inventory/store-assign/requests/store-assign';
 import { TableNoData } from "@/components/TableNoData";
 import { useParams } from 'next/navigation';
 import {

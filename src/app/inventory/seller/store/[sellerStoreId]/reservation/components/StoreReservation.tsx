@@ -38,7 +38,7 @@ import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import { dateFormat, numberFormat } from "@/utils/generalFunctions";
 import sellerStoreReservations
-    from "@/app/profile/[id]/seller/store/[sellerStoreId]/reservation/requests/sellerStoreReservations";
+    from "@/app/inventory/seller/store/[sellerStoreId]/reservation/requests/sellerStoreReservations";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -52,7 +52,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${userId}/seller/store/${storeId}/reservation/api`).then((data) => setData(data))
+        fetcher(`/inventory/seller/store/${storeId}/reservation/api`).then((data) => setData(data))
     }, [userId, storeId])
     console.log(data)
     function handleNavigateBack() {

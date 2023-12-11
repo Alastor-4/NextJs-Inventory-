@@ -1,4 +1,4 @@
-import StoresForm from "@/app/profile/[id]/store/components/StoresForm";
+import StoresForm from "@/app/inventory/store/components/StoresForm";
 import {prisma} from "db";
 
 export default async function Page({params}: {params: {id: string}}) {

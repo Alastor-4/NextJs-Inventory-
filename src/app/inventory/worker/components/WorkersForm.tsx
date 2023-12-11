@@ -7,7 +7,7 @@ import {useFormik} from "formik";
 import * as Yup from "yup"
 import {useParams, useRouter} from 'next/navigation';
 import roles from "@/app/role/requests/roles";
-import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
+import ownerUsers from "@/app/inventory/worker/requests/ownerUsers";
 import {Done, InfoOutlined} from "@mui/icons-material";
 
 export default function WorkersForm({ownerId}) {
@@ -76,7 +76,7 @@ export default function WorkersForm({ownerId}) {
         const response = await ownerUsers.addNewUser(ownerId, foundUserData.id)
 
         if (response?.status === 200) {
-            router.push(`/profile/${ownerId}/worker`)
+            router.push(`/inventory/worker`)
         } else {
             //ToDo: make something with the error
         }
@@ -232,7 +232,7 @@ export default function WorkersForm({ownerId}) {
                             variant={"outlined"}
                             size={"small"}
                             sx={{m: 1}}
-                            onClick={() => router.push(`/profile/${ownerId}/worker`)}
+                            onClick={() => router.push(`/inventory/worker`)}
                         >
                             Cancelar
                         </Button>

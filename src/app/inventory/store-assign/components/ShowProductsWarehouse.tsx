@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import storeAssign from '@/app/profile/[id]/store-assign/requests/store-assign'
+import storeAssign from '@/app/inventory/store-assign/requests/store-assign'
 import { TableNoData } from "@/components/TableNoData";
 import { Box, Button, Card, CardContent, Collapse, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import { useParams } from 'next/navigation'

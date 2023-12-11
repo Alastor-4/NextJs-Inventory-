@@ -1,4 +1,4 @@
-import UserWarehouseForm from "@/app/profile/[id]/warehouse/[warehouseId]/components/UserWarehouseForm";
+import UserWarehouseForm from "@/app/inventory/warehouse/[warehouseId]/components/UserWarehouseForm";
 
 export default async function Page({params}: {params: {id: string, warehouseId: string}}) {
     const userId = params.id

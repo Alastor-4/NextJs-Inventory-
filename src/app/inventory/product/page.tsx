@@ -1,4 +1,4 @@
-import ProductsMainTable from "@/app/profile/[id]/product/components/ProductsMainTable";
+import ProductsMainTable from "@/app/inventory/product/components/ProductsMainTable";
 
 export default function Page() {
     return (

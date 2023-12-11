@@ -1,8 +1,8 @@
 // @ts-nocheck
 import apiRequest from "@/api"
 
-const url = (userId) => `/profile/${userId}/store/api`
-const updateUrl = (userId) => `/profile/${userId}/store/update/api`
+const url = (userId) => `/inventory/store/api`
+const updateUrl = (userId) => `/inventory/store/update/api`
 
 const stores = {
     allUserStores: async function (userId) {

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import apiRequest from "@/api"
-const showProductWarehouseUrl = (userId) => `/profile/${userId}/store-assign/showProductApi/apiWarehouse`
-const showProductStoreUrl = (userId) => `/profile/${userId}/store-assign/showProductApi/apiStore`
+const showProductWarehouseUrl = (userId) => `/inventory/store-assign/showProductApi/apiWarehouse`
+const showProductStoreUrl = (userId) => `/inventory/store-assign/showProductApi/apiStore`
 
 
 const storeAssign = {

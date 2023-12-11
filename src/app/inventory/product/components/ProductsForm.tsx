@@ -18,7 +18,7 @@ import React from "react";
 import {Formik} from "formik";
 import * as Yup from "yup"
 import {useParams, useRouter} from 'next/navigation';
-import products from "@/app/profile/[id]/product/requests/products";
+import products from "@/app/inventory/product/requests/products";
 import {AddOutlined, Cancel, Close, DeleteOutline, Done} from "@mui/icons-material";
 import {useDropzone} from "react-dropzone";
 import {useUploadThing} from "@/app/api/uploadthing/utils";
@@ -152,7 +152,7 @@ export default function ProductsForm(props: any) {
         }
 
         if (response.status === 200) {
-            router.push(`/profile/${userId}/product`)
+            router.push(`/inventory/product`)
         } else {
             //ToDo: catch validation errors
         }
@@ -461,7 +461,7 @@ export default function ProductsForm(props: any) {
                                         variant={"outlined"}
                                         size={"small"}
                                         sx={{m: 1}}
-                                        onClick={() => router.push(`/profile/${userId}/product`)}
+                                        onClick={() => router.push(`/inventory/product`)}
                                     >
                                         Cancel
                                     </Button>

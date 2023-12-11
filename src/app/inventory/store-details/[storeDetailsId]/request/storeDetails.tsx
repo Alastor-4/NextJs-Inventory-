@@ -1,9 +1,9 @@
 import React from 'react'
 import apiRequest from '@/api'
 
-const url = (userId: any, storeId: any) => `/profile/${userId}/store-details/${storeId}/api`
-const urlTranferUnits = (userId: any, storeId: any) => `/profile/${userId}/store-details/${storeId}/apiTransferUnits`
-const urlOffers = (userId: any, storeId: any) => `/profile/${userId}/store-details/${storeId}/components/offers/api`
+const url = (userId: any, storeId: any) => `/inventory/store-details/${storeId}/api`
+const urlTranferUnits = (userId: any, storeId: any) => `/inventory/store-details/${storeId}/apiTransferUnits`
+const urlOffers = (userId: any, storeId: any) => `/inventory/store-details/${storeId}/components/offers/api`
 
 
 export const storeDetails = {

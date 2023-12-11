@@ -1,4 +1,4 @@
-import WorkersMainTable from "@/app/profile/[id]/worker/components/WorkersMainTable";
+import WorkersMainTable from "@/app/inventory/worker/components/WorkersMainTable";
 import {prisma} from "db";
 
 export default async function Page() {

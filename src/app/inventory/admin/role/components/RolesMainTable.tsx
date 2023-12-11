@@ -62,11 +62,11 @@ export default function RolesMainTable() {
     }
 
     async function handleUpdate() {
-        router.push(`/profile/${params.id}/admin/role/update/${selected.id}`)
+        router.push(`/inventory/admin/role/update/${selected.id}`)
     }
 
     function handleNavigateBack() {
-        router.push(`/profile/${params.id}`)
+        router.push("/inventory")
     }
 
     const CustomToolbar = () => (
@@ -107,7 +107,7 @@ export default function RolesMainTable() {
                         )
                     }
 
-                    <Link href={`/profile/${params.id}/admin/role/create`}>
+                    <Link href={`/inventory/admin/role/create`}>
                         <IconButton color={"inherit"}>
                             <AddOutlined />
                         </IconButton>

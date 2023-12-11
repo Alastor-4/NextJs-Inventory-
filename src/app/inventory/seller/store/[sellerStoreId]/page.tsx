@@ -1,4 +1,4 @@
-import StoreMain from "@/app/profile/[id]/seller/store/[sellerStoreId]/components/StoreMain"
+import StoreMain from "@/app/inventory/seller/store/[sellerStoreId]/components/StoreMain"
 
 export default function Page() {
     return (

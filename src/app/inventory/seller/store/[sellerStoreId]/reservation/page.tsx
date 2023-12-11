@@ -1,4 +1,4 @@
-//import StoreReservation from "@/app/profile/[id]/seller/store/[sellerStoreId]/reservation/components/StoreReservation"
+//import StoreReservation from "@/app/inventory/seller/store/[sellerStoreId]/reservation/components/StoreReservation"
 import StoreReservation from "./newReservation/components/StoreReservation"
 export default function Page({ params }: { params: { id: string, sellerStoreId: string } }) {
     const userId = params.id

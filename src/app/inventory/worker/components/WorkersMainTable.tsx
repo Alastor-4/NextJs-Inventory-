@@ -22,8 +22,8 @@ import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import products from "@/app/profile/[id]/product/requests/products";
-import ownerUsers from "@/app/profile/[id]/worker/requests/ownerUsers";
+import products from "@/app/inventory/product/requests/products";
+import ownerUsers from "@/app/inventory/worker/requests/ownerUsers";
 import users from "@/app/user/requests/users";
 
 export default function WorkersMainTable(props) {
@@ -131,7 +131,7 @@ export default function WorkersMainTable(props) {
     }
 
     function handleNavigateBack() {
-        router.push(`/profile/${params.id}`)
+        router.push(`/inventory`)
     }
 
     const CustomToolbar = () => (
@@ -177,7 +177,7 @@ export default function WorkersMainTable(props) {
                                         )
                                     }
 
-                                    <Link href={`/profile/${params.id}/worker/create`}>
+                                    <Link href={`/inventory/worker/create`}>
                                         <IconButton color={"inherit"}>
                                             <AddOutlined />
                                         </IconButton>

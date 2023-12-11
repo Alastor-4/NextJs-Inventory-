@@ -25,7 +25,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import stores from "@/app/profile/[id]/seller/store/[sellerStoreId]/requests/sellerStore";
+import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
 import Link from "next/link";
 import {daysMap, notifySuccess, notifyWarning, numberFormat} from "@/utils/generalFunctions";
 
@@ -268,7 +268,7 @@ export default function StoreMain() {
 
         return (
             <Card variant={"outlined"}>
-                <Link href={`/profile/${userId}/seller/store/${sellerStoreId}/product`}>
+                <Link href={`/inventory/seller/store/${sellerStoreId}/product`}>
                     <CardHeader title={"Productos en tienda"}/>
                 </Link>
 
@@ -337,7 +337,7 @@ export default function StoreMain() {
 
         return (
             <Card variant={"outlined"}>
-                <Link href={`/profile/${userId}/seller/store/${sellerStoreId}/reservation`}>
+                <Link href={`/inventory/seller/store/${sellerStoreId}/reservation`}>
                     <CardHeader title={"Reservaciones"}/>
                 </Link>
 

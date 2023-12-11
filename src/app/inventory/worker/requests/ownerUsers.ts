@@ -1,8 +1,8 @@
 // @ts-nocheck
 import apiRequest from "@/api"
 
-const url = (userId) => `/profile/${userId}/worker/api`
-const urlCreate = (userId) => `/profile/${userId}/worker/create/api`
+const url = (userId) => "/inventory/worker/api"
+const urlCreate = (userId) => "/inventory/worker/create/api"
 
 const ownerUsers = {
     allWorkers: async function (userId: any) {

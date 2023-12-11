@@ -17,7 +17,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import DepartmentProductsSelect from "@/components/DepartmentProductsSelect";
-import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
+import warehouseDepots from "@/app/inventory/warehouse/[warehouseId]/requests/warehouseDepots";
 import { notifyError } from "@/utils/generalFunctions";
 
 export default function UserWarehouseForm({ ownerId, warehouseId }) {
@@ -77,7 +77,7 @@ export default function UserWarehouseForm({ ownerId, warehouseId }) {
         )
 
         if (response?.status === 200) {
-            router.push(`/profile/${ownerId}/warehouse/${warehouseId}`)
+            router.push(`/inventory/warehouse/${warehouseId}`)
         } else {
             //ToDo: catch validation errors
             notifyError("Hay un error en la creación de depósitos")
@@ -129,7 +129,7 @@ export default function UserWarehouseForm({ ownerId, warehouseId }) {
                             variant={"outlined"}
                             size={"small"}
                             sx={{ m: 1 }}
-                            onClick={() => router.push(`/profile/${ownerId}/warehouse/${warehouseId}`)}
+                            onClick={() => router.push(`/inventory/warehouse/${warehouseId}`)}
                         >
                             Cancel
                         </Button>

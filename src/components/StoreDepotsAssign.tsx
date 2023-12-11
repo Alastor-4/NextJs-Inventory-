@@ -15,7 +15,7 @@ import {
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import ShowProductsStore from "@/app/profile/[id]/store-assign/components/ShowProductsStore";
+import ShowProductsStore from "@/app/inventory/store-assign/components/ShowProductsStore";
 import { ArrowLeft } from "@mui/icons-material";
 import { useParams } from 'next/navigation';
 import { useRouter } from "next/navigation";
@@ -66,8 +66,8 @@ export default function StoreDepotsAssign(
 
     function handleNavigateBack() {
         /*  selectedStoreIdProp
-              ? router.push(`/profile/${params.id}/store-details/${selectedStoreIdProp}`)
-              : router.push(`/profile/${params.id}/warehouse/${selectedWarehouseIdProp}`)
+              ? router.push(`/inventory/store-details/${selectedStoreIdProp}`)
+              : router.push(`/inventory/warehouse/${selectedWarehouseIdProp}`)
   */
         router.back()
     }

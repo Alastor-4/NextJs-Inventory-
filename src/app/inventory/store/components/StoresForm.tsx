@@ -18,10 +18,10 @@ import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
-import stores from "@/app/profile/[id]/store/requests/stores";
+import stores from "@/app/inventory/store/requests/stores";
 import { openDaysStores } from "@/request/openDaysStores";
 import dayjs from "dayjs";
-import StoreOpeningDays from "@/app/profile/[id]/store/components/StoreOpeningDays";
+import StoreOpeningDays from "@/app/inventory/store/components/StoreOpeningDays";
 import { notifyError } from "@/utils/generalFunctions";
 
 
@@ -31,8 +31,8 @@ export default function StoresForm(props: any) {
     const router = useRouter()
 
     //Url de las api
-    const urlApiStoreOpenDays = `/profile/${userId}/store/apiOpenDays`
-    const urlApiStoreOpenReservations = `/profile/${userId}/store/apiReservations`
+    const urlApiStoreOpenDays = "/inventory/store/apiOpenDays"
+    const urlApiStoreOpenReservations = "/inventory/store/apiReservations"
 
     const [updateItem, setUpdateItem] = React.useState<any>()
     const [userSeller, setUserSeller] = React.useState("")
@@ -317,7 +317,7 @@ export default function StoresForm(props: any) {
 
 
         if (response.status === 200) {
-            router.push(`/profile/${userId}/store`)
+            router.push(`/inventory/store`)
         } else {
             //ToDo: catch validation errors
             notifyError(`Ha ocurrido un error en la ${updateItem ? "modificación" : "creación"} de los datos de la tienda`)
@@ -543,7 +543,7 @@ export default function StoresForm(props: any) {
                                 variant={"outlined"}
                                 size={"small"}
                                 sx={{ m: 1 }}
-                                onClick={() => router.push(`/profile/${userId}/store`)}
+                                onClick={() => router.push(`/inventory/store`)}
                             >
                                 Cancel
                             </Button>

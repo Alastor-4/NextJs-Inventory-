@@ -40,7 +40,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
-import warehouseDepots from "@/app/profile/[id]/warehouse/[warehouseId]/requests/warehouseDepots";
+import warehouseDepots from "@/app/inventory/warehouse/[warehouseId]/requests/warehouseDepots";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
@@ -171,11 +171,11 @@ export default function UserWarehouseMainTable(props) {
     }
 
     function handleNavigateBack() {
-        router.push(`/profile/${ownerId}`)
+        router.push(`/inventory`)
     }
 
     function handleStoreAssign() {
-        router.push(`/profile/${ownerId}/store-assign?warehouseId=${warehouseDetails.id}`)
+        router.push(`/inventory/store-assign?warehouseId=${warehouseDetails.id}`)
     }
 
     const CustomToolbar = () => (
@@ -221,7 +221,7 @@ export default function UserWarehouseMainTable(props) {
                                         <ShareOutlined fontSize={"small"} />
                                     </IconButton>
 
-                                    <Link href={`/profile/${ownerId}/warehouse/${warehouseDetails.id}/create`}>
+                                    <Link href={`/inventory/warehouse/${warehouseDetails.id}/create`}>
                                         <IconButton color={"inherit"}>
                                             <AddOutlined />
                                         </IconButton>

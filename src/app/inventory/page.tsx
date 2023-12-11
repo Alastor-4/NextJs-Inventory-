@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { prisma } from "db";
-import UserProfileMain from "@/app/profile/components/UserProfileMain";
+import UserProfileMain from "@/app/inventory/components/UserProfileMain";
 import { nextAuthOptions } from '../api/auth/[...nextauth]/options';
 import {getServerSession} from "next-auth";
 

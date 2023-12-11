@@ -64,7 +64,7 @@ export default function RolesForm(props) {
         }
 
         if (response.status === 200) {
-            router.push(`/profile/${params.id}/admin/role`)
+            router.push(`/inventory/admin/role`)
         } else {
             //ToDo: catch validation errors
         }
@@ -117,7 +117,7 @@ export default function RolesForm(props) {
                             variant={"outlined"}
                             size={"small"}
                             sx={{ m: 1 }}
-                            onClick={() => router.push(`/profile/${params.id}/admin/role`)}
+                            onClick={() => router.push(`/inventory/admin/role`)}
                         >
                             Cancel
                         </Button>

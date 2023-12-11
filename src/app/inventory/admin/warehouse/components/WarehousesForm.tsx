@@ -90,7 +90,7 @@ export default function WarehousesForm(props) {
         }
 
         if (response.status === 200) {
-            router.push(`/profile/${params.id}/admin/warehouse`)
+            router.push(`/inventory/admin/warehouse`)
         } else {
             //ToDo: catch validation errors
         }
@@ -172,7 +172,7 @@ export default function WarehousesForm(props) {
                             variant={"outlined"}
                             size={"small"}
                             sx={{ m: 1 }}
-                            onClick={() => router.push(`/profile/${params.id}/admin/warehouse`)}
+                            onClick={() => router.push(`/inventory/admin/warehouse`)}
                         >
                             Cancel
                         </Button>

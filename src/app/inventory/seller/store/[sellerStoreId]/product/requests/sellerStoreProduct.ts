@@ -2,7 +2,7 @@
 import apiRequest from "@/api"
 import {notifyError} from "@/utils/generalFunctions";
 
-const url = (userId, sellerStoreId) => `/profile/${userId}/seller/store/${sellerStoreId}/product/api`
+const url = (userId, sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/product/api`
 
 const sellerStoreProduct = {
     allProductByDepartments: async function (userId, sellerStoreId) {

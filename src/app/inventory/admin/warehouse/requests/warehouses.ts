@@ -1,8 +1,8 @@
 import apiRequest from "@/api"
 import {notifyError} from "@/utils/generalFunctions";
 
-const url = (userId: any) => `/profile/${userId}/admin/warehouse/api`
-const updateUrl = (userId: any) => `/profile/${userId}/admin/warehouse/update/api`
+const url = (userId: any) => `/inventory/admin/warehouse/api`
+const updateUrl = (userId: any) => `/inventory/admin/warehouse/update/api`
 
 const warehouses = {
     allWarehouses: async function (userId: any) {

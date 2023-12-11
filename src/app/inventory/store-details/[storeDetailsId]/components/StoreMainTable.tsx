@@ -32,7 +32,7 @@ import {
 } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import { Formik } from "formik";
-import stores from "@/app/profile/[id]/store/requests/stores"
+import stores from "@/app/inventory/store/requests/stores"
 import StoreMoreDetails from "./StoreMoreDetails";
 import StoreModalPrice from "./Modal/StoreModalPrice"
 import StoreEditPrice from "./Modal/StoreEditPrice";
@@ -73,7 +73,7 @@ export default function StoreMainTable() {
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/profile/${params.id}/store-details/${params.storeDetailsId}/api`).then((data) =>
+        fetcher(`/inventory/store-details/${params.storeDetailsId}/api`).then((data) =>
             setAllProductsByDepartment(data.map((item: any) => ({
                 ...item,
                 selected: false
@@ -169,7 +169,7 @@ export default function StoreMainTable() {
                             ? <CircularProgress size={24} color={"inherit"} />
                             : (
                                 <>
-                                    <IconButton color={"inherit"} onClick={() => router.push(`/profile/${params.id}/store-assign?storeId=${dataStore.id}`)} >
+                                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/store-assign?storeId=${dataStore.id}`)} >
                                         <ShareOutlined fontSize={"small"} />
                                     </IconButton>
                                     <IconButton color={"inherit"} onClick={() => setActiveAddProductFromWarehouse(true)} >

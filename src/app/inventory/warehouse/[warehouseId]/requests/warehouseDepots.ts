@@ -1,9 +1,9 @@
 // @ts-nocheck
 import apiRequest from "@/api"
 
-const url = (ownerId: string, warehouseId: string) => `/profile/${ownerId}/warehouse/${warehouseId}/api`
-const urlCreate = (ownerId: string, warehouseId: string) => `/profile/${ownerId}/warehouse/${warehouseId}/create/api`
-const urlDepotAssign = (ownerId: string, warehouseId: string) => `/profile/${ownerId}/warehouse/${warehouseId}/depot-assign/api`
+const url = (ownerId: string, warehouseId: string) => `/inventory/warehouse/${warehouseId}/api`
+const urlCreate = (ownerId: string, warehouseId: string) => `/inventory/warehouse/${warehouseId}/create/api`
+const urlDepotAssign = (ownerId: string, warehouseId: string) => `/inventory/warehouse/${warehouseId}/depot-assign/api`
 
 const warehouseDepots = {
     allDepots: async function (userId: string, warehouseId: string) {
