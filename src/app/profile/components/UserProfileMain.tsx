@@ -16,28 +16,22 @@ import {
     Typography
 } from "@mui/material";
 import {
-    ArrowCircleRight, ArrowCircleRightOutlined,
-    ArrowLeft, ChevronRightOutlined, LogoutOutlined,
+    ArrowCircleRightOutlined,
+    ChevronRightOutlined,
+    LogoutOutlined,
 } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
 import userProfileStyles from "@/assets/styles/userProfileStyles"
 import Link from "next/link";
 import dayjs from "dayjs";
-import { width } from "@mui/system";
 import { signOut } from "next-auth/react";
 
 export default function UserProfileMain(props) {
     const { userDetails, userRole, ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount, sellerStores } = props
 
-    const router = useRouter()
-
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={() => router.back()}>
-                        <ArrowLeft fontSize={"large"} />
-                    </IconButton>
                     <Typography
                         variant="h6"
                         noWrap

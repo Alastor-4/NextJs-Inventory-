@@ -5,7 +5,9 @@ import { nextAuthOptions } from '../api/auth/[...nextauth]/options';
 
 const Profile = async () => {
     const session = await getServerSession(nextAuthOptions);
+    // @ts-ignore
     if (session?.user?.id) {
+        // @ts-ignore
         redirect(`/profile/${session.user?.id}`);
     }
     return (

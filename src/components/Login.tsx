@@ -3,16 +3,21 @@
 
 import React, { useEffect } from "react";
 import {
-    Avatar, Button,
+    Avatar,
+    Button,
     Card,
-    Divider, Fade,
-    Grid, IconButton, InputAdornment, TextField,
+    Divider,
+    Grid,
+    IconButton,
+    InputAdornment,
+    TextField,
     Typography
 } from "@mui/material";
 import {
-    ChevronLeft, ChevronRight,
-    InfoOutlined,
-    KeyboardDoubleArrowRightOutlined, PersonOutlined, VisibilityOffOutlined, VisibilityOutlined
+    KeyboardDoubleArrowRightOutlined,
+    PersonOutlined,
+    VisibilityOffOutlined,
+    VisibilityOutlined
 } from "@mui/icons-material";
 import { signIn, useSession } from "next-auth/react"
 
@@ -36,7 +41,7 @@ export default function Login() {
     useEffect(() => {
         if (session?.user.id) {
             router.push(`/profile/${session?.user.id}`)
-        };
+        }
     }, [session, router])
 
     const LoginForm = () => {
@@ -60,13 +65,18 @@ export default function Login() {
         return <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={async ({ username, password }) => {
+            onSubmit={async ({ username, password }, {setFieldError}) => {
                 const responseNextAuth = await signIn('credentials', {
                     username,
                     password,
                     redirect: false,
                 })
-                router.push('/profile/')
+
+                if (responseNextAuth.ok) {
+                    router.push('/profile/')
+                } else {
+                    setFieldError("password", "Usuario y/o contraseña incorrecto(s)")
+                }
             }}
         >
             {
