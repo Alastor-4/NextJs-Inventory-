@@ -23,6 +23,8 @@ import * as Yup from 'yup';
 import loginPageStyles from "@/assets/styles/loginPageStyles"
 
 import { useRouter } from "next/navigation";
+import auth from "@/app/api/auth/requests/auth";
+import { handleKeyDown } from "@/utils/handleKeyDown";
 
 export default function Login() {
     const { data: session } = useSession();
@@ -142,30 +144,32 @@ export default function Login() {
     const SignUpForm = () => {
         const initialValues = {
             username: '',
-            email: '',
+            mail: '',
+            name: '',
+            phone: '',
             password1: '',
             password2: ''
         }
 
         const validationSchema = Yup.object({
             username: Yup.string()
-                .required('campo requerido')
-                .min(6, 'username most contain 6 characters at least'),
-            email: Yup.string()
-                .required('campo requerido')
-                .email('email address is not valid'),
+                .required('Este campo es requerido')
+                .min(6, 'Debe contener al menos 6 caracteres'),
+            mail: Yup.string()
+                .required('Este campo es requerido')
+                .email('No es un correo válido'),
+            name: Yup.string()
+                .required('Este campo es requerido'),
+            phone: Yup.string()
+                .required('Este campo es requerido')
+                .matches(/^\d{8}$/, 'El telefono debe tener 8 dígitos'),
             password1: Yup.string()
-                .required('campo requerido')
-                .min(8, 'most contain 8 characters at least'),
+                .required('Este campo es requerido')
+                .min(8, 'Debe contener al menos 8 caracteres'),
             password2: Yup.string()
-                .required('campo requerido')
-                .when("password1", {
-                    is: val => ((val && val.length > 0)),
-                    then: Yup.string().oneOf(
-                        [Yup.ref("password1")],
-                        "password does not match"
-                    )
-                })
+                .required('Este campo es requerido')
+                .oneOf([Yup.ref("password1"), null],
+                    "Las contraseñas no coinciden")
         })
 
         const [showPassword1, setShowPassword1] = React.useState(false);
@@ -181,6 +185,8 @@ export default function Login() {
             initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={(data, { setErrors }) => {
+                // console.log(data);
+                auth.register(data)
                 //register here
             }}
         >
@@ -204,14 +210,39 @@ export default function Login() {
 
                                 <Grid item xs={12}>
                                     <TextField
-                                        name="email"
+                                        name="name"
+                                        label="Nombre*"
+                                        size={"small"}
+                                        fullWidth
+                                        variant="outlined"
+                                        {...formik.getFieldProps("name")}
+                                        error={formik.errors.name && formik.touched.name}
+                                        helperText={(formik.errors.name && formik.touched.name) && formik.errors.name}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name="phone"
+                                        label="Teléfono*"
+                                        size={"small"}
+                                        onKeyDown={handleKeyDown}
+                                        fullWidth
+                                        variant="outlined"
+                                        {...formik.getFieldProps("phone")}
+                                        error={formik.errors.phone && formik.touched.phone}
+                                        helperText={(formik.errors.phone && formik.touched.phone) && formik.errors.phone}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name="mail"
                                         label="Correo*"
                                         size={"small"}
                                         fullWidth
                                         variant="outlined"
-                                        {...formik.getFieldProps("email")}
-                                        error={formik.errors.email && formik.touched.email}
-                                        helperText={(formik.errors.email && formik.touched.email) && formik.errors.email}
+                                        {...formik.getFieldProps("mail")}
+                                        error={formik.errors.mail && formik.touched.mail}
+                                        helperText={(formik.errors.mail && formik.touched.mail) && formik.errors.mail}
                                     />
                                 </Grid>
 
