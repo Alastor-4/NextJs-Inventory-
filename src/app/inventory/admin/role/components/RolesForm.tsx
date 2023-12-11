@@ -8,21 +8,23 @@ import * as Yup from "yup"
 import { useParams, useRouter } from 'next/navigation';
 import roles from "../request/roles";
 
-export default function RolesForm(props) {
+export default function RolesForm({userId}) {
     const [updateItem, setUpdateItem] = React.useState()
 
     const params = useParams()
     const router = useRouter()
 
+    const roleId = params?.roleId
+
     React.useEffect(() => {
         async function fetchRole(id) {
-            const rol = await roles.roleDetails(params.id, id)
+            const rol = await roles.roleDetails(userId, id)
             setUpdateItem(rol)
         }
-        if (params?.roleId !== undefined) {
-            fetchRole(params.roleId)
+        if (roleId !== undefined) {
+            fetchRole(roleId)
         }
-    }, [params?.id, params.roleId, setUpdateItem])
+    }, [userId, roleId, setUpdateItem])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -58,9 +60,9 @@ export default function RolesForm(props) {
         let response
 
         if (updateItem) {
-            response = await roles.update(params.id, { id: updateItem.id, name: values.name, description: values.description })
+            response = await roles.update(userId, { id: updateItem.id, name: values.name, description: values.description })
         } else {
-            response = await roles.create(params.id, { name: values.name, description: values.description })
+            response = await roles.create(userId, { name: values.name, description: values.description })
         }
 
         if (response.status === 200) {

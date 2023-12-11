@@ -22,26 +22,23 @@ import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import roles from "../request/roles";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-export default function RolesMainTable() {
-    const params = useParams();
-
+export default function RolesMainTable({userId}) {
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
 
     //get initial data
     React.useEffect(() => {
-        //fetcher("/role/api").then((data) => setData(data))
         const getAllRoles = async () => {
-            const newData = await roles.allRoles(params.id)
+            const newData = await roles.allRoles(userId)
             setData(newData)
         }
         if (data === null) {
             getAllRoles();
         }
-    }, [data, params.id])
+    }, [data, userId])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -54,9 +51,9 @@ export default function RolesMainTable() {
     }
 
     async function handleRemove() {
-        const response = await roles.delete(params.id, selected.id)
+        const response = await roles.delete(userId, selected.id)
         if (response) {
-            const updatedRoles = await roles.allRoles(params.id)
+            const updatedRoles = await roles.allRoles(userId)
             if (updatedRoles) setData(updatedRoles)
         }
     }

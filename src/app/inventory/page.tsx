@@ -7,8 +7,8 @@ import {getServerSession} from "next-auth";
 
 export default async function Page() {
     const session = await getServerSession(nextAuthOptions)
-
     const userId = session.user.id
+
     const userDetails = await prisma.users.findUnique({ where: { id: userId }, include: { roles: true } })
     const userRole = userDetails?.roles?.name ?? "user"
 
