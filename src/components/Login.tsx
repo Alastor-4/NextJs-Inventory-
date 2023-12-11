@@ -40,7 +40,7 @@ export default function Login() {
 
     useEffect(() => {
         if (session?.user.id) {
-            router.push(`/profile/${session?.user.id}`)
+            router.push("/inventory")
         }
     }, [session, router])
 
@@ -73,7 +73,7 @@ export default function Login() {
                 })
 
                 if (responseNextAuth.ok) {
-                    router.push('/profile/')
+                    router.push("/inventory")
                 } else {
                     setFieldError("password", "Usuario y/o contraseña incorrecto(s)")
                 }
