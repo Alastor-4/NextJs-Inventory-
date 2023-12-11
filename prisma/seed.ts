@@ -16,6 +16,7 @@ async function main() {
                     name: "Dayan Gomez Abad",
                     mail: "dgabad91@gmail.com",
                     phone: "51698662",
+                    password_hash: "$2a$10$x5GLfSkIGWV5j2sW9OMg6.LovR90KNsFB.JB2xF3rryn7rj3NwqeS",
                     is_verified: true,
                 },
             },
@@ -32,6 +33,7 @@ async function main() {
                     name: "Dayan Owner",
                     mail: "dgabad93@gmail.com",
                     phone: "51698663",
+                    password_hash: "$2a$10$x5GLfSkIGWV5j2sW9OMg6.LovR90KNsFB.JB2xF3rryn7rj3NwqeS",
                     is_verified: true,
                     warehouses: {
                         create: {
@@ -63,6 +65,7 @@ async function main() {
                     name: "Dayan Seller",
                     mail: "dgabad94@gmail.com",
                     phone: "51698664",
+                    password_hash: "$2a$10$x5GLfSkIGWV5j2sW9OMg6.LovR90KNsFB.JB2xF3rryn7rj3NwqeS",
                     is_verified: true,
                     work_for_user_id: ownerUser.id
                 },
