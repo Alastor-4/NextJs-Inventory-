@@ -1,5 +1,5 @@
 import apiRequest from "@/api"
-//const url = (userId: any) => `/profile/${userId}/store/apiOpenDays`
+//const url = (userId: any) => `/inventory/store/apiOpenDays`
 
 export const openDaysStores = {
 
