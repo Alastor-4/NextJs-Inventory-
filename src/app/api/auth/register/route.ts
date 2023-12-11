@@ -3,7 +3,6 @@ import { prisma } from "db";
 import jwt from "jsonwebtoken"
 import { sendMail } from "@/mailer-service";
 import * as process from "process";
-import { hashSync } from 'bcrypt';
 
 // Verify user
 export async function GET(req: Request) {
@@ -46,10 +45,8 @@ export async function GET(req: Request) {
 
 // Create new user
 export async function POST(req: Request) {
-    const { username, password1, name, mail, phone } = await req.json()
+    const { username, passwordHash, name, mail, phone } = await req.json()
 
-    const password_hash = hashSync(password1, 10);
-    console.log(password_hash)
     const user = await prisma.users.findFirst({
         where: {
             OR: [
@@ -70,7 +67,7 @@ export async function POST(req: Request) {
             mail: mail,
             phone: phone,
             name: name,
-            password_hash: password_hash,
+            password_hash: passwordHash,
         }
     })
 

@@ -1,6 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials"
-import { compare, compareSync, hashSync } from "bcrypt"
+import { compare } from "bcrypt"
 
 export const nextAuthOptions: NextAuthOptions = {
     pages: {
@@ -27,11 +27,8 @@ export const nextAuthOptions: NextAuthOptions = {
 
                 if (!user) return null;
 
-                // const passwordMatch = await compare(credentials.password, user.password_hash);
-
-                // if (!passwordMatch) return null;
-
-                //TODO: descomentar cuando se haga el register
+                const passwordMatch = await compare(credentials.password, user.password_hash);
+                if (!passwordMatch) return null;
 
                 if (!user.is_verified) return null;
 
