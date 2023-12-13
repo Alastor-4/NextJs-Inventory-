@@ -86,7 +86,7 @@ export default function WorkersMainTable(props) {
         const handleApplyRole = async () => {
             const response = await ownerUsers.changeRol(selected.id, selectedRole.id)
             if (response) {
-                const allUsers = await ownerUsers.allWorkers(userId.id)
+                const allUsers = await ownerUsers.allWorkers(userId)
                 if (allUsers) setData(allUsers)
 
                 setSelected(null)
