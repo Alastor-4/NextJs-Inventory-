@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server'
 import {prisma} from "db";
 
 // Get all owner's user workers
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const ownerId = params.id
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url)
+    const ownerId = searchParams.get("ownerId")
 
     if (ownerId) {
         const users = await prisma.users.findMany(
