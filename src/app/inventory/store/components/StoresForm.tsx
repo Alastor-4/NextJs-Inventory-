@@ -25,8 +25,8 @@ import StoreOpeningDays from "@/app/inventory/store/components/StoreOpeningDays"
 import { notifyError } from "@/utils/generalFunctions";
 
 
-export default function StoresForm(props: any) {
-    const { userId, storeId, sellerUsers } = props
+export default function StoresForm({ userId, storeId, sellerUsers }: { userId: number, storeId: string | undefined, sellerUsers: any }) {
+
 
     const router = useRouter()
 
@@ -196,7 +196,7 @@ export default function StoresForm(props: any) {
                 })
             }
         }
-    }, [updateItem])
+    }, [updateItem, storeOpeningDays, storeReservationDays])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -257,8 +257,8 @@ export default function StoresForm(props: any) {
 
     const handleSubmit = async (values: any) => {
         const data = {
-            ownerId: parseInt(userId),
-            storeId: parseInt(storeId),
+            ownerId: userId,
+            storeId: parseInt(storeId ?? "1"),
             name: values.name,
             description: values.description,
             slogan: values.slogan,
@@ -289,11 +289,6 @@ export default function StoresForm(props: any) {
                     let newItem = item;
                     openDaysResponse = await openDaysStores.create(urlApiStoreOpenDays, newItem, response.data.id)
                 }
-            // Verificar si hay algun error
-            if (openDaysResponse !== 200) {
-                notifyError("Ha ocurrido un error al crear el horario de apartura de la tienda")
-            }
-
 
         })
 
@@ -308,11 +303,6 @@ export default function StoresForm(props: any) {
                     let newItem = item;
                     daysReservationsResponse = await openDaysStores.create(urlApiStoreOpenReservations, newItem, response.data.id)
                 }
-            // Verificar si hay algun error
-            if (daysReservationsResponse !== 200) {
-                notifyError("Ha ocurrido un error al crear el horario de reervación de la tienda")
-
-            }
         })
 
 

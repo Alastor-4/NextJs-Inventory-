@@ -11,7 +11,6 @@ import {
     Divider,
     Grid,
     IconButton,
-    Stack,
     Table,
     TableBody,
     TableCell,
@@ -34,15 +33,15 @@ import {
     ShoppingCartOutlined
 } from "@mui/icons-material";
 import stores from "@/app/inventory/store/requests/stores";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { daysMap } from "@/utils/generalFunctions";
 import dayjs from "dayjs";
 
-export default function StoresMainTable() {
+export default function StoresMainTable({ userId }: { userId: number }) {
+
     const [data, setData] = React.useState<any>(null)
     const [showDetails, setShowDetails] = React.useState(false)
 
-    const params = useParams()
     const router = useRouter()
 
     //ToDo: use global isLoading
@@ -51,13 +50,13 @@ export default function StoresMainTable() {
     //get initial data
     React.useEffect(() => {
         const getData = async () => {
-            const newData = await stores.allUserStores(params.id);
+            const newData = await stores.allUserStores(userId);
             setData(newData);
         }
         if (data === null) {
             getData();
         }
-    }, [params.id, data])
+    }, [userId, data])
 
     //table selected item
     const [selected, setSelected] = React.useState<any>(null)
@@ -71,10 +70,12 @@ export default function StoresMainTable() {
     }
 
     async function handleRemove() {
-        const response = await stores.delete(params.id, selected.id)
-        const updatedStores = await stores.allUserStores(params.id)
-        if (updatedStores) setData(updatedStores)
-        setSelected(null);
+        const response = await stores.delete(userId, selected.id)
+        if (response === true) {
+            const updatedStores = await stores.allUserStores(userId)
+            if (updatedStores) setData(updatedStores)
+            setSelected(null);
+        }
     }
 
     function handleUpdate() {

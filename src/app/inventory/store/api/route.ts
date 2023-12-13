@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server'
 import { prisma } from "db";
 
 // Get all user stores
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-    const userId = params.id
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url)
+    const userId = parseInt(<string>searchParams.get("userId"))
 
-    const stores = await prisma.stores.findMany({ where: { owner_id: parseInt(userId) }, include: { seller_user: true, store_open_days: true, store_reservation_days: true } })
+    const stores = await prisma.stores.findMany({ where: { owner_id: userId }, include: { seller_user: true, store_open_days: true, store_reservation_days: true } })
 
     return NextResponse.json(stores)
 }
