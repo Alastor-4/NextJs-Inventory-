@@ -43,7 +43,7 @@ function TransferUnits(props: any) {
         if (dataWarehouses === null) {
             getDataWareHouses()
         }
-    }, [dataWarehouses, setDataWarehouses])
+    }, [dataWarehouses, setDataWarehouses, params.storeDetailsId, productId])
 
 
     const maxUnits = {
@@ -111,19 +111,23 @@ function TransferUnits(props: any) {
             name="selectedWarehouse"
             size='small'
             select
-            value={formik.values.warehouseInd}
+            value={dataWarehouses !== null ? formik.values.warehouseInd : ''}
             variant='standard'
             sx={{ paddingTop: "0", '& .MuiInput-underline:before': { borderBottom: 'none' } }}
 
         >
-            {
-                dataWarehouses?.map((element: any, index: number) => (
-                    <MenuItem
-                        key={index}
-                        value={index}
-                    >{element.name}</MenuItem>
-                ))
+            {dataWarehouses !== null
+                ? (
+                    dataWarehouses.map((element: any, index: number) => (
+                        <MenuItem
+                            key={index}
+                            value={index}
+                        >{element.name}</MenuItem>
+                    ))
+                )
+                : <MenuItem value={0}></MenuItem>
             }
+
         </TextField>
     )
 
