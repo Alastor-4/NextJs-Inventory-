@@ -28,7 +28,7 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
 
     useEffect(() => {
         setActivePercentage(storeDepot.price_discount_percentage ? true : false)
-    }, [setActivePercentage])
+    }, [storeDepot?.price_discount_percentage])
 
     const initialValues = ({
         price: newSellPrice,

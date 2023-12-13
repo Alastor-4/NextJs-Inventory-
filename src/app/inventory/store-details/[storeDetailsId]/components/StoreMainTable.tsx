@@ -511,7 +511,9 @@ export default function StoreMainTable({ userId }: { userId: number }) {
                                 dataRow={data[selectedRowInd]?.depots[0].store_depots[0]}
                                 setActiveModalEditUnits={setActiveModalEditUnits}
                                 setActiveModalTransferUnits={setActiveModalTransferUnits}
-                                loadDates={loadDates} />
+                                loadDates={loadDates} 
+                                userId={userId}
+                                />
                         </StoreModalDefault>
 
                         <StoreModalDefault
@@ -525,6 +527,7 @@ export default function StoreMainTable({ userId }: { userId: number }) {
                                 productId={data[selectedRowInd]?.depots[0].product_id}
                                 setActiveTransferUnits={setActiveModalTransferUnits}
                                 loadDates={loadDates}
+                                userId={userId}
                             />
                         </StoreModalDefault>
 
@@ -534,7 +537,7 @@ export default function StoreMainTable({ userId }: { userId: number }) {
                             setOpen={setActiveAddProductFromWarehouse}
                             loadData={loadDates}
                         >
-                            <AddProductFromWarehouse dataStore={dataStore} warehouseId={null} />
+                            <AddProductFromWarehouse userId={userId} dataStore={dataStore} warehouseId={null} />
                         </ModalAddProductFromWarehouse>
 
                         <CardContent>

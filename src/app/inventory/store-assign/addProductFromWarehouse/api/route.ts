@@ -113,7 +113,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { store_id, depot_id, product_units, product_remaining_units, seller_profit_percentage, seller_profit_quantity } = await req.json();
+    const { sell_price, sell_price_unit, is_active, store_id, depot_id, product_units, product_remaining_units, seller_profit_percentage, seller_profit_quantity } = await req.json();
 
     const result = await prisma.store_depots.create({
         data: {
@@ -123,6 +123,9 @@ export async function POST(req: Request) {
             product_remaining_units,
             seller_profit_percentage,
             seller_profit_quantity,
+            sell_price,
+            sell_price_unit,
+            is_active,
         }
     })
     return NextResponse.json(result);
