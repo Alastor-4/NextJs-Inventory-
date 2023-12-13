@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react'
 import {
     Box,
@@ -22,7 +23,6 @@ import {
     Typography
 } from '@mui/material';
 import requestWarehouse from '../request/requestWarehouse';
-import { useParams } from 'next/navigation';
 import {
     ExpandLessOutlined,
     ExpandMoreOutlined,
@@ -58,10 +58,29 @@ function AddProductFromWarehouse(props: any) {
             const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(userId, dataStore.id)
             setDataDepotsWarehouse(newDataDepotsWarehouses);
         }
+        const loadDepartamentsFromSelectedInitialWarehouse = (indWarehouse: number, mirrorDataDepotsWarehouses: any) => {
+            let departments = new Map();
 
+            mirrorDataDepotsWarehouses[indWarehouse].depots.forEach((depot: any) => {
+                const nameDepartment = depot.products.departments.name;
+
+                const newContent = !departments.has(nameDepartment) ? [] : departments.get(nameDepartment)
+
+                departments.set(nameDepartment, [...newContent, depot])
+            })
+
+            let newDataProductsByDepartment: any = [];
+
+            departments.forEach((depots: any, key: any) => {
+                newDataProductsByDepartment.push({ departmentName: key, depots: depots })
+            })
+
+            setDataProductsByDepartment(newDataProductsByDepartment);
+
+        }
         const getDataSpecificWarehouse = async () => {
             const newDataDepotsWarehouses = await requestWarehouse.getWarehouseWithTheirDepots(userId, dataStore.id, warehouseId)
-            loadDepartamentsFromSelectedWarehouse(0, newDataDepotsWarehouses);
+            loadDepartamentsFromSelectedInitialWarehouse(0, newDataDepotsWarehouses);
             setDataDepotsWarehouse(newDataDepotsWarehouses);
             setSelectedWarehouse(0);
         }
@@ -443,6 +462,9 @@ function AddProductFromWarehouse(props: any) {
                 product_remaining_units: units,
                 seller_profit_percentage: dataStore.fixed_seller_profit_percentage,
                 seller_profit_quantity: dataStore.fixed_seller_profit_quantity,
+                sell_price: data[ind].products.buy_price ?? 0,
+                sell_price_unit: "CUP",
+                is_active: true
             }
 
             request = await requestWarehouse.addProductsStoreDepots(userId, dataRequest);
@@ -457,7 +479,6 @@ function AddProductFromWarehouse(props: any) {
                 price_discount_quantity,
                 seller_profit_percentage,
                 seller_profit_quantity,
-                is_active
             } = data[ind].store_depots[0];
             const dataRequest = {
                 id,
@@ -471,7 +492,7 @@ function AddProductFromWarehouse(props: any) {
                 price_discount_quantity,
                 seller_profit_percentage,
                 seller_profit_quantity,
-                is_active,
+                is_active: true,
             }
 
             request = await requestWarehouse.updateStoreDepots(userId, dataRequest)
