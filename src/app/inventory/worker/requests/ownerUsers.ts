@@ -1,27 +1,28 @@
 // @ts-nocheck
 import apiRequest from "@/api"
+import {notifyError} from "@/utils/generalFunctions";
 
-const url = (userId) => "/inventory/worker/api"
-const urlCreate = (userId) => "/inventory/worker/create/api"
+const url = () => "/inventory/worker/api"
+const urlCreate = () => "/inventory/worker/create/api"
 
 const ownerUsers = {
     allWorkers: async function (userId: any) {
         try {
-            const response = await apiRequest.get(url(userId))
+            const response = await apiRequest.get(url(), {params: {ownerId: userId}})
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Error al pedir los usuarios trabajadores")
         }
 
         return false
     },
 
-    changeRol: async function (userId: any, workerId: any, roleId: any) {
+    changeRol: async function (workerId: any, roleId: any) {
         try {
-            const response = await apiRequest.patch(url(userId), {roleId: roleId}, {params: {userId: workerId}})
+            const response = await apiRequest.patch(url(), {roleId: roleId}, {params: {userId: workerId}})
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Error al cambiar el role del usuario")
         }
 
         return false
@@ -29,20 +30,20 @@ const ownerUsers = {
 
     deleteWorker: async function (userId: any) {
         try {
-            const response = await apiRequest.delete(url(userId), {params: {userId: userId}})
+            const response = await apiRequest.delete(url(), {params: {userId: userId}})
             if (response.status === 200) return true
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Error eliminando el usuario como trabajador")
         }
 
         return false
     },
 
-    findNewUser: async function (userId: any, username: any, phone: any) {
+    findNewUser: async function (username: any, phone: any) {
         try {
-            return await apiRequest.get(urlCreate(userId), {params: {username, phone}})
+            return await apiRequest.get(urlCreate(), {params: {username, phone}})
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Error al buscar el usuario")
         }
 
         return false
@@ -50,9 +51,9 @@ const ownerUsers = {
 
     addNewUser: async function (ownerId: any, userId: any) {
         try {
-            return await apiRequest.put(urlCreate(userId), {userId}, {params: {ownerId}})
+            return await apiRequest.put(urlCreate(), {userId}, {params: {ownerId}})
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Error agregando el usuario")
         }
 
         return false

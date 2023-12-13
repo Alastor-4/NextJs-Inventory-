@@ -46,7 +46,7 @@ export default function WorkersForm({ownerId}) {
     })
 
     const handleSubmit = async (values) => {
-        let response = await ownerUsers.findNewUser(ownerId, values.username, values.phone)
+        let response = await ownerUsers.findNewUser(values.username, values.phone)
 
         if (response?.status === 200) {
             setFoundUserData(response.data)
