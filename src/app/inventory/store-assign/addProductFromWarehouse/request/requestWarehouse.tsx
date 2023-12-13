@@ -1,13 +1,13 @@
 import apiRequest from "@/api"
 
-const url = (userId: any) => `/inventory/store-assign/addProductFromWarehouse/api`
-const urlSpecificComponent = (userId: any) => `/inventory/store-assign/addProductFromWarehouse/api/specificComponent`
+const url = `/inventory/store-assign/addProductFromWarehouse/api`
+const urlSpecificComponent = `/inventory/store-assign/addProductFromWarehouse/api/specificComponent`
 
 const requestWarehouse = {
 
     getAllWarehousesWithTheirDepots: async function (userId: any, storeId: any) {
         try {
-            const request = await apiRequest.get(url(userId), { params: { storeId: storeId } })
+            const request = await apiRequest.get(url, { params: { storeId: storeId } })
 
             return request.data
 
@@ -18,7 +18,7 @@ const requestWarehouse = {
     },
     getWarehouseWithTheirDepots: async function (userId: any, storeId: any, warehouseId: any) {
         try {
-            const request = await apiRequest.get(urlSpecificComponent(userId), { params: { storeId: storeId, warehouseId: warehouseId } })
+            const request = await apiRequest.get(urlSpecificComponent, { params: { storeId: storeId, warehouseId: warehouseId } })
 
             return request.data
 
@@ -31,7 +31,7 @@ const requestWarehouse = {
     addProductsStoreDepots: async function (userId: any, data: any) {
 
         try {
-            const request = await apiRequest.post(url(userId), data)
+            const request = await apiRequest.post(url, data)
 
             return request.status;
         } catch (e) {
@@ -42,7 +42,7 @@ const requestWarehouse = {
     updateDepots: async function (userId: any, data: any) {
 
         try {
-            const request = await apiRequest.put(url(userId), data)
+            const request = await apiRequest.put(url, data)
 
             return request.status;
         } catch (e) {
@@ -53,7 +53,7 @@ const requestWarehouse = {
     updateStoreDepots: async function (userId: any, data: any) {
 
         try {
-            const request = await apiRequest.put(urlSpecificComponent(userId), data)
+            const request = await apiRequest.put(urlSpecificComponent, data)
 
             return request.status;
         } catch (e) {

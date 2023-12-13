@@ -7,11 +7,10 @@ import React, { useState } from 'react'
 import storeAssign from '../../requests/store-assign'
 import { useParams } from 'next/navigation'
 
-function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot, setActiveManageQuantity }) {
+function ManageQuantity({ userId, nameStore, nameWarehouse, productDetails, updateDepot, setActiveManageQuantity }:
+  { userId: number, nameStore: any, nameWarehouse: any, productDetails: any, updateDepot: any, setActiveManageQuantity: any }) {
 
   const [swap, setSwap] = useState(false)
-
-  const params = useParams()
 
   const maxUnits = {
     cant: (!swap)
@@ -48,7 +47,7 @@ function ManageQuantity({ nameStore, nameWarehouse, productDetails, updateDepot,
 
     } else productStoreDepots.product_remaining_units -= parseInt(values.units)
 
-    const result = await storeAssign.updateProductStore(params.id, productStoreDepots)
+    const result = await storeAssign.updateProductStore(userId, productStoreDepots)
 
     if (result === 200) {
       (!swap)

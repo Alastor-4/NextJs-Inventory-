@@ -38,9 +38,7 @@ import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/
 
 function ShowProductsStore(props: any) {
 
-    const { storeId, nameStore, dataStore, nameWarehouse, warehouseId } = props;
-
-    const params = useParams()
+    const { userId, storeId, nameStore, dataStore, nameWarehouse, warehouseId } = props;
 
     const [allProductStore, setAllProductStore] = useState(null);
     const [data, setData] = useState()
@@ -61,7 +59,7 @@ function ShowProductsStore(props: any) {
 
     useEffect(() => {
         const data = async () => {
-            const result = await storeAssign.allProductsByDepartmentStore(params.id, storeId)
+            const result = await storeAssign.allProductsByDepartmentStore(userId, storeId)
             setAllProductStore(() => result.map(data => ({
                 ...data,
                 selected: false
@@ -71,7 +69,7 @@ function ShowProductsStore(props: any) {
         if (allProductStore === null) {
             data()
         }
-    }, [allProductStore, params.id, setAllProductStore, storeId])
+    }, [allProductStore, userId, setAllProductStore, storeId])
 
 
     useEffect(() => {
@@ -227,7 +225,7 @@ function ShowProductsStore(props: any) {
         )
     }
     const loadData = async () => {
-        let newAllProductStore = await storeAssign.allProductsByDepartmentStore(params.id, storeId);
+        let newAllProductStore = await storeAssign.allProductsByDepartmentStore(userId, storeId);
 
         let selectedDepartment = allProductStore.filter(element => (element.selected)).map(element => element.id)
 
@@ -240,7 +238,7 @@ function ShowProductsStore(props: any) {
 
     const updateDepot = async (addUnits, depot) => {
         depot.product_total_remaining_units += addUnits;
-        const result = await storeAssign.updateProductWarehouse(params.id, depot)
+        const result = await storeAssign.updateProductWarehouse(userId, depot)
         if (result.status === 200) {
             loadData();
         }
@@ -264,7 +262,7 @@ function ShowProductsStore(props: any) {
             is_active: newProductStoreDepots.is_active,
         }
 
-        const result = await storeAssign.updateProductStore(params.id, updateData)
+        const result = await storeAssign.updateProductStore(userId, updateData)
 
         if (result === 200) {
             await updateDepot(data[index].depots[0].store_depots[0].product_remaining_units, data[index].depots[0]);
@@ -504,7 +502,7 @@ function ShowProductsStore(props: any) {
                                 setOpen={setActiveAddProductFromWarehouse}
                                 loadData={loadData}
                             >
-                                <AddProductFromWarehouse dataStore={dataStore} warehouseId={warehouseId} />
+                                <AddProductFromWarehouse userId={userId} dataStore={dataStore} warehouseId={warehouseId} />
                             </ModalAddProductFromWarehouse>
 
                             <ImagesDisplayDialog

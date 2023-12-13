@@ -1,14 +1,12 @@
-// @ts-nocheck
 import apiRequest from "@/api"
-const showProductWarehouseUrl = (userId) => `/inventory/store-assign/showProductApi/apiWarehouse`
-const showProductStoreUrl = (userId) => `/inventory/store-assign/showProductApi/apiStore`
-
+const showProductWarehouseUrl = `/inventory/store-assign/showProductApi/apiWarehouse`
+const showProductStoreUrl = `/inventory/store-assign/showProductApi/apiStore`
 
 const storeAssign = {
     //Peticiones del component ShowProductStore
-    allProductsByDepartmentStore: async function (userId, storeId) {
+    allProductsByDepartmentStore: async function (userId: number, storeId: any) {
         try {
-            const response = await apiRequest.get(showProductStoreUrl(userId), { params: { storeId: storeId } })
+            const response = await apiRequest.get(showProductStoreUrl, { params: { storeId: storeId } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -17,9 +15,9 @@ const storeAssign = {
         return false
     },
 
-    updateProductStore: async function (userId, data) {
+    updateProductStore: async function (userId: number, data: any) {
         try {
-            const response = await apiRequest.put(showProductStoreUrl(userId), data)
+            const response = await apiRequest.put(showProductStoreUrl, data)
             return response.status
         } catch (e) {
             //ToDo: notify error here
@@ -28,9 +26,9 @@ const storeAssign = {
         return false
     },
 
-    updateProductWarehouse: async function (userId, data) {
+    updateProductWarehouse: async function (userId: number, data: any) {
         try {
-            return await apiRequest.put(showProductWarehouseUrl(userId), data)
+            return await apiRequest.put(showProductWarehouseUrl, data)
         } catch (e) {
             //ToDo: notify error here
         }
@@ -39,9 +37,9 @@ const storeAssign = {
     },
 
     // Peticiones para el component ShowProductWarehouse
-    allProductByDepartmentWarehouse: async function (userId, storeId, warehouseId) {
+    allProductByDepartmentWarehouse: async function (userId: number, storeId: any, warehouseId: any) {
         try {
-            const response = await apiRequest.get(showProductWarehouseUrl(userId), { params: { storeId: storeId, warehouseId: warehouseId } })
+            const response = await apiRequest.get(showProductWarehouseUrl, { params: { storeId: storeId, warehouseId: warehouseId } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -50,9 +48,9 @@ const storeAssign = {
         return false
     },
 
-    postProductToStoreDepot: async function (userId, data) {
+    postProductToStoreDepot: async function (userId: number, data: any) {
         try {
-            const response = await apiRequest.post(showProductWarehouseUrl(userId), data)
+            const response = await apiRequest.post(showProductWarehouseUrl, data)
             return response.status
         } catch (e) {
             //ToDo: notify error here

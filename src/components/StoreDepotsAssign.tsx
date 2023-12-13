@@ -21,11 +21,9 @@ import { useParams } from 'next/navigation';
 import { useRouter } from "next/navigation";
 
 export default function StoreDepotsAssign(
-    { warehouseListProp, selectedWarehouseIdProp, selectedStoreIdProp, storeListProp }:
-        { warehouseListProp: any[], selectedWarehouseIdProp: number | null, selectedStoreIdProp: number | null, storeListProp: any[] }
+    { warehouseListProp, selectedWarehouseIdProp, selectedStoreIdProp, storeListProp, userId }:
+        { userId: number, warehouseListProp: any[], selectedWarehouseIdProp: number | null, selectedStoreIdProp: number | null, storeListProp: any[] }
 ) {
-    const params = useParams()
-
     const router = useRouter()
 
     const [selectedWarehouse, setSelectedWarehouse] = useState<any>("")
@@ -164,6 +162,7 @@ export default function StoreDepotsAssign(
                                                 dataStore={formik.values.selectedStore}
                                                 nameWarehouse={formik.values.selectedWarehouse.name}
                                                 warehouseId={formik.values.selectedWarehouse.id}
+                                                userId={userId}
                                             />
                                         </Grid>
                                     )

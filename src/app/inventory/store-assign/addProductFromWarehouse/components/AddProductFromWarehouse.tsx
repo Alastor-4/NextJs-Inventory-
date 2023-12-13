@@ -35,9 +35,7 @@ import * as Yup from "yup"
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 
 function AddProductFromWarehouse(props: any) {
-    const { dataStore, warehouseId } = props
-
-    const params = useParams()
+    const { userId, dataStore, warehouseId } = props
 
     const [dataDepotsWarehouses, setDataDepotsWarehouse] = useState<any>([]);
     const [dataProductsByDepartment, setDataProductsByDepartment] = useState<any>([])
@@ -57,12 +55,12 @@ function AddProductFromWarehouse(props: any) {
     //                      -> products -> departments
     useEffect(() => {
         const getData = async () => {
-            const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(params.id, dataStore.id)
+            const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(userId, dataStore.id)
             setDataDepotsWarehouse(newDataDepotsWarehouses);
         }
 
         const getDataSpecificWarehouse = async () => {
-            const newDataDepotsWarehouses = await requestWarehouse.getWarehouseWithTheirDepots(params.id, dataStore.id, warehouseId)
+            const newDataDepotsWarehouses = await requestWarehouse.getWarehouseWithTheirDepots(userId, dataStore.id, warehouseId)
             loadDepartamentsFromSelectedWarehouse(0, newDataDepotsWarehouses);
             setDataDepotsWarehouse(newDataDepotsWarehouses);
             setSelectedWarehouse(0);
@@ -72,7 +70,7 @@ function AddProductFromWarehouse(props: any) {
             if (warehouseId === null) getData()
             else getDataSpecificWarehouse();
         }
-    }, [dataDepotsWarehouses, dataStore.id, params.id, warehouseId])
+    }, [dataDepotsWarehouses, dataStore.id, userId, warehouseId])
 
     // Puede pasar que q se oculte el último depósito
     // existente de un departamento seleccionado,por lo
@@ -447,7 +445,7 @@ function AddProductFromWarehouse(props: any) {
                 seller_profit_quantity: dataStore.fixed_seller_profit_quantity,
             }
 
-            request = await requestWarehouse.addProductsStoreDepots(params.id, dataRequest);
+            request = await requestWarehouse.addProductsStoreDepots(userId, dataRequest);
         } else {
             const {
                 id,
@@ -476,7 +474,7 @@ function AddProductFromWarehouse(props: any) {
                 is_active,
             }
 
-            request = await requestWarehouse.updateStoreDepots(params.id, dataRequest)
+            request = await requestWarehouse.updateStoreDepots(userId, dataRequest)
         }
 
         // Se comprueba q se halla echo la operacion en storeDepots
@@ -498,7 +496,7 @@ function AddProductFromWarehouse(props: any) {
                 product_total_units,
                 product_total_remaining_units: (product_total_remaining_units - units)
             }
-            request = await requestWarehouse.updateDepots(params.id, dataRequest)
+            request = await requestWarehouse.updateDepots(userId, dataRequest)
 
             if (request === 200) {
                 hideDepotInWarehouse() // ocultar deposito

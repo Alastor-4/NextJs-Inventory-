@@ -43,9 +43,6 @@ export default function ModalAddProductFromWarehouse(props) {
                     {props.children}
                 </Box>
             </DialogContent>
-            <DialogActions>
-                <Button onClick={handleClose}>Cerrar</Button>
-            </DialogActions>
         </Dialog>
     )
 }

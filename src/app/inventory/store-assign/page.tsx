@@ -1,13 +1,17 @@
 import StoreDepotsAssign from "@/components/StoreDepotsAssign";
 import { prisma } from "db";
+import { getServerSession } from "next-auth";
+import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
 
-export default async function Page({ params, searchParams }: { params: { id: string }, searchParams: { storeId: string, warehouseId: string } }) {
+export default async function Page({ searchParams }: { searchParams: { storeId: string, warehouseId: string } }) {
+    const session: any = await getServerSession(nextAuthOptions)
+    const userId: number = session?.user.id
 
     const storeId = searchParams.storeId
     const warehouseId = searchParams.warehouseId
-    const ownerId = params.id
-    const ownerWarehouses = await prisma.warehouses.findMany({ where: { owner_id: parseInt(ownerId) } })
-    const ownerStores = await prisma.stores.findMany({ where: { owner_id: parseInt(ownerId) } })
+
+    const ownerWarehouses = await prisma.warehouses.findMany({ where: { owner_id: userId } })
+    const ownerStores = await prisma.stores.findMany({ where: { owner_id: userId } })
 
     return (
         <main>
@@ -16,6 +20,7 @@ export default async function Page({ params, searchParams }: { params: { id: str
                 selectedWarehouseIdProp={warehouseId ? parseInt(warehouseId) : ownerWarehouses[0]?.id ?? null}
                 selectedStoreIdProp={storeId ? parseInt(storeId) : null}
                 storeListProp={ownerStores}
+                userId={userId}
             />
         </main>
     )
