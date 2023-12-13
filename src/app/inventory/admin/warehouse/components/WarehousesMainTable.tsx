@@ -22,11 +22,9 @@ import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import warehouses from "../requests/warehouses";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-export default function WarehousesMainTable() {
-
-    const params = useParams()
+export default function WarehousesMainTable({userId}) {
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
@@ -34,14 +32,14 @@ export default function WarehousesMainTable() {
     //get initial data
     React.useEffect(() => {
         const getAllWarehouse = async () => {
-            const newData = await warehouses.allWarehouses(params.id)
+            const newData = await warehouses.allWarehouses(userId)
             setData(newData)
         }
 
         if (data === null) {
             getAllWarehouse()
         }
-    }, [data])
+    }, [data, userId])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -54,7 +52,7 @@ export default function WarehousesMainTable() {
     }
 
     async function handleRemove() {
-        const response = await warehouses.delete(params.id, selected.id)
+        const response = await warehouses.delete(userId, selected.id)
         if (response) {
             const updatedWarehouses = await warehouses.allWarehouses()
             if (updatedWarehouses) setData(updatedWarehouses)

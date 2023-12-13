@@ -41,12 +41,11 @@ import {
     StartOutlined,
 } from "@mui/icons-material";
 import users from "../requests/users"
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function UsersMainTable(props) {
-    const { roles } = props
+    const { roles, userId } = props
 
-    const params = useParams()
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
@@ -54,13 +53,13 @@ export default function UsersMainTable(props) {
     //get initial data
     React.useEffect(() => {
         const getAllUser = async () => {
-            const newData = await users.allUsers(params.id)
+            const newData = await users.allUsers(userId)
             setData(newData)
         }
         if (data === null) {
             getAllUser();
         }
-    }, [data, params.id])
+    }, [data, userId])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -88,7 +87,7 @@ export default function UsersMainTable(props) {
             setSelectedRole(event.target.value || '');
         };
 
-        const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
+        const handleClose = () => {
             setOpen(false);
         };
 
@@ -161,9 +160,8 @@ export default function UsersMainTable(props) {
     }
 
     async function handleToggleActive() {
-        console.log(selected)
         const isActive = !selected.is_active
-        const response = await users.toggleActivateUser(params.id, selected.id, isActive)
+        const response = await users.toggleActivateUser(userId, selected.id, isActive)
         if (response) {
             let newData = [...data]
             const updatedItemIndex = newData.findIndex(item => item.id === response.id)

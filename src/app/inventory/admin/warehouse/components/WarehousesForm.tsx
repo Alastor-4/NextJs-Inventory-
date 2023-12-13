@@ -9,7 +9,7 @@ import { useParams, useRouter } from 'next/navigation';
 import warehouses from "../requests/warehouses";
 
 export default function WarehousesForm(props) {
-    const { ownerUsers } = props
+    const { ownerUsers, userId } = props
 
     const [updateItem, setUpdateItem] = React.useState()
 
@@ -18,7 +18,7 @@ export default function WarehousesForm(props) {
 
     React.useEffect(() => {
         async function fetchWarehouse(id: any) {
-            let item = await warehouses.warehouseDetails(params.id, id)
+            let item = await warehouses.warehouseDetails(userId, id)
 
             if (ownerUsers.length) {
                 const userIndex = ownerUsers.findIndex(userItem => userItem.id === item.users.id)
@@ -29,7 +29,7 @@ export default function WarehousesForm(props) {
         if (params?.warehouseId !== undefined) {
             fetchWarehouse(params.warehouseId)
         }
-    }, [ownerUsers, params.warehouseId, params.id, setUpdateItem])
+    }, [ownerUsers, params.warehouseId, userId, setUpdateItem])
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -71,7 +71,7 @@ export default function WarehousesForm(props) {
         if (updateItem) {
             response = await warehouses.update(
                 {
-                    userId: params.id,
+                    userId: userId,
                     id: updateItem.id,
                     name: values.name,
                     description: values.description,
@@ -81,7 +81,7 @@ export default function WarehousesForm(props) {
         } else {
             response = await warehouses.create(
                 {
-                    userId: params.id,
+                    userId: userId,
                     name: values.name,
                     description: values.description,
                     address: values.address,
