@@ -45,7 +45,7 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
             price_discount_quantity: storeDepot.price_discount_quantity,
         }
 
-        const request = await storeDetails.update(userId, storeDepot.id, data);
+        const request = await storeDetails.update(storeDepot.id, data);
         if (request === 200) {
             setActiveModalSellerProfit(false)
             loadDates()

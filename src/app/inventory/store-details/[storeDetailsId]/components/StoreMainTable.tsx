@@ -68,9 +68,6 @@ export default function StoreMainTable({ userId }: { userId: number }) {
     // modal q la usan:  TransferUnits , StoreEditUnits
     const [selectedRowInd, setSelectedRowInd] = React.useState<any>(null);
 
-    //ToDo: use global isLoading
-    const isLoading = false
-
     //get initial data
     React.useEffect(() => {
         fetcher(`/inventory/store-details/${params.storeDetailsId}/api`).then((data) =>
@@ -136,7 +133,7 @@ export default function StoreMainTable({ userId }: { userId: number }) {
             price_discount_percentage: product.price_discount_percentage,
             price_discount_quantity: product.price_discount_quantity,
         }
-        const response = await storeDetails.update(userId, product.id, data)
+        const response = await storeDetails.update(product.id, data)
         if (response === 200) {
             await loadDates();
         }
@@ -164,20 +161,12 @@ export default function StoreMainTable({ userId }: { userId: number }) {
                 </Box>
 
                 <Box sx={{ display: "flex" }}>
-                    {
-                        isLoading
-                            ? <CircularProgress size={24} color={"inherit"} />
-                            : (
-                                <>
-                                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/store-assign?storeId=${dataStore.id}`)} >
-                                        <ShareOutlined fontSize={"small"} />
-                                    </IconButton>
-                                    <IconButton color={"inherit"} onClick={() => setActiveAddProductFromWarehouse(true)} >
-                                        <AddOutlined />
-                                    </IconButton>
-                                </>
-                            )
-                    }
+                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/store-assign?storeId=${dataStore.id}`)} >
+                        <ShareOutlined fontSize={"small"} />
+                    </IconButton>
+                    <IconButton color={"inherit"} onClick={() => setActiveAddProductFromWarehouse(true)} >
+                        <AddOutlined />
+                    </IconButton>
                 </Box>
             </Toolbar>
         </AppBar>
@@ -237,7 +226,7 @@ export default function StoreMainTable({ userId }: { userId: number }) {
     }
 
     const loadDates = async () => {
-        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartament(userId, params.storeDetailsId);
+        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartment(params.storeDetailsId);
 
         let selectedDepartment = allProductsByDepartment.filter((element: any) => (element.selected)).map((element: any) => element.id)
 

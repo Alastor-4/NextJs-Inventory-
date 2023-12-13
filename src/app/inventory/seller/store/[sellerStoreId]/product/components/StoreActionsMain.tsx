@@ -274,7 +274,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
         } = formik.values
 
         const handleToggleOffer = async (offerId: number, storeDepotId: number) => {
-            const response = await storeDetails.toggleProductOffers(userId, storeId, offerId)
+            const response = await storeDetails.toggleProductOffers(storeId, offerId)
 
             if (response) {
                 const newDepartments = [...allProductsByDepartment]
