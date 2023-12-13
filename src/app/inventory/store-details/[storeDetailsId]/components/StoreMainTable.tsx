@@ -48,7 +48,7 @@ import { numberFormat } from "@/utils/generalFunctions";
 const fetcher = (url: any) => fetch(url).then((res) => res.json())
 
 
-export default function StoreMainTable() {
+export default function StoreMainTable({ userId }: { userId: number }) {
     const params = useParams()
     const router = useRouter()
 
@@ -78,7 +78,7 @@ export default function StoreMainTable() {
                 ...item,
                 selected: false
             }))))
-    }, [params.id, params.storeDetailsId])
+    }, [params.storeDetailsId])
 
     React.useEffect(() => {
         if (allProductsByDepartment.length) {
@@ -108,14 +108,14 @@ export default function StoreMainTable() {
     //Get Store name
     React.useEffect(() => {
         const getDataStore = async () => {
-            const newdataStore = await stores.storeDetails(params.id, params.storeDetailsId);
+            const newdataStore = await stores.storeDetails(userId, params.storeDetailsId);
             setDataStore(newdataStore);
         }
         if (dataStore === '') {
             getDataStore()
         }
 
-    }, [dataStore, params, setDataStore])
+    }, [dataStore, params.storeDetailsId, userId, setDataStore])
 
     function handleNavigateBack() {
         router.back()
@@ -136,7 +136,7 @@ export default function StoreMainTable() {
             price_discount_percentage: product.price_discount_percentage,
             price_discount_quantity: product.price_discount_quantity,
         }
-        const response = await storeDetails.update(params.id, product.id, data)
+        const response = await storeDetails.update(userId, product.id, data)
         if (response === 200) {
             await loadDates();
         }
@@ -237,7 +237,7 @@ export default function StoreMainTable() {
     }
 
     const loadDates = async () => {
-        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartament(params.id, params.storeDetailsId);
+        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartament(userId, params.storeDetailsId);
 
         let selectedDepartment = allProductsByDepartment.filter((element: any) => (element.selected)).map((element: any) => element.id)
 
@@ -410,7 +410,7 @@ export default function StoreMainTable() {
                                             <TableCell style={{ padding: 0 }} colSpan={6}>
                                                 {showDetails === row.id && (
                                                     <StoreMoreDetails
-                                                        userId={params.id}
+                                                        userId={userId}
                                                         details={row.depots[0].store_depots[0]}
                                                         show={(showDetails === row.id)}
                                                         loadDates={loadDates}
@@ -510,7 +510,7 @@ export default function StoreMainTable() {
                             open={activeModalPrice.active}
                             setOpen={setActiveModalPrice}
                         >
-                            <StoreEditPrice userId={params.id} storeDepot={activeModalPrice.storeDepot} setActiveModalPrice={setActiveModalPrice} loadDates={loadDates} />
+                            <StoreEditPrice userId={userId} storeDepot={activeModalPrice.storeDepot} setActiveModalPrice={setActiveModalPrice} loadDates={loadDates} />
                         </StoreModalPrice>
 
                         <StoreModalDefault
