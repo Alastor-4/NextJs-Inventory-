@@ -1,18 +1,15 @@
 // @ts-nocheck
 "use client"
 
-import {AppBar, Box, Button, Card, Divider, Grid, IconButton, TextField, Toolbar, Typography} from "@mui/material";
+import {AppBar, Box, Button, Card, Grid, TextField, Toolbar, Typography} from "@mui/material";
 import React, {useState} from "react";
 import {useFormik} from "formik";
 import * as Yup from "yup"
-import {useParams, useRouter} from 'next/navigation';
-import roles from "@/app/role/requests/roles";
+import {useRouter} from 'next/navigation';
 import ownerUsers from "@/app/inventory/worker/requests/ownerUsers";
 import {Done, InfoOutlined} from "@mui/icons-material";
 
 export default function WorkersForm({ownerId}) {
-    const [updateItem, setUpdateItem] = React.useState()
-
     const router = useRouter()
 
     const CustomToolbar = () => (
@@ -34,7 +31,6 @@ export default function WorkersForm({ownerId}) {
             </Toolbar>
         </AppBar>
     )
-
 
     const [displaySearchResult, setDisplaySearchResult] = useState(false)
     const [foundUserData, setFoundUserData] = useState(null)

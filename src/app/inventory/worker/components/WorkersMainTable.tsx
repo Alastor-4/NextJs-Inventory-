@@ -4,12 +4,24 @@
 import React from "react";
 import {
     AppBar,
-    Box, Button,
+    Box,
+    Button,
     Card,
     CardContent,
-    Checkbox, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
-    Divider, FormControl, Grid,
-    IconButton, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent,
+    Checkbox,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    OutlinedInput,
+    Select,
+    SelectChangeEvent,
     Table,
     TableBody,
     TableCell,
@@ -19,33 +31,27 @@ import {
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline, EditOutlined } from "@mui/icons-material";
+import { AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline } from "@mui/icons-material";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import products from "@/app/inventory/product/requests/products";
+import { useRouter } from "next/navigation";
 import ownerUsers from "@/app/inventory/worker/requests/ownerUsers";
-import users from "@/app/user/requests/users";
 
 export default function WorkersMainTable(props) {
-    const { roles } = props
+    const { roles, userId } = props
 
     const [data, setData] = React.useState(null)
 
-    const params = useParams()
     const router = useRouter()
-
-    //ToDo: use global isLoading
-    const isLoading = false
 
     //get initial data
     React.useEffect(() => {
         const getData = async () => {
-            const newData = await ownerUsers.allWorkers(params.id)
+            const newData = await ownerUsers.allWorkers(userId)
             setData(newData)
         }
         getData();
 
-    }, [params.id])
+    }, [userId])
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -78,9 +84,9 @@ export default function WorkersMainTable(props) {
         };
 
         const handleApplyRole = async () => {
-            const response = await ownerUsers.changeRol(params.id, selected.id, selectedRole.id)
+            const response = await ownerUsers.changeRol(userId, selected.id, selectedRole.id)
             if (response) {
-                const allUsers = await ownerUsers.allWorkers(params.id)
+                const allUsers = await ownerUsers.allWorkers(userId.id)
                 if (allUsers) setData(allUsers)
 
                 setSelected(null)
@@ -124,7 +130,7 @@ export default function WorkersMainTable(props) {
     async function handleRemove() {
         const response = await ownerUsers.deleteWorker(selected.id)
         if (response) {
-            const allUsers = await ownerUsers.allWorkers(params.id)
+            const allUsers = await ownerUsers.allWorkers(userId)
             if (allUsers) setData(allUsers)
             setSelected(null)
         }
@@ -156,35 +162,27 @@ export default function WorkersMainTable(props) {
 
                 <Box sx={{ display: "flex" }}>
                     {
-                        isLoading
-                            ? <CircularProgress size={24} color={"inherit"} />
-                            : (
-                                <>
-                                    {
-                                        selected && (
-                                            <Box sx={{ display: "flex" }}>
-                                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
-                                                    <ChangeCircleOutlined fontSize={"small"} />
-                                                </IconButton>
+                        selected && (
+                            <Box sx={{ display: "flex" }}>
+                                <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
+                                    <ChangeCircleOutlined fontSize={"small"} />
+                                </IconButton>
 
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"} />
-                                                </IconButton>
+                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                    <DeleteOutline fontSize={"small"} />
+                                </IconButton>
 
-                                                <Divider orientation="vertical" variant="middle" flexItem
-                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
-                                            </Box>
-                                        )
-                                    }
-
-                                    <Link href={`/inventory/worker/create`}>
-                                        <IconButton color={"inherit"}>
-                                            <AddOutlined />
-                                        </IconButton>
-                                    </Link>
-                                </>
-                            )
+                                <Divider orientation="vertical" variant="middle" flexItem
+                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                            </Box>
+                        )
                     }
+
+                    <Link href={`/inventory/worker/create`}>
+                        <IconButton color={"inherit"}>
+                            <AddOutlined />
+                        </IconButton>
+                    </Link>
                 </Box>
             </Toolbar>
         </AppBar>
