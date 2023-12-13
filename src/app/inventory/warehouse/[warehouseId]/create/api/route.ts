@@ -1,9 +1,10 @@
-import {NextResponse} from 'next/server'
-import {prisma} from "db";
+import { NextResponse } from 'next/server'
+import { prisma } from "db";
 
 // Get all products without depots in warehouse
-export async function GET(req: Request, {params}: { params: { id: string, warehouseId: string } }) {
-    const ownerId = params.id
+export async function GET(req: Request, { params }: { params: { warehouseId: string } }) {
+    const { searchParams } = new URL(req.url)
+    const ownerId = parseInt(<string>searchParams.get("userId"))
     const warehouseId = params.warehouseId
 
     if (ownerId && warehouseId) {
@@ -13,20 +14,20 @@ export async function GET(req: Request, {params}: { params: { id: string, wareho
                     AND: [
                         {
                             products: {
-                                some: {owner_id: parseInt(ownerId)}
+                                some: { owner_id: ownerId }
                             },
                         },
                         {
                             products: {
-                                some: {depots: {none: {warehouse_id: parseInt(warehouseId)}}}
+                                some: { depots: { none: { warehouse_id: parseInt(warehouseId) } } }
                             },
                         },
                     ]
                 },
                 include: {
                     products: {
-                        where: {depots: {none: {warehouse_id: parseInt(warehouseId)}}},
-                        include: {departments: true, characteristics: true, images: true},
+                        where: { depots: { none: { warehouse_id: parseInt(warehouseId) } } },
+                        include: { departments: true, characteristics: true, images: true },
                     }
                 }
             }
@@ -35,5 +36,5 @@ export async function GET(req: Request, {params}: { params: { id: string, wareho
         return NextResponse.json(warehouseDepots)
     }
 
-    return new Response('La acción de obtener los depósitos ha fallado', {status: 500})
+    return new Response('La acción de obtener los depósitos ha fallado', { status: 500 })
 }
