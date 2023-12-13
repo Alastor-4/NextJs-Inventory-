@@ -3,7 +3,7 @@ import { prisma } from "@/db"
 
 //Sirve para abreviar params en las props de las peticiones
 interface Params {
-    params: { id: string, storeDetailsId: string }
+    params: { storeDetailsId: string }
 }
 
 //Pido todos los departamentos, productos de estos departamentos
@@ -72,7 +72,7 @@ export async function GET(req: Request, { params }: Params) {
                                         }
                                     ]
                                 },
-                                include: {_count: {select: {product_offers: true}}}
+                                include: { _count: { select: { product_offers: true } } }
                             }
                         }
                     },
@@ -103,8 +103,8 @@ export async function PUT(req: Request) {
         price_discount_quantity,
     } = await req.json();
 
-    
-    
+
+
     const result = await prisma.store_depots.update({
         data: {
             id,

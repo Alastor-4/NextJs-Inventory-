@@ -1,16 +1,16 @@
 import React from 'react'
 import apiRequest from '@/api'
 
-const url = (userId: any, storeId: any) => `/inventory/store-details/${storeId}/api`
-const urlTranferUnits = (userId: any, storeId: any) => `/inventory/store-details/${storeId}/apiTransferUnits`
-const urlOffers = (userId: any, storeId: any) => `/inventory/store-details/${storeId}/components/offers/api`
+const url = (storeId: any) => `/inventory/store-details/${storeId}/api`
+const urlTranferUnits = (storeId: any) => `/inventory/store-details/${storeId}/apiTransferUnits`
+const urlOffers = (storeId: any) => `/inventory/store-details/${storeId}/components/offers/api`
 
 
 export const storeDetails = {
 
     getAllProductsByDepartament: async function (userId: any, storeId: any) {
         try {
-            const response = await apiRequest.get(url(userId, storeId))
+            const response = await apiRequest.get(url(storeId))
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -21,7 +21,7 @@ export const storeDetails = {
 
     update: async function (userId: any, storeId: any, data: Object) {
         try {
-            const response = await apiRequest.put(url(userId, storeId), data)
+            const response = await apiRequest.put(url(storeId), data)
             return response.status
         } catch (e) {
             //ToDo: notify error here
@@ -32,7 +32,7 @@ export const storeDetails = {
     //Requests transferUnits
     getDataWharehouse_Depots: async function (userId: any, storeId: any, productId: any) {
         try {
-            const response = await apiRequest.get(urlTranferUnits(userId, storeId), { params: { productId: productId } })
+            const response = await apiRequest.get(urlTranferUnits(storeId), { params: { productId: productId } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -42,7 +42,7 @@ export const storeDetails = {
 
     updateDepotsAndStoreDepots: async function (userId: any, storeId: any, data: Object) {
         try {
-            const response = await apiRequest.put(urlTranferUnits(userId, storeId), data)
+            const response = await apiRequest.put(urlTranferUnits(storeId), data)
             return response.status;
         } catch (e) {
             //ToDo: notify error here
@@ -53,7 +53,7 @@ export const storeDetails = {
     //productOffers
     getProductOffers: async function (userId: any, storeId: any, storeDepotId: any) {
         try {
-            const response = await apiRequest.get(urlOffers(userId, storeId), { params: { storeDepotId: storeDepotId } })
+            const response = await apiRequest.get(urlOffers(storeId), { params: { storeDepotId: storeDepotId } })
 
             return response.data
         } catch (e) {
@@ -64,7 +64,7 @@ export const storeDetails = {
 
     createProductOffers: async function (userId: any, storeId: any, data: any) {
         try {
-            const response = await apiRequest.post(urlOffers(userId, storeId), data)
+            const response = await apiRequest.post(urlOffers(storeId), data)
 
             return response.data
         } catch (e) {
@@ -74,7 +74,7 @@ export const storeDetails = {
     },
     updateProductOffers: async function (userId: any, storeId: any, data: any) {
         try {
-            const response = await apiRequest.put(urlOffers(userId, storeId), data)
+            const response = await apiRequest.put(urlOffers(storeId), data)
 
             return response.data
         } catch (e) {
@@ -84,7 +84,7 @@ export const storeDetails = {
     },
     toggleProductOffers: async function (userId: any, storeId: any, productOfferId: any) {
         try {
-            const response = await apiRequest.patch(urlOffers(userId, storeId), { productOfferId: productOfferId })
+            const response = await apiRequest.patch(urlOffers(storeId), { productOfferId: productOfferId })
 
             return response.data
         } catch (e) {
@@ -94,7 +94,7 @@ export const storeDetails = {
     },
     removeProductOffers: async function (userId: any, storeId: any, productOfferId: any) {
         try {
-            const response = await apiRequest.delete(urlOffers(userId, storeId), { params: { productOfferId: productOfferId } })
+            const response = await apiRequest.delete(urlOffers(storeId), { params: { productOfferId: productOfferId } })
 
             return response.data
         } catch (e) {
