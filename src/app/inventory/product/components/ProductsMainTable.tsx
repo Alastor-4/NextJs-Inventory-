@@ -7,33 +7,30 @@ import {
     Box, Button,
     Card,
     CardContent,
-    Checkbox, CircularProgress,
+    Checkbox,
     Divider, Grid,
     IconButton,
     Table,
     TableBody,
     TableCell,
     TableHead,
-    TableRow, TextField,
+    TableRow,
+    TextField,
     Toolbar,
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import products from "@/app/inventory/product/requests/products";
-import * as Yup from "yup";
-import { Formik, useFormik } from "formik";
+import { Formik } from "formik";
 
 export default function ProductsMainTable({ userId }: { userId: number }) {
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
-
-    //ToDo: use global isLoading
-    const isLoading = false
 
     //get initial data
     React.useEffect(() => {
@@ -129,35 +126,27 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
 
                 <Box sx={{ display: "flex" }}>
                     {
-                        isLoading
-                            ? <CircularProgress size={24} color={"inherit"} />
-                            : (
-                                <>
-                                    {
-                                        selected && (
-                                            <Box sx={{ display: "flex" }}>
-                                                <IconButton color={"inherit"} onClick={handleUpdate}>
-                                                    <EditOutlined fontSize={"small"} />
-                                                </IconButton>
+                        selected && (
+                            <Box sx={{ display: "flex" }}>
+                                <IconButton color={"inherit"} onClick={handleUpdate}>
+                                    <EditOutlined fontSize={"small"} />
+                                </IconButton>
 
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"} />
-                                                </IconButton>
+                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                    <DeleteOutline fontSize={"small"} />
+                                </IconButton>
 
-                                                <Divider orientation="vertical" variant="middle" flexItem
-                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
-                                            </Box>
-                                        )
-                                    }
-
-                                    <Link href={`/inventory/product/create`}>
-                                        <IconButton color={"inherit"}>
-                                            <AddOutlined />
-                                        </IconButton>
-                                    </Link>
-                                </>
-                            )
+                                <Divider orientation="vertical" variant="middle" flexItem
+                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                            </Box>
+                        )
                     }
+
+                    <Link href={`/inventory/product/create`}>
+                        <IconButton color={"inherit"}>
+                            <AddOutlined />
+                        </IconButton>
+                    </Link>
                 </Box>
             </Toolbar>
         </AppBar>

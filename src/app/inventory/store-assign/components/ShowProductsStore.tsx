@@ -502,7 +502,7 @@ function ShowProductsStore(props: any) {
                                 setOpen={setActiveAddProductFromWarehouse}
                                 loadData={loadData}
                             >
-                                <AddProductFromWarehouse userId={userId} dataStore={dataStore} warehouseId={warehouseId} />
+                                <AddProductFromWarehouse dataStore={dataStore} warehouseId={warehouseId} />
                             </ModalAddProductFromWarehouse>
 
                             <ImagesDisplayDialog

@@ -68,9 +68,6 @@ export default function StoreMainTable({ userId }: { userId: number }) {
     // modal q la usan:  TransferUnits , StoreEditUnits
     const [selectedRowInd, setSelectedRowInd] = React.useState<any>(null);
 
-    //ToDo: use global isLoading
-    const isLoading = false
-
     //get initial data
     React.useEffect(() => {
         fetcher(`/inventory/store-details/${params.storeDetailsId}/api`).then((data) =>
@@ -164,20 +161,12 @@ export default function StoreMainTable({ userId }: { userId: number }) {
                 </Box>
 
                 <Box sx={{ display: "flex" }}>
-                    {
-                        isLoading
-                            ? <CircularProgress size={24} color={"inherit"} />
-                            : (
-                                <>
-                                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/store-assign?storeId=${dataStore.id}`)} >
-                                        <ShareOutlined fontSize={"small"} />
-                                    </IconButton>
-                                    <IconButton color={"inherit"} onClick={() => setActiveAddProductFromWarehouse(true)} >
-                                        <AddOutlined />
-                                    </IconButton>
-                                </>
-                            )
-                    }
+                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/store-assign?storeId=${dataStore.id}`)} >
+                        <ShareOutlined fontSize={"small"} />
+                    </IconButton>
+                    <IconButton color={"inherit"} onClick={() => setActiveAddProductFromWarehouse(true)} >
+                        <AddOutlined />
+                    </IconButton>
                 </Box>
             </Toolbar>
         </AppBar>
