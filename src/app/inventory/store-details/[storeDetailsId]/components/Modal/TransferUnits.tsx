@@ -19,7 +19,7 @@ import { useParams } from 'next/navigation'
 import { storeDetails } from '../../request/storeDetails'
 
 function TransferUnits(props: any) {
-    const { nameStore, storeDepot, productId, setActiveTransferUnits, loadDates } = props;
+    const { userId, nameStore, storeDepot, productId, setActiveTransferUnits, loadDates } = props;
 
     const params = useParams()
 
@@ -35,7 +35,7 @@ function TransferUnits(props: any) {
 
     useEffect(() => {
         const getDataWareHouses = async () => {
-            const data = await storeDetails.getDataWharehouse_Depots(params.id, params.storeDetailsId, productId)
+            const data = await storeDetails.getDataWharehouse_Depots(userId, params.storeDetailsId, productId)
             setDataWarehouses(data);
             setSelectedWarehouseDepot(data[0].depots[0])
         }
@@ -43,7 +43,7 @@ function TransferUnits(props: any) {
         if (dataWarehouses === null) {
             getDataWareHouses()
         }
-    }, [dataWarehouses, setDataWarehouses])
+    }, [userId,params.storeDetailsId,dataWarehouses,productId])
 
 
     const maxUnits = {
@@ -97,7 +97,7 @@ function TransferUnits(props: any) {
             }
         }
 
-        const result = await storeDetails.updateDepotsAndStoreDepots(params.id, params.storeDetailsId, data)
+        const result = await storeDetails.updateDepotsAndStoreDepots(userId, params.storeDetailsId, data)
 
         if (result === 200) {
             loadDates()

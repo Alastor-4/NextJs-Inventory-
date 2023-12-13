@@ -21,7 +21,7 @@ import StoreModalOffers from './StoreModalOffers';
 import { notifyError, notifySuccess, notifyWarning } from '@/utils/generalFunctions';
 
 function StoreListOffers(props: any) {
-    const { priceProduct, currency, storeDepotId } = props;
+    const { userId, priceProduct, currency, storeDepotId } = props;
     const params = useParams()
 
     const [offers, setOffers] = useState<any>([])
@@ -32,16 +32,16 @@ function StoreListOffers(props: any) {
 
     //Se pide a la bd las offertas del producto
     const getDataOffers = async () => {
-        const newOffers = await storeDetails.getProductOffers(params.id, params.storeDetailsId, storeDepotId)
+        const newOffers = await storeDetails.getProductOffers(userId, params.storeDetailsId, storeDepotId)
         setOffers(newOffers)
     }
     useEffect(() => {
         const getData = async () => {
-            const newOffers = await storeDetails.getProductOffers(params.id, params.storeDetailsId, storeDepotId)
+            const newOffers = await storeDetails.getProductOffers(userId, params.storeDetailsId, storeDepotId)
             setOffers(newOffers)
         }
         getData()
-    }, [params.id, params.storeDetailsId, storeDepotId])
+    }, [userId, params.storeDetailsId, storeDepotId])
 
     // Componente para editar cada nota ( create and update )
     function EditOffer(props: any) {
@@ -85,10 +85,10 @@ function StoreListOffers(props: any) {
             }
 
             if (activeModalCreateOffer) {
-                response = await storeDetails.createProductOffers(params.id, params.storeDetailsId, data)
+                response = await storeDetails.createProductOffers(userId, params.storeDetailsId, data)
                 setActiveModalCreateOffer(false)
             } else {
-                response = await storeDetails.updateProductOffers(params.id, params.storeDetailsId, data)
+                response = await storeDetails.updateProductOffers(userId, params.storeDetailsId, data)
                 setActiveModalEditOffer(false)
             }
             if (response === false) {
@@ -175,7 +175,7 @@ function StoreListOffers(props: any) {
     }
 
     const removeOffer = async (offerId: any) => {
-        const response = await storeDetails.removeProductOffers(params.id, params.storeDetailsId, offerId)
+        const response = await storeDetails.removeProductOffers(userId, params.storeDetailsId, offerId)
 
         if (response === false) {
             notifyError("No se ha podido eliminar la oferta")
@@ -183,7 +183,7 @@ function StoreListOffers(props: any) {
     }
 
     const handleToggleOffer = async (offerId: any) => {
-        const response = await storeDetails.toggleProductOffers(params.id, params.storeDetailsId, offerId)
+        const response = await storeDetails.toggleProductOffers(userId, params.storeDetailsId, offerId)
 
         if (response) {
             const isActive = response.is_active

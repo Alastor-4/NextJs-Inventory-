@@ -7,7 +7,7 @@ import { storeDetails } from '../../request/storeDetails';
 import { useParams } from 'next/navigation';
 
 function StoreEditUnits(props: any) {
-    const { dataRow, setActiveModalEditUnits, setActiveModalTransferUnits, loadDates } = props;
+    const { userId,dataRow, setActiveModalEditUnits, setActiveModalTransferUnits, loadDates } = props;
 
     const params = useParams();
 
@@ -36,7 +36,7 @@ function StoreEditUnits(props: any) {
         const data = dataRow;
         data.product_units = parseInt(values.units);
 
-        const result = await storeDetails.update(params.id, params.storeDetailsId, data);
+        const result = await storeDetails.update(userId, params.storeDetailsId, data);
 
         if (result === 200) {
             setActiveModalEditUnits(false);
