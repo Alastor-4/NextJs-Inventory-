@@ -1,4 +1,4 @@
-// @ts-nocheck
+//@ts-nocheck
 "use client"
 
 import {
@@ -15,16 +15,16 @@ import {
     Typography
 } from "@mui/material";
 import React from "react";
-import {Formik} from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup"
-import {useParams, useRouter} from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import products from "@/app/inventory/product/requests/products";
-import {AddOutlined, Cancel, Close, DeleteOutline, Done} from "@mui/icons-material";
-import {useDropzone} from "react-dropzone";
-import {useUploadThing} from "@/app/api/uploadthing/utils";
+import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-material";
+import { useDropzone } from "react-dropzone";
+import { useUploadThing } from "@/app/api/uploadthing/utils";
 
 export default function ProductsForm(props: any) {
-    const {userId, departments} = props
+    const { userId, departments } = props
 
     const [updateItem, setUpdateItem] = React.useState()
 
@@ -33,7 +33,7 @@ export default function ProductsForm(props: any) {
 
     //initial values
     const [department, setDepartment] = React.useState("")
-    
+
     React.useEffect(() => {
         async function fetchProduct(id: string) {
             const product = await products.productDetails(userId, id)
@@ -53,7 +53,7 @@ export default function ProductsForm(props: any) {
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
                 <Box>
                     <Typography
                         variant="h6"
@@ -103,7 +103,7 @@ export default function ProductsForm(props: any) {
             return res
         },
         onUploadError: () => {
-           return false
+            return false
         },
     });
 
@@ -127,7 +127,7 @@ export default function ProductsForm(props: any) {
         }
 
         if (values.deletedImages.length) {
-            data.deletedImages = values.deletedImages.map(item => ({id: item.id, fileKey: item.fileKey}))
+            data.deletedImages = values.deletedImages.map(item => ({ id: item.id, fileKey: item.fileKey }))
         }
 
         if (values.images.length) {
@@ -136,7 +136,7 @@ export default function ProductsForm(props: any) {
             if (newImages.length) {
                 const files = await startUpload(newImages)
                 if (files) {
-                    data.images = files.map(item => ({fileKey: item.fileKey, fileUrl: item.fileUrl}))
+                    data.images = files.map(item => ({ fileKey: item.fileKey, fileUrl: item.fileUrl }))
                 }
             }
         }
@@ -160,7 +160,7 @@ export default function ProductsForm(props: any) {
 
     function handleAddCharacteristic(formik) {
         if (formik.values.characteristicName && formik.values.characteristicValue) {
-            let characteristics = [...formik.values.characteristics, {name: formik.values.characteristicName, value: formik.values.characteristicValue}]
+            let characteristics = [...formik.values.characteristics, { name: formik.values.characteristicName, value: formik.values.characteristicValue }]
             formik.setFieldValue("characteristics", characteristics)
 
             formik.setFieldValue("characteristicName", "")
@@ -187,7 +187,7 @@ export default function ProductsForm(props: any) {
         formik.setFieldValue("characteristics", characteristics)
     }
 
-    function MyDropzone({formik}) {
+    function MyDropzone({ formik }) {
         function onDrop(acceptedFiles) {
             const newFiles = [...acceptedFiles]
             let addedFiles = [...formik.values.images]
@@ -206,7 +206,7 @@ export default function ProductsForm(props: any) {
             formik.setFieldValue("images", addedFiles)
         }
 
-        const {getRootProps, getInputProps, isDragActive} = useDropzone(
+        const { getRootProps, getInputProps, isDragActive } = useDropzone(
             {
                 accept: {
                     'image/*': ['.jpeg', '.jpg', '.png']
@@ -246,8 +246,8 @@ export default function ProductsForm(props: any) {
                     {
                         isDragActive ?
                             <p>Suelte las imágenes aquí ...</p> :
-                            <p>Arrastre imágenes hasta aquí o click para seleccionar. <br/>
-                                Sube hasta 3 archivos menores de 4MB cada uno. <br/>
+                            <p>Arrastre imágenes hasta aquí o click para seleccionar. <br />
+                                Sube hasta 3 archivos menores de 4MB cada uno. <br />
                                 Formatos permitidos .jpeg, .jpg o .png
                             </p>
                     }
@@ -277,10 +277,10 @@ export default function ProductsForm(props: any) {
         <Badge
             key={file.name ? file.name : file.fileKey}
             overlap={"circular"}
-            badgeContent={<Cancel sx={{color: "red", cursor: "pointer"}} />}
+            badgeContent={<Cancel sx={{ color: "red", cursor: "pointer" }} />}
             onClick={() => handleRemoveImage(formik, file)}
         >
-            <Avatar src={file.fileUrl} variant={"rounded"} sx={{width: "120px", height: "120px", marginX: "10px"}}/>
+            <Avatar src={file.fileUrl} variant={"rounded"} sx={{ width: "120px", height: "120px", marginX: "10px" }} />
         </Badge>
     ))
 
@@ -297,10 +297,10 @@ export default function ProductsForm(props: any) {
                         <form onSubmit={formik.handleSubmit}>
                             <Grid container rowSpacing={2}>
                                 <Grid item xs={12}>
-                                    <CustomToolbar/>
+                                    <CustomToolbar />
                                 </Grid>
 
-                                <Grid container item rowSpacing={4} sx={{padding: "25px"}}>
+                                <Grid container item rowSpacing={4} sx={{ padding: "25px" }}>
                                     <Grid item xs={12}>
                                         <TextField
                                             name={"Nombre*"}
@@ -355,7 +355,7 @@ export default function ProductsForm(props: any) {
                                     </Grid>
 
                                     <Grid item container xs={12} rowSpacing={2}>
-                                        <Grid item xs={12} sx={{paddingX: "15px"}}>
+                                        <Grid item xs={12} sx={{ paddingX: "15px" }}>
                                             <FormControlLabel
                                                 label={
                                                     <Typography variant={"subtitle2"}>
@@ -388,12 +388,12 @@ export default function ProductsForm(props: any) {
                                                         <Grid container item alignItems={"center"} sx={{ color: "rgba(16,27,44,0.8)" }}>
                                                             {item.value}
                                                         </Grid>
-                                                        <Grid item sx={{marginLeft: "3px"}}>
+                                                        <Grid item sx={{ marginLeft: "3px" }}>
                                                             <DeleteOutline
                                                                 fontSize={"small"}
                                                                 color={"secondary"}
                                                                 onClick={() => handleRemoveCharacteristic(formik, index)}
-                                                                sx={{cursor: "pointer"}}
+                                                                sx={{ cursor: "pointer" }}
                                                             />
                                                         </Grid>
                                                     </Grid>
@@ -401,7 +401,7 @@ export default function ProductsForm(props: any) {
                                             }
                                             {
                                                 !formik?.values?.displayCharacteristicForm && (
-                                                    <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm",true)}>
+                                                    <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm", true)}>
                                                         <AddOutlined />
                                                     </IconButton>
                                                 )
@@ -435,7 +435,7 @@ export default function ProductsForm(props: any) {
                                                     </Grid>
                                                     <Grid item xs={12}>
                                                         <IconButton color={"primary"} onClick={() => handleAddCharacteristic(formik)}>
-                                                            <Done color={"primary"}/>
+                                                            <Done color={"primary"} />
                                                         </IconButton>
 
                                                         <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm", false)}>
@@ -446,8 +446,8 @@ export default function ProductsForm(props: any) {
                                             )
                                         }
 
-                                        <Grid item xs={12} sx={{mt: "15px"}}>
-                                            <MyDropzone formik={formik}/>
+                                        <Grid item xs={12} sx={{ mt: "15px" }}>
+                                            <MyDropzone formik={formik} />
                                         </Grid>
                                         <Grid item container xs={12} justifyContent={"center"}>
                                             <aside>{thumbs(formik)}</aside>
@@ -455,12 +455,12 @@ export default function ProductsForm(props: any) {
                                     </Grid>
                                 </Grid>
 
-                                <Grid container item justifyContent={"flex-end"} sx={{paddingRight: "25px"}}>
+                                <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                                     <Button
                                         color={"secondary"}
                                         variant={"outlined"}
                                         size={"small"}
-                                        sx={{m: 1}}
+                                        sx={{ m: 1 }}
                                         onClick={() => router.push(`/inventory/product`)}
                                     >
                                         Cancel
@@ -471,7 +471,7 @@ export default function ProductsForm(props: any) {
                                         color={"primary"}
                                         variant={"outlined"}
                                         size={"small"}
-                                        sx={{m: 1}}
+                                        sx={{ m: 1 }}
                                         disabled={!formik.isValid}
                                     >
                                         {updateItem ? "Update" : "Create"}

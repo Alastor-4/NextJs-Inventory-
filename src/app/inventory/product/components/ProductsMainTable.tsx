@@ -26,8 +26,7 @@ import products from "@/app/inventory/product/requests/products";
 import * as Yup from "yup";
 import { Formik, useFormik } from "formik";
 
-export default function ProductsMainTable() {
-    const params = useParams()
+export default function ProductsMainTable({ userId }: { userId: number }) {
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
@@ -39,7 +38,7 @@ export default function ProductsMainTable() {
     //get initial data
     React.useEffect(() => {
         const getAllProductsByDepartment = async () => {
-            const newAllProductsByDepartment = await products.allUserProductDepartments(params.id);
+            const newAllProductsByDepartment = await products.allUserProductDepartments(userId);
             setAllProductsByDepartment(newAllProductsByDepartment.map((item: any) => ({
                 ...item,
                 selected: false
@@ -47,7 +46,7 @@ export default function ProductsMainTable() {
         }
         getAllProductsByDepartment()
 
-    }, [params.id])
+    }, [userId])
 
     React.useEffect(() => {
         if (allProductsByDepartment.length) {
@@ -85,14 +84,14 @@ export default function ProductsMainTable() {
     }
 
     async function handleRemove() {
-        const response = await products.delete(params.id, selected.id)
+        const response = await products.delete(userId, selected.id)
         if (response) {
             //ToDo: remove product images from uploadthing
             setSelected(null)
 
             const selectedFilters = allProductsByDepartment.filter(item => item.selected).map(item => item.id)
 
-            const updatedProducts = await products.allUserProductDepartments(params.id)
+            const updatedProducts = await products.allUserProductDepartments(userId)
 
             if (updatedProducts) {
                 setAllProductsByDepartment(updatedProducts.map(item => ({ ...item, selected: selectedFilters.includes(item.id) })))

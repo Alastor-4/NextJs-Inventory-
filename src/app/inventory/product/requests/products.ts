@@ -1,14 +1,14 @@
-// @ts-nocheck
+//@ts-nocheck
 import apiRequest from "@/api"
-import {notifyError} from "@/utils/generalFunctions";
+import { notifyError } from "@/utils/generalFunctions";
 
-const url = (userId) => `/inventory/product/api`
-const updateUrl = (userId) => `/inventory/product/update/api`
+const url = `/inventory/product/api`
+const updateUrl = `/inventory/product/update/api`
 
 const products = {
-    allUserProducts: async function (userId, departmentIds) {
+    allUserProducts: async function (userId: number, departmentIds) {
         try {
-            const response = await apiRequest.get(url(userId), {params: {departmentIds: departmentIds}})
+            const response = await apiRequest.get(url, { params: { userId: userId, departmentIds: departmentIds } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -19,7 +19,7 @@ const products = {
 
     allUserProductDepartments: async function (userId) {
         try {
-            const response = await apiRequest.get(url(userId))
+            const response = await apiRequest.get(url, { params: { userId: userId } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -30,7 +30,7 @@ const products = {
 
     productDetails: async function (userId, productId) {
         try {
-            const response = await apiRequest.get(updateUrl(userId), {params: {productId: productId}})
+            const response = await apiRequest.get(updateUrl, { params: { productId: productId } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -41,7 +41,7 @@ const products = {
 
     create: async function (userId, data) {
         try {
-            return await apiRequest.post(url(userId), data)
+            return await apiRequest.post(url, data)
         } catch (e) {
             notifyError("Ha ocurrido un error creando el producto")
         }
@@ -49,9 +49,9 @@ const products = {
         return false
     },
 
-    syncImages: async function ({userId, productId, productImages}) {
+    syncImages: async function ({ userId, productId, productImages }) {
         try {
-            return await apiRequest.patch(url(userId), {productId, productImages})
+            return await apiRequest.patch(url, { productId, productImages })
         } catch (e) {
             //ToDo: notify error here
         }
@@ -61,7 +61,7 @@ const products = {
 
     update: async function (userId, data) {
         try {
-            return await apiRequest.put(url(userId), data)
+            return await apiRequest.put(url, data)
         } catch (e) {
             //ToDo: notify error here
         }
@@ -71,7 +71,7 @@ const products = {
 
     delete: async function (userId, productId) {
         try {
-            const response = await apiRequest.delete(url(userId), {params: {productId: productId}})
+            const response = await apiRequest.delete(url, { params: { productId: productId } })
             if (response.status === 200) return true
         } catch (e) {
             //ToDo: notify error here
