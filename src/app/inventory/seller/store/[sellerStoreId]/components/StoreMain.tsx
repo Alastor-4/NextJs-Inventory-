@@ -46,7 +46,7 @@ export default function StoreMain({userId}) {
     React.useEffect(() => {
         async function loadStatsData() {
             const p1 = stores.storeDetails(userId, sellerStoreId)
-            const p2 = stores.storeSellsDetails(userId, sellerStoreId)
+            const p2 = stores.storeSellsDetails(sellerStoreId)
 
             const [storeDetailsResponse, storeSellsResponse] = await Promise.all([p1, p2])
 
@@ -177,7 +177,7 @@ export default function StoreMain({userId}) {
 
     async function handleToggleAutoOpen() {
         //change auto open time
-        const updatedStore = await stores.changeAutoOpenTime(userId, sellerStoreId)
+        const updatedStore = await stores.changeAutoOpenTime(sellerStoreId)
 
         let storeData = {...storeDetails}
         storeData.auto_open_time = updatedStore.auto_open_time
@@ -200,7 +200,7 @@ export default function StoreMain({userId}) {
 
     async function handleToggleAutoReservation() {
         //change auto reservation time
-        const updatedStore = await stores.changeAutoReservationTime(userId, sellerStoreId)
+        const updatedStore = await stores.changeAutoReservationTime(sellerStoreId)
 
         let storeData = {...storeDetails}
         storeData.auto_reservation_time = updatedStore.auto_reservation_time

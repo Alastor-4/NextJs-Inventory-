@@ -35,7 +35,7 @@ function TransferUnits(props: any) {
 
     useEffect(() => {
         const getDataWareHouses = async () => {
-            const data = await storeDetails.getDataWharehouse_Depots(params.id, params.storeDetailsId, productId)
+            const data = await storeDetails.getDataWarehouseDepots(params.storeDetailsId, productId)
             setDataWarehouses(data);
             setSelectedWarehouseDepot(data[0].depots[0])
         }
@@ -97,7 +97,7 @@ function TransferUnits(props: any) {
             }
         }
 
-        const result = await storeDetails.updateDepotsAndStoreDepots(params.id, params.storeDetailsId, data)
+        const result = await storeDetails.updateDepotsAndStoreDepots(params.storeDetailsId, data)
 
         if (result === 200) {
             loadDates()

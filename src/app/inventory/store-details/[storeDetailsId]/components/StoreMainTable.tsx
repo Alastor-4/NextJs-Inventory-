@@ -136,7 +136,7 @@ export default function StoreMainTable({ userId }: { userId: number }) {
             price_discount_percentage: product.price_discount_percentage,
             price_discount_quantity: product.price_discount_quantity,
         }
-        const response = await storeDetails.update(userId, product.id, data)
+        const response = await storeDetails.update(product.id, data)
         if (response === 200) {
             await loadDates();
         }
@@ -237,7 +237,7 @@ export default function StoreMainTable({ userId }: { userId: number }) {
     }
 
     const loadDates = async () => {
-        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartament(userId, params.storeDetailsId);
+        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartment(params.storeDetailsId);
 
         let selectedDepartment = allProductsByDepartment.filter((element: any) => (element.selected)).map((element: any) => element.id)
 

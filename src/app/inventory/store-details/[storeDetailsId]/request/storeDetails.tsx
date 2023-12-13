@@ -1,14 +1,12 @@
-import React from 'react'
 import apiRequest from '@/api'
 
 const url = (storeId: any) => `/inventory/store-details/${storeId}/api`
-const urlTranferUnits = (storeId: any) => `/inventory/store-details/${storeId}/apiTransferUnits`
+const urlTransferUnits = (storeId: any) => `/inventory/store-details/${storeId}/apiTransferUnits`
 const urlOffers = (storeId: any) => `/inventory/store-details/${storeId}/components/offers/api`
 
 
 export const storeDetails = {
-
-    getAllProductsByDepartament: async function (userId: any, storeId: any) {
+    getAllProductsByDepartment: async function (storeId: any) {
         try {
             const response = await apiRequest.get(url(storeId))
             return response.data
@@ -19,7 +17,7 @@ export const storeDetails = {
     },
 
 
-    update: async function (userId: any, storeId: any, data: Object) {
+    update: async function (storeId: any, data: Object) {
         try {
             const response = await apiRequest.put(url(storeId), data)
             return response.status
@@ -29,10 +27,11 @@ export const storeDetails = {
 
         return false
     },
+
     //Requests transferUnits
-    getDataWharehouse_Depots: async function (userId: any, storeId: any, productId: any) {
+    getDataWarehouseDepots: async function (storeId: any, productId: any) {
         try {
-            const response = await apiRequest.get(urlTranferUnits(storeId), { params: { productId: productId } })
+            const response = await apiRequest.get(urlTransferUnits(storeId), { params: { productId: productId } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -40,9 +39,9 @@ export const storeDetails = {
         return false
     },
 
-    updateDepotsAndStoreDepots: async function (userId: any, storeId: any, data: Object) {
+    updateDepotsAndStoreDepots: async function (storeId: any, data: Object) {
         try {
-            const response = await apiRequest.put(urlTranferUnits(storeId), data)
+            const response = await apiRequest.put(urlTransferUnits(storeId), data)
             return response.status;
         } catch (e) {
             //ToDo: notify error here
@@ -51,7 +50,7 @@ export const storeDetails = {
     },
 
     //productOffers
-    getProductOffers: async function (userId: any, storeId: any, storeDepotId: any) {
+    getProductOffers: async function (storeId: any, storeDepotId: any) {
         try {
             const response = await apiRequest.get(urlOffers(storeId), { params: { storeDepotId: storeDepotId } })
 
@@ -62,7 +61,7 @@ export const storeDetails = {
         return false
     },
 
-    createProductOffers: async function (userId: any, storeId: any, data: any) {
+    createProductOffers: async function (storeId: any, data: any) {
         try {
             const response = await apiRequest.post(urlOffers(storeId), data)
 
@@ -72,7 +71,8 @@ export const storeDetails = {
         }
         return false
     },
-    updateProductOffers: async function (userId: any, storeId: any, data: any) {
+
+    updateProductOffers: async function (storeId: any, data: any) {
         try {
             const response = await apiRequest.put(urlOffers(storeId), data)
 
@@ -82,7 +82,8 @@ export const storeDetails = {
         }
         return false
     },
-    toggleProductOffers: async function (userId: any, storeId: any, productOfferId: any) {
+
+    toggleProductOffers: async function (storeId: any, productOfferId: any) {
         try {
             const response = await apiRequest.patch(urlOffers(storeId), { productOfferId: productOfferId })
 
@@ -92,7 +93,8 @@ export const storeDetails = {
         }
         return false
     },
-    removeProductOffers: async function (userId: any, storeId: any, productOfferId: any) {
+
+    removeProductOffers: async function (storeId: any, productOfferId: any) {
         try {
             const response = await apiRequest.delete(urlOffers(storeId), { params: { productOfferId: productOfferId } })
 

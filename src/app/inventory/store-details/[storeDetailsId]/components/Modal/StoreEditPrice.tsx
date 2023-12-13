@@ -97,7 +97,7 @@ function StoreEditPrice({ userId, storeDepot, setActiveModalPrice, loadDates }) 
 
         }
 
-        const response = await storeDetails.update(userId, storeDepot.store_id, data)
+        const response = await storeDetails.update(storeDepot.store_id, data)
 
         if (response === 200) {
             setActiveModalPrice({ active: false, storeDepot: [] })

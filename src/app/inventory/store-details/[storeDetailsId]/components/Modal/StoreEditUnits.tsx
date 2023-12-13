@@ -36,7 +36,7 @@ function StoreEditUnits(props: any) {
         const data = dataRow;
         data.product_units = parseInt(values.units);
 
-        const result = await storeDetails.update(params.id, params.storeDetailsId, data);
+        const result = await storeDetails.update(params.storeDetailsId, data);
 
         if (result === 200) {
             setActiveModalEditUnits(false);
