@@ -2,7 +2,6 @@
 import {
     AppBar,
     Box,
-    Button,
     Card,
     CardContent,
     Chip,
@@ -22,7 +21,6 @@ import StatusOptions from './StatusOptions'
 import dayjs from 'dayjs'
 
 export default function StoreReservation({ userId, storeId }: { userId: string, storeId: string }) {
-
     const [dataReservation, setDataReservation] = useState<any>([])
     const [selectedReservation, setSelectedReservation] = useState<any>(null)
 
@@ -47,6 +45,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
     const handleNavigateBack = () => {
 
     }
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
@@ -71,7 +70,6 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
     )
 
     const ReservationNotification = () => {
-
         const [openImageDialog, setOpenImageDialog] = useState(false);
         const [dialogImages, setDialogImages] = useState([])
 
@@ -170,41 +168,27 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                         component={'div'}
                                                         fontSize={14.5}
                                                         onClick={() => selectReservation(index)}
-
                                                     >
-
                                                         <Grid container>
-                                                            <Grid item container columnGap={2} xs={12}  >
-
+                                                            <Grid item container columnGap={2} xs={12}>
                                                                 <Grid item container alignItems={'center'} xs={"auto"} spacing={1}>
-
                                                                     <Grid item>
                                                                         <Person color='primary' />
                                                                     </Grid>
 
-                                                                    <Grid item >
-
+                                                                    <Grid item>
                                                                         {userReservation.users.username}
-
                                                                     </Grid>
-
                                                                 </Grid>
 
-
-
-
                                                                 <Grid item container xs={"auto"} spacing={1}>
-
                                                                     <Grid item xs={true} alignSelf={'center'}>
                                                                         <CreditCard color='primary' />
                                                                     </Grid>
 
                                                                     <Grid item container spacing={1} xs={"auto"} alignItems={'center'}>
-
                                                                         <Grid item>
-
                                                                             {userReservation.total_price}
-
                                                                         </Grid>
 
                                                                         <Grid item>
@@ -212,9 +196,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                 {userReservation.payment_method}
                                                                             </small>
                                                                         </Grid>
-
                                                                     </Grid>
-
                                                                 </Grid>
 
 
@@ -228,7 +210,6 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                         color={reservationStatusColors[userReservation.reservation_status.code]}
                                                                     />
                                                                 </Grid>
-
                                                             </Grid>
 
                                                             <Grid item sx={{ marginLeft: "auto", marginRight: "2%" }}>
@@ -254,8 +235,6 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                         </Box>
 
                                                         <Grid container direction={"column"} sx={{ padding: "8px 26px" }} spacing={2} fontSize={13}>
-
-
                                                             <Grid item container spacing={2} alignItems={'center'} position={'relative'} >
                                                                 <Grid item position={"absolute"} >
                                                                     <IconButton
@@ -274,21 +253,17 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                         color={reservationStatusColors[userReservation.reservation_status.code]}
                                                                     />
                                                                 </Grid>
-
-
                                                             </Grid>
 
                                                             {/*Detalles de la reservacion*/}
                                                             <Grid item xs={12}>
                                                                 <Card variant='outlined' sx={{ padding: "10px 10px" }}>
                                                                     <Grid container direction={"column"} spacing={1}>
-
                                                                         <Grid item >
                                                                             <Typography variant="subtitle1" component="div" sx={{ textDecoration: "underline" }} >Detalles de la reservación:</Typography>
                                                                         </Grid>
 
                                                                         <Grid item container direction={"column"} spacing={1.5} xs={"auto"}>
-
                                                                             <Grid item container spacing={1} xs={true}>
                                                                                 <Grid item sx={{ fontWeight: 600 }}>Usuario: </Grid>
                                                                                 <Grid item xs={true}>
@@ -337,7 +312,6 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                     />
                                                                                 </Grid>
                                                                             </Grid>
-
                                                                         </Grid>
                                                                     </Grid>
                                                                 </Card>
@@ -345,16 +319,13 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
 
                                                             {/*Datos del cliente*/}
                                                             <Grid item xs={12}>
-                                                                <Card variant='outlined' sx={{ padding: "10px 10px" }} >
-
+                                                                <Card variant='outlined' sx={{ padding: "10px 10px" }}>
                                                                     <Grid container direction={"column"} spacing={1}>
-
                                                                         <Grid item>
                                                                             <Typography variant="subtitle1" component="div" sx={{ textDecoration: "underline" }}>Datos del cliente:</Typography>
                                                                         </Grid>
 
                                                                         <Grid item container direction={"column"} spacing={1.5} xs={'auto'} >
-
                                                                             <Grid item container spacing={1} xs={true} >
                                                                                 <Grid item sx={{ fontWeight: 600 }} >Nombre: </Grid>
                                                                                 <Grid item>
@@ -379,29 +350,22 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                     {userReservation.users.phone}
                                                                                 </Grid>
                                                                             </Grid>
-
                                                                         </Grid>
-
                                                                     </Grid>
-
                                                                 </Card>
-
                                                             </Grid>
 
                                                             {/*Productos Solicitados*/}
                                                             <Grid item xs={12}>
-                                                                <Card variant='outlined' sx={{ padding: "10px 10px" }} >
-
+                                                                <Card variant='outlined' sx={{ padding: "10px 10px" }}>
                                                                     <Grid container direction={"column"} spacing={1}>
-
                                                                         <Grid item>
                                                                             <Typography variant="subtitle1" component="div" sx={{ textDecoration: "underline" }}>Productos Solicitados:</Typography>
                                                                         </Grid>
                                                                         {
                                                                             userReservation.reservation_products.map((reservationProduct: any, productIndex: any) => (
                                                                                 <Grid item key={productIndex}>
-                                                                                    <Card variant='outlined' sx={{ padding: "10px 10px" }} >
-
+                                                                                    <Card variant='outlined' sx={{ padding: "10px 10px" }}>
                                                                                         <Grid container spacing={1.5}>
                                                                                             <Grid item>{`Producto #${productIndex + 1}`}</Grid>
 
@@ -418,7 +382,6 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                                         )
                                                                                                     }
                                                                                                 </Grid>
-
                                                                                             </Grid>
 
 
@@ -426,7 +389,6 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                                 <Grid item sx={{ fontWeight: 600 }}>Departamento: </Grid>
                                                                                                 <Grid item>
                                                                                                     {reservationProduct.store_depots.depots.products.departments.name}
-
                                                                                                 </Grid>
                                                                                             </Grid>
 
@@ -462,7 +424,6 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                                         ) : "-"
                                                                                                     }
                                                                                                 </Grid>
-
                                                                                             </Grid>
 
                                                                                             <Grid container item spacing={1} xs={12}>
@@ -489,7 +450,6 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                                 <Grid item sx={{ fontWeight: 600 }}>Unidades solicitadas: </Grid>
 
                                                                                                 <Grid item container spacing={1} alignItems={'center'} xs={true}>
-
                                                                                                     <Grid item>
                                                                                                         {reservationProduct.units_quantity}
                                                                                                     </Grid>
@@ -511,9 +471,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                                             )
                                                                                                         }
                                                                                                     </Grid>
-
                                                                                                 </Grid>
-
                                                                                             </Grid>
 
                                                                                             <Grid item container xs={12} columnGap={1}>
@@ -559,32 +517,21 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                                     </Grid>
                                                                                                 </Grid>
                                                                                             </Grid>
-
-
                                                                                         </Grid>
-
                                                                                     </Card>
                                                                                 </Grid>
-
                                                                             ))
                                                                         }
-
                                                                     </Grid>
-
                                                                 </Card>
-
                                                             </Grid>
-
                                                         </Grid>
                                                     </>
                                                 )
                                         }
                                     </Collapse>
                                 </Card>
-
                             </React.Fragment>
-
-
                         ))
                     }
                 </Stack>
@@ -606,10 +553,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                     }
 
                 </CardContent>
-
             </Card>
-
-
         </>
     )
 }

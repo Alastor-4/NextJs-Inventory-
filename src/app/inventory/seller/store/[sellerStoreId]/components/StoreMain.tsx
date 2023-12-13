@@ -31,7 +31,7 @@ import {daysMap, notifySuccess, notifyWarning, numberFormat} from "@/utils/gener
 
 dayjs.extend(isBetween)
 
-export default function StoreMain() {
+export default function StoreMain({userId}) {
     const [storeDetails, setStoreDetails] = React.useState(null)
     const [storeDepotsStats, setStoreDepotsStats] = React.useState(null)
     const [productSells, setProductSells] = React.useState(null)
@@ -39,8 +39,7 @@ export default function StoreMain() {
 
     const params = useParams()
     const router = useRouter()
-    
-    const userId = params.id
+
     const sellerStoreId = params.sellerStoreId
 
     //get initial store and sells details and compute stats

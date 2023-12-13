@@ -17,9 +17,6 @@ export default function StoreModalStatusOptions(props: any) {
         setOpen(false);
     };
 
-
-
-
     return (
         <Dialog open={open} onClose={handleClose} fullWidth >
             <AppBar sx={{ position: 'relative' }}>
@@ -42,7 +39,6 @@ export default function StoreModalStatusOptions(props: any) {
                     {props.children}
                 </Box>
             </DialogContent>
-
         </Dialog>
     )
 }

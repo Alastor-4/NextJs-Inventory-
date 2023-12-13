@@ -1,18 +1,16 @@
 import { Button, Grid, MenuItem, TextField } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { reservation } from '../request/reservation'
 import { notifyError, notifySuccess } from '@/utils/generalFunctions'
 import { useParams } from 'next/navigation'
 
 
 function StatusOptions({ codeId, indUpdate, dataReservation, getData, setOpen }: { codeId: number, indUpdate: number, dataReservation: any, getData: any, setOpen: any }) {
-
     const params = useParams()
 
     const [selectedState, setSelectedState] = useState<any>(codeId)
 
     const nameStates = ['Pendiente', 'Cancelada', 'Reservado', 'Vendido', 'En camino', 'Entregado']
-
 
     const changeStatus = async () => {
         const data = {
@@ -24,7 +22,6 @@ function StatusOptions({ codeId, indUpdate, dataReservation, getData, setOpen }:
             status_description: dataReservation[indUpdate].status_description,
             status_id: selectedState,
             total_price: dataReservation[indUpdate].total_price,
-
         }
 
         const request = await reservation.updateReservation(params.id, params.sellerStoreId, data)
@@ -78,11 +75,8 @@ function StatusOptions({ codeId, indUpdate, dataReservation, getData, setOpen }:
                             Aceptar
                         </Button>
                     </Grid>
-
                 </Grid>
             </Grid>
-
-
         </>
     )
 }

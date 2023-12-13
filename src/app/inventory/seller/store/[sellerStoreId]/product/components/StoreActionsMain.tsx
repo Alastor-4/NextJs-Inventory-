@@ -55,7 +55,7 @@ import UpdateValueDialog from "@/components/UpdateValueDialog";
 import {storeDetails} from "@/app/inventory/store-details/[storeDetailsId]/request/storeDetails";
 import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 
-export default function StoreActionsMain({userId, storeId}: { userId: string, storeId: string }) {
+export default function StoreActionsMain({userId, storeId}: { userId: number, storeId: string }) {
     const router = useRouter()
 
     const [data, setData] = React.useState<null | any[]>(null)
@@ -74,7 +74,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: string, st
         }
 
         if (userId && storeId) {
-            loadInitialData(userId, storeId)
+            loadInitialData(String(userId), storeId)
         }
     }, [userId, storeId])
 
