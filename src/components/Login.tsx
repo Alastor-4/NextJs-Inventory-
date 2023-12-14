@@ -56,7 +56,6 @@ export default function Login() {
                 .min(6, 'Debe contener al menos 6 caracteres'),
             password: Yup.string()
                 .required('Este campo es requerido')
-                .min(8, 'Debe contener al menos 8 caracteres'),
         })
 
         const [showPassword, setShowPassword] = React.useState(false);
@@ -73,7 +72,6 @@ export default function Login() {
                     password,
                     redirect: false,
                 })
-
                 if (responseNextAuth.ok) {
                     router.push("/inventory")
                 } else {

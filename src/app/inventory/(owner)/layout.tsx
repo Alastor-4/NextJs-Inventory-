@@ -3,11 +3,13 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
 
-export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
+export default async function OwnerLayout({ children }: { children: React.ReactNode }) {
     const session = await getServerSession(nextAuthOptions);
 
-    if (!session) {
-        redirect('/');
+    const role_id = session?.user.role_id;
+
+    if (![1, 2].includes(role_id!)) {
+        redirect('/inventory');
     }
 
     return (<>{children}</>);

@@ -1,6 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials"
 import { compare } from "bcrypt"
+import { users } from "@prisma/client";
+import axios from "axios";
 
 export const nextAuthOptions: NextAuthOptions = {
     pages: {
@@ -17,23 +19,23 @@ export const nextAuthOptions: NextAuthOptions = {
 
                 if (!credentials?.username || !credentials?.password) return null;
 
-                const res = await fetch(`${process.env.NEXTAUTH_URL}/login`, {
-                    method: "POST",
-                    body: JSON.stringify(credentials),
-                    headers: { "Content-Type": "application/json" }
-                });
+                const res = await axios.post(`${process.env.NEXTAUTH_URL}/login`, credentials);
 
-                const user = await res.json();
+                const user: users | null = await res.data;
 
                 if (!user) return null;
 
-                const passwordMatch = await compare(credentials.password, user.password_hash);
+                const passwordMatch = await compare(credentials.password, user.password_hash!);
                 if (!passwordMatch) return null;
 
                 if (!user.is_verified) return null;
 
                 return {
-                    id: user.id
+                    id: user.id,
+                    username: user.username,
+                    role_id: user.role_id,
+                    is_verified: user.is_verified,
+                    is_active: user.is_active,
                 }
             },
         }),
@@ -43,10 +45,15 @@ export const nextAuthOptions: NextAuthOptions = {
         maxAge: 60 * 60 * 24 * 3 // 3 days,
     },
     callbacks: {
-        async jwt({ token, user }: any) {
+        async jwt({ token, user }) {
             if (user) {
                 return {
-                    ...token, id: user.id,
+                    ...token,
+                    id: user.id,
+                    username: user.username,
+                    role_id: user.role_id,
+                    is_verified: user.is_verified,
+                    is_active: user.is_active
                 }
             }
             return token
@@ -55,8 +62,11 @@ export const nextAuthOptions: NextAuthOptions = {
             return {
                 ...session,
                 user: {
-                    ...session.user,
                     id: token.id,
+                    username: token.username,
+                    role_id: token.role_id,
+                    is_verified: token.is_verified,
+                    is_active: token.is_active
                 }
             }
         }

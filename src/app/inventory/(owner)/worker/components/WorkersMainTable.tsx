@@ -1,4 +1,4 @@
-// @ts-nocheck
+//@ts-nocheck
 "use client"
 
 import React from "react";
@@ -34,7 +34,7 @@ import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline } from "@mui/icons-material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import ownerUsers from "@/app/inventory/worker/requests/ownerUsers";
+import ownerUsers from "../requests/ownerUsers";
 
 export default function WorkersMainTable(props) {
     const { roles, userId } = props
@@ -173,7 +173,7 @@ export default function WorkersMainTable(props) {
                                 </IconButton>
 
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
                             </Box>
                         )
                     }
