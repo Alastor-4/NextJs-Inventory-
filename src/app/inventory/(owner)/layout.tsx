@@ -8,7 +8,7 @@ export default async function OwnerLayout({ children }: { children: React.ReactN
 
     const role_id = session?.user.role_id;
 
-    if (![1, 2].includes(role_id!)) {
+    if (![2, 3].includes(role_id)) {
         redirect('/inventory');
     }
 

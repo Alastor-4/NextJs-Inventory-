@@ -8,7 +8,7 @@ export default async function SellerLayout({ children }: { children: React.React
 
     const role_id = session?.user.role_id;
 
-    if (![1, 2, 4].includes(role_id!)) {
+    if (![2, 3, 4].includes(role_id)) {
         redirect('/inventory');
     }
 
