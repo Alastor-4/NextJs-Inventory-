@@ -462,9 +462,6 @@ export default function AddProductFromWarehouse(props: any) {
                 product_remaining_units: units,
                 seller_profit_percentage: dataStore.fixed_seller_profit_percentage,
                 seller_profit_quantity: dataStore.fixed_seller_profit_quantity,
-                sell_price: data[ind].products.buy_price ?? 0,
-                sell_price_unit: "CUP",
-                is_active: true
             }
 
             request = await requestWarehouse.addProductsStoreDepots(userId, dataRequest);
