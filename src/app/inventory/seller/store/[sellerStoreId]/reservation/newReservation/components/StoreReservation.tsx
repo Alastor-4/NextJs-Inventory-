@@ -14,13 +14,18 @@ import {
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { reservation } from '../request/reservation'
-import { AddTask, ArrowLeft, CreditCard, DeliveryDiningOutlined, Person, VisibilityOutlined } from '@mui/icons-material'
+import { AddTask, ArrowLeft, DeliveryDiningOutlined, VisibilityOutlined } from '@mui/icons-material'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import StoreModalStatusOptions from './StoreModalStatusOptions'
 import StatusOptions from './StatusOptions'
 import dayjs from 'dayjs'
+import { TableNoData } from '@/components/TableNoData'
+import { useRouter } from 'next/navigation'
 
 export default function StoreReservation({ userId, storeId }: { userId: string, storeId: string }) {
+
+    const router = useRouter()
+
     const [dataReservation, setDataReservation] = useState<any>([])
     const [selectedReservation, setSelectedReservation] = useState<any>(null)
 
@@ -43,7 +48,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
     }, [userId, storeId])
 
     const handleNavigateBack = () => {
-
+        router.push("http://localhost:3000/inventory/seller/store/1")
     }
 
     const CustomToolbar = () => (
@@ -117,7 +122,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                 ? offers[ind].compare_function === '='
                     ? `Cuando compren ${offers[ind].compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${offers[ind].price_per_unit} ${currency}`
                     : `Cuando compren más de ${offers[ind].compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${offers[ind].price_per_unit} ${currency}`
-                : "-"
+                : ""
         }
 
         function handleOpenImagesDialog(images: any) {
@@ -179,16 +184,21 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                     </Grid>
 
                                                                     <Grid item container spacing={1} xs={'auto'}>
+                                                                        {
+                                                                            userReservation.request_delivery === true &&
+                                                                            (
+                                                                                <Grid item>
+                                                                                    <Chip
+                                                                                        label={
+                                                                                            <DeliveryDiningOutlined />
+                                                                                        }
+                                                                                        size='small'
+                                                                                        color='primary'
+                                                                                    />
+                                                                                </Grid>
+                                                                            )
+                                                                        }
 
-                                                                        <Grid item>
-                                                                            <Chip
-                                                                                label={
-                                                                                    <DeliveryDiningOutlined />
-                                                                                }
-                                                                                size='small'
-                                                                                color='primary'
-                                                                            />
-                                                                        </Grid>
 
                                                                         <Grid item >
                                                                             <Chip
@@ -250,7 +260,6 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                             <Grid item container spacing={2} alignItems={'center'} position={'relative'} >
                                                                 <Grid item position={"absolute"} >
                                                                     <IconButton
-                                                                        size='large'
                                                                         onClick={() => selectReservation(index)}
                                                                     >
                                                                         <ArrowLeft color='primary' fontSize='large' />
@@ -324,6 +333,41 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                     />
                                                                                 </Grid>
                                                                             </Grid>
+
+                                                                            <Grid item container xs={12} columnGap={1} alignItems={'center'}>
+                                                                                <Grid item sx={{ fontWeight: 600 }}>Mensaje: </Grid>
+
+                                                                                {
+                                                                                    userReservation.delivery_notes
+                                                                                        ? (
+                                                                                            <Grid
+                                                                                                container
+                                                                                                item
+                                                                                                sx={{
+                                                                                                    width: 'fit-content',
+                                                                                                    backgroundColor: "lightgray",
+                                                                                                    padding: "2px 4px",
+                                                                                                    borderRadius: "5px 2px 2px 2px",
+                                                                                                    border: "1px solid",
+                                                                                                    borderColor: "seagreen",
+                                                                                                    fontSize: 14,
+                                                                                                    cursor: "default",
+                                                                                                    textDecorationLine: "none",
+                                                                                                }}
+                                                                                            >
+                                                                                                <Grid container item xs={true} alignItems={"center"}
+                                                                                                    sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                                                                    {
+                                                                                                        userReservation.delivery_notes
+                                                                                                    }
+                                                                                                </Grid>
+                                                                                            </Grid>
+                                                                                        )
+                                                                                        : '-'
+                                                                                }
+
+                                                                            </Grid>
+
                                                                         </Grid>
                                                                     </Grid>
                                                                 </Card>
@@ -532,11 +576,14 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                         </Grid>
                                                                                     </Card>
                                                                                 </Grid>
-                                                                            ))
+                                                                            )
+
+                                                                            )
                                                                         }
                                                                     </Grid>
                                                                 </Card>
                                                             </Grid>
+
                                                         </Grid>
                                                     </>
                                                 )
@@ -561,7 +608,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                     {
                         dataReservation.length !== 0
                             ? <ReservationNotification />
-                            : "-"
+                            : <TableNoData />
                     }
 
                 </CardContent>
