@@ -1,49 +1,44 @@
-import { NextResponse } from 'next/server'
-import { prisma } from "db";
-import jwt from "jsonwebtoken"
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { sendMail } from "@/mailer-service";
+import { NextResponse } from 'next/server';
 import * as process from "process";
+import { prisma } from "db";
 
-// Verify user
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
     const token = searchParams.get("token")
 
     if (token) {
-        const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
+        const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey";
 
         try {
-            const tokenPayload = jwt.verify(token, jwtPrivateKey)
+            const tokenPayload: string | JwtPayload = jwt.verify(token, jwtPrivateKey);
 
-            // @ts-ignore
-            if (tokenPayload.username) {
-                // @ts-ignore
-                const user = await prisma.users.findUnique({ where: { username: tokenPayload.username } })
+            if (typeof tokenPayload !== 'string' && tokenPayload.username) {
+                const user = await prisma.users.findUnique({ where: { username: tokenPayload.username } });
 
                 if (user && user.is_active) {
                     if (user.is_verified) {
-                        return NextResponse.json({ status: "error", message: "Este usuario ya está verificado" })
+                        return new NextResponse("Este usuario ya está verificado", { status: 202 });
                     } else {
-                        // @ts-ignore
-                        await prisma.users.update({ is_verified: true }, { where: { username: tokenPayload.username } })
-
-                        return NextResponse.json({ status: "ok", message: "Usuario verificado correctamente. Ahora puede autenticarse en el sistema" })
+                        await prisma.users.update({
+                            where: { username: tokenPayload.username },
+                            data: { is_verified: true }
+                        });
+                        return new NextResponse("Usuario verificado correctamente. Ahora puede autenticarse en el sistema", { status: 201 });
                     }
                 } else {
-                    return NextResponse.json({ status: "error", message: "Este usuario no existe o no esta activo" })
+                    return new NextResponse("Este usuario no existe o no esta activo", { status: 404 });
                 }
             }
         } catch (e) {
-            return NextResponse.json({ status: "error", message: "El token de verificación proporcionado no es correcto" })
+            return new NextResponse("El token de verificación proporcionado no es correcto", { status: 400 });
         }
-
-        return NextResponse.json({ status: "error", message: "El token de verificación proporcionado no es correcto" })
     } else {
-        return NextResponse.json({ status: "error", message: "No fue proporcionado el token de verificación del usuario" })
+        return new NextResponse("No fue proporcionado el token de verificación del usuario", { status: 400 });
     }
 }
 
-// Create new user
 export async function POST(req: Request) {
     const { username, passwordHash, name, mail, phone } = await req.json()
 
@@ -57,9 +52,7 @@ export async function POST(req: Request) {
         }
     })
 
-    if (user) {
-        return NextResponse.json({ status: "error", message: "Usuario, correo o teléfono ya se encuentra registrado en el sistema" })
-    }
+    if (user) new NextResponse("Usuario, correo o teléfono ya se encuentra registrado en el sistema", { status: 202 });
 
     const newUser = await prisma.users.create({
         data: {
@@ -69,25 +62,25 @@ export async function POST(req: Request) {
             name: name,
             password_hash: passwordHash,
         }
-    })
+    });
 
     const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
-    const verificationToken = jwt.sign({ username: username }, jwtPrivateKey, { expiresIn: "24h" })
+    const verificationToken = jwt.sign({ username: username }, jwtPrivateKey, { expiresIn: "24h" });
 
-    // try {
-    //     await sendMail(
-    //         "Verificación de usuario",
-    //         newUser.mail,
-    //         `Visite el siguiente link para verificar su usuario ${process.env.APP_BASE_URL}/api/auth/register?token=${verificationToken}`
-    //     )
-    // } catch (e) {
-    //     console.log(e)
-    // }
+    try {
+        await sendMail(
+            "Verificación de usuario",
+            newUser.mail,
+            `Visite el siguiente link para verificar su usuario ${process.env.APP_BASE_URL}/api/auth/register?token=${verificationToken}`
+        )
+    } catch (e) {
+        console.log(e)
+    }
 
     return NextResponse.json(
         {
             status: "ok",
-            message: `Usuario registrado en el sistema. Siga las instrucciones del correo enviado a ${newUser.mail} para terminar el proceso`,
+            message: `Usuario registrado correctamente. Siga las instrucciones del correo enviado a ${newUser.mail} para terminar el proceso`,
             user: newUser,
         }
     )

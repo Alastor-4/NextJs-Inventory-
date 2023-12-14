@@ -34,7 +34,7 @@ import { handleKeyDown } from "@/utils/handleKeyDown";
 export default function Login() {
     const { data: session } = useSession();
 
-    const [showSignUpForm, setShowSignUpForm] = React.useState(false)
+    const [showSignUpForm, setShowSignUpForm] = React.useState(false);
 
     const router = useRouter()
 
@@ -52,9 +52,10 @@ export default function Login() {
 
         const validationSchema = Yup.object({
             username: Yup.string()
-                .required('campo requerido'),
+                .required('Este campo es requerido')
+                .min(6, 'Debe contener al menos 6 caracteres'),
             password: Yup.string()
-                .required('campo requerido')
+                .required('Este campo es requerido')
         })
 
         const [showPassword, setShowPassword] = React.useState(false);
@@ -65,7 +66,7 @@ export default function Login() {
         return <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={async ({ username, password }, {setFieldError}) => {
+            onSubmit={async ({ username, password }, { setFieldError }) => {
                 const responseNextAuth = await signIn('credentials', {
                     username,
                     password,
@@ -195,9 +196,8 @@ export default function Login() {
             initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={(data, { setErrors }) => {
-                // console.log(data);
-                auth.register(data)
-                //register here
+                auth.register(data);
+                setShowSignUpForm(false);
             }}
         >
             {

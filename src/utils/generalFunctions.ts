@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import {enqueueSnackbar} from "notistack";
+import { enqueueSnackbar } from "notistack";
 
 export const numberFormat = (number: string) => parseFloat((Math.round(parseFloat(number.toString()) * 100) / 100).toFixed(2))
 
@@ -15,9 +15,9 @@ export const daysMap = {
     7: "Sábado",
 }
 
-export const notifySuccess = (message: string) => enqueueSnackbar(message, {variant: "success"})
-export const notifyError = (message: string) => enqueueSnackbar(message, {variant: "error"})
-export const notifyWarning = (message: string) => enqueueSnackbar(message, {variant: "warning"})
+export const notifySuccess = (message: string) => enqueueSnackbar(message, { variant: "success" })
+export const notifyError = (message: string) => enqueueSnackbar(message, { variant: "error" })
+export const notifyWarning = (message: string) => enqueueSnackbar(message, { variant: "warning" })
 
 //return offer price per unit from first applicable offer found. return false if no applicable offer found
 export function evaluateOffers(offerItems: any[], itemsQuantity: number): number | false {
@@ -36,7 +36,7 @@ export function evaluateOffers(offerItems: any[], itemsQuantity: number): number
 
     const foundApplicableOfferIndex = offerItems.findIndex(item => evaluate(item.compare_function, item.compare_units_quantity, itemsQuantity))
 
-    if(foundApplicableOfferIndex > -1)
+    if (foundApplicableOfferIndex > -1)
         return offerItems[foundApplicableOfferIndex].price_per_unit
 
     return false
