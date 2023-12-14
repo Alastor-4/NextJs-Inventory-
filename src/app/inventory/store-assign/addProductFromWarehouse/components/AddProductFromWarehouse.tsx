@@ -34,7 +34,7 @@ import { Formik } from 'formik';
 import * as Yup from "yup"
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 
-function AddProductFromWarehouse(props: any) {
+export default function AddProductFromWarehouse(props: any) {
     const { userId, dataStore, warehouseId } = props
 
     const [dataDepotsWarehouses, setDataDepotsWarehouse] = useState<any>([]);
@@ -675,5 +675,3 @@ function AddProductFromWarehouse(props: any) {
         </>
     )
 }
-
-export default AddProductFromWarehouse
