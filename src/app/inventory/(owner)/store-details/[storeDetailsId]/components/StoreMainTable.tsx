@@ -32,7 +32,6 @@ import {
 } from "@mui/icons-material";
 import { useParams, useRouter } from "next/navigation";
 import { Formik } from "formik";
-import stores from "@/app/inventory/store/requests/stores"
 import StoreMoreDetails from "./StoreMoreDetails";
 import StoreModalPrice from "./Modal/StoreModalPrice"
 import StoreEditPrice from "./Modal/StoreEditPrice";
@@ -44,11 +43,12 @@ import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWa
 import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
 import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import { numberFormat } from "@/utils/generalFunctions";
+import stores from "../../../store/requests/stores";
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json())
 
 
-export default function StoreMainTable({ userId }: { userId: number }) {
+export default function StoreMainTable({ userId }: { userId?: number }) {
     const params = useParams()
     const router = useRouter()
 
@@ -105,7 +105,7 @@ export default function StoreMainTable({ userId }: { userId: number }) {
     //Get Store name
     React.useEffect(() => {
         const getDataStore = async () => {
-            const newdataStore = await stores.storeDetails(userId, params.storeDetailsId);
+            const newdataStore = await stores.storeDetails(userId!, params.storeDetailsId);
             setDataStore(newdataStore);
         }
         if (dataStore === '') {
@@ -511,9 +511,9 @@ export default function StoreMainTable({ userId }: { userId: number }) {
                                 dataRow={data[selectedRowInd]?.depots[0].store_depots[0]}
                                 setActiveModalEditUnits={setActiveModalEditUnits}
                                 setActiveModalTransferUnits={setActiveModalTransferUnits}
-                                loadDates={loadDates} 
+                                loadDates={loadDates}
                                 userId={userId}
-                                />
+                            />
                         </StoreModalDefault>
 
                         <StoreModalDefault

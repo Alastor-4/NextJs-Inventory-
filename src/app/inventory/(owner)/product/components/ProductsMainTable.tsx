@@ -23,7 +23,7 @@ import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import products from "@/app/inventory/product/requests/products";
+import products from "../requests/products";
 import { Formik } from "formik";
 
 export default function ProductsMainTable({ userId }: { userId: number }) {
@@ -137,7 +137,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                 </IconButton>
 
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
                             </Box>
                         )
                     }

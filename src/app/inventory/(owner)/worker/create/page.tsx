@@ -1,14 +1,15 @@
-import WorkersForm from "@/app/inventory/worker/components/WorkersForm";
-import {getServerSession} from "next-auth";
-import {nextAuthOptions} from "@/app/api/auth/[...nextauth]/options";
+
+import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
+import WorkersForm from "../components/WorkersForm";
+import { getServerSession } from "next-auth";
 
 export default async function Page() {
-    const session = await getServerSession(nextAuthOptions)
-    const ownerId = session?.user.id
+    const session = await getServerSession(nextAuthOptions);
+    const ownerId = session?.user.id;
 
     return (
         <main>
-            <WorkersForm ownerId={ownerId}/>
+            <WorkersForm ownerId={ownerId} />
         </main>
     )
 }

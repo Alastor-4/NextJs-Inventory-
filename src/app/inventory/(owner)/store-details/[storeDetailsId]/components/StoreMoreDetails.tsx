@@ -2,9 +2,9 @@ import { EditOutlined, VisibilityOutlined } from '@mui/icons-material'
 import { Box, Collapse, Grid, IconButton, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import StoreListOffers from './offers/components/StoreListOffers'
-import StoreEditSellerProfit from '@/app/inventory/store-details/[storeDetailsId]/components/Modal/StoreEditSellerProfit'
 import StoreModalDefault from './Modal/StoreModalDefault'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
+import StoreEditSellerProfit from './Modal/StoreEditSellerProfit'
 function StoreMoreDetails(props: any) {
 
     const { userId, details, show, loadDates, row } = props

@@ -2,7 +2,6 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import storeAssign from '@/app/inventory/store-assign/requests/store-assign';
 import { TableNoData } from "@/components/TableNoData";
 import { useParams } from 'next/navigation';
 import {
@@ -34,7 +33,9 @@ import ModalStoreAssign from './Modal/ModalStoreAssign';
 import ManageQuantity from './Modal/ManageQuantity';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
-import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse.tsx';
+
+import storeAssign from '../requests/store-assign';
+import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse';
 
 function ShowProductsStore(props: any) {
 

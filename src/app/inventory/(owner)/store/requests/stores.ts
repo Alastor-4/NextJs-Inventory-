@@ -1,8 +1,8 @@
 
-import apiRequest from "@/api"
+import apiRequest from "@/api";
 
-const url = `/inventory/store/api`
-const updateUrl = `/inventory/store/update/api`
+const url = `/inventory/store/api`;
+const updateUrl = `/inventory/store/update/api`;
 
 const stores = {
     allUserStores: async function (userId: number) {

@@ -18,10 +18,11 @@ import React from "react";
 import { Formik } from "formik";
 import * as Yup from "yup"
 import { useParams, useRouter } from 'next/navigation';
-import products from "@/app/inventory/product/requests/products";
+
 import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-material";
 import { useDropzone } from "react-dropzone";
 import { useUploadThing } from "@/app/api/uploadthing/utils";
+import products from "../requests/products";
 
 export default function ProductsForm(props: any) {
     const { userId, departments } = props
@@ -32,7 +33,7 @@ export default function ProductsForm(props: any) {
     const router = useRouter()
 
     //initial values
-    const [department, setDepartment] = React.useState("")
+    const [department, setDepartment] = React.useState("");
 
     React.useEffect(() => {
         async function fetchProduct(id: string) {

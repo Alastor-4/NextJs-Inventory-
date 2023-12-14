@@ -15,13 +15,4 @@ declare module "next-auth" {
     interface Session {
         user: User;
     }
-    // interface Session {
-    //     user: {
-    //         id: number,
-    //         username: string,
-    //         role_id: number,
-    //         is_active: boolean,
-    //         is_verified: boolean
-    //     }
-    // }
 }

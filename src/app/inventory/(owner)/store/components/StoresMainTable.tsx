@@ -32,10 +32,11 @@ import {
     ExpandMoreOutlined,
     ShoppingCartOutlined
 } from "@mui/icons-material";
-import stores from "@/app/inventory/store/requests/stores";
+
 import { useRouter } from "next/navigation";
 import { daysMap } from "@/utils/generalFunctions";
 import dayjs from "dayjs";
+import stores from "../requests/stores";
 
 export default function StoresMainTable({ userId }: { userId: number }) {
 

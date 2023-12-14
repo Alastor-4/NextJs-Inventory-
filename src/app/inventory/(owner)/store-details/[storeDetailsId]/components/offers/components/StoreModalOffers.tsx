@@ -17,9 +17,6 @@ export default function StoreModalOffers(props: any) {
         setOpen(false);
     };
 
-
-
-
     return (
         <Dialog open={open} onClose={handleClose} >
             <AppBar sx={{ position: 'relative' }}>

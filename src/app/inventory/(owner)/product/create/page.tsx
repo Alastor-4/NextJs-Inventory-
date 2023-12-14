@@ -1,15 +1,15 @@
-import ProductsForm from "@/app/inventory/product/components/ProductsForm";
-import { prisma } from "db";
-import { getServerSession } from "next-auth";
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
+import ProductsForm from "../components/ProductsForm";
+import { getServerSession } from "next-auth";
+import { prisma } from "db";
 
-const getData = () => prisma.departments.findMany()
+const getData = () => prisma.departments.findMany();
 
 export default async function Page() {
-    const session: any = await getServerSession(nextAuthOptions)
-    const userId: number = session?.user.id
+    const session = await getServerSession(nextAuthOptions);
+    const userId = session?.user.id;
 
-    const departments = await getData()
+    const departments = await getData();
 
     return (
         <main>

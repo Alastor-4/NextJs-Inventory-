@@ -17,8 +17,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import DepartmentProductsSelect from "@/components/DepartmentProductsSelect";
-import warehouseDepots from "@/app/inventory/warehouse/[warehouseId]/requests/warehouseDepots";
 import { notifyError } from "@/utils/generalFunctions";
+import warehouseDepots from "../requests/warehouseDepots";
 
 export default function UserWarehouseForm({ ownerId, warehouseId }) {
     const router = useRouter()

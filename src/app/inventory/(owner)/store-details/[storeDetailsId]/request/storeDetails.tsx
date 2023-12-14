@@ -1,4 +1,4 @@
-import apiRequest from '@/api'
+import apiRequest from '@/api';
 
 const url = (storeId: any) => `/inventory/store-details/${storeId}/api`
 const urlTransferUnits = (storeId: any) => `/inventory/store-details/${storeId}/apiTransferUnits`

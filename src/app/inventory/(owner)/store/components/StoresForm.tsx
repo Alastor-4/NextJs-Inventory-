@@ -18,14 +18,14 @@ import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
-import stores from "@/app/inventory/store/requests/stores";
+import stores from "../requests/stores";
 import { openDaysStores } from "@/request/openDaysStores";
 import dayjs from "dayjs";
-import StoreOpeningDays from "@/app/inventory/store/components/StoreOpeningDays";
+import StoreOpeningDays from "./StoreOpeningDays";
 import { notifyError } from "@/utils/generalFunctions";
 
 
-export default function StoresForm({ userId, storeId, sellerUsers }: { userId: number, storeId: string | undefined, sellerUsers: any }) {
+export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: number, storeId: string | undefined, sellerUsers: any }) {
 
 
     const router = useRouter()
@@ -153,7 +153,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId: n
 
     React.useEffect(() => {
         async function fetchStore(id: any) {
-            const store = await stores.storeDetails(userId, id)
+            const store = await stores.storeDetails(userId!, id)
             setUpdateItem(store)
             if (store.seller_user) {
                 const index = sellerUsers.findIndex((item: any) => item.id === store.seller_user.id)
@@ -273,9 +273,9 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId: n
         let response: any
 
         if (updateItem) {
-            response = await stores.update(userId, data)
+            response = await stores.update(userId!, data)
         } else {
-            response = await stores.create(userId, data)
+            response = await stores.create(userId!, data)
         }
 
         let openDaysResponse: any;

@@ -15,14 +15,14 @@ import {
 import React, { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import ShowProductsStore from "@/app/inventory/store-assign/components/ShowProductsStore";
+
 import { ArrowLeft } from "@mui/icons-material";
-import { useParams } from 'next/navigation';
 import { useRouter } from "next/navigation";
+import ShowProductsStore from "@/app/inventory/(owner)/store-assign/components/ShowProductsStore";
 
 export default function StoreDepotsAssign(
     { warehouseListProp, selectedWarehouseIdProp, selectedStoreIdProp, storeListProp, userId }:
-        { userId: number, warehouseListProp: any[], selectedWarehouseIdProp: number | null, selectedStoreIdProp: number | null, storeListProp: any[] }
+        { userId?: number, warehouseListProp: any[], selectedWarehouseIdProp: number | null, selectedStoreIdProp: number | null, storeListProp: any[] }
 ) {
     const router = useRouter()
 

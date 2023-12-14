@@ -11,7 +11,7 @@ import {
     Typography,
 } from "@mui/material";
 import React from "react";
-import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
+import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
 export default function ModalAddProductFromWarehouse(props) {
     const { open, setOpen, dialogTitle, loadData } = props

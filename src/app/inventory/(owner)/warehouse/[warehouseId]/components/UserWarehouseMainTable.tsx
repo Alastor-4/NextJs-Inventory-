@@ -40,12 +40,13 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
-import warehouseDepots from "@/app/inventory/warehouse/[warehouseId]/requests/warehouseDepots";
+
 import { Formik } from "formik";
 import * as Yup from "yup";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import tableStyles from "@/assets/styles/tableStyles";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
+import warehouseDepots from "../requests/warehouseDepots";
 
 export default function UserWarehouseMainTable(props) {
     const { ownerId, warehouseDetails } = props

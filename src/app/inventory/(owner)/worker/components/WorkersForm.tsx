@@ -1,20 +1,20 @@
 // @ts-nocheck
 "use client"
 
-import {AppBar, Box, Button, Card, Grid, TextField, Toolbar, Typography} from "@mui/material";
-import React, {useState} from "react";
-import {useFormik} from "formik";
+import { AppBar, Box, Button, Card, Grid, TextField, Toolbar, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { useFormik } from "formik";
 import * as Yup from "yup"
-import {useRouter} from 'next/navigation';
-import ownerUsers from "@/app/inventory/worker/requests/ownerUsers";
-import {Done, InfoOutlined} from "@mui/icons-material";
+import { useRouter } from 'next/navigation';
+import { Done, InfoOutlined } from "@mui/icons-material";
+import ownerUsers from "../requests/ownerUsers";
 
-export default function WorkersForm({ownerId}) {
+export default function WorkersForm({ ownerId }) {
     const router = useRouter()
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
                 <Box>
                     <Typography
                         variant="h6"
@@ -83,20 +83,20 @@ export default function WorkersForm({ownerId}) {
             <form onSubmit={formik.handleSubmit}>
                 <Grid container rowSpacing={2}>
                     <Grid item xs={12}>
-                        <CustomToolbar/>
+                        <CustomToolbar />
                     </Grid>
 
                     <Grid item>
-                       <Typography variant={"subtitle1"} sx={{paddingLeft: "20px"}}>
-                           <InfoOutlined sx={{marginRight: "5px"}}/>
-                           Proporcione los datos exactos de un usuario para hacerlo su trabajador y darle acceso en el sistema.
-                           El usuario debe existir en el sistema, con su cuenta verificada y no puede ser trabajador de
-                           otro usuario. Si el usuario es ya trabajador de algún usuario, primero debe darse baja para
-                           que sea elegible en esta opción.
-                       </Typography>
+                        <Typography variant={"subtitle1"} sx={{ paddingLeft: "20px" }}>
+                            <InfoOutlined sx={{ marginRight: "5px" }} />
+                            Proporcione los datos exactos de un usuario para hacerlo su trabajador y darle acceso en el sistema.
+                            El usuario debe existir en el sistema, con su cuenta verificada y no puede ser trabajador de
+                            otro usuario. Si el usuario es ya trabajador de algún usuario, primero debe darse baja para
+                            que sea elegible en esta opción.
+                        </Typography>
                     </Grid>
 
-                    <Grid container item rowSpacing={4} sx={{padding: "25px"}}>
+                    <Grid container item rowSpacing={4} sx={{ padding: "25px" }}>
                         <Grid item xs={12}>
                             <TextField
                                 name={"usuario"}
@@ -122,14 +122,14 @@ export default function WorkersForm({ownerId}) {
                         </Grid>
                     </Grid>
 
-                    <Grid container item justifyContent={"flex-end"} sx={{paddingRight: "25px"}}>
+                    <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                         {
                             displaySearchResult && (
                                 <Button
                                     color={"secondary"}
                                     variant={"outlined"}
                                     size={"small"}
-                                    sx={{m: 1}}
+                                    sx={{ m: 1 }}
                                     onClick={handleCancelSearch}
                                 >
                                     Limpiar busqueda
@@ -142,7 +142,7 @@ export default function WorkersForm({ownerId}) {
                             color={"primary"}
                             variant={"outlined"}
                             size={"small"}
-                            sx={{m: 1}}
+                            sx={{ m: 1 }}
                             disabled={!formik.isValid}
                         >
                             Buscar
@@ -196,7 +196,7 @@ export default function WorkersForm({ownerId}) {
                                                                 variant={"outlined"}
                                                                 color={"primary"}
                                                                 size={"small"}
-                                                                startIcon={<Done/>}
+                                                                startIcon={<Done />}
                                                                 onClick={handleAddWorker}
                                                             >
                                                                 Agregar trabajador
@@ -222,12 +222,12 @@ export default function WorkersForm({ownerId}) {
                         )
                     }
 
-                    <Grid container item justifyContent={"flex-end"} sx={{paddingRight: "25px"}}>
+                    <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                         <Button
                             color={"secondary"}
                             variant={"outlined"}
                             size={"small"}
-                            sx={{m: 1}}
+                            sx={{ m: 1 }}
                             onClick={() => router.push(`/inventory/worker`)}
                         >
                             Cancelar

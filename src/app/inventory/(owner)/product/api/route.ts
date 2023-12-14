@@ -1,6 +1,6 @@
+import { utapi } from 'uploadthing/server';
 import { NextResponse } from 'next/server'
 import { prisma } from "db";
-import { utapi } from 'uploadthing/server';
 
 // Get all user products
 export async function GET(request: Request) {

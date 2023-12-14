@@ -72,7 +72,7 @@ export default function Login() {
                     password,
                     redirect: false,
                 })
-                if (responseNextAuth.ok) {
+                if (responseNextAuth?.ok) {
                     router.push("/inventory")
                 } else {
                     setFieldError("password", "Usuario y/o contraseña incorrecto(s)")
@@ -86,7 +86,6 @@ export default function Login() {
                             <Grid container item xs={12} spacing={2}>
                                 <Grid item xs={12}>
                                     <TextField
-                                        name="username"
                                         label="Usuario"
                                         size={"small"}
                                         fullWidth
@@ -106,7 +105,6 @@ export default function Login() {
 
                                 <Grid item xs={12}>
                                     <TextField
-                                        name="password"
                                         label="Contraseña"
                                         size={"small"}
                                         type={showPassword ? "text" : "password"}
@@ -206,7 +204,6 @@ export default function Login() {
                             <Grid container item xs={12} spacing={2}>
                                 <Grid item xs={12}>
                                     <TextField
-                                        name="username"
                                         label="Usuario*"
                                         size={"small"}
                                         fullWidth
@@ -219,7 +216,6 @@ export default function Login() {
 
                                 <Grid item xs={12}>
                                     <TextField
-                                        name="name"
                                         label="Nombre*"
                                         size={"small"}
                                         fullWidth
@@ -231,7 +227,6 @@ export default function Login() {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        name="phone"
                                         label="Teléfono*"
                                         size={"small"}
                                         onKeyDown={handleKeyDown}
@@ -244,7 +239,6 @@ export default function Login() {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        name="mail"
                                         label="Correo*"
                                         size={"small"}
                                         fullWidth
@@ -257,7 +251,6 @@ export default function Login() {
 
                                 <Grid item xs={12}>
                                     <TextField
-                                        name="password1"
                                         label="Contraseña*"
                                         size={"small"}
                                         type={showPassword1 ? "text" : "password"}
@@ -282,7 +275,6 @@ export default function Login() {
 
                                 <Grid item xs={12}>
                                     <TextField
-                                        name="password2"
                                         label="Confirmar Contraseña*"
                                         size={"small"}
                                         type={showPassword2 ? "text" : "password"}
