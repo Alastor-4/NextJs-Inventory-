@@ -10,7 +10,7 @@ import {
 import React from "react";
 
 export default function UpdateValueDialog(props) {
-    const {open, setOpen, dialogTitle} = props
+    const { open, setOpen, dialogTitle } = props
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
         setOpen(false);
@@ -30,4 +30,4 @@ export default function UpdateValueDialog(props) {
             </DialogActions>
         </Dialog>
     )
- }
+}

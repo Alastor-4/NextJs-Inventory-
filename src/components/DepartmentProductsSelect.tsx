@@ -14,11 +14,11 @@ import {
     Typography
 } from "@mui/material";
 import React from "react";
-import {Formik} from "formik";
-import {TableNoData} from "@/components/TableNoData";
+import { Formik } from "formik";
+import { TableNoData } from "@/components/TableNoData";
 
 export default function DepartmentProductsSelect(
-    {departmentProductsList, setDepartmentProductsList, selectedProduct, setSelectedProduct}: any
+    { departmentProductsList, setDepartmentProductsList, selectedProduct, setSelectedProduct }: any
 ) {
     const [data, setData] = React.useState([])
 
@@ -58,8 +58,8 @@ export default function DepartmentProductsSelect(
         searchBarValue: ""
     }
 
-    const DepartmentsFilter = ({formik}) => (
-        <Card variant={"outlined"} sx={{padding: "15px"}}>
+    const DepartmentsFilter = ({ formik }) => (
+        <Card variant={"outlined"} sx={{ padding: "15px" }}>
             <Grid container rowSpacing={2}>
                 <Grid item>
                     <Typography variant={"subtitle2"}>
@@ -172,71 +172,71 @@ export default function DepartmentProductsSelect(
         }
     }
 
-    const TableContent = ({formik}) => {
+    const TableContent = ({ formik }) => {
         return (
             <TableBody>
                 {data.filter(
                     item =>
                         item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                         item?.description?.toUpperCase()?.includes(formik.values.searchBarValue.toUpperCase())).map(
-                    row => (
-                        <TableRow
-                            key={row.id}
-                            hover
-                            tabIndex={-1}
-                            selected={selectedProduct && (row.id === selectedProduct.id)}
-                            onClick={() => handleSelectItem(row)}
-                        >
-                            <TableCell>
-                                <Checkbox size={"small"} checked={selectedProduct && (row.id === selectedProduct.id)}/>
-                            </TableCell>
-                            <TableCell>
-                                {row.name}
-                            </TableCell>
-                            <TableCell>
-                                {row.description ?? "-"}
-                            </TableCell>
-                            <TableCell>
-                                {row?.departments?.name ?? "-"}
-                            </TableCell>
-                            <TableCell>
-                                {row.characteristics.length > 0
-                                    ? row.characteristics.map(item => (
-                                            <Grid
-                                                key={item.id}
-                                                sx={{
-                                                    display: "inline-flex",
-                                                    margin: "3px",
-                                                    backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                    padding: "2px 4px",
-                                                    borderRadius: "5px 2px 2px 2px",
-                                                    border: "1px solid rgba(130, 130, 130)",
-                                                    fontSize: 14,
-                                                }}
-                                            >
-                                                <Grid container item alignItems={"center"} sx={{marginRight: "3px"}}>
-                                                    <Typography variant={"caption"}
-                                                                sx={{color: "white", fontWeight: "600"}}>
-                                                        {item.name.toUpperCase()}
-                                                    </Typography>
+                            row => (
+                                <TableRow
+                                    key={row.id}
+                                    hover
+                                    tabIndex={-1}
+                                    selected={selectedProduct && (row.id === selectedProduct.id)}
+                                    onClick={() => handleSelectItem(row)}
+                                >
+                                    <TableCell>
+                                        <Checkbox size={"small"} checked={selectedProduct && (row.id === selectedProduct.id)} />
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.name}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.description ?? "-"}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row?.departments?.name ?? "-"}
+                                    </TableCell>
+                                    <TableCell>
+                                        {row.characteristics.length > 0
+                                            ? row.characteristics.map(item => (
+                                                <Grid
+                                                    key={item.id}
+                                                    sx={{
+                                                        display: "inline-flex",
+                                                        margin: "3px",
+                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                        padding: "2px 4px",
+                                                        borderRadius: "5px 2px 2px 2px",
+                                                        border: "1px solid rgba(130, 130, 130)",
+                                                        fontSize: 14,
+                                                    }}
+                                                >
+                                                    <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
+                                                        <Typography variant={"caption"}
+                                                            sx={{ color: "white", fontWeight: "600" }}>
+                                                            {item.name.toUpperCase()}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid container item alignItems={"center"}
+                                                        sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                        {item.value}
+                                                    </Grid>
                                                 </Grid>
-                                                <Grid container item alignItems={"center"}
-                                                      sx={{color: "rgba(16,27,44,0.8)"}}>
-                                                    {item.value}
-                                                </Grid>
-                                            </Grid>
-                                        )
-                                    ) : "-"
-                                }
-                            </TableCell>
-                            <TableCell>
-                                {
-                                    row.images.length > 0
-                                        ? `${row.images.length} imagen(es)` : "-"
-                                }
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                                            )
+                                            ) : "-"
+                                        }
+                                    </TableCell>
+                                    <TableCell>
+                                        {
+                                            row.images.length > 0
+                                                ? `${row.images.length} imagen(es)` : "-"
+                                        }
+                                    </TableCell>
+                                </TableRow>
+                            ))}
             </TableBody>
         )
     }
@@ -254,20 +254,20 @@ export default function DepartmentProductsSelect(
                         <CardContent>
                             {
                                 departmentProductsList.length > 0 && (
-                                    <DepartmentsFilter formik={formik}/>
+                                    <DepartmentsFilter formik={formik} />
                                 )
                             }
 
                             {
                                 data?.length > 0
                                     ? (
-                                        <Table sx={{width: "100%"}} size={"small"}>
-                                            <TableHeader/>
+                                        <Table sx={{ width: "100%" }} size={"small"}>
+                                            <TableHeader />
 
-                                            <TableContent formik={formik}/>
+                                            <TableContent formik={formik} />
                                         </Table>
                                     ) : (
-                                        <TableNoData/>
+                                        <TableNoData />
                                     )
                             }
                         </CardContent>
@@ -276,4 +276,4 @@ export default function DepartmentProductsSelect(
             }
         </Formik>
     )
- }
+}

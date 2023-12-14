@@ -1,6 +1,6 @@
 // @ts-nocheck
-import {Box} from "@mui/material";
-import {InfoOutlined} from "@mui/icons-material";
+import { Box } from "@mui/material";
+import { InfoOutlined } from "@mui/icons-material";
 
 export const TableNoData = () => {
     return (
@@ -16,7 +16,7 @@ export const TableNoData = () => {
                 }
             }
         >
-            <InfoOutlined sx={{mr: "5px"}}/>
+            <InfoOutlined sx={{ mr: "5px" }} />
             No hay datos que mostrar
         </Box>
     )
