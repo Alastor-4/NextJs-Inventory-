@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { reservation } from '../request/reservation'
-import { AddTask, ArrowLeft, CreditCard, Person, VisibilityOutlined } from '@mui/icons-material'
+import { AddTask, ArrowLeft, CreditCard, DeliveryDiningOutlined, Person, VisibilityOutlined } from '@mui/icons-material'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import StoreModalStatusOptions from './StoreModalStatusOptions'
 import StatusOptions from './StatusOptions'
@@ -169,22 +169,43 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                         fontSize={14.5}
                                                         onClick={() => selectReservation(index)}
                                                     >
-                                                        <Grid container>
-                                                            <Grid item container columnGap={2} xs={12}>
-                                                                <Grid item container alignItems={'center'} xs={"auto"} spacing={1}>
-                                                                    <Grid item>
-                                                                        <Person color='primary' />
-                                                                    </Grid>
+                                                        <Grid container >
+                                                            <Grid item container rowGap={2} xs={12}>
 
-                                                                    <Grid item>
+                                                                <Grid item container justifyContent={"space-between"}>
+
+                                                                    <Grid item alignSelf={'center'} >
                                                                         {userReservation.users.username}
                                                                     </Grid>
+
+                                                                    <Grid item container spacing={1} xs={'auto'}>
+
+                                                                        <Grid item>
+                                                                            <Chip
+                                                                                label={
+                                                                                    <DeliveryDiningOutlined />
+                                                                                }
+                                                                                size='small'
+                                                                                color='primary'
+                                                                            />
+                                                                        </Grid>
+
+                                                                        <Grid item >
+                                                                            <Chip
+                                                                                label={
+                                                                                    userReservation.reservation_status.name
+                                                                                }
+                                                                                size={"small"}
+                                                                                color={reservationStatusColors[userReservation.reservation_status.code]}
+                                                                            />
+                                                                        </Grid>
+
+                                                                    </Grid>
+
+
                                                                 </Grid>
 
-                                                                <Grid item container xs={"auto"} spacing={1}>
-                                                                    <Grid item xs={true} alignSelf={'center'}>
-                                                                        <CreditCard color='primary' />
-                                                                    </Grid>
+                                                                <Grid item container justifyContent={"space-between"}>
 
                                                                     <Grid item container spacing={1} xs={"auto"} alignItems={'center'}>
                                                                         <Grid item>
@@ -197,23 +218,14 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                             </small>
                                                                         </Grid>
                                                                     </Grid>
+
+                                                                    <Grid item sx={{ marginLeft: "auto", marginRight: "2%" }}>
+                                                                        <Typography variant='subtitle2' >{dayjs(userReservation.created_at).format("hh:mm A")}</Typography>
+                                                                    </Grid>
+
                                                                 </Grid>
 
 
-
-                                                                <Grid item>
-                                                                    <Chip
-                                                                        label={
-                                                                            userReservation.reservation_status.name
-                                                                        }
-                                                                        size={"small"}
-                                                                        color={reservationStatusColors[userReservation.reservation_status.code]}
-                                                                    />
-                                                                </Grid>
-                                                            </Grid>
-
-                                                            <Grid item sx={{ marginLeft: "auto", marginRight: "2%" }}>
-                                                                <Typography variant='subtitle2' >{dayjs(userReservation.created_at).format("hh:mm A")}</Typography>
                                                             </Grid>
                                                         </Grid>
 
