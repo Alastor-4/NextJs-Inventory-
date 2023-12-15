@@ -20,7 +20,7 @@ export const notifyError = (message: string) => enqueueSnackbar(message, { varia
 export const notifyWarning = (message: string) => enqueueSnackbar(message, { variant: "warning" })
 
 //return offer price per unit from first applicable offer found. return false if no applicable offer found
-export function evaluateOffers(offerItems: any[], itemsQuantity: number): number | false {
+function evaluateOffers(offerItems: any[], itemsQuantity: number): number | false {
     const evaluate = (compareFunction: string, compareQuantity: number, itemsQuantity: number): boolean => {
         switch (compareFunction) {
             case "=":
@@ -43,19 +43,21 @@ export function evaluateOffers(offerItems: any[], itemsQuantity: number): number
 }
 
 //compute price per unit using offers (if exist and apply some) and discount if exist
-export function computeDepotPricePerUnit(storeDepot: any, unitsQuantity: number): number {
-    const productOffers = storeDepot.product_offers
+export function computeDepotPricePerUnit(storeDepotWithOffersRelation: any, unitsQuantity: number): number {
+    const productOffers = storeDepotWithOffersRelation.product_offers
     const productHasOffers = !!productOffers.length
 
     const offersEvaluation = productHasOffers
         ? evaluateOffers(productOffers, unitsQuantity)
         : false
 
-    const pricePerUnitWithOffers = offersEvaluation ? offersEvaluation : storeDepot.sell_price
-
-    return storeDepot.price_discount_quantity
-        ? pricePerUnitWithOffers - storeDepot.price_discount_quantity
-        : storeDepot.price_discount_percentage
-            ? pricePerUnitWithOffers - (storeDepot.price_discount_percentage * pricePerUnitWithOffers / 100)
-            : pricePerUnitWithOffers
+    //final price method: If product has offers and unitsQuantity apply to one of them, final price is taken from
+    //fulfilled offer. If no applicable offer exist then final price es taken from product base price and discount if it exists
+    return offersEvaluation
+        ? offersEvaluation
+        : storeDepotWithOffersRelation.price_discount_quantity
+            ? storeDepotWithOffersRelation.sell_price - storeDepotWithOffersRelation.price_discount_quantity
+            : storeDepotWithOffersRelation.price_discount_percentage
+                ? storeDepotWithOffersRelation.sell_price - (storeDepotWithOffersRelation.price_discount_percentage * storeDepotWithOffersRelation.sell_price / 100)
+                : storeDepotWithOffersRelation.sell_price
 }
