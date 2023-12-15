@@ -2,6 +2,6 @@
 
 import { hashSync } from "bcrypt"
 
-export function hashPassword(password: string) {
+export async function hashPassword(password: string) {
     return hashSync(password, 10);
 }

@@ -3,7 +3,7 @@ import apiRequest from "@/api"
 const url = (userId: any) => `/inventory/admin/user/api`
 const updateUrl = (userId: any) => `/inventory/admin/user/update/api`
 
-const roles = {
+const users = {
     allUsers: async function (userId: any) {
         try {
             const response = await apiRequest.get(url(userId))
@@ -71,4 +71,4 @@ const roles = {
     },
 }
 
-export default roles;
+export default users;
