@@ -8,7 +8,7 @@ const auth = {
     register: async function ({ username, password1, name, mail, phone }: any) {
 
         try {
-            const passwordHash = await hashPassword(password1);
+            const passwordHash = hashPassword(password1);
             const response = await apiRequest.post(url, { username, passwordHash, name, mail, phone, })
             notifySuccess(response.data.message);
             return response.data
