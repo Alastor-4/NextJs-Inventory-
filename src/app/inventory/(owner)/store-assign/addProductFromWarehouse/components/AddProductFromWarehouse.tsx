@@ -32,7 +32,7 @@ import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import { TableNoData } from '@/components/TableNoData';
 import { Formik } from 'formik';
 import * as Yup from "yup"
-import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import { notifyError, notifySuccess, notifyWarning } from "@/utils/generalFunctions";
 
 export default function AddProductFromWarehouse(props: any) {
     const { userId, dataStore, warehouseId } = props
@@ -54,10 +54,16 @@ export default function AddProductFromWarehouse(props: any) {
     // Wharehouse -> depots -> storeDepots
     //                      -> products -> departments
     useEffect(() => {
+
         const getData = async () => {
             const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(userId, dataStore.id)
-            setDataDepotsWarehouse(newDataDepotsWarehouses);
+
+            newDataDepotsWarehouses.length === 0 && dataDepotsWarehouses.length === 0
+                ? notifyWarning("No hay almacenes que tengan productos para agregar")
+                : setDataDepotsWarehouse(newDataDepotsWarehouses)
+
         }
+
         const loadDepartamentsFromSelectedInitialWarehouse = (indWarehouse: number, mirrorDataDepotsWarehouses: any) => {
             let departments = new Map();
 
@@ -78,17 +84,23 @@ export default function AddProductFromWarehouse(props: any) {
             setDataProductsByDepartment(newDataProductsByDepartment);
 
         }
+
         const getDataSpecificWarehouse = async () => {
             const newDataDepotsWarehouses = await requestWarehouse.getWarehouseWithTheirDepots(userId, dataStore.id, warehouseId)
             loadDepartamentsFromSelectedInitialWarehouse(0, newDataDepotsWarehouses);
-            setDataDepotsWarehouse(newDataDepotsWarehouses);
             setSelectedWarehouse(0);
+            setDataDepotsWarehouse(newDataDepotsWarehouses)
+
+            if (newDataDepotsWarehouses[0].depots.length === 0 && dataDepotsWarehouses.length === 0) {
+                notifyWarning("El almacén no tiene produtos para agregar")
+            }
         }
 
         if (dataDepotsWarehouses.length === 0) {
             if (warehouseId === null) getData()
             else getDataSpecificWarehouse();
         }
+
     }, [dataDepotsWarehouses, dataStore.id, userId, warehouseId])
 
     // Puede pasar que q se oculte el último depósito
