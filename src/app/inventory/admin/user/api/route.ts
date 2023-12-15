@@ -1,38 +1,70 @@
-import { NextResponse } from 'next/server'
-import {prisma} from "db";
+import { checkAdminRoleMiddleware } from '@/utils/middlewares';
+import { NextResponse } from 'next/server';
+import { prisma } from "db";
 
-// Get all user
-export async function GET() {
-    const users = await prisma.users.findMany({include: {roles: true}})
+// GET all users
+export async function GET(req: Request) {
+    try {
+        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
 
-    return NextResponse.json(users)
+        if (checkAdminRoleResult) {
+            return checkAdminRoleResult
+        };
+
+        const users = await prisma.users.findMany({ include: { roles: true } });
+
+        return NextResponse.json(users);
+    } catch (error) {
+        console.log('[USER_GET_ALL]', error);
+        return new NextResponse("Internal Error", { status: 500 });
+    }
 }
 
-// Verify user
+// VERIFY user
 export async function PUT(req: Request) {
-    const {searchParams} = new URL(req.url)
-    const userId = searchParams.get("userId")
+    try {
+        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
 
-    if (userId) {
-        const updatedRole = await prisma.users.update({data: {is_verified: true}, where: {id: parseInt(userId)}})
+        if (checkAdminRoleResult) {
+            return checkAdminRoleResult
+        };
 
-        return NextResponse.json(updatedRole)
+        const { userId } = await req.json();
+
+        const verifiedUser = await prisma.users.update({
+            data: { is_verified: true },
+            where: { id: +userId! }
+        });
+
+        return NextResponse.json(verifiedUser);
+    } catch (error) {
+        console.log('[USER_VERIFY]', error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    return new Response('La acción de verificar ha fallado', {status: 500})
 }
 
-// activate/deactivate user
+// TOGGLE isActive user
 export async function PATCH(req: Request) {
-    const {searchParams} = new URL(req.url)
-    const userId = searchParams.get("userId")
-    const {isActive} = await req.json()
+    try {
+        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
 
-    if (userId) {
-        const updatedRole = await prisma.users.update({data: {is_active: isActive}, where: {id: parseInt(userId)}})
+        if (checkAdminRoleResult) {
+            return checkAdminRoleResult
+        };
 
-        return NextResponse.json(updatedRole)
+        const { searchParams } = new URL(req.url);
+        const userId = searchParams.get("userId");
+
+        const { isActive } = await req.json();
+
+        const updatedUser = await prisma.users.update({
+            data: { is_active: isActive },
+            where: { id: +userId! }
+        });
+
+        return NextResponse.json(updatedUser);
+    } catch (error) {
+        console.log('[USER_TOGGLE_ACTIVE_STATE]', error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    return new Response('La acción de activar/desactivar ha fallado', {status: 500})
 }

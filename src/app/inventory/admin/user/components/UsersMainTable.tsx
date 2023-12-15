@@ -34,6 +34,7 @@ import { TableNoData } from "@/components/TableNoData";
 import {
     ArrowLeft,
     ChangeCircleOutlined,
+    DeleteOutline,
     Done,
     PauseOutlined,
     PersonOutlined,
@@ -91,10 +92,10 @@ export default function UsersMainTable(props) {
         };
 
         const handleApplyRole = async () => {
-            const response = await users.changeRol(selected.id, selectedRole.id)
-            if (response) {
-                const updatedUser = await users.userDetails(response.id)
+            const response = await users.changeRol(userId, selected.id, selectedRole.id);
 
+            if (response) {
+                const updatedUser = await users.userDetails(response.id);
                 if (updatedUser) {
                     let newData = [...data]
                     const updatedItemIndex = newData.findIndex(item => item.id === updatedUser.id)
@@ -140,7 +141,7 @@ export default function UsersMainTable(props) {
     }
 
     async function handleVerify() {
-        const response = await users.verifyUser(selected.id)
+        const response = await users.verifyUser(userId, selected.id);
         if (response) {
             let newData = [...data]
             const updatedItemIndex = newData.findIndex(item => item.id === response.id)
@@ -208,11 +209,12 @@ export default function UsersMainTable(props) {
                                 </IconButton>
 
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
 
                                 <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
                                     <ChangeCircleOutlined fontSize={"small"} />
                                 </IconButton>
+
                             </Box>
                         )
                     }

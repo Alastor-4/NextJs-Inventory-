@@ -1,8 +1,8 @@
 
 import apiRequest from "@/api"
 
-const url = (userId: any) => `/inventory/admin/role/api`
-const updateUrl = (userId: any) => `/inventory/admin/role/update/api`
+const url = (userId: any) => `/inventory/admin/role/api`;
+const updateUrl = (userId: any) => `/inventory/admin/role/update/api`;
 
 const roles = {
     allRoles: async function (userId: any) {

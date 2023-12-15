@@ -1,29 +1,47 @@
-import { NextResponse } from 'next/server'
-import {prisma} from "db";
+import { checkAdminRoleMiddleware } from '@/utils/middlewares';
+import { NextResponse } from 'next/server';
+import { prisma } from "db";
 
-// User details
+// GET warehouse details
 export async function GET(req: Request) {
-    const {searchParams} = new URL(req.url)
-    const warehouseId = searchParams.get("warehouseId")
+    try {
+        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
 
-    if (warehouseId) {
-        const warehouse = await prisma.warehouses.findUnique({where: {id: parseInt(warehouseId)}, include: {users: true}})
+        if (checkAdminRoleResult) {
+            return checkAdminRoleResult
+        };
 
-        return NextResponse.json(warehouse)
+        const { searchParams } = new URL(req.url)
+        const warehouseId = searchParams.get("warehouseId");
+
+        const warehouse = await prisma.warehouses.findUnique({ where: { id: +warehouseId! }, include: { users: true } })
+
+        return NextResponse.json(warehouse);
+    } catch (error) {
+        console.log('[USER_GET_ONE_BY_ID]', error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    return new Response('La acción de modificar almacen ha fallado', {status: 500})
 }
 
-// Change user role
+// UPDATE warehouse
 export async function PATCH(req: Request) {
-    const {warehouseId, ownerId, name, description, address} = await req.json()
+    try {
+        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
 
-    if (warehouseId) {
-        const updatedRole = await prisma.warehouses.update({data: {owner_id: ownerId, name, description, address}, where: {id: parseInt(warehouseId)}})
+        if (checkAdminRoleResult) {
+            return checkAdminRoleResult
+        };
 
-        return NextResponse.json(updatedRole)
+        const { warehouseId, ownerId, name, description, address } = await req.json()
+
+        const updatedWarehouse = await prisma.warehouses.update({
+            data: { owner_id: ownerId, name, description, address },
+            where: { id: +warehouseId! }
+        })
+
+        return NextResponse.json(updatedWarehouse);
+    } catch (error) {
+        console.log('[USER_UPDATE_ROLE]', error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    return new Response('La acción de modificar almacén ha fallado', {status: 500})
 }

@@ -2,29 +2,33 @@
 "use client"
 
 import { AppBar, Box, Button, Card, Grid, TextField, Toolbar, Typography } from "@mui/material";
-import React from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup"
 import { useParams, useRouter } from 'next/navigation';
 import roles from "../request/roles";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import React from "react";
 
-export default function RolesForm({userId}) {
-    const [updateItem, setUpdateItem] = React.useState()
+interface RolesFormProps {
+    userId?: number;
+}
 
-    const params = useParams()
-    const router = useRouter()
+export default function RolesForm({ userId }: RolesFormProps) {
+    const [updateItem, setUpdateItem] = React.useState();
 
-    const roleId = params?.roleId
+    const params = useParams();
+    const router = useRouter();
+
+    const roleId = params?.roleId;
 
     React.useEffect(() => {
         async function fetchRole(id) {
-            const rol = await roles.roleDetails(userId, id)
-            setUpdateItem(rol)
+            const rol = await roles.roleDetails(userId, id);
+            setUpdateItem(rol);
         }
         if (roleId !== undefined) {
-            fetchRole(roleId)
+            fetchRole(roleId);
         }
-    }, [userId, roleId, setUpdateItem])
+    }, [userId, roleId, setUpdateItem]);
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -52,8 +56,8 @@ export default function RolesForm({userId}) {
     }
 
     const validationSchema = Yup.object({
-        name: Yup.string().required("campo requerido"),
-        description: Yup.string().required("campo requerido"),
+        name: Yup.string().required("Este campo es requerido"),
+        description: Yup.string().required("Este campo es requerido"),
     })
 
     const handleSubmit = async (values) => {

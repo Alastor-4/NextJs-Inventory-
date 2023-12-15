@@ -24,10 +24,14 @@ import roles from "../request/roles";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function RolesMainTable({userId}) {
-    const router = useRouter()
+interface RolesMainTableProps {
+    userId?: number;
+}
 
-    const [data, setData] = React.useState(null)
+export default function RolesMainTable({ userId }: RolesMainTableProps) {
+    const router = useRouter();
+
+    const [data, setData] = React.useState(null);
 
     //get initial data
     React.useEffect(() => {
@@ -99,7 +103,7 @@ export default function RolesMainTable({userId}) {
                                 </IconButton>
 
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
                             </Box>
                         )
                     }

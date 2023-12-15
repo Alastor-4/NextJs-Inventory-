@@ -15,9 +15,9 @@ const users = {
         return false
     },
 
-    userDetails: async function (userId: any, id: any) {
+    userDetails: async function (userId: any) {
         try {
-            const response = await apiRequest.get(updateUrl(userId), { params: { userId: id } })
+            const response = await apiRequest.get(updateUrl(userId), { params: { userId: userId } })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -28,7 +28,7 @@ const users = {
 
     verifyUser: async function (userId: any, id: any) {
         try {
-            const response = await apiRequest.put(url(userId), { params: { userId: id } })
+            const response = await apiRequest.put(url(userId), { userId: id });
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -52,17 +52,6 @@ const users = {
         try {
             const response = await apiRequest.patch(updateUrl(userId), { roleId: roleId }, { params: { userId: id } })
             return response.data
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
-
-    delete: async function (userId: any, id: any) {
-        try {
-            const response = await apiRequest.delete(url(userId), { params: { userId: id } })
-            if (response.status === 200) return true
         } catch (e) {
             //ToDo: notify error here
         }

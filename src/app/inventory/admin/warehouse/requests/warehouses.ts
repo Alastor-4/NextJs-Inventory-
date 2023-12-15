@@ -1,5 +1,5 @@
 import apiRequest from "@/api"
-import {notifyError} from "@/utils/generalFunctions";
+import { notifyError } from "@/utils/generalFunctions";
 
 const url = (userId: any) => `/inventory/admin/warehouse/api`
 const updateUrl = (userId: any) => `/inventory/admin/warehouse/update/api`
@@ -31,7 +31,7 @@ const warehouses = {
         try {
             return await apiRequest.post(url(userId), { name, description, address, ownerId })
         } catch (e) {
-           notifyError("Ha fallado la creación del almacén")
+            notifyError("Ha fallado la creación del almacén")
         }
 
         return false
