@@ -315,6 +315,8 @@ model reservations {
   request_delivery     Boolean                @default(false)
   delivery_notes       String?                @db.Text
   status_description   String?                @db.Text
+  applied_offer        Json?                  @db.Json
+  applied_discount     Json?                  @db.Json
   status_id            Int
   total_price          Float
   reservation_messages reservation_messages[]
