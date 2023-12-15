@@ -11,10 +11,10 @@ import warehouses from "../requests/warehouses";
 export default function WarehousesForm(props) {
     const { ownerUsers, userId } = props
 
-    const [updateItem, setUpdateItem] = React.useState()
+    const [updateItem, setUpdateItem] = React.useState();
 
-    const params = useParams()
-    const router = useRouter()
+    const params = useParams();
+    const router = useRouter();
 
     React.useEffect(() => {
         async function fetchWarehouse(id: any) {

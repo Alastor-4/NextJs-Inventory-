@@ -24,7 +24,7 @@ import warehouses from "../requests/warehouses";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function WarehousesMainTable({userId}) {
+export default function WarehousesMainTable({ userId }) {
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
@@ -39,7 +39,7 @@ export default function WarehousesMainTable({userId}) {
         if (data === null) {
             getAllWarehouse()
         }
-    }, [data, userId])
+    }, [data, userId]);
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -100,7 +100,7 @@ export default function WarehousesMainTable({userId}) {
                                 </IconButton>
 
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
                             </Box>
                         )
                     }

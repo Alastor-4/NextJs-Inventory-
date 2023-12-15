@@ -1,31 +1,47 @@
-import { NextResponse } from 'next/server'
-import {prisma} from "db";
+import { checkAdminRoleMiddleware } from '@/utils/middlewares';
+import { NextResponse } from 'next/server';
+import { prisma } from "db";
 
-// User details
+// GET user details
 export async function GET(req: Request) {
-    const {searchParams} = new URL(req.url)
-    const userId = searchParams.get("userId")
+    try {
+        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
 
-    if (typeof userId === "string") {
-        const users = await prisma.users.findUnique({where: {id: parseInt(userId)}, include: {roles: true}})
+        if (checkAdminRoleResult) {
+            return checkAdminRoleResult
+        };
 
-        return NextResponse.json(users)
+        const { searchParams } = new URL(req.url);
+        const userId = searchParams.get("userId");
+
+        const user = await prisma.users.findUnique({ where: { id: +userId! }, include: { roles: true } });
+
+        return NextResponse.json(user);
+    } catch (error) {
+        console.log('[USER_GET_ONE_BY_ID]', error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    return new Response('La acción de obtener detalles ha fallado', {status: 400})
 }
 
-// Change user role
+// UPDATE user role
 export async function PATCH(req: Request) {
-    const {searchParams} = new URL(req.url)
-    const userId = searchParams.get("userId")
-    const {roleId} = await req.json()
+    try {
+        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
 
-    if (userId) {
-        const updatedRole = await prisma.users.update({data: {role_id: roleId}, where: {id: parseInt(userId)}})
+        if (checkAdminRoleResult) {
+            return checkAdminRoleResult
+        };
 
-        return NextResponse.json(updatedRole)
+        const { searchParams } = new URL(req.url);
+        const userId = searchParams.get("userId");
+
+        const { roleId } = await req.json();
+
+        const userWithRoleUpdated = await prisma.users.update({ data: { role_id: roleId }, where: { id: +userId! } })
+
+        return NextResponse.json(userWithRoleUpdated);
+    } catch (error) {
+        console.log('[USER_UPDATE_ROLE]', error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    return new Response('La acción de modificar rol ha fallado', {status: 500})
 }

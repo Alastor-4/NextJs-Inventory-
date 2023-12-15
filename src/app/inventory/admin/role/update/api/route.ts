@@ -1,16 +1,24 @@
-import { NextResponse } from 'next/server'
+import { checkAdminRoleMiddleware } from '@/utils/middlewares';
+import { NextResponse } from 'next/server';
 import { prisma } from "db";
 
-// Get role details
+// GET role details by roleId
 export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url)
-    const roleId = searchParams.get("roleId")
+    try {
+        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
 
-    if (roleId) {
-        const role = await prisma.roles.findUnique({ where: { id: parseInt(roleId) } })
+        if (checkAdminRoleResult) {
+            return checkAdminRoleResult
+        };
 
-        return NextResponse.json(role)
+        const { searchParams } = new URL(req.url);
+        const roleId = searchParams.get("roleId");
+
+        const role = await prisma.roles.findUnique({ where: { id: +roleId! } });
+
+        return NextResponse.json(role);
+    } catch (error) {
+        console.log('[ROLE_GET_ONE_BY_ID]', error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    return new Response('La acción de modificar ha fallado', { status: 500 })
 }
