@@ -34,7 +34,6 @@ import { TableNoData } from "@/components/TableNoData";
 import {
     ArrowLeft,
     ChangeCircleOutlined,
-    DeleteOutline,
     Done,
     PauseOutlined,
     PersonOutlined,
@@ -140,14 +139,6 @@ export default function UsersMainTable(props) {
         );
     }
 
-    async function handleRemove() {
-        const response = await users.delete(selected.id)
-        if (response) {
-            const updatedUsers = await users.allUsers()
-            if (updatedUsers) setData(updatedUsers)
-        }
-    }
-
     async function handleVerify() {
         const response = await users.verifyUser(selected.id)
         if (response) {
@@ -221,13 +212,6 @@ export default function UsersMainTable(props) {
 
                                 <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
                                     <ChangeCircleOutlined fontSize={"small"} />
-                                </IconButton>
-
-                                <Divider orientation="vertical" variant="middle" flexItem
-                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
-
-                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                    <DeleteOutline fontSize={"small"} />
                                 </IconButton>
                             </Box>
                         )

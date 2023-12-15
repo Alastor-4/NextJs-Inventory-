@@ -36,17 +36,3 @@ export async function PATCH(req: Request) {
 
     return new Response('La acción de activar/desactivar ha fallado', {status: 500})
 }
-
-// Delete user
-export async function DELETE(req: Request) {
-    const {searchParams} = new URL(req.url)
-    const userId = searchParams.get("userId")
-
-    if (userId) {
-        const deletedRole = await prisma.roles.delete({where: {id: parseInt(userId)}})
-
-        return NextResponse.json(deletedRole)
-    }
-
-    return new Response('La acción de eliminar ha fallado', {status: 500})
-}
