@@ -105,25 +105,15 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
             setSelectedReservation(selectedReservation === index ? null : index)
         }
 
-        const rightOffers = (offers: any, requiredUnits: number, currency: string) => {
-            let largestUnitToCompare: number = 0
-            let ind: number = -1;
-
-            offers.forEach((item: any, index: number) => {
-
-                if (largestUnitToCompare <= item.compare_units_quantity && item.compare_units_quantity <= requiredUnits) {
-                    largestUnitToCompare = item.compare_units_quantity
-                    ind = index
+        const offerText = (compareFunction: string, compareUnits: number, newPrice: number, currency: string) => (
+            <Box>
+                {compareFunction === '='
+                    ? `Cuando compren ${compareUnits} unidades de este producto, cada unidad tendrá un precio de ${newPrice} `
+                    : `Cuando compren más de ${compareUnits} unidades de este producto, cada unidad tendrá un precio de ${newPrice} `
                 }
-
-            })
-
-            return ind !== -1
-                ? offers[ind].compare_function === '='
-                    ? `Cuando compren ${offers[ind].compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${offers[ind].price_per_unit} ${currency}`
-                    : `Cuando compren más de ${offers[ind].compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${offers[ind].price_per_unit} ${currency}`
-                : ""
-        }
+                <small>{currency}</small>
+            </Box>
+        )
 
         function handleOpenImagesDialog(images: any) {
             setDialogImages(images)
@@ -543,35 +533,65 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                                 </Grid>
                                                                                             </Grid>
 
+                                                                                            <Grid item container xs={12} columnGap={1}>
+                                                                                                <Grid item sx={{ fontWeight: 600 }}>Descuento: </Grid>
+                                                                                                <Grid item>
+                                                                                                    {
+                                                                                                        reservationProduct.applied_discount
+                                                                                                            ? reservationProduct.applied_discount.price_discount_percentage
+                                                                                                                ? `${reservationProduct.applied_discount.price_discount_percentage}%`
+                                                                                                                : (
+                                                                                                                    <>
+                                                                                                                        {`${reservationProduct.applied_discount.price_discount_quantity} `}
+                                                                                                                        <small>{`${reservationProduct.store_depots.sell_price_unit}`}</small>
+                                                                                                                    </>
+                                                                                                                )
+                                                                                                            : "-"
+
+                                                                                                    }
+
+                                                                                                </Grid>
+                                                                                            </Grid>
+
                                                                                             <Grid item container xs={12} columnGap={1} alignItems={'center'}>
                                                                                                 <Grid item sx={{ fontWeight: 600 }}>Oferta: </Grid>
 
-                                                                                                <Grid
-                                                                                                    container
-                                                                                                    item
-                                                                                                    sx={{
-                                                                                                        width: 'fit-content',
-                                                                                                        backgroundColor: "lightgray",
-                                                                                                        padding: "2px 4px",
-                                                                                                        borderRadius: "5px 2px 2px 2px",
-                                                                                                        border: "1px solid",
-                                                                                                        borderColor: "seagreen",
-                                                                                                        fontSize: 14,
-                                                                                                        cursor: "default",
-                                                                                                        textDecorationLine: "none",
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <Grid container item xs={true} alignItems={"center"}
-                                                                                                        sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                                                                        {
-                                                                                                            rightOffers(
-                                                                                                                reservationProduct.store_depots.product_offers,
-                                                                                                                reservationProduct.units_quantity,
-                                                                                                                reservationProduct.store_depots.sell_price_unit
-                                                                                                            )
-                                                                                                        }
-                                                                                                    </Grid>
-                                                                                                </Grid>
+                                                                                                {
+                                                                                                    reservationProduct.applied_offer
+                                                                                                        ? (
+                                                                                                            <Grid
+                                                                                                                container
+                                                                                                                item
+                                                                                                                sx={{
+                                                                                                                    width: 'fit-content',
+                                                                                                                    backgroundColor: "lightgray",
+                                                                                                                    padding: "2px 4px",
+                                                                                                                    borderRadius: "5px 2px 2px 2px",
+                                                                                                                    border: "1px solid",
+                                                                                                                    borderColor: "seagreen",
+                                                                                                                    fontSize: 14,
+                                                                                                                    cursor: "default",
+                                                                                                                    textDecorationLine: "none",
+                                                                                                                }}
+                                                                                                            >
+                                                                                                                <Grid container item xs={true} alignItems={"center"}
+                                                                                                                    sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                                                                                    {
+                                                                                                                        offerText(
+                                                                                                                            reservationProduct.applied_offer.compare_function,
+                                                                                                                            reservationProduct.applied_offer.compare_units_quantity,
+                                                                                                                            reservationProduct.applied_offer.price_per_unit,
+                                                                                                                            reservationProduct.store_depots.sell_price_unit
+
+                                                                                                                        )
+                                                                                                                    }
+                                                                                                                </Grid>
+                                                                                                            </Grid>
+                                                                                                        )
+                                                                                                        : "-"
+                                                                                                }
+
+
                                                                                             </Grid>
                                                                                         </Grid>
                                                                                     </Card>
