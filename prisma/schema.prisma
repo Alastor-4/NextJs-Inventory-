@@ -294,14 +294,16 @@ model product_offers {
 }
 
 model reservation_products {
-  id             Int          @id @default(autoincrement())
-  reservation_id Int
-  store_depot_id Int
-  units_quantity Int
-  price          Float
-  created_at     DateTime     @default(now()) @db.Timestamp(0)
-  reservations   reservations @relation(fields: [reservation_id], references: [id], onUpdate: Restrict, map: "reservation_products_FK")
-  store_depots   store_depots @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "reservation_products_FK_1")
+  id               Int   @id @default(autoincrement())
+  reservation_id   Int
+  store_depot_id   Int
+  units_quantity   Int
+  price            Float
+  applied_offer    Json? @db.Json
+  applied_discount Json? @db.Json
+  created_at   DateTime     @default(now()) @db.Timestamp(0)
+  reservations reservations @relation(fields: [reservation_id], references: [id], onUpdate: Restrict, map: "reservation_products_FK")
+  store_depots store_depots @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "reservation_products_FK_1")
 
   @@index([reservation_id], map: "reservation_products_FK")
   @@index([store_depot_id], map: "reservation_products_FK_1")
@@ -315,8 +317,6 @@ model reservations {
   request_delivery     Boolean                @default(false)
   delivery_notes       String?                @db.Text
   status_description   String?                @db.Text
-  applied_offer        Json?                  @db.Json
-  applied_discount     Json?                  @db.Json
   status_id            Int
   total_price          Float
   reservation_messages reservation_messages[]
