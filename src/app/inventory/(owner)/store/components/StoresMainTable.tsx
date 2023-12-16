@@ -307,7 +307,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                             <Grid container item spacing={1} xs={12}>
                                                 <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Direccion:</Grid>
                                                 <Grid item xs={true}>
-                                                    {row.address === "" ? '-' : row.slogan}
+                                                    {row.address === "" ? '-' : row.address}
                                                 </Grid>
                                             </Grid>
 
