@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -15,7 +15,7 @@ model characteristics {
   created_at DateTime  @default(now()) @db.Timestamp(0)
   products   products? @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "characteristics_ibfk_1")
 
-  @@index([product_id], map: "product_id")
+  @@index([product_id], map: "characteristic_product_id")
 }
 
 model images {
@@ -26,7 +26,7 @@ model images {
   fileUrl    String?   @db.VarChar(255)
   products   products? @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "images_ibfk_1")
 
-  @@index([product_id], map: "product_id")
+  @@index([product_id], map: "image_product_id")
 }
 
 model departments {
@@ -83,8 +83,8 @@ model product_store_transfers {
   store_depots               store_depots? @relation(fields: [store_depot_id], references: [id])
   stores                     stores?       @relation(fields: [to_store_id], references: [id])
 
-  @@index([store_depot_id], map: "product_store_transfers_store_depot_id_fkey")
-  @@index([to_store_id], map: "product_store_transfers_to_store_id_fkey")
+  @@index([store_depot_id], map: "product_store_transfers_store_depot_fkey")
+  @@index([to_store_id], map: "product_store_transfers_store_fkey")
 }
 
 model store_depot_transfers {
@@ -95,12 +95,12 @@ model store_depot_transfers {
   created_at                 DateTime      @default(now()) @db.Timestamp(0)
   store_depots               store_depots? @relation(fields: [store_depot_id], references: [id])
 
-  @@index([store_depot_id], map: "store_depot_transfers_store_depot_id_fkey")
+  @@index([store_depot_id], map: "store_depot_transfers_store_depot_fkey")
 }
 
 model roles {
   id          Int      @id @default(autoincrement())
-  name        String?  @unique(map: "name") @db.VarChar(255)
+  name        String?  @unique(map: "role_name") @db.VarChar(255)
   description String?  @db.VarChar(255)
   created_at  DateTime @default(now()) @db.Timestamp(0)
   users       users[]
@@ -112,14 +112,14 @@ model store_depots {
   depot_id                  Int?
   product_units             Int?
   product_remaining_units   Int?
-  seller_profit_percentage  Float?                    @db.Float
+  seller_profit_percentage  Float?                    @db.Real
   created_at                DateTime                  @default(now()) @db.Timestamp(0)
   is_active                 Boolean?                  @default(false)
   sell_price                Decimal?                  @default(0.00) @db.Decimal(10, 2)
   sell_price_unit           String?                   @default("CUP") @db.VarChar(100)
-  seller_profit_quantity    Float?                    @db.Float
-  price_discount_percentage Float?                    @db.Float
-  price_discount_quantity   Float?                    @db.Float
+  seller_profit_quantity    Float?                    @db.Real
+  price_discount_percentage Float?                    @db.Real
+  price_discount_quantity   Float?                    @db.Real
   seller_profit_unit        String?                   @db.VarChar(255)
   product_offers            product_offers[]
   product_store_transfers   product_store_transfers[]
@@ -146,20 +146,20 @@ model stores {
   created_at                     DateTime                  @default(now()) @db.Timestamp(0)
   auto_open_time                 Boolean?                  @default(true)
   auto_reservation_time          Boolean?                  @default(true)
-  fixed_seller_profit_percentage Float?                    @db.Float
+  fixed_seller_profit_percentage Float?                    @db.Real
   online_catalog                 Boolean?                  @default(false)
   online_reservation             Boolean?                  @default(false)
-  fixed_seller_profit_quantity   Float?                    @db.Float
+  fixed_seller_profit_quantity   Float?                    @db.Real
   fixed_seller_profit_unit       String?                   @db.VarChar(255)
   product_store_transfers        product_store_transfers[]
   store_collections              store_collections[]
   store_depots                   store_depots[]
   store_open_days                store_open_days[]
   store_reservation_days         store_reservation_days[]
-  seller_user                    users?                    @relation("seller_user", fields: [seller_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "stores_FK")
-  owner_user                     users?                    @relation("owner_user", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "stores_ibfk_1")
+  seller_user                    users?                    @relation("seller_user", fields: [seller_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_seller_FK")
+  owner_user                     users?                    @relation("owner_user", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_owner_FK")
 
-  @@index([owner_id], map: "owner_id")
+  @@index([owner_id], map: "store_owner_id")
   @@index([seller_user_id], map: "stores_FK")
 }
 
@@ -200,22 +200,22 @@ model warehouses {
 
 model store_open_days {
   id              Int      @id @default(autoincrement())
-  week_day_number Int      @db.TinyInt
+  week_day_number Int      @db.SmallInt
   day_start_time  DateTime @db.Time(0)
   day_end_time    DateTime @db.Time(0)
   store_id        Int
-  stores          stores   @relation(fields: [store_id], references: [id], onUpdate: Restrict, map: "store_open_days_FK")
+  stores          stores   @relation(fields: [store_id], references: [id], onUpdate: Restrict, map: "store_open_days_store_FK")
 
   @@index([store_id], map: "store_open_days_FK")
 }
 
 model store_reservation_days {
   id              Int      @id @default(autoincrement())
-  week_day_number Int      @db.TinyInt
+  week_day_number Int      @db.SmallInt
   day_start_time  DateTime @db.Time(0)
   day_end_time    DateTime @db.Time(0)
   store_id        Int
-  stores          stores   @relation(fields: [store_id], references: [id], onUpdate: Restrict, map: "store_reservation_days_FK")
+  stores          stores   @relation(fields: [store_id], references: [id], onUpdate: Restrict, map: "store_reservation_days_store_FK")
 
   @@index([store_id], map: "store_reservation_days_FK")
 }
@@ -225,8 +225,8 @@ model store_collection_depots {
   store_collection_id Int
   store_depot_id      Int
   created_at          DateTime?         @default(now()) @db.Timestamp(0)
-  store_collections   store_collections @relation(fields: [store_collection_id], references: [id], onUpdate: Restrict, map: "store_collection_depot_FK")
-  store_depots        store_depots      @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "store_collection_depot_FK_1")
+  store_collections   store_collections @relation(fields: [store_collection_id], references: [id], onUpdate: Restrict, map: "store_collection_depot_store_collection_FK")
+  store_depots        store_depots      @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "store_collection_depot_store_depot")
 
   @@index([store_collection_id], map: "store_collection_depot_FK")
   @@index([store_depot_id], map: "store_collection_depot_FK_1")
@@ -240,7 +240,7 @@ model store_collections {
   created_at              DateTime?                 @default(now()) @db.Timestamp(0)
   is_active               Boolean?                  @default(false)
   store_collection_depots store_collection_depots[]
-  stores                  stores                    @relation(fields: [store_id], references: [id], onUpdate: Restrict, map: "store_collections_FK")
+  stores                  stores                    @relation(fields: [store_id], references: [id], onUpdate: Restrict, map: "store_collections_store_collection_depot_FK")
 
   @@index([store_id], map: "store_collections_FK")
 }
@@ -252,14 +252,14 @@ model reservation_messages {
   was_read               Boolean?     @default(false)
   product_reservation_id Int
   created_at             DateTime?    @default(now()) @db.Timestamp(0)
-  products_reservation   reservations @relation(fields: [product_reservation_id], references: [id], onUpdate: Restrict, map: "reservation_messages_FK")
+  products_reservation   reservations @relation(fields: [product_reservation_id], references: [id], onUpdate: Restrict, map: "reservation_messages_products_reservation_FK")
 
   @@index([product_reservation_id], map: "reservation_messages_FK")
 }
 
 model reservation_status {
   id           Int            @id @default(autoincrement())
-  code         Int            @db.TinyInt
+  code         Int            @db.SmallInt
   name         String         @db.VarChar(100)
   description  String         @db.VarChar(255)
   created_at   DateTime       @default(now()) @db.Timestamp(0)
@@ -288,7 +288,7 @@ model product_offers {
   store_depot_id         Int
   is_active              Boolean?     @default(true)
   created_at             DateTime     @default(now()) @db.Timestamp(0)
-  store_depots           store_depots @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "NewTable_FK")
+  store_depots           store_depots @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "product_offers_store_depots_FK")
 
   @@index([store_depot_id], map: "NewTable_FK")
 }
@@ -300,11 +300,11 @@ model reservation_products {
   units_quantity Int
   price          Float
   created_at     DateTime     @default(now()) @db.Timestamp(0)
-  reservations   reservations @relation(fields: [reservation_id], references: [id], onUpdate: Restrict, map: "reservation_products_FK")
-  store_depots   store_depots @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "reservation_products_FK_1")
+  reservations   reservations @relation(fields: [reservation_id], references: [id], onUpdate: Restrict, map: "reservation_products_reservations_FK")
+  store_depots   store_depots @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "reservation_products_store_depots_FK")
 
-  @@index([reservation_id], map: "reservation_products_FK")
-  @@index([store_depot_id], map: "reservation_products_FK_1")
+  @@index([reservation_id], map: "reservation_products_reservation_id_FK")
+  @@index([store_depot_id], map: "reservation_products_store_depot_id_FK")
 }
 
 model reservations {
@@ -321,8 +321,8 @@ model reservations {
   total_price          Float
   reservation_messages reservation_messages[]
   reservation_products reservation_products[]
-  reservation_status   reservation_status     @relation(fields: [status_id], references: [id], onUpdate: Restrict, map: "products_reservation_FK")
-  users                users                  @relation(fields: [requesting_user_id], references: [id], onUpdate: Restrict, map: "products_reservation_user_FK")
+  reservation_status   reservation_status     @relation(fields: [status_id], references: [id], onUpdate: Restrict, map: "reservation_reservation_status_FK")
+  users                users                  @relation(fields: [requesting_user_id], references: [id], onUpdate: Restrict, map: "reservation_user_FK")
   sells                sells[]
 
   @@index([status_id], map: "products_reservation_FK")
@@ -354,8 +354,8 @@ model sells {
   from_reservation_id     Int?
   requesting_user_id      Int?
   sell_products           sell_products[]
-  reservations            reservations?   @relation(fields: [from_reservation_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_sell_FK")
-  users                   users?          @relation(fields: [requesting_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_FK")
+  reservations            reservations?   @relation(fields: [from_reservation_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_reservations_FK")
+  users                   users?          @relation(fields: [requesting_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_users_FK")
 
   @@index([from_reservation_id], map: "products_sell_FK")
   @@index([requesting_user_id], map: "sells_FK")
