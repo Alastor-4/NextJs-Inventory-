@@ -19,7 +19,7 @@ export const nextAuthOptions: NextAuthOptions = {
 
                 if (!credentials?.username || !credentials?.password) return null;
 
-                const res = await axios.post(`${process.env.NEXTAUTH_URL}/login`, credentials);
+                const res = await axios.post("/api/auth/login", credentials);
 
                 const user: users | null = await res.data;
 
