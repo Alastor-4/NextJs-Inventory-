@@ -19,7 +19,14 @@ export const nextAuthOptions: NextAuthOptions = {
 
                 if (!credentials?.username || !credentials?.password) return null;
 
-                const res = await axios.post("/api/auth/login", credentials);
+                const res = await axios.post(
+                    "/api/auth/login",
+                    credentials,
+                    {headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
+                        }}
+                )
 
                 const user: users | null = await res.data;
 
