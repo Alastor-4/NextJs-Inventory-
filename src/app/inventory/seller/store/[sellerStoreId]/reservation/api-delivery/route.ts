@@ -8,7 +8,7 @@ export async function PUT(req: Request) {
     if (productReservationId) {
         const enCaminoStatus = await prisma.reservation_status.findFirst({where: {code: 5}})
 
-        const reservation = await prisma.products_reservation.findUnique(
+        const reservation = await prisma.reservations.findUnique(
             {
                 where: {id: parseInt(productReservationId)},
                 include: {reservation_status: true}
@@ -18,7 +18,7 @@ export async function PUT(req: Request) {
 
         //check if reservation has request_delivery and "Reservado" status
         if (enCaminoStatus && reservation?.request_delivery && reservationStatusCode === 3) {
-            const updatedReservation = await prisma.products_reservation.update(
+            const updatedReservation = await prisma.reservations.update(
                 {
                     data: {
                         status_id: enCaminoStatus.id,
@@ -26,20 +26,24 @@ export async function PUT(req: Request) {
                     },
                     where: {id: reservation.id},
                     include: {
-                        store_depots: {
+                        reservation_products: {
                             include: {
-                                depots: {
+                                store_depots: {
                                     include: {
-                                        products: {
+                                        depots: {
                                             include: {
-                                                departments: true,
-                                                characteristics: true,
-                                                images: true,
-                                            },
+                                                products: {
+                                                    include: {
+                                                        departments: true,
+                                                        characteristics: true,
+                                                        images: true,
+                                                    },
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                            }
+                                },
+                            },
                         },
                         reservation_status: true,
                         users: true,
