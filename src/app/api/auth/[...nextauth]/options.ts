@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { compare } from "bcrypt"
 import { users } from "@prisma/client";
 import axios from "axios";
+import * as process from "process";
 
 export const nextAuthOptions: NextAuthOptions = {
     pages: {
@@ -20,7 +21,7 @@ export const nextAuthOptions: NextAuthOptions = {
                 if (!credentials?.username || !credentials?.password) return null;
 
                 const res = await axios.post(
-                    "/api/auth/login",
+                    `${process.env.NEXTAUTH_URL}/login`,
                     credentials,
                     {headers: {
                             Accept: 'application/json',
