@@ -16,8 +16,8 @@ import React, { useEffect, useState } from 'react'
 import { reservation } from '../request/reservation'
 import { AddTask, ArrowLeft, DeliveryDiningOutlined, VisibilityOutlined } from '@mui/icons-material'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
-import StoreModalStatusOptions from './StoreModalStatusOptions'
-import StatusOptions from './StatusOptions'
+import StoreModalStatusOptions from './statusOptions/components/StoreModalStatusOptions'
+import StatusOptions from './statusOptions/components/StatusOptions'
 import dayjs from 'dayjs'
 import { TableNoData } from '@/components/TableNoData'
 import { useRouter } from 'next/navigation'
@@ -29,16 +29,25 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
     const [dataReservation, setDataReservation] = useState<any>([])
     const [selectedReservation, setSelectedReservation] = useState<any>(null)
 
-    const getData = async () => {
-        let newDataReservation = await reservation.getAllReservations(userId, storeId)
+    const [justCancel, setJustCancel] = useState(false)
 
-        setDataReservation(
-            newDataReservation.sort((a: any, b: any) => -(dayjs(a.created_at).valueOf() - dayjs(b.created_at).valueOf()))
-        )
-    }
+    useEffect(() => {
+        if (selectedReservation !== null) {
+            if (dataReservation[selectedReservation].reservation_status.code === 1) {
+
+                dataReservation[selectedReservation].reservation_products.forEach((element: any) => {
+                    if (element.units_quantity > element.store_depots.product_remaining_units) {
+                        setJustCancel(true)
+                    }
+                })
+            }
+        } else setJustCancel(false)
+
+    }, [selectedReservation, dataReservation])
+
     useEffect(() => {
         const getDataReservation = async () => {
-            let newDataReservation = await reservation.getAllReservations(userId, storeId)
+            let newDataReservation = await reservation.getAllReservations(storeId)
 
             setDataReservation(
                 newDataReservation.sort((a: any, b: any) => -(dayjs(a.created_at).valueOf() - dayjs(b.created_at).valueOf()))
@@ -48,7 +57,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
     }, [userId, storeId])
 
     const handleNavigateBack = () => {
-        router.push("http://localhost:3000/inventory/seller/store/1")
+        router.push("/inventory/seller/store/1")
     }
 
     const CustomToolbar = () => (
@@ -75,10 +84,9 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
     )
 
     const ReservationNotification = () => {
+
         const [openImageDialog, setOpenImageDialog] = useState(false);
         const [dialogImages, setDialogImages] = useState([])
-
-        let controlDates = "0"
 
         const [activeModalStatusOptions, setActiveModalStatusOptions] = useState(false)
 
@@ -91,7 +99,9 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
             6: "success",
         }
 
-        const daysOFReservations = (reservationDate: any) => {
+        let controlDates = "0"
+
+        const daysOfReservations = (reservationDate: any) => {
             if (!(dayjs(controlDates).isSame(dayjs(reservationDate), "day"))) {
                 controlDates = reservationDate
                 return (
@@ -132,13 +142,16 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                     dialogTitle={"Nuevo Estado"}
                     open={activeModalStatusOptions}
                     setOpen={setActiveModalStatusOptions}
+                    setDataReservation={setDataReservation}
+                    storeId={storeId}
                 >
                     <StatusOptions
-                        codeId={dataReservation[selectedReservation]?.reservation_status.code}
+                        storeId={storeId}
                         indUpdate={selectedReservation}
                         dataReservation={dataReservation}
-                        getData={getData}
-                        setOpen={setActiveModalStatusOptions}
+                        delivery={dataReservation[selectedReservation]?.request_delivery}
+                        reservationStatusColors={reservationStatusColors}
+                        justCancel={justCancel}
                     />
                 </StoreModalStatusOptions>
 
@@ -147,7 +160,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                         dataReservation.map((userReservation: any, index: any) => (
                             <React.Fragment key={index}>
 
-                                {daysOFReservations(userReservation.created_at)}
+                                {daysOfReservations(userReservation.created_at)}
 
                                 <Card
                                     key={index}
@@ -234,13 +247,10 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                 )
                                                 : (
                                                     <>
-                                                        <Box component={"div"} display={"flex"} justifyContent={"flex-end"} >
+                                                        <Box component={"div"} display={"flex"} justifyContent={"flex-end"}>
                                                             <IconButton
                                                                 sx={{ position: "fixed", backgroundColor: "primary.main", border: "1px solid black", '&:hover': { backgroundColor: 'primary.main' } }}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation()
-                                                                    setActiveModalStatusOptions(true)
-                                                                }}
+                                                                onClick={() => setActiveModalStatusOptions(true)}
                                                             >
                                                                 <AddTask sx={{ color: "black" }} />
                                                             </IconButton>
@@ -501,20 +511,24 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                                                                     </Grid>
                                                                                                     <Grid item>
                                                                                                         {
-                                                                                                            reservationProduct.units_quantity && (
-                                                                                                                <Chip
-                                                                                                                    label={
-                                                                                                                        `Disponible ${reservationProduct.store_depots.depots.product_total_remaining_units}`
-                                                                                                                    }
-                                                                                                                    size='small'
-                                                                                                                    color={
-                                                                                                                        reservationProduct.store_depots.depots.product_total_remaining_units < reservationProduct.units_quantity
-                                                                                                                            ? "error"
-                                                                                                                            : "success"
-                                                                                                                    }
-                                                                                                                />
+                                                                                                            dataReservation[selectedReservation].reservation_status.code === 1
+                                                                                                                ? (
+                                                                                                                    reservationProduct.units_quantity && (
+                                                                                                                        <Chip
+                                                                                                                            label={
+                                                                                                                                `Disponible ${reservationProduct.store_depots.product_remaining_units}`
+                                                                                                                            }
+                                                                                                                            size='small'
+                                                                                                                            color={
+                                                                                                                                reservationProduct.store_depots.product_remaining_units < reservationProduct.units_quantity
+                                                                                                                                    ? "error"
+                                                                                                                                    : "success"
+                                                                                                                            }
+                                                                                                                        />
 
-                                                                                                            )
+                                                                                                                    )
+                                                                                                                )
+                                                                                                                : ""
                                                                                                         }
                                                                                                     </Grid>
                                                                                                 </Grid>

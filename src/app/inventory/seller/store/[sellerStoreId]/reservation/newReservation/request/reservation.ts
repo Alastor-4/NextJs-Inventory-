@@ -1,11 +1,11 @@
 import apiRequest from "@/api"
 
-const url = (userId: string, storeId: string) => `/inventory/seller/store/${storeId}/reservation/newReservation/api`
+const url = (storeId: string) => `/inventory/seller/store/${storeId}/reservation/newReservation/api`
 
 export const reservation = {
-    getAllReservations: async (userId: string, storeId: string) => {
+    getAllReservations: async (storeId: string) => {
         try {
-            const request = await apiRequest.get(url(userId, storeId))
+            const request = await apiRequest.get(url(storeId))
 
             return request.data
         } catch (e) {
@@ -13,9 +13,9 @@ export const reservation = {
         }
         return false
     },
-    updateReservation: async (userId: any, storeId: any, data: any) => {
+    updateReservation: async (storeId: any, data: any) => {
         try {
-            const request = await apiRequest.put(url(userId, storeId), data)
+            const request = await apiRequest.put(url(storeId), data)
             return request.status
 
         } catch (e) {
