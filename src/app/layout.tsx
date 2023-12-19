@@ -8,8 +8,8 @@ import ClientLayout from "@/app/clientLayout";
 const roboto = Roboto_Serif({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Inventory',
-  description: 'Inventory online',
+  title: 'Inventario+',
+  description: 'Inventario y ventas online',
 }
 
 export default function RootLayout({
