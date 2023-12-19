@@ -67,13 +67,11 @@ export async function POST(req: Request) {
     const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
     const verificationToken = jwt.sign({ username: username }, jwtPrivateKey, { expiresIn: "24h" });
 
-    const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : process.env.APP_BASE_URL
-
     try {
         await sendMail(
             "Verificación de usuario",
             newUser.mail,
-            `Visite el siguiente link para verificar su usuario ${baseUrl}/api/auth/register?token=${verificationToken}`
+            `Visite el siguiente link para verificar su usuario ${process.env.NEXTAUTH_URL}/register?token=${verificationToken}`
         )
     } catch (e) {
         console.log(e)
