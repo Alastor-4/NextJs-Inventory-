@@ -9,11 +9,21 @@ import {
 } from "@mui/material";
 import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import React from "react";
+import { reservation } from "../../../request/reservation";
+import dayjs from "dayjs";
 
 export default function StoreModalStatusOptions(props: any) {
-    const { open, setOpen, dialogTitle } = props
+    const { open, setOpen, dialogTitle, setDataReservation, storeId } = props
+
+    const getData = async () => {
+        let newDataReservation = await reservation.getAllReservations(storeId)
+        setDataReservation(
+            newDataReservation.sort((a: any, b: any) => -(dayjs(a.created_at).valueOf() - dayjs(b.created_at).valueOf()))
+        )
+    }
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
+        getData();
         setOpen(false);
     };
 
