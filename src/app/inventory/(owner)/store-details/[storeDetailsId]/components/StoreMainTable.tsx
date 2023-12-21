@@ -276,7 +276,6 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                                         <TableRow
                                             hover
                                             tabIndex={-1}
-                                            onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
                                         >
                                             <TableCell>
 
@@ -380,6 +379,8 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                                                     <IconButton
                                                         size={"small"}
                                                         sx={{ m: "3px" }}
+                                                        onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
+
                                                     >
                                                         {
 
