@@ -269,7 +269,6 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
             online_catalog: activeCollection,
             online_reservation: activeReservations
         }
-        console.log(parseFloat(values.valueSellProfit))
         let response: any
 
         if (updateItem) {
