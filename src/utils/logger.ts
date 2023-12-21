@@ -38,7 +38,7 @@ if (process.env.NEXTAUTH_URL === "http://localhost:3000/api/auth") {
     )
 }
 
-module.exports = createLogger({
+export default createLogger({
     level: "info",
     transports: logTransports,
     exceptionHandlers: logTransports,
