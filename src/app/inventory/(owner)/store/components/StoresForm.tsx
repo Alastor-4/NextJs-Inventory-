@@ -269,7 +269,6 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
             online_catalog: activeCollection,
             online_reservation: activeReservations
         }
-
         let response: any
 
         if (updateItem) {

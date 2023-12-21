@@ -328,7 +328,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                                     defecto:</Grid>
                                                 <Grid item xs={true}>
                                                     {
-                                                        (row.fixed_seller_profit_percentage)
+                                                        (row.fixed_seller_profit_percentage !== null)
                                                             ? `${row.fixed_seller_profit_percentage} %`
                                                             : `${row.fixed_seller_profit_quantity} CUP`
                                                     }
