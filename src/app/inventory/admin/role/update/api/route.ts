@@ -1,16 +1,9 @@
-import { checkAdminRoleMiddleware } from '@/utils/middlewares';
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
 
 // GET role details by roleId
 export async function GET(req: Request) {
     try {
-        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
-
-        if (checkAdminRoleResult) {
-            return checkAdminRoleResult
-        };
-
         const { searchParams } = new URL(req.url);
         const roleId = searchParams.get("roleId");
 

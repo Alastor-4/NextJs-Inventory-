@@ -5,12 +5,6 @@ import { prisma } from "db";
 // GET warehouse details
 export async function GET(req: Request) {
     try {
-        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
-
-        if (checkAdminRoleResult) {
-            return checkAdminRoleResult
-        };
-
         const { searchParams } = new URL(req.url)
         const warehouseId = searchParams.get("warehouseId");
 
@@ -26,12 +20,6 @@ export async function GET(req: Request) {
 // UPDATE warehouse
 export async function PATCH(req: Request) {
     try {
-        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
-
-        if (checkAdminRoleResult) {
-            return checkAdminRoleResult
-        };
-
         const { warehouseId, ownerId, name, description, address } = await req.json()
 
         const updatedWarehouse = await prisma.warehouses.update({

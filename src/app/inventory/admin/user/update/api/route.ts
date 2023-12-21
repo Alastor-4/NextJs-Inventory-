@@ -1,16 +1,9 @@
-import { checkAdminRoleMiddleware } from '@/utils/middlewares';
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
 
 // GET user details
 export async function GET(req: Request) {
     try {
-        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
-
-        if (checkAdminRoleResult) {
-            return checkAdminRoleResult
-        };
-
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get("userId");
 
@@ -26,12 +19,6 @@ export async function GET(req: Request) {
 // UPDATE user role
 export async function PATCH(req: Request) {
     try {
-        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
-
-        if (checkAdminRoleResult) {
-            return checkAdminRoleResult
-        };
-
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get("userId");
 

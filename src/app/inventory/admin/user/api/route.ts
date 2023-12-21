@@ -1,16 +1,9 @@
-import { checkAdminRoleMiddleware } from '@/utils/middlewares';
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
 
 // GET all users
 export async function GET(req: Request) {
     try {
-        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
-
-        if (checkAdminRoleResult) {
-            return checkAdminRoleResult
-        };
-
         const users = await prisma.users.findMany({ include: { roles: true } });
 
         return NextResponse.json(users);
@@ -23,12 +16,6 @@ export async function GET(req: Request) {
 // VERIFY user
 export async function PUT(req: Request) {
     try {
-        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
-
-        if (checkAdminRoleResult) {
-            return checkAdminRoleResult
-        };
-
         const { userId } = await req.json();
 
         const verifiedUser = await prisma.users.update({
@@ -46,12 +33,6 @@ export async function PUT(req: Request) {
 // TOGGLE isActive user
 export async function PATCH(req: Request) {
     try {
-        const checkAdminRoleResult = await checkAdminRoleMiddleware(req);
-
-        if (checkAdminRoleResult) {
-            return checkAdminRoleResult
-        };
-
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get("userId");
 
