@@ -77,6 +77,6 @@ export const nextAuthOptions: NextAuthOptions = {
                     is_active: token.is_active
                 }
             }
-        }
+        },
     }
 }
