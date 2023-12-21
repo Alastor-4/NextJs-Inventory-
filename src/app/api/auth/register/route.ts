@@ -3,6 +3,7 @@ import { sendMail } from "@/mailer-service";
 import { NextResponse } from 'next/server';
 import * as process from "process";
 import { prisma } from "db";
+import logger from "@/utils/logger";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
@@ -74,7 +75,7 @@ export async function POST(req: Request) {
             `Visite el siguiente link para verificar su usuario ${process.env.NEXTAUTH_URL}/register?token=${verificationToken}`
         )
     } catch (e) {
-        console.log(e)
+        logger.info(`Ha fallado el envio del email al usuario ${username}`)
     }
 
     return NextResponse.json(
