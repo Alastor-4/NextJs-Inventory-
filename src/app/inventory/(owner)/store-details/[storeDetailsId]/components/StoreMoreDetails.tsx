@@ -19,8 +19,8 @@ function StoreMoreDetails(props: any) {
 
         let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
 
-        const valuePercentage = (details.seller_profit_percentage !== null) ? (details.seller_profit_percentage * price / 100).toFixed(2) : null;
-        if (valuePercentage !== null) return `${details.seller_profit_percentage}%  (${valuePercentage} ${details.sell_price_unit})`
+        const valuePercentage = (details.seller_profit_percentage) ? (details.seller_profit_percentage * price / 100).toFixed(2) : null;
+        if (valuePercentage) return `${details.seller_profit_percentage}%  (${valuePercentage} ${details.sell_price_unit})`
         return `${details.seller_profit_quantity} CUP`
     }
 
