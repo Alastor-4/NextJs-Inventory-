@@ -77,7 +77,7 @@ export default function UserWarehouseForm({ ownerId, warehouseId }) {
         )
 
         if (response?.status === 200) {
-            router.push(`/inventory/warehouse/${warehouseId}`)
+            router.push(`/inventory/owner/warehouse/${warehouseId}`)
         } else {
             //ToDo: catch validation errors
             notifyError("Hay un error en la creación de depósitos")
@@ -129,7 +129,7 @@ export default function UserWarehouseForm({ ownerId, warehouseId }) {
                             variant={"outlined"}
                             size={"small"}
                             sx={{ m: 1 }}
-                            onClick={() => router.push(`/inventory/warehouse/${warehouseId}`)}
+                            onClick={() => router.push(`/inventory/owner/warehouse/${warehouseId}`)}
                         >
                             Cancel
                         </Button>

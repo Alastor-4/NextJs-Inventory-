@@ -72,7 +72,7 @@ export default function WorkersForm({ ownerId }) {
         const response = await ownerUsers.addNewUser(ownerId, foundUserData.id)
 
         if (response?.status === 200) {
-            router.push(`/inventory/worker`)
+            router.push(`/inventory/owner/worker`)
         } else {
             //ToDo: make something with the error
         }
@@ -228,7 +228,7 @@ export default function WorkersForm({ ownerId }) {
                             variant={"outlined"}
                             size={"small"}
                             sx={{ m: 1 }}
-                            onClick={() => router.push(`/inventory/worker`)}
+                            onClick={() => router.push(`/inventory/owner/worker`)}
                         >
                             Cancelar
                         </Button>

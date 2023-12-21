@@ -1,9 +1,9 @@
 // @ts-nocheck
 import apiRequest from "@/api"
 
-const url = (warehouseId: string) => `/inventory/warehouse/${warehouseId}/api`
-const urlCreate = (warehouseId: string) => `/inventory/warehouse/${warehouseId}/create/api`
-const urlDepotAssign = (warehouseId: string) => `/inventory/warehouse/${warehouseId}/depot-assign/api`
+const url = (warehouseId: string) => `/inventory/owner/warehouse/${warehouseId}/api`
+const urlCreate = (warehouseId: string) => `/inventory/owner/warehouse/${warehouseId}/create/api`
+const urlDepotAssign = (warehouseId: string) => `/inventory/owner/warehouse/${warehouseId}/depot-assign/api`
 
 const warehouseDepots = {
     allDepots: async function (userId: string, warehouseId: string) {

@@ -1,7 +1,7 @@
 import apiRequest from "@/api"
 
-const url = `/inventory/store-assign/addProductFromWarehouse/api`
-const urlSpecificComponent = `/inventory/store-assign/addProductFromWarehouse/api/specificComponent`
+const url = `/inventory/owner/store-assign/addProductFromWarehouse/api`
+const urlSpecificComponent = `/inventory/owner/store-assign/addProductFromWarehouse/api/specificComponent`
 
 const requestWarehouse = {
 

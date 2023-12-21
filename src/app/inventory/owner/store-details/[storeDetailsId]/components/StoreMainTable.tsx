@@ -70,7 +70,7 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/inventory/store-details/${params.storeDetailsId}/api`).then((data) =>
+        fetcher(`/inventory/owner/store-details/${params.storeDetailsId}/api`).then((data) =>
             setAllProductsByDepartment(data.map((item: any) => ({
                 ...item,
                 selected: false
@@ -161,7 +161,7 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                 </Box>
 
                 <Box sx={{ display: "flex" }}>
-                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/store-assign?storeId=${dataStore.id}`)} >
+                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/owner/store-assign?storeId=${dataStore.id}`)} >
                         <ShareOutlined fontSize={"small"} />
                     </IconButton>
                     <IconButton color={"inherit"} onClick={() => setActiveAddProductFromWarehouse(true)} >

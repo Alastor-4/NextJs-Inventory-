@@ -31,8 +31,8 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
     const router = useRouter()
 
     //Url de las api
-    const urlApiStoreOpenDays = "/inventory/store/apiOpenDays"
-    const urlApiStoreOpenReservations = "/inventory/store/apiReservations"
+    const urlApiStoreOpenDays = "/inventory/owner/store/apiOpenDays"
+    const urlApiStoreOpenReservations = "/inventory/owner/store/apiReservations"
 
     const [updateItem, setUpdateItem] = React.useState<any>()
     const [userSeller, setUserSeller] = React.useState("")
@@ -307,7 +307,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
 
 
         if (response.status === 200) {
-            router.push(`/inventory/store`)
+            router.push(`/inventory/owner/store`)
         } else {
             //ToDo: catch validation errors
             notifyError(`Ha ocurrido un error en la ${updateItem ? "modificación" : "creación"} de los datos de la tienda`)
@@ -533,7 +533,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                                 variant={"outlined"}
                                 size={"small"}
                                 sx={{ m: 1 }}
-                                onClick={() => router.push(`/inventory/store`)}
+                                onClick={() => router.push(`/inventory/owner/store`)}
                             >
                                 Cancel
                             </Button>

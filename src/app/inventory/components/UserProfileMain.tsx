@@ -132,7 +132,7 @@ export default function UserProfileMain(props) {
                     <Grid container>
                         {ownerWarehouses.map((item: any, index: number) => (
                             <Grid container key={item.id}>
-                                <Link href={`/inventory/warehouse/${item.id}`} key={item.id}>
+                                <Link href={`/inventory/owner/warehouse/${item.id}`} key={item.id}>
                                     <Grid container columnSpacing={2} item xs={12} sx={index > 0 ? { mt: "10px" } : { mt: "0" }}>
                                         <Grid container item xs={"auto"} alignItems={"center"}>
                                             <ChevronRightOutlined fontSize={"small"} />
@@ -170,7 +170,7 @@ export default function UserProfileMain(props) {
                     <Grid container>
                         {ownerStores.map((item, index) => (
                             <Grid container key={item.id}>
-                                <Link href={`/inventory/store-details/${item.id}`} >
+                                <Link href={`/inventory/owner/store-details/${item.id}`} >
                                     <Grid container columnSpacing={1} item sx={index > 0 ? { mt: "10px" } : { mt: "0" }}>
                                         <Grid container item xs={"auto"} alignItems={"center"}>
                                             <ChevronRightOutlined fontSize={"small"} />
@@ -184,7 +184,7 @@ export default function UserProfileMain(props) {
                         ))}
 
                         <Grid container>
-                            <Link href={`/inventory/store`}>
+                            <Link href={`/inventory/owner/store`}>
                                 <Grid container columnSpacing={1} item xs={12} sx={{ mt: "15px" }}>
                                     <Grid container item xs={"auto"} alignItems={"center"}>
                                         <ArrowCircleRightOutlined fontSize={"small"} />
@@ -205,7 +205,7 @@ export default function UserProfileMain(props) {
                 <CardHeader title={"Productos"} />
 
                 <CardContent>
-                    <Link href={`/inventory/product`}>
+                    <Link href={`/inventory/owner/product`}>
                         <Grid container rowSpacing={2} item xs={12}>
                             <Grid container item xs={"auto"} alignItems={"center"}>
                                 <ChevronRightOutlined fontSize={"small"} />
@@ -224,7 +224,7 @@ export default function UserProfileMain(props) {
                 <CardHeader title={"Trabajadores"} />
 
                 <CardContent>
-                    <Link href={`/inventory/worker`}>
+                    <Link href={`/inventory/owner/worker`}>
                         <Grid container rowSpacing={2} item xs={12}>
                             <Grid container item xs={"auto"} alignItems={"center"}>
                                 <ChevronRightOutlined fontSize={"small"} />

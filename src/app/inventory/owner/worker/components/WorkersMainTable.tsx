@@ -178,7 +178,7 @@ export default function WorkersMainTable(props) {
                         )
                     }
 
-                    <Link href={`/inventory/worker/create`}>
+                    <Link href={`/inventory/owner/worker/create`}>
                         <IconButton color={"inherit"}>
                             <AddOutlined />
                         </IconButton>

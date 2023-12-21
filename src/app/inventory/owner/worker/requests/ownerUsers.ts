@@ -2,8 +2,8 @@
 import apiRequest from "@/api";
 import { notifyError } from "@/utils/generalFunctions";
 
-const url = () => "/inventory/worker/api";
-const urlCreate = () => "/inventory/worker/create/api";
+const url = () => "/inventory/owner/worker/api";
+const urlCreate = () => "/inventory/owner/worker/create/api";
 
 const ownerUsers = {
     allWorkers: async function (userId: any) {

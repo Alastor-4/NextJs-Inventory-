@@ -3,33 +3,18 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
     function middleware(request: NextRequestWithAuth) {
-        //Para Admins
-        if (request.nextUrl.pathname.startsWith('/inventory/admin') && request.nextauth.token?.role_id !== 1) {
-            if (request.nextauth.token?.role_id) {
-                return NextResponse.redirect(new URL('/inventory', request.url));
-            }
-            return NextResponse.rewrite(new URL('/', request.url));
-        }
+        const role_id = +request.nextauth.token?.role_id!;
+        const pathMatch = (path: string): boolean => request.nextUrl.pathname.startsWith(`${path}`);
+        const inventoryPath = NextResponse.redirect(new URL('/inventory', request.url));
 
-        //Para Owners
-        if (request.nextUrl.pathname.startsWith('/inventory/owner') && request.nextauth.token?.role_id !== 2) {
-            if (request.nextauth.token?.role_id) {
-                return NextResponse.redirect(new URL('/inventory', request.url));
-            }
-            return NextResponse.rewrite(new URL('/', request.url));
-        }
+        //Only Admins
+        if (pathMatch('/inventory/admin') && role_id !== 1) return inventoryPath;
 
-        //Para Sellers
-        if (request.nextUrl.pathname.startsWith('/inventory/seller') && ![2, 3, 4].includes(+request.nextauth.token?.role_id!)) {
-            if (request.nextauth.token?.role_id) {
-                return NextResponse.redirect(new URL('/inventory', request.url));
-            }
-            return NextResponse.rewrite(new URL('/', request.url));
-        }
+        //Only Owners & Keepers
+        if (pathMatch('/inventory/owner') && ![2, 3].includes(role_id)) return inventoryPath;
 
-        if (!request.nextauth.token?.role_id) {
-            return NextResponse.redirect(new URL('/', request.url));
-        }
+        //Only Owners & Keepers & Sellers
+        if (pathMatch('/inventory/seller') && ![2, 3, 4].includes(role_id)) return inventoryPath;
     },
     {
         callbacks: {

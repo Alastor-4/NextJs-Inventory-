@@ -97,7 +97,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
     }
 
     async function handleUpdate() {
-        await router.push(`/inventory/product/update/${selected.id}`)
+        await router.push(`/inventory/owner/product/update/${selected.id}`)
     }
 
     function handleNavigateBack() {
@@ -142,7 +142,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                         )
                     }
 
-                    <Link href={`/inventory/product/create`}>
+                    <Link href={`/inventory/owner/product/create`}>
                         <IconButton color={"inherit"}>
                             <AddOutlined />
                         </IconButton>

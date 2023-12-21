@@ -80,10 +80,10 @@ export default function StoresMainTable({ userId }: { userId: number }) {
     }
 
     function handleUpdate() {
-        router.push(`/inventory/store/update/${selected.id}`)
+        router.push(`/inventory/owner/store/update/${selected.id}`)
     }
     function handleCreate() {
-        router.push(`/inventory/store/create`)
+        router.push(`/inventory/owner/store/create`)
     }
     function handleNavigateBack() {
         router.push(`/inventory`)
@@ -374,7 +374,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                                 <Button
                                                     variant={"outlined"}
                                                     color={"info"}
-                                                    onClick={() => router.push(`/inventory/store-details/${row.id}`)}
+                                                    onClick={() => router.push(`/inventory/owner/store-details/${row.id}`)}
                                                 >
                                                     Administrar productos
                                                 </Button>

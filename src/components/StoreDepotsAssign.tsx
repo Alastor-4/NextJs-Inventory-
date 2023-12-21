@@ -18,7 +18,7 @@ import * as Yup from "yup";
 
 import { ArrowLeft } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
-import ShowProductsStore from "@/app/inventory/(owner)/store-assign/components/ShowProductsStore";
+import ShowProductsStore from "@/app/inventory/owner/store-assign/components/ShowProductsStore";
 
 export default function StoreDepotsAssign(
     { warehouseListProp, selectedWarehouseIdProp, selectedStoreIdProp, storeListProp, userId }:
@@ -64,8 +64,8 @@ export default function StoreDepotsAssign(
 
     function handleNavigateBack() {
         /*  selectedStoreIdProp
-              ? router.push(`/inventory/store-details/${selectedStoreIdProp}`)
-              : router.push(`/inventory/warehouse/${selectedWarehouseIdProp}`)
+              ? router.push(`/inventory/owner/store-details/${selectedStoreIdProp}`)
+              : router.push(`/inventory/owner/warehouse/${selectedWarehouseIdProp}`)
   */
         router.back()
     }

@@ -1,6 +1,6 @@
 import apiRequest from "@/api"
-const showProductWarehouseUrl = `/inventory/store-assign/showProductApi/apiWarehouse`
-const showProductStoreUrl = `/inventory/store-assign/showProductApi/apiStore`
+const showProductWarehouseUrl = `/inventory/owner/store-assign/showProductApi/apiWarehouse`
+const showProductStoreUrl = `/inventory/owner/store-assign/showProductApi/apiStore`
 
 const storeAssign = {
     //Peticiones del component ShowProductStore

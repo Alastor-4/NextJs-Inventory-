@@ -176,7 +176,7 @@ export default function UserWarehouseMainTable(props) {
     }
 
     function handleStoreAssign() {
-        router.push(`/inventory/store-assign?warehouseId=${warehouseDetails.id}`)
+        router.push(`/inventory/owner/store-assign?warehouseId=${warehouseDetails.id}`)
     }
 
     const CustomToolbar = () => (
@@ -222,7 +222,7 @@ export default function UserWarehouseMainTable(props) {
                                         <ShareOutlined fontSize={"small"} />
                                     </IconButton>
 
-                                    <Link href={`/inventory/warehouse/${warehouseDetails.id}/create`}>
+                                    <Link href={`/inventory/owner/warehouse/${warehouseDetails.id}/create`}>
                                         <IconButton color={"inherit"}>
                                             <AddOutlined />
                                         </IconButton>

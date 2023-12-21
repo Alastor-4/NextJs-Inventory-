@@ -1,16 +1,20 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
 
-// Get product details
+// GET product details by productId
 export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
-    const productId = searchParams.get("productId");
+    try {
+        const { searchParams } = new URL(req.url);
+        const productId = searchParams.get("productId");
 
-    if (productId) {
-        const product = await prisma.products.findUnique({ where: { id: parseInt(productId) }, include: { departments: true, characteristics: true, images: true } })
+        const product = await prisma.products.findUnique({
+            where: { id: +productId! },
+            include: { departments: true, characteristics: true, images: true }
+        })
 
-        return NextResponse.json(product)
+        return NextResponse.json(product);
+    } catch (error) {
+        console.log('[PRODUCT_GET_ONE_BY_ID]', error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    return new Response('La acción de obtener detalles ha fallado', { status: 500 })
 }

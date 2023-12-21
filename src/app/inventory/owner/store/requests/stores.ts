@@ -1,8 +1,9 @@
 
 import apiRequest from "@/api";
+import { notifySuccess } from "@/utils/generalFunctions";
 
-const url = `/inventory/store/api`;
-const updateUrl = `/inventory/store/update/api`;
+const url = `/inventory/owner/store/api`;
+const updateUrl = `/inventory/owner/store/update/api`;
 
 const stores = {
     allUserStores: async function (userId: number) {
@@ -51,7 +52,7 @@ const stores = {
     delete: async function (userId: number, storeId: any) {
         try {
             const response = await apiRequest.delete(url, { params: { storeId: storeId } })
-            return true
+            if (response.status === 200) return true
         } catch (e) {
             //ToDo: notify error here
         }

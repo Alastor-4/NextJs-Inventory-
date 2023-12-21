@@ -25,7 +25,7 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import {TableNoData} from "@/components/TableNoData";
+import { TableNoData } from "@/components/TableNoData";
 import {
     ArrowLeft,
     ChevronRightOutlined,
@@ -38,11 +38,11 @@ import {
     SellOutlined,
     VisibilityOutlined
 } from "@mui/icons-material";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import * as Yup from "yup";
-import {Formik} from "formik";
+import { Formik } from "formik";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
+import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import {
     computeDepotPricePerUnit,
     notifyError,
@@ -52,10 +52,10 @@ import {
 } from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
-import {storeDetails} from "@/app/inventory/(owner)/store-details/[storeDetailsId]/request/storeDetails";
+import { storeDetails } from "@/app/inventory/owner/store-details/[storeDetailsId]/request/storeDetails";
 import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 
-export default function StoreActionsMain({userId, storeId}: { userId: number, storeId: string }) {
+export default function StoreActionsMain({ userId, storeId }: { userId: number, storeId: string }) {
     const router = useRouter()
 
     const [data, setData] = React.useState<null | any[]>(null)
@@ -110,10 +110,10 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
-                <Box sx={{display: "flex", alignItems: "center"}}>
-                    <IconButton color={"inherit"} sx={{mr: "10px"}} onClick={handleNavigateBack}>
-                        <ArrowLeft fontSize={"large"}/>
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"} />
                     </IconButton>
                     <Typography
                         variant="h6"
@@ -259,7 +259,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
         setSelected(newSelected)
     }
 
-    const TableContent = ({formik}: { formik: any }) => {
+    const TableContent = ({ formik }: { formik: any }) => {
         const {
             searchBarValue,
             enVentaFilter,
@@ -302,7 +302,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
             }
         }
 
-        const OfferItem = ({item, index, currency, depotId}: {item: any, index: number, currency: string, depotId: number}) => (
+        const OfferItem = ({ item, index, currency, depotId }: { item: any, index: number, currency: string, depotId: number }) => (
             <Grid container item xs={12}>
                 <Grid
                     container
@@ -322,13 +322,13 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                 >
                     <Grid container item xs={"auto"} alignItems={"center"}>
                         <Typography variant={"caption"}
-                                    sx={{color: "white", fontWeight: "600"}}>
+                            sx={{ color: "white", fontWeight: "600" }}>
                             {`${index + 1} . `}
                         </Typography>
                     </Grid>
 
                     <Grid container item xs={"auto"} alignItems={"center"}
-                          sx={{color: "rgba(16,27,44,0.8)"}}>
+                        sx={{ color: "rgba(16,27,44,0.8)" }}>
                         {
                             item.compare_function === '='
                                 ? `Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
@@ -416,7 +416,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                         </TableCell>
 
                                         <TableCell>
-                                            {row.name} <br/>
+                                            {row.name} <br />
                                             {
                                                 row.description && (
                                                     <small>
@@ -429,13 +429,13 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                             {row?.departments?.name ?? "-"}
                                         </TableCell>
                                         <TableCell>
-                                            <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice}/>
+                                            <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice} />
                                             {row.depots[0].store_depots[0].product_offers.length > 0 && (
-                                                <DescriptionOutlined fontSize={"small"}/>
+                                                <DescriptionOutlined fontSize={"small"} />
                                             )}
-                                            <br/>
+                                            <br />
                                             {
-                                                displayPriceDiscount && <InfoTag value={`- ${displayPriceDiscount}`}/>
+                                                displayPriceDiscount && <InfoTag value={`- ${displayPriceDiscount}`} />
                                             }
                                         </TableCell>
                                         <TableCell>
@@ -490,7 +490,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                                 color={"primary"}
                                                                 onClick={(e) => handleSellProduct(e, row.depots[0].store_depots[0].id)}
                                                             >
-                                                                <SellOutlined fontSize={"small"}/>
+                                                                <SellOutlined fontSize={"small"} />
                                                             </IconButton>
                                                         </Grid>
                                                     )
@@ -500,11 +500,11 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                     </TableRow>
 
                                     <TableRow>
-                                        <TableCell style={{padding: 0}} colSpan={6}>
+                                        <TableCell style={{ padding: 0 }} colSpan={6}>
                                             <Collapse in={expandIndex === row.id} timeout="auto" unmountOnExit>
-                                                <Grid container spacing={1} sx={{padding: "8px 26px"}}>
+                                                <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{fontWeight: 600}}>Acciones:</Grid>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Acciones:</Grid>
                                                         <Grid item xs={"auto"}>
                                                             <Button
                                                                 size={"small"}
@@ -530,7 +530,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{fontWeight: 600}}>Producto:</Grid>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Producto:</Grid>
                                                         <Grid item xs={true}>
                                                             {row.name}
                                                             {
@@ -545,13 +545,13 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"}
-                                                              sx={{fontWeight: 600}}>Departamento:</Grid>
+                                                            sx={{ fontWeight: 600 }}>Departamento:</Grid>
                                                         <Grid item xs={true}>{row.departments?.name ?? "-"}</Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"}
-                                                              sx={{fontWeight: 600}}>Disponibles:</Grid>
+                                                            sx={{ fontWeight: 600 }}>Disponibles:</Grid>
                                                         <Grid item xs={true}>
                                                             {row.depots[0].store_depots[0].product_remaining_units}
                                                         </Grid>
@@ -559,50 +559,50 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"}
-                                                              sx={{
-                                                                  fontWeight: 600,
-                                                                  display: "flex",
-                                                                  alignItems: "center"
-                                                              }}>Características:</Grid>
+                                                            sx={{
+                                                                fontWeight: 600,
+                                                                display: "flex",
+                                                                alignItems: "center"
+                                                            }}>Características:</Grid>
                                                         <Grid item xs={true}
-                                                              sx={{display: "flex", alignItems: "center"}}>
+                                                            sx={{ display: "flex", alignItems: "center" }}>
                                                             {row.characteristics.length > 0
                                                                 ? row.characteristics.map((item: any) => (
-                                                                        <Grid
-                                                                            key={item.id}
-                                                                            sx={{
-                                                                                display: "inline-flex",
-                                                                                margin: "3px",
-                                                                                backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                                                padding: "2px 4px",
-                                                                                borderRadius: "5px 2px 2px 2px",
-                                                                                border: "1px solid rgba(130, 130, 130)",
-                                                                                fontSize: 14,
-                                                                            }}
-                                                                        >
-                                                                            <Grid container item alignItems={"center"}
-                                                                                  sx={{marginRight: "3px"}}>
-                                                                                <Typography variant={"caption"}
-                                                                                            sx={{
-                                                                                                color: "white",
-                                                                                                fontWeight: "600"
-                                                                                            }}>
-                                                                                    {item.name.toUpperCase()}
-                                                                                </Typography>
-                                                                            </Grid>
-                                                                            <Grid container item alignItems={"center"}
-                                                                                  sx={{color: "rgba(16,27,44,0.8)"}}>
-                                                                                {item.value}
-                                                                            </Grid>
+                                                                    <Grid
+                                                                        key={item.id}
+                                                                        sx={{
+                                                                            display: "inline-flex",
+                                                                            margin: "3px",
+                                                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                                            padding: "2px 4px",
+                                                                            borderRadius: "5px 2px 2px 2px",
+                                                                            border: "1px solid rgba(130, 130, 130)",
+                                                                            fontSize: 14,
+                                                                        }}
+                                                                    >
+                                                                        <Grid container item alignItems={"center"}
+                                                                            sx={{ marginRight: "3px" }}>
+                                                                            <Typography variant={"caption"}
+                                                                                sx={{
+                                                                                    color: "white",
+                                                                                    fontWeight: "600"
+                                                                                }}>
+                                                                                {item.name.toUpperCase()}
+                                                                            </Typography>
                                                                         </Grid>
-                                                                    )
+                                                                        <Grid container item alignItems={"center"}
+                                                                            sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                                            {item.value}
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                )
                                                                 ) : "-"
                                                             }
                                                         </Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{fontWeight: 600}}>Imágenes:</Grid>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
                                                         <Grid item xs={true}>
                                                             {
                                                                 row.images.length > 0
@@ -619,7 +619,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                                             {row.images.length}
 
                                                                             <VisibilityOutlined fontSize={"small"}
-                                                                                                sx={{ml: "5px"}}/>
+                                                                                sx={{ ml: "5px" }} />
                                                                         </Box>
                                                                     ) : "no"
                                                             }
@@ -627,7 +627,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{fontWeight: 600}}>Precio
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio
                                                             base:</Grid>
                                                         <Grid item xs={true}>
                                                             {
@@ -639,7 +639,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{fontWeight: 600}}>Precio:</Grid>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio:</Grid>
                                                         <Grid item xs={true}>
                                                             <MoneyInfoTag
                                                                 value={displayProductPrice}
@@ -647,7 +647,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             />
                                                             {
                                                                 priceDiscountQuantity && (
-                                                                    <InfoTag value={`- ${displayPriceDiscount} descuento`}/>
+                                                                    <InfoTag value={`- ${displayPriceDiscount} descuento`} />
                                                                 )
                                                             }
                                                         </Grid>
@@ -655,7 +655,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"}
-                                                              sx={{fontWeight: 600}}>Distribución:</Grid>
+                                                            sx={{ fontWeight: 600 }}>Distribución:</Grid>
                                                         <Grid item xs={true}>
                                                             {
                                                                 (baseProductPrice && sellerProfitQuantity && finalProductPrice)
@@ -666,7 +666,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={12} sx={{fontWeight: 600}}>Ofertas:</Grid>
+                                                        <Grid item xs={12} sx={{ fontWeight: 600 }}>Ofertas:</Grid>
                                                         <Grid container item xs={12} rowSpacing={1}>
                                                             {row.depots[0].store_depots[0].product_offers.map((item: any, index: number) => (
                                                                 <OfferItem
@@ -735,7 +735,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
         })
     })
 
-    const DepartmentsFilter = ({formik}: any) => {
+    const DepartmentsFilter = ({ formik }: any) => {
         const {
             searchBarValue,
             enVentaFilter,
@@ -752,15 +752,15 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
         const [displayFilterSection, setDisplayFilterSection] = React.useState(false)
 
         return (
-            <Card variant={"outlined"} sx={{padding: "10px"}}>
+            <Card variant={"outlined"} sx={{ padding: "10px" }}>
                 <Grid container>
-                    <Grid item container sx={{backgroundColor: "lightgray", padding: "10px 15px 15px 15px"}}>
+                    <Grid item container sx={{ backgroundColor: "lightgray", padding: "10px 15px 15px 15px" }}>
                         <Grid item xs={12}>
                             <Typography variant={"subtitle1"}>
                                 Seleccione departamentos para encontrar el producto deseado
                             </Typography>
                         </Grid>
-                        <Grid container item columnSpacing={2} sx={{mt: "8px", flexWrap: "nowrap", overflowX: "auto"}}>
+                        <Grid container item columnSpacing={2} sx={{ mt: "8px", flexWrap: "nowrap", overflowX: "auto" }}>
                             {
                                 allProductsByDepartment.map((item, index) => (
                                     <Grid key={item.id} item xs={"auto"}>
@@ -778,17 +778,17 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
 
                     {
                         data && data.length > 0 && (
-                            <Grid container item rowSpacing={2} sx={{mt: "5px", p: "15px"}}>
+                            <Grid container item rowSpacing={2} sx={{ mt: "5px", p: "15px" }}>
                                 <Grid item xs={12}>
-                                    <Typography variant={"subtitle1"} sx={{display: "flex", alignItems: "center"}}>
+                                    <Typography variant={"subtitle1"} sx={{ display: "flex", alignItems: "center" }}>
                                         Para los productos en los departamentos seleccionados
 
                                         <IconButton onClick={() => setDisplayFilterSection(!displayFilterSection)}>
-                                            {displayFilterSection ? <KeyboardArrowDown fontSize={"small"}/> :
-                                                <KeyboardArrowRight fontSize={"small"}/>}
+                                            {displayFilterSection ? <KeyboardArrowDown fontSize={"small"} /> :
+                                                <KeyboardArrowRight fontSize={"small"} />}
                                         </IconButton>
 
-                                        <FilterAltOutlined fontSize={"small"} sx={{ml: "15px"}}/>
+                                        <FilterAltOutlined fontSize={"small"} sx={{ ml: "15px" }} />
                                         {(!!searchBarValue && 1) + (enVentaFilter && 1) + (inactivoFilter && 1) + (retiradoFilter && 1) + (sinPrecioFilter && 1) + (conDescuentoFilter && 1) + (conOfertasFilter && 1) + (sinDisponibilidadFilter && 1) + (disponibilidad10Filter && 1) + (disponibilidad20Filter && 1)}
                                     </Typography>
                                 </Grid>
@@ -799,8 +799,8 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                             <Grid container item rowSpacing={1}>
                                                 <Grid item xs={12}>
                                                     <Typography variant={"subtitle2"}
-                                                                sx={{display: "flex", alignItems: "center"}}>
-                                                        <ChevronRightOutlined/> Puede filtrar aquellos con una característica
+                                                        sx={{ display: "flex", alignItems: "center" }}>
+                                                        <ChevronRightOutlined /> Puede filtrar aquellos con una característica
                                                         común
                                                     </Typography>
                                                 </Grid>
@@ -813,7 +813,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             mx: "5px",
                                                             border: "2px solid",
                                                             backgroundColor: "lightgray"
-                                                        } : {mx: "5px"}}
+                                                        } : { mx: "5px" }}
                                                         size={"small"}
                                                         color={enVentaFilter ? "primary" : "default"}
                                                         onClick={() => formik.setFieldValue("enVentaFilter", !enVentaFilter)}
@@ -825,7 +825,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             mx: "5px",
                                                             border: "2px solid",
                                                             backgroundColor: "lightgray"
-                                                        } : {mx: "5px"}}
+                                                        } : { mx: "5px" }}
                                                         size={"small"}
                                                         color={inactivoFilter ? "primary" : "default"}
                                                         onClick={() => formik.setFieldValue("inactivoFilter", !inactivoFilter)}
@@ -837,7 +837,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             mx: "5px",
                                                             border: "2px solid",
                                                             backgroundColor: "lightgray"
-                                                        } : {mx: "5px"}}
+                                                        } : { mx: "5px" }}
                                                         size={"small"}
                                                         color={retiradoFilter ? "primary" : "default"}
                                                         onClick={() => formik.setFieldValue("retiradoFilter", !retiradoFilter)}
@@ -849,7 +849,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             mx: "5px",
                                                             border: "2px solid",
                                                             backgroundColor: "lightgray"
-                                                        } : {mx: "5px"}}
+                                                        } : { mx: "5px" }}
                                                         size={"small"}
                                                         color={sinPrecioFilter ? "primary" : "default"}
                                                         onClick={() => formik.setFieldValue("sinPrecioFilter", !sinPrecioFilter)}
@@ -861,7 +861,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             mx: "5px",
                                                             border: "2px solid",
                                                             backgroundColor: "lightgray"
-                                                        } : {mx: "5px"}}
+                                                        } : { mx: "5px" }}
                                                         size={"small"}
                                                         color={conDescuentoFilter ? "primary" : "default"}
                                                         onClick={() => formik.setFieldValue("conDescuentoFilter", !conDescuentoFilter)}
@@ -873,7 +873,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             mx: "5px",
                                                             border: "2px solid",
                                                             backgroundColor: "lightgray"
-                                                        } : {mx: "5px"}}
+                                                        } : { mx: "5px" }}
                                                         size={"small"}
                                                         color={conOfertasFilter ? "primary" : "default"}
                                                         onClick={() => formik.setFieldValue("conOfertasFilter", !conOfertasFilter)}
@@ -885,7 +885,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             mx: "5px",
                                                             border: "2px solid",
                                                             backgroundColor: "lightgray"
-                                                        } : {mx: "5px"}}
+                                                        } : { mx: "5px" }}
                                                         size={"small"}
                                                         color={sinDisponibilidadFilter ? "primary" : "default"}
                                                         onClick={() => formik.setFieldValue("sinDisponibilidadFilter", !sinDisponibilidadFilter)}
@@ -897,7 +897,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             mx: "5px",
                                                             border: "2px solid",
                                                             backgroundColor: "lightgray"
-                                                        } : {mx: "5px"}}
+                                                        } : { mx: "5px" }}
                                                         size={"small"}
                                                         color={disponibilidad10Filter ? "primary" : "default"}
                                                         onClick={() => formik.setFieldValue("disponibilidad10Filter", !disponibilidad10Filter)}
@@ -909,7 +909,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                             mx: "5px",
                                                             border: "2px solid",
                                                             backgroundColor: "lightgray"
-                                                        } : {mx: "5px"}}
+                                                        } : { mx: "5px" }}
                                                         size={"small"}
                                                         color={disponibilidad20Filter ? "primary" : "default"}
                                                         onClick={() => formik.setFieldValue("disponibilidad20Filter", !disponibilidad20Filter)}
@@ -920,8 +920,8 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                             <Grid container item rowSpacing={1}>
                                                 <Grid item xs={12}>
                                                     <Typography variant={"subtitle2"}
-                                                                sx={{display: "flex", alignItems: "center"}}>
-                                                        <ChevronRightOutlined/> Puede buscar productos por nombre o descripción
+                                                        sx={{ display: "flex", alignItems: "center" }}>
+                                                        <ChevronRightOutlined /> Puede buscar productos por nombre o descripción
                                                     </Typography>
                                                 </Grid>
 
@@ -931,7 +931,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                         placeholder="Buscar producto..."
                                                         size={"small"}
                                                         fullWidth
-                                                        InputProps={{startAdornment: <SearchOutlined sx={{color: "gray"}}/>}}
+                                                        InputProps={{ startAdornment: <SearchOutlined sx={{ color: "gray" }} /> }}
                                                         {...formik.getFieldProps("searchBarValue")}
                                                     />
                                                 </Grid>
@@ -949,7 +949,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
     }
 
     //selected products
-    const [selected, setSelected] =  React.useState<any[]>([])
+    const [selected, setSelected] = React.useState<any[]>([])
 
     const [displayProductSellForm, setDisplayProductSellForm] = React.useState<boolean>(false)
     function handleOpenSellProduct(formik: any) {
@@ -969,7 +969,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
         setDisplayProductSellForm(true)
     }
 
-    const ProductSellForm = ({formik, closeForm}: {formik: any, closeForm: any}) => {
+    const ProductSellForm = ({ formik, closeForm }: { formik: any, closeForm: any }) => {
         async function productsSell() {
             let sellProduct: any[] = []
 
@@ -985,7 +985,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
 
             const totalPrice = sellProduct.reduce((accumulate, current) => accumulate + current.price, 0)
 
-            const sell = {paymentMethod: formik.values.productSell.paymentMethod, totalPrice: totalPrice}
+            const sell = { paymentMethod: formik.values.productSell.paymentMethod, totalPrice: totalPrice }
 
             const sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(
                 {
@@ -1036,11 +1036,11 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                 totalPrice += (pricePerUnit * item.unitsQuantity)
             })
 
-            return {totalProducts, totalPrice}
+            return { totalProducts, totalPrice }
         }
 
         return (
-            <Card variant={"outlined"} sx={{width: 1, padding: "15px"}}>
+            <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
                 <Grid container item spacing={3}>
                     <Grid container item xs={12} rowSpacing={1}>
                         {
@@ -1061,7 +1061,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                                 variant={"standard"}
                                                 size={"small"}
                                                 type={"number"}
-                                                sx={{width: "60px"}}
+                                                sx={{ width: "60px" }}
                                                 {...formik.getFieldProps(`productSell.products.${index}.unitsQuantity`)}
                                                 error={formik.errors.productSell?.products[index]?.unitsQuantity && formik.touched.productSell?.products[index]?.unitsQuantity}
                                                 helperText={(formik.errors.productSell?.products[index]?.unitsQuantity && formik.touched.productSell?.products[index]?.unitsQuantity) && formik.errors.productSell?.products[index]?.unitsQuantity}
@@ -1077,7 +1077,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                         }
 
                         <Grid item xs={12}>
-                            <Divider/>
+                            <Divider />
                         </Grid>
 
                         <Grid container item xs={12}>
@@ -1114,7 +1114,7 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
 
                     <Grid container item justifyContent={"flex-end"}>
                         <IconButton color={"primary"} disabled={!!formik.errors.productSell} onClick={productsSell}>
-                            <Done/>
+                            <Done />
                         </IconButton>
                     </Grid>
                 </Grid>
@@ -1152,12 +1152,12 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                             />
                         </UpdateValueDialog>
 
-                        <CustomToolbar/>
+                        <CustomToolbar />
 
                         <CardContent>
                             {
                                 allProductsByDepartment.length > 0 && (
-                                    <DepartmentsFilter formik={formik}/>
+                                    <DepartmentsFilter formik={formik} />
                                 )
                             }
 
@@ -1167,13 +1167,13 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                         <>
                                             {
                                                 selected.length > 0 && (
-                                                    <Grid container sx={{mt: "15px", pl: "15px"}}>
+                                                    <Grid container sx={{ mt: "15px", pl: "15px" }}>
                                                         <Button
                                                             size={"small"}
                                                             color={"primary"}
                                                             variant={"outlined"}
                                                             onClick={() => handleOpenSellProduct(formik)}
-                                                            startIcon={<SellOutlined fontSize={"small"}/>}
+                                                            startIcon={<SellOutlined fontSize={"small"} />}
                                                         >
                                                             Vender seleccionados {selected.length}
                                                         </Button>
@@ -1182,14 +1182,14 @@ export default function StoreActionsMain({userId, storeId}: { userId: number, st
                                             }
 
                                             <TableContainer sx={{ width: "100%", maxHeight: "500px", mt: "20px" }}>
-                                                <Table sx={{width: "100%"}} size={"small"}>
-                                                    <TableHeader/>
-                                                    <TableContent formik={formik}/>
+                                                <Table sx={{ width: "100%" }} size={"small"}>
+                                                    <TableHeader />
+                                                    <TableContent formik={formik} />
                                                 </Table>
                                             </TableContainer>
                                         </>
                                     ) : (
-                                        <TableNoData/>
+                                        <TableNoData />
                                     )
                             }
                         </CardContent>

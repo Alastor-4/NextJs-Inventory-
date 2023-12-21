@@ -153,7 +153,7 @@ export default function ProductsForm(props: any) {
         }
 
         if (response.status === 200) {
-            router.push(`/inventory/product`)
+            router.push(`/inventory/owner/product`)
         } else {
             //ToDo: catch validation errors
         }
@@ -462,7 +462,7 @@ export default function ProductsForm(props: any) {
                                         variant={"outlined"}
                                         size={"small"}
                                         sx={{ m: 1 }}
-                                        onClick={() => router.push(`/inventory/product`)}
+                                        onClick={() => router.push(`/inventory/owner/product`)}
                                     >
                                         Cancel
                                     </Button>

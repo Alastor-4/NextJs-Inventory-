@@ -1,44 +1,80 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
 
-// Get all user stores
-export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url)
-    const userId = parseInt(<string>searchParams.get("userId"))
+// GET all user stores
+export async function GET(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const userId = searchParams.get("userId");
 
-    const stores = await prisma.stores.findMany({ where: { owner_id: userId }, include: { seller_user: true, store_open_days: true, store_reservation_days: true } })
+        const stores = await prisma.stores.findMany({
+            where: { owner_id: +userId! },
+            include: { seller_user: true, store_open_days: true, store_reservation_days: true }
+        })
 
-    return NextResponse.json(stores)
+        return NextResponse.json(stores)
+    } catch (error) {
+        console.log('[STORE_GET_ALL]', error);
+        return new NextResponse("Internal Error", { status: 500 });
+    }
 }
 
-// Create new user store
+// CREATE new user store
 export async function POST(req: Request) {
-    const { ownerId, name, description, slogan, address, sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity, online_catalog, online_reservation } = await req.json()
+    try {
+        const { ownerId, name, description, slogan, address,
+            sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity,
+            online_catalog, online_reservation } = await req.json()
 
-    const newStore = await prisma.stores.create({ data: { owner_id: ownerId, name, description, slogan, address, seller_user_id: sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity, online_catalog, online_reservation } })
+        const newStore = await prisma.stores.create({
+            data: {
+                owner_id: ownerId, name, description,
+                slogan, address, seller_user_id: sellerUserId,
+                fixed_seller_profit_percentage, fixed_seller_profit_quantity,
+                online_catalog, online_reservation
+            }
+        })
 
-    return NextResponse.json(newStore)
+        return NextResponse.json(newStore)
+    } catch (error) {
+        console.log('[STORE_CREATE]', error);
+        return new NextResponse("Internal Error", { status: 500 });
+    }
 }
 
-// Update user store
+// UPDATE user store
 export async function PUT(req: Request) {
-    const { storeId, name, description, slogan, address, sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity, online_catalog, online_reservation } = await req.json()
+    try {
+        const { storeId, name, description, slogan, address, sellerUserId,
+            fixed_seller_profit_percentage, fixed_seller_profit_quantity,
+            online_catalog, online_reservation } = await req.json()
 
-    const updatedStore = await prisma.stores.update({ data: { name, description, slogan, address, seller_user_id: sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity, online_catalog, online_reservation }, where: { id: storeId } })
+        const updatedStore = await prisma.stores.update({
+            data: {
+                name, description, slogan, address, seller_user_id: sellerUserId,
+                fixed_seller_profit_percentage, fixed_seller_profit_quantity,
+                online_catalog, online_reservation
+            }, where: { id: storeId }
+        })
 
-    return NextResponse.json(updatedStore)
+        return NextResponse.json(updatedStore)
+    } catch (error) {
+        console.log('[STORE_UPDATE]', error);
+        return new NextResponse("Internal Error", { status: 500 });
+    }
 }
 
-// Delete user store
+// DELETE user store
 export async function DELETE(req: Request) {
-    const { searchParams } = new URL(req.url)
-    const storeId = searchParams.get("storeId")
+    try {
+        const { searchParams } = new URL(req.url);
+        const storeId = searchParams.get("storeId");
 
-    if (storeId) {
-        const deletedStore = await prisma.stores.delete({ where: { id: parseInt(storeId) } })
+        const deletedStore = await prisma.stores.delete({ where: { id: +storeId! } })
 
         return NextResponse.json(deletedStore)
+    } catch (error) {
+        console.log('[STORE_DELETE]', error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
-
-    return new Response('La acción de eliminar ha fallado', { status: 500 })
 }
