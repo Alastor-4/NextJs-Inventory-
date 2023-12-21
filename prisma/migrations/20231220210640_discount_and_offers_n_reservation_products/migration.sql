@@ -6,9 +6,9 @@
 
 */
 -- AlterTable
-ALTER TABLE `reservation_products` ADD COLUMN `applied_discount` JSON NULL,
-    ADD COLUMN `applied_offer` JSON NULL;
+ALTER TABLE "reservation_products" ADD COLUMN     "applied_discount" JSON,
+ADD COLUMN     "applied_offer" JSON;
 
 -- AlterTable
-ALTER TABLE `reservations` DROP COLUMN `applied_discount`,
-    DROP COLUMN `applied_offer`;
+ALTER TABLE "reservations" DROP COLUMN "applied_discount",
+DROP COLUMN "applied_offer";
