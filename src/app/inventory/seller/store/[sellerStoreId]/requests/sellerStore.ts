@@ -22,7 +22,7 @@ const sellerStore = {
             const response = await apiRequest.get(sellsUrl(sellerStoreId), {params: {sellerStoreId: sellerStoreId}})
             return response.data
         } catch (e) {
-            notifyError("Ha ocurrido un error obteniendo los datos de la tienda. Inténtelo nuevamente")
+            notifyError("Ha ocurrido un error obteniendo los datos de las ventas de la tienda. Inténtelo nuevamente")
         }
 
         return false
