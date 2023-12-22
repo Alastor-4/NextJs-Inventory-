@@ -1,8 +1,9 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const { withAxiom } = require('next-axiom');
+
+module.exports = withAxiom({
   experimental: {
     serverActions: true,
   },
-};
+})
 
-module.exports = nextConfig;
+

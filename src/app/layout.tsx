@@ -1,8 +1,9 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Roboto_Serif } from 'next/font/google'
-import ClientLayout from "@/app/clientLayout";
-import { Analytics } from '@vercel/analytics/react';
+import ClientLayout from "@/app/clientLayout"
+import { Analytics } from '@vercel/analytics/react'
+import { AxiomWebVitals } from 'next-axiom'
 // import SessionAuthProvider from '@/providers/SessionAuthProvider';
 // import SnackBarContextProvider from '@/providers/SnackbarProvider';
 
@@ -27,6 +28,7 @@ export default function RootLayout({
           {children}
         </ClientLayout>
         <Analytics />
+        <AxiomWebVitals />
         {/* </SnackBarContextProvider> */}
         {/* </SessionAuthProvider> */}
       </body>

@@ -3,7 +3,8 @@ import { sendMail } from "@/mailer-service";
 import { NextResponse } from 'next/server';
 import * as process from "process";
 import { prisma } from "db";
-import logger from "@/utils/logger";
+//import logger from "@/utils/logger";
+import { withAxiom, AxiomRequest } from "next-axiom"
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
@@ -40,7 +41,9 @@ export async function GET(req: Request) {
     }
 }
 
-export async function POST(req: Request) {
+export const POST = withAxiom(async (req: AxiomRequest) => {
+    req.log.info("Ejecutada función verificar usuario")
+
     const { username, passwordHash, name, mail, phone } = await req.json()
 
     const user = await prisma.users.findFirst({
@@ -68,6 +71,9 @@ export async function POST(req: Request) {
     const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
     const verificationToken = jwt.sign({ username: username }, jwtPrivateKey, { expiresIn: "24h" });
 
+    // You can create intermediate loggers
+    const log = req.log.with({ scope: 'register' })
+
     try {
         await sendMail(
             "Verificación de usuario",
@@ -75,8 +81,10 @@ export async function POST(req: Request) {
             `Visite el siguiente link para verificar su usuario ${process.env.NEXTAUTH_URL}/register?token=${verificationToken}`
         )
     } catch (e) {
-        logger.info(`Ha fallado el envio del email al usuario ${username}`)
+        log.error(`Ha fallado el envio del email al usuario ${username}`)
     }
+
+    log.info('Usuario verificado correctamente', newUser)
 
     return NextResponse.json(
         {
@@ -85,4 +93,4 @@ export async function POST(req: Request) {
             user: newUser,
         }
     )
-}
+});
