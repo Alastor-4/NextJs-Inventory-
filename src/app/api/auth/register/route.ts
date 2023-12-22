@@ -27,14 +27,15 @@ export async function GET(req: Request) {
                             where: { username: tokenPayload.username },
                             data: { is_verified: true }
                         });
+
                         return new NextResponse("Usuario verificado correctamente. Ahora puede autenticarse en el sistema", { status: 201 });
                     }
                 } else {
-                    return new NextResponse("Este usuario no existe o no esta activo", { status: 404 });
+                    return new NextResponse("Este usuario no existe o no esta activo", { status: 406 });
                 }
             }
         } catch (e) {
-            return new NextResponse("El token de verificación proporcionado no es correcto", { status: 400 });
+            return new NextResponse("El token de verificación proporcionado no es correcto", { status: 406 });
         }
     } else {
         return new NextResponse("No fue proporcionado el token de verificación del usuario", { status: 400 });
@@ -78,7 +79,7 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
         await sendMail(
             "Verificación de usuario",
             newUser.mail,
-            `Visite el siguiente link para verificar su usuario ${process.env.NEXTAUTH_URL}/register?token=${verificationToken}`
+            `Visite el siguiente link para verificar su usuario ${process.env.APP_BASE_URL}/verification/${verificationToken}`
         )
     } catch (e) {
         log.error(`Ha fallado el envio del email al usuario ${username}`)
