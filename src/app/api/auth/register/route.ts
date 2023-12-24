@@ -1,10 +1,12 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { sendMail } from "@/mailer-service";
+//import { sendMail } from "@/mailer-service";
 import { NextResponse } from 'next/server';
 import * as process from "process";
 import { prisma } from "db";
 //import logger from "@/utils/logger";
 import { withAxiom, AxiomRequest } from "next-axiom"
+import { Resend } from 'resend';
+import VerifyUserTemplate from '@/components/email-templates/VerifyUserTemplate';
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
@@ -42,8 +44,10 @@ export async function GET(req: Request) {
     }
 }
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 export const POST = withAxiom(async (req: AxiomRequest) => {
-    req.log.info("Ejecutada función verificar usuario")
+    req.log.info("Ejecutada función de registrar usuario")
 
     const { username, passwordHash, name, mail, phone } = await req.json()
 
@@ -75,17 +79,18 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
     // You can create intermediate loggers
     const log = req.log.with({ scope: 'register' })
 
-    try {
-        await sendMail(
-            "Verificación de usuario",
-            newUser.mail,
-            `Visite el siguiente link para verificar su usuario ${process.env.APP_BASE_URL}/verification/${verificationToken}`
-        )
-    } catch (e) {
-        log.error(`Ha fallado el envio del email al usuario ${username}`)
-    }
+    const {error } = await resend.emails.send({
+        from: 'Dan <onboarding@inventarioplus.online>',
+        to: newUser.mail,
+        subject: "Verificación de usuario",
+        react: VerifyUserTemplate({ link: `${process.env.NEXTAUTH_URL}/register/verify/${verificationToken}` }),
+    });
 
-    log.info('Usuario verificado correctamente', newUser)
+    if (error) {
+        log.error(`Ha fallado el envio del email al usuario ${username}`)
+    } else {
+        log.info('Usuario verificado correctamente', newUser)
+    }
 
     return NextResponse.json(
         {

@@ -40,6 +40,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
+    "resend": "^2.0.0",
     "tailwindcss": "^3.3.3",
     "uploadthing": "^5.3.3",
     "winston": "^3.11.0",
