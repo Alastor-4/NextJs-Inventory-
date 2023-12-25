@@ -80,18 +80,20 @@ export default function UserProfileMain(props) {
 
     const AdminModule = () => {
         const LinksTemplate = ({ pageAddress, title }: { pageAddress: string, title: string }) => (
-            <Link href={pageAddress}>
-                <Grid container columnSpacing={2} item xs={12} >
-                    <Grid container item xs={"auto"} alignItems={"center"}>
-                        <ChevronRightOutlined fontSize={"small"} />
+            <Grid container>
+                <Link href={pageAddress}>
+                    <Grid container item columnSpacing={2}>
+                        <Grid container item xs={"auto"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                        </Grid>
+                        <Grid item xs={"auto"}>
+                            {title}
+                        </Grid>
                     </Grid>
-                    <Grid item xs={true}>
-                        {title}
-                    </Grid>
-                </Grid>
-            </Link>
-
+                </Link>
+            </Grid>
         )
+
         return (
             <Card variant="outlined">
                 <CardHeader title={"Administrar:"} />

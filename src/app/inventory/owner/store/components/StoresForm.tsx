@@ -545,7 +545,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                                 sx={{ m: 1 }}
                                 disabled={!formik.isValid}
                             >
-                                {updateItem ? "Update" : "Create"}
+                                {updateItem ? "Update" : "Crear"}
                             </Button>
 
                         </Grid>

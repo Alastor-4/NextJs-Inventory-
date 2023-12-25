@@ -12,7 +12,7 @@ import {
     IconButton,
     Table,
     TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
     TableRow,
     Toolbar,
@@ -86,7 +86,7 @@ export default function RolesMainTable({ userId }: RolesMainTableProps) {
                             color: "white",
                         }}
                     >
-                        Listado de roles
+                        Roles
                     </Typography>
                 </Box>
 
@@ -109,7 +109,7 @@ export default function RolesMainTable({ userId }: RolesMainTableProps) {
                     }
 
                     <Link href={`/inventory/admin/role/create`}>
-                        <IconButton color={"inherit"}>
+                        <IconButton sx={{color: "white"}}>
                             <AddOutlined />
                         </IconButton>
                     </Link>
@@ -164,10 +164,12 @@ export default function RolesMainTable({ userId }: RolesMainTableProps) {
                         key={row.id}
                         hover
                         tabIndex={-1}
-                        onClick={() => handleSelectItem(row)}
                     >
                         <TableCell>
-                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                            <Checkbox
+                                size={"small"} checked={selected && (row.id === selected.id)}
+                                onClick={() => handleSelectItem(row)}
+                            />
                         </TableCell>
                         <TableCell>
                             {row.name}
@@ -189,11 +191,14 @@ export default function RolesMainTable({ userId }: RolesMainTableProps) {
                 {
                     data?.length > 0
                         ? (
-                            <Table sx={{ width: "100%" }} size={"small"}>
-                                <TableHeader />
+                            <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                <Table sx={{ width: "100%" }} size={"small"}>
+                                    <TableHeader />
 
-                                <TableContent />
-                            </Table>
+                                    <TableContent />
+                                </Table>
+                            </TableContainer>
+
                         ) : (
                             <TableNoData />
                         )
