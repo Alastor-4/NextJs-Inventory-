@@ -12,7 +12,7 @@ import {
     IconButton,
     Table,
     TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
     TableRow,
     Toolbar,
@@ -70,7 +70,7 @@ export default function WarehousesMainTable({ userId }) {
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center", overflowX: "auto" }}>
                     <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
                         <ArrowLeft fontSize={"large"} />
                     </IconButton>
@@ -83,7 +83,7 @@ export default function WarehousesMainTable({ userId }) {
                             color: "white",
                         }}
                     >
-                        Listado de almacenes
+                        Almacenes
                     </Typography>
                 </Box>
 
@@ -106,7 +106,7 @@ export default function WarehousesMainTable({ userId }) {
                     }
 
                     <Link href={`/inventory/admin/warehouse/create`}>
-                        <IconButton color={"inherit"}>
+                        <IconButton sx={{color: "white"}}>
                             <AddOutlined />
                         </IconButton>
                     </Link>
@@ -172,10 +172,13 @@ export default function WarehousesMainTable({ userId }) {
                         hover
                         tabIndex={-1}
                         selected={selected && (row.id === selected.id)}
-                        onClick={() => handleSelectItem(row)}
                     >
                         <TableCell>
-                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                            <Checkbox
+                                size={"small"}
+                                checked={selected && (row.id === selected.id)}
+                                onClick={() => handleSelectItem(row)}
+                            />
                         </TableCell>
                         <TableCell>
                             {row.users.name}
@@ -203,11 +206,13 @@ export default function WarehousesMainTable({ userId }) {
                 {
                     data?.length > 0
                         ? (
-                            <Table sx={{ width: "100%" }} size={"small"}>
-                                <TableHeader />
+                            <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                <Table sx={{ width: "100%" }} size={"small"}>
+                                    <TableHeader />
 
-                                <TableContent />
-                            </Table>
+                                    <TableContent />
+                                </Table>
+                            </TableContainer>
                         ) : (
                             <TableNoData />
                         )

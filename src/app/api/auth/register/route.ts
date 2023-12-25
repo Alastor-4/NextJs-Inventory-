@@ -1,5 +1,4 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-//import { sendMail } from "@/mailer-service";
 import { NextResponse } from 'next/server';
 import * as process from "process";
 import { prisma } from "db";
