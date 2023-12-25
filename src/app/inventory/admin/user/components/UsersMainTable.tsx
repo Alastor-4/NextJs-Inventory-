@@ -23,7 +23,7 @@ import {
     Select,
     Table,
     TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
     TableRow,
     Toolbar,
@@ -183,7 +183,7 @@ export default function UsersMainTable(props) {
                             color: "white",
                         }}
                     >
-                        Listado de usuarios
+                        Usuarios
                     </Typography>
                 </Box>
 
@@ -304,11 +304,13 @@ export default function UsersMainTable(props) {
                         key={row.id}
                         hover
                         tabIndex={-1}
-                        onClick={() => handleSelectItem(row)}
                         selected={selected && (row.id === selected.id)}
                     >
                         <TableCell>
-                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                            <Checkbox
+                                size={"small"} checked={selected && (row.id === selected.id)}
+                                onClick={() => handleSelectItem(row)}
+                            />
                         </TableCell>
                         <TableCell>
                             <Tooltip title={`Usuario ${row.is_active ? 'activo' : 'inactivo'} (${row.roles?.name ?? "user"})`}>
@@ -386,11 +388,13 @@ export default function UsersMainTable(props) {
                     {
                         data?.length > 0
                             ? (
-                                <Table sx={{ width: "100%" }} size={"small"}>
-                                    <TableHeader />
+                                <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                    <Table sx={{ width: "100%" }} size={"small"}>
+                                        <TableHeader />
 
-                                    <TableContent />
-                                </Table>
+                                        <TableContent />
+                                    </Table>
+                                </TableContainer>
                             ) : (
                                 <TableNoData />
                             )

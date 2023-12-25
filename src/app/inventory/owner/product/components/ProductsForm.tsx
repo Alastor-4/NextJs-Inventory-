@@ -475,7 +475,7 @@ export default function ProductsForm(props: any) {
                                         sx={{ m: 1 }}
                                         disabled={!formik.isValid}
                                     >
-                                        {updateItem ? "Update" : "Create"}
+                                        {updateItem ? "Actualizar" : "Crear"}
                                     </Button>
                                 </Grid>
                             </Grid>

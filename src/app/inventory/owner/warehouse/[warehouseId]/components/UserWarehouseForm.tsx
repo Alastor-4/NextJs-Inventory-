@@ -142,7 +142,7 @@ export default function UserWarehouseForm({ ownerId, warehouseId }) {
                             sx={{ m: 1 }}
                             disabled={!formik.isValid}
                         >
-                            Create
+                            Crear
                         </Button>
                     </Grid>
                 </Grid>

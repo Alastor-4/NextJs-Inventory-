@@ -125,7 +125,7 @@ export default function RolesForm({ userId }: RolesFormProps) {
                             sx={{ m: 1 }}
                             onClick={() => router.push(`/inventory/admin/role`)}
                         >
-                            Cancel
+                            Cancelar
                         </Button>
 
                         <Button
@@ -136,7 +136,7 @@ export default function RolesForm({ userId }: RolesFormProps) {
                             sx={{ m: 1 }}
                             disabled={!formik.isValid}
                         >
-                            {updateItem ? "Update" : "Create"}
+                            {updateItem ? "Actualizar" : "Crear"}
                         </Button>
                     </Grid>
                 </Grid>

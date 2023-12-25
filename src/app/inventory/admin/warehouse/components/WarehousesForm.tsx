@@ -185,7 +185,7 @@ export default function WarehousesForm(props) {
                             sx={{ m: 1 }}
                             disabled={!formik.isValid}
                         >
-                            {updateItem ? "Update" : "Create"}
+                            {updateItem ? "Actualizar" : "Crear"}
                         </Button>
                     </Grid>
                 </Grid>
