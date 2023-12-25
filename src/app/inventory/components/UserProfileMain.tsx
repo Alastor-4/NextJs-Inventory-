@@ -147,18 +147,18 @@ export default function UserProfileMain(props) {
                             </Grid>
                         ))}
 
-                        <Grid container>
-                            <Link href={"#"}>
-                                <Grid container columnSpacing={1} item xs={12} sx={{ mt: "15px" }}>
-                                    <Grid container item xs={"auto"} alignItems={"center"}>
-                                        <ArrowCircleRightOutlined fontSize={"small"} />
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        Mis almacenes
-                                    </Grid>
-                                </Grid>
-                            </Link>
-                        </Grid>
+                        {/*<Grid container>*/}
+                        {/*    <Link href={"#"}>*/}
+                        {/*        <Grid container columnSpacing={1} item sx={{ mt: "15px" }}>*/}
+                        {/*            <Grid container item xs={"auto"} alignItems={"center"}>*/}
+                        {/*                <ArrowCircleRightOutlined fontSize={"small"} />*/}
+                        {/*            </Grid>*/}
+                        {/*            <Grid item xs={"auto"}>*/}
+                        {/*                Mis almacenes*/}
+                        {/*            </Grid>*/}
+                        {/*        </Grid>*/}
+                        {/*    </Link>*/}
+                        {/*</Grid>*/}
                     </Grid>
                 </CardContent>
             </Card>
@@ -207,16 +207,18 @@ export default function UserProfileMain(props) {
                 <CardHeader title={"Productos"} />
 
                 <CardContent>
-                    <Link href={`/inventory/owner/product`}>
-                        <Grid container rowSpacing={2} item xs={12}>
-                            <Grid container item xs={"auto"} alignItems={"center"}>
-                                <ChevronRightOutlined fontSize={"small"} />
+                    <Grid container>
+                        <Link href={`/inventory/owner/product`}>
+                            <Grid container item rowSpacing={2}>
+                                <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                </Grid>
+                                <Grid item xs={"auto"}>
+                                    {ownerProductsCount} producto(s)
+                                </Grid>
                             </Grid>
-                            <Grid item xs={true}>
-                                {ownerProductsCount} producto(s)
-                            </Grid>
-                        </Grid>
-                    </Link>
+                        </Link>
+                    </Grid>
                 </CardContent>
             </Card>
         )
@@ -226,16 +228,18 @@ export default function UserProfileMain(props) {
                 <CardHeader title={"Trabajadores"} />
 
                 <CardContent>
-                    <Link href={`/inventory/owner/worker`}>
-                        <Grid container rowSpacing={2} item xs={12}>
-                            <Grid container item xs={"auto"} alignItems={"center"}>
-                                <ChevronRightOutlined fontSize={"small"} />
+                    <Grid container>
+                        <Link href={`/inventory/owner/worker`}>
+                            <Grid container rowSpacing={2} item xs={12}>
+                                <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                </Grid>
+                                <Grid item xs={"auto"}>
+                                    {ownerWorkersCount} trabajador(es)
+                                </Grid>
                             </Grid>
-                            <Grid item xs={true}>
-                                {ownerWorkersCount} trabajador(es)
-                            </Grid>
-                        </Grid>
-                    </Link>
+                        </Link>
+                    </Grid>
                 </CardContent>
             </Card>
         )
@@ -250,21 +254,21 @@ export default function UserProfileMain(props) {
                     <Typography variant={"h5"} sx={{ textAlign: "center" }}>Administración</Typography>
                 </Grid>
 
-                <Grid container item rowSpacing={2}>
-                    <Grid container item xs={6} justifyContent={"center"}>
-                        <WarehouseButton />
-                    </Grid>
-
-                    <Grid container item xs={6} justifyContent={"center"}>
-                        <StoreButton />
-                    </Grid>
-
+                <Grid container item spacing={2}>
                     <Grid container item xs={6} justifyContent={"center"}>
                         <ProductButton />
                     </Grid>
 
                     <Grid container item xs={6} justifyContent={"center"}>
                         <UsersButton />
+                    </Grid>
+
+                    <Grid container item xs={6} justifyContent={"center"}>
+                        <WarehouseButton />
+                    </Grid>
+
+                    <Grid container item xs={6} justifyContent={"center"}>
+                        <StoreButton />
                     </Grid>
                 </Grid>
             </Grid>
@@ -307,7 +311,7 @@ export default function UserProfileMain(props) {
                     <Typography variant={"h5"} sx={{ textAlign: "center" }}>Vendedor</Typography>
                 </Grid>
 
-                <Grid container item rowSpacing={2}>
+                <Grid container item spacing={2}>
                     <Grid container item xs={6} justifyContent={"center"}>
                         <StoreButton />
                     </Grid>

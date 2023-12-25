@@ -12,7 +12,7 @@ import {
     IconButton,
     Table,
     TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
     TableRow,
     TextField,
@@ -20,11 +20,19 @@ import {
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
-import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined } from "@mui/icons-material";
+import {
+    AddOutlined,
+    ArrowLeft,
+    DeleteOutline,
+    EditOutlined,
+    ExpandLessOutlined,
+    ExpandMoreOutlined
+} from "@mui/icons-material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import products from "../requests/products";
 import { Formik } from "formik";
+import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 
 export default function ProductsMainTable({ userId }: { userId: number }) {
     const router = useRouter()
@@ -107,7 +115,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center", overflowX: "auto" }}>
                     <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
                         <ArrowLeft fontSize={"large"} />
                     </IconButton>
@@ -120,7 +128,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             color: "white",
                         }}
                     >
-                        Productos del usuario
+                        Productos
                     </Typography>
                 </Box>
 
@@ -143,7 +151,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                     }
 
                     <Link href={`/inventory/owner/product/create`}>
-                        <IconButton color={"inherit"}>
+                        <IconButton color={"inherit"} sx={{color: "white"}}>
                             <AddOutlined />
                         </IconButton>
                     </Link>
@@ -218,10 +226,13 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                     hover
                                     tabIndex={-1}
                                     selected={selected && (row.id === selected.id)}
-                                    onClick={() => handleSelectItem(row)}
                                 >
                                     <TableCell>
-                                        <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                                        <Checkbox
+                                            size={"small"}
+                                            checked={selected && (row.id === selected.id)}
+                                            onClick={() => handleSelectItem(row)}
+                                        />
                                     </TableCell>
                                     <TableCell>
                                         {row.name}
@@ -282,6 +293,8 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
     }
 
     const DepartmentsFilter = ({ formik }) => {
+        const [displaySearchBar, setDisplaySearchBar] = React.useState(false)
+
         return (
             <Card variant={"outlined"} sx={{ padding: "15px" }}>
                 <Grid container rowSpacing={2}>
@@ -290,22 +303,16 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             Seleccione departamentos para encontrar el producto que busca
                         </Typography>
                     </Grid>
-                    <Grid container item columnSpacing={2}>
+                    <Grid container item spacing={2} flexWrap={"nowrap"} sx={{overflowX: "auto", py: "7px"}}>
                         {
                             allProductsByDepartment.map((item, index) => (
                                 <Grid key={item.id} item xs={"auto"}>
-                                    <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
-                                        <Grid container>
-                                            <Grid item xs={12}>
-                                                {item.name}
-                                            </Grid>
-                                            <Grid container item xs={12} justifyContent={"center"}>
-                                                <Typography variant={"caption"}>
-                                                    {item.products.length} productos
-                                                </Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </Button>
+                                    <DepartmentCustomButton
+                                        title={item.name}
+                                        subtitle={`${item.products.length} productos`}
+                                        selected={item.selected}
+                                        onClick={() => handleSelectFilter(index)}
+                                    />
                                 </Grid>
                             ))
                         }
@@ -317,17 +324,30 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                 <Grid item xs={12}>
                                     <Typography variant={"subtitle2"}>
                                         Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
+                                        <IconButton
+                                            onClick={() => setDisplaySearchBar(!displaySearchBar)}
+                                            sx={{ ml: "5px" }}
+                                        >
+                                            {displaySearchBar
+                                                ? <ExpandMoreOutlined fontSize={"small"} />
+                                                : <ExpandLessOutlined fontSize={"small"} />
+                                            }
+                                        </IconButton>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        name={"handleChangeSearchBarValue"}
-                                        placeholder="Buscar producto..."
-                                        size={"small"}
-                                        fullWidth
-                                        {...formik.getFieldProps("searchBarValue")}
-                                    />
-                                </Grid>
+                                {
+                                    displaySearchBar && (
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                name={"handleChangeSearchBarValue"}
+                                                placeholder="Buscar producto..."
+                                                size={"small"}
+                                                fullWidth
+                                                {...formik.getFieldProps("searchBarValue")}
+                                            />
+                                        </Grid>
+                                    )
+                                }
                             </Grid>
                         )
                     }
@@ -363,11 +383,13 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             {
                                 data?.length > 0
                                     ? (
-                                        <Table sx={{ width: "100%" }} size={"small"}>
-                                            <TableHeader />
+                                        <TableContainer sx={{width: "100%", overflowX: "auto"}}>
+                                            <Table sx={{ width: "100%" }} size={"small"}>
+                                                <TableHeader />
 
-                                            <TableContent formik={formik} />
-                                        </Table>
+                                                <TableContent formik={formik} />
+                                            </Table>
+                                        </TableContainer>
                                     ) : (
                                         <TableNoData />
                                     )
