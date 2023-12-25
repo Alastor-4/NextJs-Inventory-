@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from "db";
-import logger from '@/utils/logger';
+import { log } from 'next-axiom';
+
 // Get store details
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
@@ -26,8 +27,7 @@ export async function GET(req: Request) {
         return NextResponse.json(store)
     } else {
         
-        logger.info("Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de los datos de la tienda")
-       
+       log.error("Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de los datos de la tienda")
         return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
     }
 }
