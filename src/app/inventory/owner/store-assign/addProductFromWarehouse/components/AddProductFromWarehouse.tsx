@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react'
 import {
     Box,
@@ -15,7 +14,8 @@ import {
     SelectChangeEvent,
     Table,
     TableBody,
-    TableCell, TableContainer,
+    TableCell,
+    TableContainer,
     TableHead,
     TableRow,
     TextField,
@@ -54,7 +54,6 @@ export default function AddProductFromWarehouse(props: any) {
     // Wharehouse -> depots -> storeDepots
     //                      -> products -> departments
     useEffect(() => {
-
         const getData = async () => {
             const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(userId, dataStore.id)
 
@@ -203,7 +202,7 @@ export default function AddProductFromWarehouse(props: any) {
             },
             {
                 id: "store_units",
-                label: "Unidades restantes",
+                label: "Cantidad disponible",
                 align: "left"
             },
             {
@@ -259,11 +258,15 @@ export default function AddProductFromWarehouse(props: any) {
                                 key={row.id}
                                 hover
                                 tabIndex={-1}
-                                onClick={() => setSelectedDepot(selectedDepot === index ? undefined : index)}
                                 selected={selectedDepot === index}
+                                onClick={() => setShowDetails((showDetails !== row.id) ? row.id : '')}
                             >
                                 <TableCell>
-                                    <Checkbox size='small' checked={selectedDepot === index} />
+                                    <Checkbox
+                                        size='small'
+                                        checked={selectedDepot === index}
+                                        onClick={() => setSelectedDepot(selectedDepot === index ? undefined : index)}
+                                    />
                                 </TableCell>
 
                                 <TableCell>
@@ -327,13 +330,13 @@ export default function AddProductFromWarehouse(props: any) {
                                                     <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
                                                     <Grid item xs={true}>
                                                         {row.products.name}
-                                                        {
-                                                            row.products.description && (
-                                                                <small>
-                                                                    {` ${row.products.description}`}
-                                                                </small>
-                                                            )
-                                                        }
+                                                    </Grid>
+                                                </Grid>
+
+                                                <Grid container item spacing={1} xs={12}>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Descripción:</Grid>
+                                                    <Grid item xs={true}>
+                                                        {row.products.description ? row.products.description : "-"}
                                                     </Grid>
                                                 </Grid>
 
@@ -434,10 +437,10 @@ export default function AddProductFromWarehouse(props: any) {
     const setValidationSchema = (
         Yup.object({
             units: Yup.number()
-                .typeError("La cantidad debe ser numérica")
-                .min(0, "No se admiten cantidades negativas")
-                .max(data[selectedDepot ?? 0]?.product_total_remaining_units, "No existe esa cantidad en el almacen")
-                .required("Ponga alguna unidad inicial")
+                .typeError("Cantidad numérica")
+                .min(0, "Cantidad positiva")
+                .max(data[selectedDepot ?? 0]?.product_total_remaining_units, "Cantidad no existente en almacén")
+                .required("Cantidad requerida")
         })
     )
 
@@ -632,11 +635,11 @@ export default function AddProductFromWarehouse(props: any) {
                                 </Grid>
 
                                 <Grid item container columnSpacing={1} alignItems={"center"}>
-                                    <Grid item xs={4} md={3}>
+                                    <Grid item xs={5} md={3}>
                                         <TextField
                                             name={"units"}
                                             {...formik.getFieldProps("units")}
-                                            label={"Cantidad inicial"}
+                                            label={"Cantidad"}
                                             value={formik.values.units}
                                             size={'small'}
                                             disabled={selectedDepot === undefined}
@@ -652,7 +655,7 @@ export default function AddProductFromWarehouse(props: any) {
                                             type='submit'
                                             disabled={selectedDepot === undefined}
                                         >
-                                            Agregar Producto
+                                            Agregar
                                         </Button>
                                     </Grid>
                                 </Grid>
