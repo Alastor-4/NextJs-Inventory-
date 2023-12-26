@@ -26,7 +26,7 @@ export default function StoreOpeningDays({ title, formik, valuesFieldKey }: { ti
                     <Typography variant={"subtitle1"}>{title}</Typography>
                 </Grid>
 
-                <Grid container item xs={12} alignItems={"flex-start"} columnSpacing={1} sx={{ overflowX: "auto" }}>
+                <Grid container item xs={12} alignItems={"flex-start"} columnSpacing={1} sx={{ flexWrap: "nowrap", overflowX: "auto", pt: "5px", pb: "7px" }}>
                     {
                         formik.values[valuesFieldKey].map((item: any, index: number) => (
                             <Grid container item xs={true} justifyContent={"center"} key={index}>
@@ -77,6 +77,7 @@ export default function StoreOpeningDays({ title, formik, valuesFieldKey }: { ti
                                                                             label={"Desde"}
                                                                             value={item.startTime}
                                                                             onChange={(value) => handleSetTime(index, "startTime", value)}
+                                                                            sx={{minWidth: "110px"}}
                                                                         />
                                                                     </Grid>
 
@@ -85,6 +86,7 @@ export default function StoreOpeningDays({ title, formik, valuesFieldKey }: { ti
                                                                             label={"Hasta"}
                                                                             value={item.endTime}
                                                                             onChange={(value) => handleSetTime(index, "endTime", value)}
+                                                                            sx={{minWidth: "110px"}}
                                                                         />
                                                                     </Grid>
                                                                 </Grid>

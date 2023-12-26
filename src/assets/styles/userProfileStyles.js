@@ -3,12 +3,12 @@ const userProfileStyles = {
         display: "flex",
         fontWeight: "600",
         justifyContent: "flex-end",
-        width: 2/5
+        width: 1/3
     },
 
     rightFlex: {
         display: "flex",
-        width: 3/5
+        width: 2/3
     },
 
     cardButton: {

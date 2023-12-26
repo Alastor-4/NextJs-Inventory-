@@ -135,11 +135,11 @@ export default function UserProfileMain(props) {
                         {ownerWarehouses.map((item: any, index: number) => (
                             <Grid container key={item.id}>
                                 <Link href={`/inventory/owner/warehouse/${item.id}`} key={item.id}>
-                                    <Grid container columnSpacing={2} item xs={12} sx={index > 0 ? { mt: "10px" } : { mt: "0" }}>
+                                    <Grid container item xs={12} sx={index > 0 ? { mt: "10px" } : { mt: "0" }}>
                                         <Grid container item xs={"auto"} alignItems={"center"}>
                                             <ChevronRightOutlined fontSize={"small"} />
                                         </Grid>
-                                        <Grid item xs={true}>
+                                        <Grid item xs={"auto"}>
                                             {item.name}
                                         </Grid>
                                     </Grid>

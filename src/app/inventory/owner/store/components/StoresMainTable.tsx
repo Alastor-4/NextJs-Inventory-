@@ -6,14 +6,14 @@ import {
     Box, Button,
     Card,
     CardContent,
-    Checkbox, CircularProgress,
+    Checkbox,
     Collapse,
     Divider,
     Grid,
     IconButton,
     Table,
     TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
     TableRow,
     Toolbar,
@@ -30,7 +30,8 @@ import {
     EditOutlined,
     ExpandLessOutlined,
     ExpandMoreOutlined,
-    ShoppingCartOutlined
+    ShoppingCartOutlined,
+    StorefrontOutlined
 } from "@mui/icons-material";
 
 import { useRouter } from "next/navigation";
@@ -44,9 +45,6 @@ export default function StoresMainTable({ userId }: { userId: number }) {
     const [showDetails, setShowDetails] = React.useState(false)
 
     const router = useRouter()
-
-    //ToDo: use global isLoading
-    const isLoading = false
 
     //get initial data
     React.useEffect(() => {
@@ -72,7 +70,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
 
     async function handleRemove() {
         const response = await stores.delete(userId, selected.id)
-        if (response === true) {
+        if (response) {
             const updatedStores = await stores.allUserStores(userId)
             if (updatedStores) setData(updatedStores)
             setSelected(null);
@@ -92,7 +90,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center", overflowX: "auto" }}>
                     <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
                         <ArrowLeft fontSize={"large"} />
                     </IconButton>
@@ -105,39 +103,42 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                             color: "white",
                         }}
                     >
-                        Listado de Tiendas
+                        Tiendas
                     </Typography>
                 </Box>
 
                 <Box sx={{ display: "flex" }}>
                     {
-                        isLoading
-                            ? <CircularProgress size={24} color={"inherit"} />
-                            : (
-                                <>
-                                    {
-                                        selected && (
-                                            <Box sx={{ display: "flex" }}>
-                                                <IconButton color={"inherit"} onClick={handleUpdate}>
-                                                    <EditOutlined fontSize={"small"} />
-                                                </IconButton>
+                        selected && (
+                            <Box sx={{ display: "flex" }}>
+                                <IconButton
+                                    color={"inherit"}
+                                    onClick={() => router.push(`/inventory/owner/store-details/${selected.id}`)}
+                                >
+                                    <StorefrontOutlined fontSize={"small"} />
+                                </IconButton>
 
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"} />
-                                                </IconButton>
+                                <Divider orientation="vertical" variant="middle" flexItem
+                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
 
-                                                <Divider orientation="vertical" variant="middle" flexItem
-                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
-                                            </Box>
-                                        )
-                                    }
+                                <IconButton color={"inherit"} onClick={handleUpdate}>
+                                    <EditOutlined fontSize={"small"} />
+                                </IconButton>
 
-                                    <IconButton color={"inherit"} onClick={handleCreate} >
-                                        <AddOutlined />
-                                    </IconButton>
-                                </>
-                            )
+                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                    <DeleteOutline fontSize={"small"} />
+                                </IconButton>
+
+                                <Divider orientation="vertical" variant="middle" flexItem
+                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+
+                            </Box>
+                        )
                     }
+
+                    <IconButton color={"inherit"} onClick={handleCreate} >
+                        <AddOutlined />
+                    </IconButton>
                 </Box>
             </Toolbar>
         </AppBar>
@@ -162,7 +163,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
             },
             {
                 id: "seller",
-                label: "Vendedor(a)",
+                label: "Vendedor",
                 align: "left"
             },
             {
@@ -180,9 +181,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                         key={"checkbox"}
                         align={"left"}
                         padding={'checkbox'}
-                    >
-
-                    </TableCell>
+                    />
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
@@ -196,6 +195,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
             </TableHead>
         )
     }
+
     const TableContent = () => {
         return (
             <TableBody>
@@ -205,18 +205,18 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                             key={row.id}
                             hover
                             tabIndex={-1}
-                            onClick={() => handleSelectItem(row)}
+                            onClick={() => setShowDetails((showDetails !== index) ? index : '')}
                         >
                             <TableCell>
-                                <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                                <Checkbox
+                                    size={"small"}
+                                    checked={selected && (row.id === selected.id)}
+                                    onClick={() => handleSelectItem(row)}
+                                />
                             </TableCell>
 
                             <TableCell>
                                 {row.name}
-                                <br />
-                                <small>
-                                    {(row.description !== '') ? row.description : ''}
-                                </small>
                             </TableCell>
 
                             <TableCell>
@@ -224,8 +224,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                             </TableCell>
 
                             <TableCell>
-                                <Grid container columnSpacing={1} >
-
+                                <Grid container columnSpacing={1}>
                                     <Grid item >
                                         <Tooltip title={"Catálogo"} >
                                             <AutoStories
@@ -241,13 +240,11 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                                 fontSize="small" />
                                         </Tooltip>
                                     </Grid>
-
                                 </Grid>
-
                             </TableCell>
 
                             <TableCell>
-                                {row.seller_user ? `${row.seller_user.name} (${row.seller_user.username})` : "-"}
+                                {row.seller_user ? row.seller_user.name.split(" ")[0] : "-"}
                             </TableCell>
 
                             <TableCell style={{ padding: 0 }} colSpan={5}>
@@ -255,10 +252,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                     <IconButton
                                         size={"small"}
                                         sx={{ m: "3px" }}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setShowDetails((showDetails !== index) ? index : '')
-                                        }}
+                                        onClick={() => setShowDetails((showDetails !== index) ? index : '')}
                                     >
                                         {
                                             (showDetails !== index)
@@ -287,13 +281,13 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                                 <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
                                                 <Grid item xs={true}>
                                                     {row.name}
-                                                    {
-                                                        row.description && (
-                                                            <small>
-                                                                {` ${row.description}`}
-                                                            </small>
-                                                        )
-                                                    }
+                                                </Grid>
+                                            </Grid>
+
+                                            <Grid container item spacing={1} xs={12}>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Descripción:</Grid>
+                                                <Grid item xs={true}>
+                                                    {row.description === "" ? '-' : row.description}
                                                 </Grid>
                                             </Grid>
 
@@ -305,7 +299,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Direccion:</Grid>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Dirección:</Grid>
                                                 <Grid item xs={true}>
                                                     {row.address === "" ? '-' : row.address}
                                                 </Grid>
@@ -368,16 +362,6 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                                         </Grid>
                                                     </Grid>
                                                 </Grid>
-                                            </Grid>
-
-                                            <Grid item xs={12}>
-                                                <Button
-                                                    variant={"outlined"}
-                                                    color={"info"}
-                                                    onClick={() => router.push(`/inventory/owner/store-details/${row.id}`)}
-                                                >
-                                                    Administrar productos
-                                                </Button>
                                             </Grid>
 
                                             <Grid container item rowSpacing={1} xs={12}>
@@ -443,10 +427,19 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                                     </Grid>
                                                 )
                                             }
+
+                                            <Grid item xs={12}>
+                                                <Button
+                                                    variant={"outlined"}
+                                                    color={"info"}
+                                                    onClick={() => router.push(`/inventory/owner/store-details/${row.id}`)}
+                                                >
+                                                    Administrar productos
+                                                </Button>
+                                            </Grid>
                                         </Grid>
                                     </Collapse>
-                                )
-                                }
+                                )}
                             </TableCell>
                         </TableRow>
                     </React.Fragment>
@@ -463,11 +456,14 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                 {
                     data?.length > 0
                         ? (
-                            <Table sx={{ width: "100%" }} size={"small"}>
-                                <TableHeader />
+                            <TableContainer sx={{width: "100%", overflowX: "auto"}}>
+                                <Table sx={{ width: "100%" }} size={"small"}>
+                                    <TableHeader />
 
-                                <TableContent />
-                            </Table>
+                                    <TableContent />
+                                </Table>
+                            </TableContainer>
+
                         ) : (
                             <TableNoData />
                         )

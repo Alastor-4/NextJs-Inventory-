@@ -303,7 +303,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             Seleccione departamentos para encontrar el producto que busca
                         </Typography>
                     </Grid>
-                    <Grid container item spacing={2} flexWrap={"nowrap"} sx={{overflowX: "auto", py: "7px"}}>
+                    <Grid container item columnSpacing={2} flexWrap={"nowrap"} sx={{overflowX: "auto", py: "7px"}}>
                         {
                             allProductsByDepartment.map((item, index) => (
                                 <Grid key={item.id} item xs={"auto"}>

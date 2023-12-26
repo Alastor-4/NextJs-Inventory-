@@ -3,18 +3,18 @@
 import React from "react";
 import {
     AppBar,
-    Box, Button,
+    Box,
     Card,
     CardContent,
-    CircularProgress,
     Grid,
     IconButton,
     Switch,
     Table,
     TableBody,
-    TableCell,
+    TableCell, TableContainer,
     TableHead,
-    TableRow, TextField,
+    TableRow,
+    TextField,
     Toolbar,
     Tooltip,
     Typography
@@ -30,7 +30,7 @@ import {
     ShareOutlined,
     SwapHoriz
 } from "@mui/icons-material";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Formik } from "formik";
 import StoreMoreDetails from "./StoreMoreDetails";
 import StoreModalPrice from "./Modal/StoreModalPrice"
@@ -44,12 +44,11 @@ import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehou
 import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import { numberFormat } from "@/utils/generalFunctions";
 import stores from "../../../store/requests/stores";
+import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json())
 
-
-export default function StoreMainTable({ userId }: { userId?: number }) {
-    const params = useParams()
+export default function StoreMainTable({ userId, storeDetailsId }: { userId?: number, storeDetailsId: number }) {
     const router = useRouter()
 
     // Guardan datos de bd
@@ -70,12 +69,12 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
 
     //get initial data
     React.useEffect(() => {
-        fetcher(`/inventory/owner/store-details/${params.storeDetailsId}/api`).then((data) =>
+        fetcher(`/inventory/owner/store-details/${storeDetailsId}/api`).then((data) =>
             setAllProductsByDepartment(data.map((item: any) => ({
                 ...item,
                 selected: false
             }))))
-    }, [params.storeDetailsId])
+    }, [storeDetailsId])
 
     React.useEffect(() => {
         if (allProductsByDepartment.length) {
@@ -105,14 +104,14 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
     //Get Store name
     React.useEffect(() => {
         const getDataStore = async () => {
-            const newdataStore = await stores.storeDetails(userId!, params.storeDetailsId);
-            setDataStore(newdataStore);
+            const datastore = await stores.storeDetails(userId!, storeDetailsId);
+            setDataStore(datastore);
         }
         if (dataStore === '') {
             getDataStore()
         }
 
-    }, [dataStore, params.storeDetailsId, userId, setDataStore])
+    }, [dataStore, storeDetailsId, userId, setDataStore])
 
     function handleNavigateBack() {
         router.back()
@@ -143,7 +142,7 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center", overflowX: "auto" }}>
                     <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
                         <ArrowLeft fontSize={"large"} />
                     </IconButton>
@@ -156,7 +155,7 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                             color: "white",
                         }}
                     >
-                        {dataStore.name}
+                        Productos {dataStore.name}
                     </Typography>
                 </Box>
 
@@ -226,7 +225,7 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
     }
 
     const loadDates = async () => {
-        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartment(params.storeDetailsId);
+        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartment(storeDetailsId);
 
         let selectedDepartment = allProductsByDepartment.filter((element: any) => (element.selected)).map((element: any) => element.id)
 
@@ -276,9 +275,9 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                                         <TableRow
                                             hover
                                             tabIndex={-1}
+                                            onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
                                         >
                                             <TableCell>
-
                                                 <div>
                                                     <Grid item container >
                                                         <Grid>
@@ -294,14 +293,14 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                                                         )
                                                     }
                                                 </div>
-
                                             </TableCell>
+
                                             <TableCell>
                                                 {row.departments?.name}
                                             </TableCell>
+
                                             <TableCell>
                                                 <Grid container alignItems={"center"} columnGap={1}>
-
                                                     <Grid item>
                                                         <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice} />
                                                         {row.depots[0].store_depots[0]._count.product_offers > 0 && (
@@ -319,9 +318,7 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                                                             <EditOutlined fontSize="small" />
                                                         </IconButton>
                                                     </Grid>
-
                                                 </Grid>
-
                                             </TableCell>
 
                                             <TableCell>
@@ -380,11 +377,8 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                                                         size={"small"}
                                                         sx={{ m: "3px" }}
                                                         onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
-
                                                     >
                                                         {
-
-
                                                             (showDetails !== row.id)
                                                                 ? <ExpandMoreOutlined />
                                                                 : <ExpandLessOutlined />
@@ -424,6 +418,8 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
     }
 
     const DepartmentsFilter = ({ formik }: { formik: any }) => {
+        const [displaySearchBar, setDisplaySearchBar] = React.useState(false)
+
         return (
             <Card variant={"outlined"} sx={{ padding: "15px" }}>
                 <Grid container rowSpacing={2}>
@@ -432,22 +428,16 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                             Seleccione departamentos para encontrar el producto que busca
                         </Typography>
                     </Grid>
-                    <Grid container item columnSpacing={2}>
+                    <Grid container item columnSpacing={2} flexWrap={"nowrap"} sx={{overflowX: "auto", py: "7px"}}>
                         {
                             allProductsByDepartment.map((item: any, index: number) => (
                                 <Grid key={item.id} item xs={"auto"}>
-                                    <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
-                                        <Grid container>
-                                            <Grid item xs={12}>
-                                                {item.name}
-                                            </Grid>
-                                            <Grid container item xs={12} justifyContent={"center"}>
-                                                <Typography variant={"caption"}>
-                                                    {item.products.length} productos
-                                                </Typography>
-                                            </Grid>
-                                        </Grid>
-                                    </Button>
+                                    <DepartmentCustomButton
+                                        title={item.name}
+                                        subtitle={`${item.products.length} productos`}
+                                        selected={item.selected}
+                                        onClick={() => handleSelectFilter(index)}
+                                    />
                                 </Grid>
                             ))
                         }
@@ -459,22 +449,35 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                                 <Grid item xs={12}>
                                     <Typography variant={"subtitle2"}>
                                         Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
+                                        <IconButton
+                                            onClick={() => setDisplaySearchBar(!displaySearchBar)}
+                                            sx={{ ml: "5px" }}
+                                        >
+                                            {displaySearchBar
+                                                ? <ExpandMoreOutlined fontSize={"small"} />
+                                                : <ExpandLessOutlined fontSize={"small"} />
+                                            }
+                                        </IconButton>
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        name={"handleChangeSearchBarValue"}
-                                        placeholder="Buscar producto..."
-                                        size={"small"}
-                                        fullWidth
-                                        {...formik.getFieldProps("searchBarValue")}
-                                    />
-                                </Grid>
+
+                                {
+                                    displaySearchBar && (
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                name={"handleChangeSearchBarValue"}
+                                                placeholder="Buscar producto..."
+                                                size={"small"}
+                                                fullWidth
+                                                {...formik.getFieldProps("searchBarValue")}
+                                            />
+                                        </Grid>
+                                    )
+                                }
                             </Grid>
                         )
                     }
                 </Grid>
-
             </Card>
         )
     }
@@ -551,11 +554,13 @@ export default function StoreMainTable({ userId }: { userId?: number }) {
                             {
                                 data?.length > 0
                                     ? (
-                                        <Table sx={{ width: "100%" }} size={"small"}>
-                                            <TableHeader />
+                                        <TableContainer sx={{width: "100%", overflowX: "auto"}}>
+                                            <Table sx={{ width: "100%" }} size={"small"}>
+                                                <TableHeader />
 
-                                            <TableContent formik={formik} />
-                                        </Table>
+                                                <TableContent formik={formik} />
+                                            </Table>
+                                        </TableContainer>
                                     ) : (
                                         <TableNoData />
                                     )

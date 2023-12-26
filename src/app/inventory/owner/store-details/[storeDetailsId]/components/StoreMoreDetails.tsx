@@ -5,8 +5,8 @@ import StoreListOffers from './offers/components/StoreListOffers'
 import StoreModalDefault from './Modal/StoreModalDefault'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import StoreEditSellerProfit from './Modal/StoreEditSellerProfit'
-function StoreMoreDetails(props: any) {
 
+function StoreMoreDetails(props: any) {
     const { userId, details, show, loadDates, row } = props
 
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
@@ -32,7 +32,6 @@ function StoreMoreDetails(props: any) {
 
     return (
         <>
-
             <StoreModalDefault
                 dialogTitle={"Editar ganacia del vendedor"}
                 open={activeModalSellerProfit}
@@ -61,28 +60,24 @@ function StoreMoreDetails(props: any) {
                         </Typography>
                     </Grid>
 
-
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Producto:</Grid>
                         <Grid item xs={true}>
                             {row.name}
-                            {
-                                row.description && (
-                                    <small>
-                                        {` ${row.description}`}
-                                    </small>
-
-                                )
-                            }
                         </Grid>
                     </Grid>
 
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Descripción:</Grid>
+                        <Grid item xs={true}>
+                            {row.description ? row.description : "-"}
+                        </Grid>
+                    </Grid>
 
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
                         <Grid item xs={true}>{row.departments?.name ?? "-"}</Grid>
                     </Grid>
-
 
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
@@ -112,12 +107,10 @@ function StoreMoreDetails(props: any) {
                                             {item.value}
                                         </Grid>
                                     </Grid>
-                                )
-                                ) : "-"
+                                )) : "-"
                             }
                         </Grid>
                     </Grid>
-
 
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
