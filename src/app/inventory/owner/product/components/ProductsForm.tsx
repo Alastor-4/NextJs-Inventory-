@@ -20,10 +20,10 @@ import * as Yup from "yup"
 import { useParams, useRouter } from 'next/navigation';
 
 import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-material";
-import { useDropzone } from "react-dropzone";
+import { handleKeyDownWithDot } from "@/utils/handleKeyDown";
 import { useUploadThing } from "@/app/api/uploadthing/utils";
+import { useDropzone } from "react-dropzone";
 import products from "../requests/products";
-import { handleKeyDownWithCommaOrDot } from "@/utils/handleKeyDown";
 
 export default function ProductsForm(props: any) {
     const { userId, departments } = props
@@ -332,7 +332,7 @@ export default function ProductsForm(props: any) {
                                             name={"buyPrice"}
                                             label="Precio de compra"
                                             size={"small"}
-                                            onKeyDown={handleKeyDownWithCommaOrDot}
+                                            onKeyDown={handleKeyDownWithDot}
                                             fullWidth
                                             {...formik.getFieldProps("buyPrice")}
                                             error={formik.errors.buyPrice && formik.touched.buyPrice}
