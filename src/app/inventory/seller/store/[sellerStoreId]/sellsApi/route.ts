@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import {prisma} from "db";
+import { prisma } from "db";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import logger from '@/utils/logger';
@@ -8,7 +8,7 @@ dayjs.extend(utc)
 
 // Get today store product sells
 export async function GET(req: Request) {
-    const {searchParams} = new URL(req.url)
+    const { searchParams } = new URL(req.url)
 
     const storeIdParam = searchParams.get("sellerStoreId")
 
@@ -30,25 +30,25 @@ export async function GET(req: Request) {
                         {
                             sell_products: {
                                 some: {
-                                    store_depots: {store_id: storeId}
+                                    store_depots: { store_id: storeId }
                                 }
                             }
                         },
                         {
                             reservations: {
-                                reservation_products: {some: {store_depots: {store_id: storeId}}}
+                                reservation_products: { some: { store_depots: { store_id: storeId } } }
                             }
                         }
                     ]
                 },
                 include: {
-                    sell_products: {where: {store_depots: {store_id: storeId}}, include: {store_depots: true}},
+                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: true } },
                     reservations: {
-                        where: {reservation_products: {some: {store_depots: {store_id: storeId}}}},
+                        where: { reservation_products: { some: { store_depots: { store_id: storeId } } } },
                         include: {
                             reservation_products: {
-                                where: {store_depots: {store_id: storeId}},
-                                include: {store_depots: true},
+                                where: { store_depots: { store_id: storeId } },
+                                include: { store_depots: true },
                             },
                         },
                     }
@@ -58,8 +58,8 @@ export async function GET(req: Request) {
 
         return NextResponse.json(store)
     } else {
-       
-        logger.info("Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de las ventas de los productos en la tienda")
+
+        logger.info(`Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de las ventas de los productos en la tienda(Posible fallos en storeIdParam=${storeIdParam} )`)
 
         return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
     }

@@ -25,9 +25,9 @@ export async function GET(req: Request) {
 
         return NextResponse.json(store)
     } else {
-        
-        logger.info("Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de los datos de la tienda")
-       
+
+        logger.info(`Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de los datos de la tienda(Posible fallos en userIdParam =${userIdParam} storeIdParam=${storeIdParam} )`)
+
         return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
     }
 }

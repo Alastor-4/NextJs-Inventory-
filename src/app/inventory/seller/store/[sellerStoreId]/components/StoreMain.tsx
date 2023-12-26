@@ -27,11 +27,11 @@ import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
 import Link from "next/link";
-import {daysMap, notifySuccess, notifyWarning, numberFormat} from "@/utils/generalFunctions";
+import { daysMap, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 
 dayjs.extend(isBetween)
 
-export default function StoreMain({userId}) {
+export default function StoreMain({ userId }) {
     const [storeDetails, setStoreDetails] = React.useState(null)
     const [storeDepotsStats, setStoreDepotsStats] = React.useState(null)
     const [productSells, setProductSells] = React.useState(null)
@@ -45,10 +45,11 @@ export default function StoreMain({userId}) {
     //get initial store and sells details and compute stats
     React.useEffect(() => {
         async function loadStatsData() {
-            const p1 = stores.storeDetails(userId, sellerStoreId)
-            const p2 = stores.storeSellsDetails(sellerStoreId)
+            const p1 = await stores.storeDetails(userId, sellerStoreId)
+            const p2 = await stores.storeSellsDetails(sellerStoreId)
 
-            const [storeDetailsResponse, storeSellsResponse] = await Promise.all([p1, p2])
+            const [storeDetailsResponse, storeSellsResponse] = [p1, p2]
+            // const [storeDetailsResponse, storeSellsResponse] = await Promise.all([p1, p2])
 
             if (storeDetailsResponse) {
                 setStoreDetails(storeDetailsResponse)
@@ -147,10 +148,10 @@ export default function StoreMain({userId}) {
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{display: "flex", justifyContent: "space-between", color: "white"}}>
-                <Box sx={{display: "flex", alignItems: "center"}}>
-                    <IconButton color={"inherit"} sx={{mr: "10px"}} onClick={() => router.back()}>
-                        <ArrowLeft fontSize={"large"}/>
+            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={() => router.back()}>
+                        <ArrowLeft fontSize={"large"} />
                     </IconButton>
                     <Typography
                         variant="h6"
@@ -179,7 +180,7 @@ export default function StoreMain({userId}) {
         //change auto open time
         const updatedStore = await stores.changeAutoOpenTime(sellerStoreId)
 
-        let storeData = {...storeDetails}
+        let storeData = { ...storeDetails }
         storeData.auto_open_time = updatedStore.auto_open_time
 
         setStoreDetails(storeData)
@@ -202,7 +203,7 @@ export default function StoreMain({userId}) {
         //change auto reservation time
         const updatedStore = await stores.changeAutoReservationTime(sellerStoreId)
 
-        let storeData = {...storeDetails}
+        let storeData = { ...storeDetails }
         storeData.auto_reservation_time = updatedStore.auto_reservation_time
 
         setStoreDetails(storeData)
@@ -268,7 +269,7 @@ export default function StoreMain({userId}) {
         return (
             <Card variant={"outlined"}>
                 <Link href={`/inventory/seller/store/${sellerStoreId}/product`}>
-                    <CardHeader title={"Productos en tienda"}/>
+                    <CardHeader title={"Productos en tienda"} />
                 </Link>
 
                 <CardContent>
@@ -276,8 +277,8 @@ export default function StoreMain({userId}) {
                         storeDepotsStats && (
                             <Grid container rowSpacing={2}>
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Productos:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -286,8 +287,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Productos agotados:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -296,8 +297,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Productos inactivos:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -306,8 +307,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Productos sin precio:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -316,8 +317,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Productos con descuento:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -337,7 +338,7 @@ export default function StoreMain({userId}) {
         return (
             <Card variant={"outlined"}>
                 <Link href={`/inventory/seller/store/${sellerStoreId}/reservation`}>
-                    <CardHeader title={"Reservaciones"}/>
+                    <CardHeader title={"Reservaciones"} />
                 </Link>
 
                 <CardContent>
@@ -345,8 +346,8 @@ export default function StoreMain({userId}) {
                         storeDepotsStats && (
                             <Grid container rowSpacing={2}>
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Pendientes:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -355,8 +356,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Aceptadas hoy:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -365,8 +366,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Canceladas hoy:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -375,8 +376,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Vendidas hoy:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -396,15 +397,15 @@ export default function StoreMain({userId}) {
 
         return (
             <Card variant={"outlined"}>
-                <CardHeader title={"Ventas de hoy"}/>
+                <CardHeader title={"Ventas de hoy"} />
 
                 <CardContent>
                     {
                         productSellsStats && (
                             <Grid container rowSpacing={2}>
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Ventas:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -413,8 +414,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Productos devueltos:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -423,8 +424,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Total vendido:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -433,8 +434,8 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Desglose:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -453,7 +454,7 @@ export default function StoreMain({userId}) {
 
         return (
             <Card variant={"outlined"}>
-                <CardHeader title={"Transferencias de hoy"}/>
+                <CardHeader title={"Transferencias de hoy"} />
 
                 <CardContent>
                     contenido aqui
@@ -466,13 +467,13 @@ export default function StoreMain({userId}) {
 
         return (
             <Card variant={"outlined"}>
-                <CardHeader title={"Colecciones"}/>
+                <CardHeader title={"Colecciones"} />
 
                 <CardContent>
                     <Grid container rowSpacing={2}>
                         <Grid container item spacing={1} xs={12}>
-                            <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                <ChevronRightOutlined fontSize={"small"}/>
+                            <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                <ChevronRightOutlined fontSize={"small"} />
                                 Colecciones:
                             </Grid>
                             <Grid item xs={true}>
@@ -487,11 +488,11 @@ export default function StoreMain({userId}) {
 
 
     const StoreHours = () => (
-        <Card variant={"outlined"} sx={{padding: "10px"}}>
+        <Card variant={"outlined"} sx={{ padding: "10px" }}>
             <Grid container rowSpacing={2}>
-                <Grid item xs={12} sx={{fontWeight: 600}}>
+                <Grid item xs={12} sx={{ fontWeight: 600 }}>
                     Horarios de apertura:
-                    <Switch checked={autoOpenTime} onChange={handleToggleAutoOpen} color={autoOpenTime ? "success" : "warning"}/>
+                    <Switch checked={autoOpenTime} onChange={handleToggleAutoOpen} color={autoOpenTime ? "success" : "warning"} />
                 </Grid>
                 <Grid item xs={12}>
                     <Box sx={
@@ -512,7 +513,7 @@ export default function StoreMain({userId}) {
                                 alignItems: "center",
                             }
                     }>
-                        <InfoOutlined color={autoOpenTime ? "success" : "error"} sx={{mr: "3px"}}/>
+                        <InfoOutlined color={autoOpenTime ? "success" : "error"} sx={{ mr: "3px" }} />
                         {autoOpenTime
                             ? "Abriendo en los horarios establecidos"
                             : "La tienda permanecerá siempre cerrada"
@@ -524,10 +525,10 @@ export default function StoreMain({userId}) {
                         Ver horarios
                         <IconButton
                             size={"small"}
-                            sx={{m: "3px"}}
+                            sx={{ m: "3px" }}
                             onClick={() => setDisplayAutoOpenSection(!displayAutoOpenSection)}
                         >
-                            {displayAutoOpenSection ? <ExpandLessOutlined/> : <ExpandMoreOutlined/>}
+                            {displayAutoOpenSection ? <ExpandLessOutlined /> : <ExpandMoreOutlined />}
                         </IconButton>
 
                     </Grid>
@@ -539,8 +540,8 @@ export default function StoreMain({userId}) {
                                     storeDetails?.store_open_days?.length ? (
                                         storeDetails.store_open_days.map(openItem => (
                                             <Grid container item spacing={1} xs={12} key={openItem.id}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                                    <ChevronRightOutlined fontSize={"small"}/>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                                    <ChevronRightOutlined fontSize={"small"} />
                                                     {daysMap[openItem.week_day_number]}:
                                                 </Grid>
                                                 <Grid item xs={true}>
@@ -559,11 +560,11 @@ export default function StoreMain({userId}) {
     )
 
     const ReservationHours = () => (
-        <Card variant={"outlined"} sx={{padding: "10px"}}>
+        <Card variant={"outlined"} sx={{ padding: "10px" }}>
             <Grid container rowSpacing={2}>
-                <Grid item xs={12} sx={{fontWeight: 600}}>
+                <Grid item xs={12} sx={{ fontWeight: 600 }}>
                     Horarios de reservaciones:
-                    <Switch checked={autoReservationTime} onChange={handleToggleAutoReservation} color={autoReservationTime ? "success" : "warning"}/>
+                    <Switch checked={autoReservationTime} onChange={handleToggleAutoReservation} color={autoReservationTime ? "success" : "warning"} />
                 </Grid>
                 <Grid item xs={12}>
                     <Box sx={
@@ -584,7 +585,7 @@ export default function StoreMain({userId}) {
                                 alignItems: "center",
                             }
                     }>
-                        <InfoOutlined color={autoReservationTime ? "success" : "error"} sx={{mr: "3px"}}/>
+                        <InfoOutlined color={autoReservationTime ? "success" : "error"} sx={{ mr: "3px" }} />
                         {autoReservationTime
                             ? "Recibiendo reservaciones en los horarios establecidos"
                             : "No se recibirán reservaciones"
@@ -596,10 +597,10 @@ export default function StoreMain({userId}) {
                         Ver horarios
                         <IconButton
                             size={"small"}
-                            sx={{m: "3px"}}
+                            sx={{ m: "3px" }}
                             onClick={() => setDisplayAutoReservationSection(!displayAutoReservationSection)}
                         >
-                            {displayAutoReservationSection ? <ExpandLessOutlined/> : <ExpandMoreOutlined/>}
+                            {displayAutoReservationSection ? <ExpandLessOutlined /> : <ExpandMoreOutlined />}
                         </IconButton>
 
                     </Grid>
@@ -611,8 +612,8 @@ export default function StoreMain({userId}) {
                                     storeDetails?.store_reservation_days?.length ? (
                                         storeDetails.store_reservation_days.map(reservationItem => (
                                             <Grid container item spacing={1} xs={12} key={reservationItem.id}>
-                                                <Grid item xs={"auto"} sx={{fontWeight: 600, display: "flex", alignItems: "center"}}>
-                                                    <ChevronRightOutlined fontSize={"small"}/>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                                    <ChevronRightOutlined fontSize={"small"} />
                                                     {daysMap[reservationItem.week_day_number]}:
                                                 </Grid>
                                                 <Grid item xs={true}>
@@ -632,7 +633,7 @@ export default function StoreMain({userId}) {
 
     return (
         <Card variant={"outlined"}>
-            <CustomToolbar/>
+            <CustomToolbar />
 
             {
                 storeDetails && (
@@ -644,7 +645,7 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid container item xs={12} justifyContent={"center"}>
-                                    <Box sx={{display: "inline-flex", ml: "10px"}}>
+                                    <Box sx={{ display: "inline-flex", ml: "10px" }}>
                                         Ahora mismo:
                                         {
                                             checkOpenCondition() ? (
@@ -652,14 +653,14 @@ export default function StoreMain({userId}) {
                                                     size={"small"}
                                                     label={"Abierto"}
                                                     color={"success"}
-                                                    sx={{ml: "10px"}}
+                                                    sx={{ ml: "10px" }}
                                                 />
                                             ) : (
                                                 <Chip
                                                     size={"small"}
                                                     label={"Cerrado"}
                                                     color={"error"}
-                                                    sx={{ml: "10px"}}
+                                                    sx={{ ml: "10px" }}
                                                 />
                                             )
                                         }
@@ -673,14 +674,14 @@ export default function StoreMain({userId}) {
                                                                 size={"small"}
                                                                 label={"Aceptando Reservaciones"}
                                                                 color={"success"}
-                                                                sx={{ml: "10px"}}
+                                                                sx={{ ml: "10px" }}
                                                             />
                                                         ) : (
                                                             <Chip
                                                                 size={"small"}
                                                                 label={"Reservaciones No Aceptadas"}
                                                                 color={"error"}
-                                                                sx={{ml: "10px"}}
+                                                                sx={{ ml: "10px" }}
                                                             />
                                                         )
                                                     }
@@ -703,37 +704,37 @@ export default function StoreMain({userId}) {
                                 </Grid>
 
                                 <Grid item xs={12} md={6}>
-                                    <StoreProducts/>
+                                    <StoreProducts />
                                 </Grid>
 
                                 <Grid item xs={12} md={6}>
-                                    <TodaySells/>
+                                    <TodaySells />
                                 </Grid>
 
                                 {
                                     storeDetails.online_reservation && (
                                         <Grid item xs={12} md={6}>
-                                            <StoreReservation/>
+                                            <StoreReservation />
                                         </Grid>
                                     )
                                 }
 
                                 <Grid item xs={12} md={6}>
-                                    <TodayTransfers/>
+                                    <TodayTransfers />
                                 </Grid>
 
                                 <Grid item xs={12} md={6}>
-                                    <StoreCollections/>
+                                    <StoreCollections />
                                 </Grid>
 
                                 <Grid item xs={12} md={6}>
-                                    <StoreHours/>
+                                    <StoreHours />
                                 </Grid>
 
                                 {
                                     storeDetails.online_reservation && (
                                         <Grid item xs={12} md={6}>
-                                            <ReservationHours/>
+                                            <ReservationHours />
                                         </Grid>
                                     )
                                 }
