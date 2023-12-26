@@ -79,7 +79,7 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
     const log = req.log.with({ scope: 'register' })
 
     const {error } = await resend.emails.send({
-        from: 'Dan <onboarding@inventarioplus.online>',
+        from: 'Inventario Plus <onboarding@inventarioplus.online>',
         to: newUser.mail,
         subject: "Verificación de usuario",
         react: VerifyUserTemplate({ link: `${process.env.NEXTAUTH_URL}/register/verify/${verificationToken}` }),
