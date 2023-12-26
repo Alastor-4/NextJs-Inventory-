@@ -23,6 +23,7 @@ import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-mate
 import { useDropzone } from "react-dropzone";
 import { useUploadThing } from "@/app/api/uploadthing/utils";
 import products from "../requests/products";
+import { handleKeyDownWithCommaOrDot } from "@/utils/handleKeyDown";
 
 export default function ProductsForm(props: any) {
     const { userId, departments } = props
@@ -331,6 +332,7 @@ export default function ProductsForm(props: any) {
                                             name={"buyPrice"}
                                             label="Precio de compra"
                                             size={"small"}
+                                            onKeyDown={handleKeyDownWithCommaOrDot}
                                             fullWidth
                                             {...formik.getFieldProps("buyPrice")}
                                             error={formik.errors.buyPrice && formik.touched.buyPrice}

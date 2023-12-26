@@ -6,11 +6,18 @@ import {
     DialogContent,
     DialogTitle, Grid,
 } from "@mui/material";
-import React from "react";
-import {Circle, CircleOutlined, ControlPoint, FormatListBulletedOutlined} from "@mui/icons-material";
+import React, { useEffect } from "react";
+import { Circle, CircleOutlined, ControlPoint, FormatListBulletedOutlined } from "@mui/icons-material";
+import { images } from "@prisma/client";
 
-export default function ImagesDisplayDialog(props: any) {
-    const {open, setOpen, dialogTitle, images} = props
+interface ImagesDisplayDialogProps {
+    open: boolean;
+    setOpen: (bool: boolean) => void;
+    dialogTitle: string;
+    images: images[] | null;
+}
+
+export default function ImagesDisplayDialog({ dialogTitle, images, open, setOpen }: ImagesDisplayDialogProps) {
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
         setOpen(false);
@@ -18,11 +25,11 @@ export default function ImagesDisplayDialog(props: any) {
 
     const [imageIndex, setImageIndex] = React.useState(0)
 
-    React.useEffect(() => {
-        if (images.length) {
-            setImageIndex(0)
+    useEffect(() => {
+        if (images?.length) {
+            setImageIndex(0);
         }
-    }, [images])
+    }, [images]);
 
     return (
         <Dialog open={open} onClose={handleClose}>
@@ -31,28 +38,28 @@ export default function ImagesDisplayDialog(props: any) {
                 <Grid container rowSpacing={2}>
                     <Grid container item xs={12} justifyContent={"center"}>
                         {
-                            images.length && (
+                            !!images?.length! && (
                                 <Avatar
                                     src={images[imageIndex]?.fileUrl ?? ""}
                                     variant={"rounded"}
-                                    sx={{width: "250px", maxWidth: "300px", height: "auto"}}
+                                    sx={{ width: "250px", maxWidth: "300px", height: "auto" }}
                                 />
                             )
                         }
                     </Grid>
 
                     {
-                        images.length > 1 && (
+                        images?.length! > 1 && (
                             <Grid container item xs={12} justifyContent={"center"}>
-                                {images.map((item: any, index: number) => (
+                                {images?.map((item: any, index: number) => (
                                     <React.Fragment key={item.id}>
                                         {
                                             imageIndex === index ? (
-                                                <Circle color={"info"} sx={{cursor: "pointer", mx: "7px"}}/>
+                                                <Circle color={"info"} sx={{ cursor: "pointer", mx: "7px" }} />
                                             ) : (
                                                 <CircleOutlined
                                                     onClick={() => setImageIndex(index)}
-                                                    sx={{cursor: "pointer", mx: "7px"}}
+                                                    sx={{ cursor: "pointer", mx: "7px" }}
                                                 />
                                             )
                                         }
@@ -68,4 +75,4 @@ export default function ImagesDisplayDialog(props: any) {
             </DialogActions>
         </Dialog>
     )
- }
+}

@@ -4,18 +4,18 @@ import { prisma } from "db";
 // Get all stores and a specific depot info
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
-    const ownerId = parseInt(<string>searchParams.get("userId"))
 
-    const depotId = searchParams.get("depotId")
+    const depotId = searchParams.get("depotId");
+    const ownerId = searchParams.get("userId");
 
     if (ownerId && depotId) {
         const storeDepots = await prisma.stores.findMany(
             {
                 where: {
-                    owner_id: ownerId
+                    owner_id: +ownerId!
                 },
                 include: {
-                    store_depots: { where: { depot_id: parseInt(depotId) } }
+                    store_depots: { where: { depot_id: +depotId! } }
                 }
             }
         )

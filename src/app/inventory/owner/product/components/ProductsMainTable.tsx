@@ -4,7 +4,7 @@
 import React from "react";
 import {
     AppBar,
-    Box, Button,
+    Box,
     Card,
     CardContent,
     Checkbox,
@@ -151,7 +151,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                     }
 
                     <Link href={`/inventory/owner/product/create`}>
-                        <IconButton color={"inherit"} sx={{color: "white"}}>
+                        <IconButton color={"inherit"} sx={{ color: "white" }}>
                             <AddOutlined />
                         </IconButton>
                     </Link>
@@ -309,7 +309,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                 <Grid key={item.id} item xs={"auto"}>
                                     <DepartmentCustomButton
                                         title={item.name}
-                                        subtitle={`${item.products.length} productos`}
+                                        subtitle={item.products?.length === 1 ? `${item.products.length!}` + " producto" : `${item.products?.length!}` + " productos"}
                                         selected={item.selected}
                                         onClick={() => handleSelectFilter(index)}
                                     />
@@ -383,7 +383,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             {
                                 data?.length > 0
                                     ? (
-                                        <TableContainer sx={{width: "100%", overflowX: "auto"}}>
+                                        <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
                                             <Table sx={{ width: "100%" }} size={"small"}>
                                                 <TableHeader />
 
