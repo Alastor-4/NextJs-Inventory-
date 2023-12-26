@@ -1,4 +1,3 @@
-
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
 import WorkersForm from "../components/WorkersForm";
 import { getServerSession } from "next-auth";
@@ -9,7 +8,7 @@ export default async function Page() {
 
     return (
         <main>
-            <WorkersForm ownerId={ownerId} />
+            <WorkersForm ownerId={ownerId!} />
         </main>
     )
 }
