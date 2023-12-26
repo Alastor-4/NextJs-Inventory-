@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server'
 import { prisma } from "db";
 import logger from '@/utils/logger';
+
+interface Params {
+    params: { sellerStoreId: string }
+}
+
+
 // Get store details
-export async function GET(req: Request) {
+export async function GET(req: Request, { params }: Params) {
     const { searchParams } = new URL(req.url)
 
     const userIdParam = searchParams.get("id")
-    const storeIdParam = searchParams.get('prueba')
+    const storeIdParam = params.sellerStoreId
 
     if (userIdParam && storeIdParam) {
         const userId = parseInt(userIdParam)
@@ -25,19 +31,17 @@ export async function GET(req: Request) {
 
         return NextResponse.json(store)
     } else {
-        logger.info(JSON.stringify(searchParams))
 
-        logger.info(`Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de los datos de la tienda(Posible fallos en userIdParam =${userIdParam} storeIdParam=${storeIdParam} )`)
+        logger.info(`Hay datos undefined que impiden pedir los datos a la bd, en la obtencion de los datos de la tienda`)
 
         return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
     }
 }
 
 // Change store auto open time
-export async function PUT(req: Request) {
-    const { searchParams } = new URL(req.url)
+export async function PUT(req: Request, { params }: Params) {
 
-    const storeIdParam = searchParams.get("sellerStoreId")
+    const storeIdParam = params.sellerStoreId
 
     if (storeIdParam) {
         const storeId = parseInt(storeIdParam)
@@ -52,10 +56,9 @@ export async function PUT(req: Request) {
 }
 
 // Change store auto reservation time
-export async function PATCH(req: Request) {
-    const { searchParams } = new URL(req.url)
+export async function PATCH(req: Request, { params }: Params) {
 
-    const storeIdParam = searchParams.get("sellerStoreId")
+    const storeIdParam = params.sellerStoreId
 
     if (storeIdParam) {
         const storeId = parseInt(storeIdParam)

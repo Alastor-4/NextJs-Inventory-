@@ -6,11 +6,14 @@ import logger from '@/utils/logger';
 
 dayjs.extend(utc)
 
-// Get today store product sells
-export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url)
+interface Params {
+    params: { sellerStoreId: string }
+}
 
-    const storeIdParam = searchParams.get("sellerStoreId")
+// Get today store product sells
+export async function GET(req: Request, { params }: Params) {
+
+    const storeIdParam = params.sellerStoreId
 
     if (storeIdParam) {
         const storeId = parseInt(storeIdParam)
@@ -59,7 +62,7 @@ export async function GET(req: Request) {
         return NextResponse.json(store)
     } else {
 
-        logger.info(`Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de las ventas de los productos en la tienda(Posible fallos en storeIdParam=${storeIdParam} )`)
+        logger.info(`Hay datos undefined que impiden pedir los datos a la bd, en la obtencion de las ventas de los productos en la tienda`)
 
         return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
     }
