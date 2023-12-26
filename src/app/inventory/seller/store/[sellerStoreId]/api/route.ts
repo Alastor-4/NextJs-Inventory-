@@ -6,7 +6,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
 
     const userIdParam = searchParams.get("id")
-    const storeIdParam = searchParams.get("sellerStoreId")
+    const storeIdParam = searchParams.get('prueba')
 
     if (userIdParam && storeIdParam) {
         const userId = parseInt(userIdParam)
@@ -25,8 +25,9 @@ export async function GET(req: Request) {
 
         return NextResponse.json(store)
     } else {
-        logger.info(searchParams)
-        //logger.info(`Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de los datos de la tienda(Posible fallos en userIdParam =${userIdParam} storeIdParam=${storeIdParam} )`)
+        logger.info(JSON.stringify(searchParams))
+
+        logger.info(`Hay datos undefined q impiden pedir los datos a la bd, en la obtencion de los datos de la tienda(Posible fallos en userIdParam =${userIdParam} storeIdParam=${storeIdParam} )`)
 
         return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
     }

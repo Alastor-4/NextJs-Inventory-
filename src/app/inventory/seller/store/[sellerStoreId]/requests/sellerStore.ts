@@ -8,7 +8,7 @@ const sellsUrl = (sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/se
 const sellerStore = {
     storeDetails: async function (userId, sellerStoreId) {
         try {
-            const response = await apiRequest.get(url(sellerStoreId), { params: { id: userId, sellerStoreId: sellerStoreId } })
+            const response = await apiRequest.get(url(sellerStoreId), { params: { id: userId, prueba: sellerStoreId } })
             return response.data
         } catch (e) {
             notifyError(`Ha ocurrido un error obteniendo los datos de la tienda. Inténtelo nuevamente(Posible fallos en userId =${userId} sellerStoreId=${sellerStoreId} )`)
