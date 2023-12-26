@@ -1,4 +1,4 @@
-// @ts-nocheck
+//@ts-nocheck
 import apiRequest from "@/api"
 import { notifyError } from "@/utils/generalFunctions";
 
@@ -22,7 +22,7 @@ const sellerStore = {
             const response = await apiRequest.get(sellsUrl(sellerStoreId), { params: { sellerStoreId: sellerStoreId } })
             return response.data
         } catch (e) {
-            notifyError(`Ha ocurrido un error obteniendo los datos de las ventas de la tienda. Inténtelo nuevamente(Posible fallos en userId =${userId} sellerStoreId=${sellerStoreId} )`)
+            notifyError(`Ha ocurrido un error obteniendo los datos de las ventas de la tienda. Inténtelo nuevamente(Posible fallos en sellerStoreId=${sellerStoreId} )`)
         }
 
         return false

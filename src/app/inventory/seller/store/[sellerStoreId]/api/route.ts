@@ -6,8 +6,8 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
 
     const userIdParam = searchParams.get("id")
-    const storeIdParam = searchParams.get("sellerStoreId")
-
+    const storeIdParam = searchParams.get("sellerStoreId") ?? "1"
+    
     if (userIdParam && storeIdParam) {
         const userId = parseInt(userIdParam)
         const storeId = parseInt(storeIdParam)
