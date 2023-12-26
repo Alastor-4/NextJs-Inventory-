@@ -45,8 +45,8 @@ export default function StoreMain({ userId }) {
     //get initial store and sells details and compute stats
     React.useEffect(() => {
         async function loadStatsData() {
-            const p1 = await stores.storeDetails(userId, sellerStoreId)
-            const p2 = await stores.storeSellsDetails(sellerStoreId)
+            const p1 = await stores.storeDetails(userId, 1)
+            const p2 = await stores.storeSellsDetails(1)
 
             const [storeDetailsResponse, storeSellsResponse] = [p1, p2]
             // const [storeDetailsResponse, storeSellsResponse] = await Promise.all([p1, p2])
