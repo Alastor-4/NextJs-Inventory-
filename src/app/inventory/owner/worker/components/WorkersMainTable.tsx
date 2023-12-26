@@ -1,7 +1,7 @@
-//@ts-nocheck
+
 "use client"
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     AppBar,
     Box,
@@ -25,79 +25,78 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableContainer,
     TableHead,
     TableRow,
     Toolbar,
     Typography
 } from "@mui/material";
-import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline } from "@mui/icons-material";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { TableNoData } from "@/components/TableNoData";
 import ownerUsers from "../requests/ownerUsers";
+import { roles, users } from "@prisma/client";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-export default function WorkersMainTable(props) {
-    const { roles, userId } = props
+interface WorkersMainTableProps {
+    roles: roles[];
+    userId?: number;
+}
 
-    const [data, setData] = React.useState(null)
+export default function WorkersMainTable({ roles, userId }: WorkersMainTableProps) {
 
-    const router = useRouter()
+    const router = useRouter();
+    const [dataWorkers, setDataWorkers] = useState<(users & { roles: roles })[] | null>(null);
 
-    //get initial data
-    React.useEffect(() => {
+    //GET initial workers data
+    useEffect(() => {
         const getData = async () => {
-            const newData = await ownerUsers.allWorkers(userId)
-            setData(newData)
+            const newDataWorkers: (users & { roles: roles })[] = await ownerUsers.allWorkers(userId);
+            setDataWorkers(newDataWorkers);
         }
         getData();
+    }, [userId]);
 
-    }, [userId])
+    const refreshAfterAction = async () => {
+        const newDataWorkers: (users & { roles: roles })[] = await ownerUsers.allWorkers(userId);
+        setDataWorkers(newDataWorkers);
+        setSelectedWorker(null);
+    }
 
-    //table selected item
-    const [selected, setSelected] = React.useState(null)
-    const handleSelectItem = (item) => {
-        if (selected && (selected.id === item.id)) {
-            setSelected(null)
+    //SELECT worker in table
+    const [selectedWorker, setSelectedWorker] = React.useState<users | null>(null);
+    const handleSelectItem = (worker: users) => {
+        if (selectedWorker && (selectedWorker.id === worker.id)) {
+            setSelectedWorker(null);
         } else {
-            setSelected(item)
+            setSelectedWorker(worker);
         }
     }
 
-    //change role dialog
-    const [openDialog, setOpenDialog] = React.useState(false);
+    //CHANGE Role Dialog
+    const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
 
-    const handleClickOpenDialog = () => {
-        setOpenDialog(true);
-    };
+    const handleClickOpenDialog = () => setIsOpenDialog(true);
 
-    function ChangeRoleDialog(props) {
-        const { open, setOpen, selected, setData, setSelected } = props
+    const ChangeRoleDialog = () => {
 
-        const [selectedRole, setSelectedRole] = React.useState<number | string>('');
+        const [selectedRole, setSelectedRole] = useState<string>(`${selectedWorker?.role_id!}`);
 
         const handleChange = (event: SelectChangeEvent<typeof selectedRole>) => {
-            setSelectedRole(event.target.value || '');
+            setSelectedRole(event.target.value!);
         };
 
-        const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
-            setOpen(false);
-        };
+        const handleClose = () => setIsOpenDialog(false);
 
         const handleApplyRole = async () => {
-            const response = await ownerUsers.changeRol(selected.id, selectedRole.id)
-            if (response) {
-                const allUsers = await ownerUsers.allWorkers(userId)
-                if (allUsers) setData(allUsers)
-
-                setSelected(null)
-                setOpen(false)
-            }
+            const response = await ownerUsers.changeRol(selectedWorker?.id, +selectedRole);
+            if (response) await refreshAfterAction();
+            handleClose()
         }
 
         return (
-            <Dialog open={open} onClose={handleClose}>
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                <DialogTitle>Cambiar role a "{selected ? selected.username : ""}"</DialogTitle>
+            <Dialog open={isOpenDialog} onClose={handleClose}>
+                <DialogTitle>{`Cambiar rol de "${selectedWorker ? selectedWorker.username : ""}"`}</DialogTitle>
                 <DialogContent>
                     <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap' }}>
                         <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
@@ -110,11 +109,7 @@ export default function WorkersMainTable(props) {
                                 input={<OutlinedInput label="Rol" fullWidth />}
                                 fullWidth
                             >
-                                {
-                                    roles.map(item => (
-                                        <MenuItem key={item.id} value={item}>{item.name}</MenuItem>
-                                    ))
-                                }
+                                {roles.map((role: roles) => <MenuItem key={role.id} value={role.id}>{role.name}</MenuItem>)}
                             </Select>
                         </FormControl>
                     </Box>
@@ -127,23 +122,17 @@ export default function WorkersMainTable(props) {
         );
     }
 
-    async function handleRemove() {
-        const response = await ownerUsers.deleteWorker(selected.id)
-        if (response) {
-            const allUsers = await ownerUsers.allWorkers(userId)
-            if (allUsers) setData(allUsers)
-            setSelected(null)
-        }
-    }
+    const handleRemove = async () => {
+        const response = await ownerUsers.deleteWorker(selectedWorker?.id);
+        if (response) await refreshAfterAction();
+    };
 
-    function handleNavigateBack() {
-        router.push(`/inventory`)
-    }
+    const handleNavigateBack = () => router.push('/inventory');
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center", overflowX: "auto" }}>
                     <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
                         <ArrowLeft fontSize={"large"} />
                     </IconButton>
@@ -162,7 +151,7 @@ export default function WorkersMainTable(props) {
 
                 <Box sx={{ display: "flex" }}>
                     {
-                        selected && (
+                        selectedWorker && (
                             <Box sx={{ display: "flex" }}>
                                 <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
                                     <ChangeCircleOutlined fontSize={"small"} />
@@ -179,7 +168,7 @@ export default function WorkersMainTable(props) {
                     }
 
                     <Link href={`/inventory/owner/worker/create`}>
-                        <IconButton color={"inherit"}>
+                        <IconButton color={"inherit"} sx={{ color: "white" }}>
                             <AddOutlined />
                         </IconButton>
                     </Link>
@@ -242,7 +231,7 @@ export default function WorkersMainTable(props) {
     }
 
     const TableContent = () => {
-        function getColorByRole(roleName) {
+        function getColorByRole(roleName: string) {
             switch (roleName) {
                 case "admin":
                     return "primary"
@@ -263,39 +252,30 @@ export default function WorkersMainTable(props) {
 
         return (
             <TableBody>
-                {data.map(row => (
+                {dataWorkers?.map((worker) => (
                     <TableRow
-                        key={row.id}
+                        key={worker.id}
                         hover
                         tabIndex={-1}
-                        selected={selected && (row.id === selected.id)}
-                        onClick={() => handleSelectItem(row)}
+                        selected={!!selectedWorker && (worker.id === selectedWorker.id)}
+                        onClick={() => handleSelectItem(worker)}
                     >
                         <TableCell>
-                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                            <Checkbox size={"small"} checked={!!selectedWorker && (worker.id === selectedWorker.id)} />
                         </TableCell>
-                        <TableCell>
-                            {row.username}
-                        </TableCell>
-                        <TableCell>
-                            {row.name}
-                        </TableCell>
-                        <TableCell>
-                            {row.mail}
-                        </TableCell>
-                        <TableCell>
-                            {row.phone}
-                        </TableCell>
+                        <TableCell>{worker.username}</TableCell>
+                        <TableCell>{worker.name}</TableCell>
+                        <TableCell>{worker.mail}</TableCell>
+                        <TableCell>{worker.phone}</TableCell>
                         <TableCell>
                             {
-                                row.roles ? (
+                                worker.roles ? (
                                     <Chip
                                         size={"small"}
-                                        label={row.roles.name}
-                                        color={getColorByRole(row.roles.name)}
+                                        label={worker.roles.name}
+                                        color={getColorByRole(worker.roles.name!)}
                                         sx={{ border: "1px solid lightGreen" }}
-                                    />
-                                ) : "-"
+                                    />) : "-"
                             }
                         </TableCell>
                     </TableRow>
@@ -306,29 +286,23 @@ export default function WorkersMainTable(props) {
 
     return (
         <>
-            <ChangeRoleDialog
-                open={openDialog}
-                setOpen={setOpenDialog}
-                setData={setData}
-                selected={selected}
-                setSelected={setSelected}
-            />
+            {/* Dialog */}
+            <ChangeRoleDialog />
 
             <Card variant={"outlined"}>
                 <CustomToolbar />
-
                 <CardContent>
                     {
-                        data?.length > 0
-                            ? (
+                        dataWorkers?.length! > 0
+                            ?
+                            (<TableContainer sx={{ width: "100%", overflowX: "auto" }}>
                                 <Table sx={{ width: "100%" }} size={"small"}>
                                     <TableHeader />
-
                                     <TableContent />
                                 </Table>
-                            ) : (
-                                <TableNoData />
-                            )
+                            </TableContainer>)
+                            :
+                            (<TableNoData />)
                     }
                 </CardContent>
             </Card>

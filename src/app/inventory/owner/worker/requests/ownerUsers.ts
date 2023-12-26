@@ -17,12 +17,12 @@ const ownerUsers = {
         return false
     },
 
-    changeRol: async function (workerId: any, roleId: any) {
+    changeRol: async function (workerId?: number, roleId?: number) {
         try {
             const response = await apiRequest.patch(url(), { roleId: roleId }, { params: { userId: workerId } })
             return response.data
         } catch (e) {
-            notifyError("Error al cambiar el role del usuario")
+            notifyError("Error al cambiar el rol del usuario")
         }
 
         return false
