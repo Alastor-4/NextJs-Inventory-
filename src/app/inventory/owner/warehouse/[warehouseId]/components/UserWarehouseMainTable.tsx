@@ -209,7 +209,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                         noWrap
                         sx={{
                             fontWeight: 700,
-                            letterSpacing: ".2rem",
+                            letterSpacing: ".15rem",
                             color: "white",
                         }}
                     >
