@@ -274,7 +274,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                             <Grid key={deposits.id} item xs={"auto"}>
                                 <DepartmentCustomButton
                                     title={deposits.name!}
-                                    subtitle={`${deposits.products!.length!} productos`}
+                                    subtitle={deposits.products?.length === 1 ? `${deposits.products.length!}` + " producto" : `${deposits.products?.length!}` + " productos"}
                                     selected={deposits.selected!}
                                     onClick={() => handleSelectFilter(index)}
                                 />
@@ -780,21 +780,18 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                             {dayjs(product.depots![0].created_at).format("DD/MM/YYYY HH:MM")}
                                         </TableCell>
                                         <TableCell>
-                                            <Box sx={tableStyles.actionColumn}>
-                                                <Tooltip title={"Details"}>
-                                                    <IconButton
-                                                        size={"small"}
-                                                        sx={{ m: "3px" }}
-                                                        onClick={(event) => handleExpand(event, index)}
-                                                    >
-                                                        {
-                                                            expandIndex === index
-                                                                ? <ExpandLessOutlined />
-                                                                : <ExpandMoreOutlined />
-                                                        }
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </Box>
+                                            <Tooltip title={"Details"}>
+                                                <IconButton
+                                                    size={"small"}
+                                                    onClick={(event) => handleExpand(event, index)}
+                                                >
+                                                    {
+                                                        expandIndex === index
+                                                            ? <ExpandLessOutlined />
+                                                            : <ExpandMoreOutlined />
+                                                    }
+                                                </IconButton>
+                                            </Tooltip>
                                         </TableCell>
                                     </TableRow>
 
@@ -810,17 +807,16 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Producto:</Grid>
-                                                        <Grid item xs={true}>
-                                                            {product.name}
-                                                            {
-                                                                product.description && (
-                                                                    <small>
-                                                                        {` ${product.description}`}
-                                                                    </small>
-                                                                )
-                                                            }
-                                                        </Grid>
+                                                        <Grid item xs={true}>{product.name}</Grid>
                                                     </Grid>
+                                                    {!!product.description &&
+                                                        <Grid container item spacing={1} xs={12}>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Descripción:</Grid>
+                                                            <Grid item xs={true}>
+                                                                {product.description}
+                                                            </Grid>
+                                                        </Grid>
+                                                    }
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>

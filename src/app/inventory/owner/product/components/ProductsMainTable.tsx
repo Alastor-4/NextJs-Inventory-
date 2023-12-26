@@ -4,7 +4,7 @@
 import React from "react";
 import {
     AppBar,
-    Box, Button,
+    Box,
     Card,
     CardContent,
     Checkbox,
@@ -309,7 +309,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                 <Grid key={item.id} item xs={"auto"}>
                                     <DepartmentCustomButton
                                         title={item.name}
-                                        subtitle={`${item.products.length} productos`}
+                                        subtitle={item.products?.length === 1 ? `${item.products.length!}` + " producto" : `${item.products?.length!}` + " productos"}
                                         selected={item.selected}
                                         onClick={() => handleSelectFilter(index)}
                                     />
