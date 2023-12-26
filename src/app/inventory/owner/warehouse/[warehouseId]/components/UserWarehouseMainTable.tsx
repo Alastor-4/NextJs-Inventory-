@@ -1,10 +1,9 @@
-//@ts-nocheck
 "use client"
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     AppBar,
-    Box, Button,
+    Box,
     Card,
     CardContent,
     Checkbox,
@@ -16,6 +15,7 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableContainer,
     TableHead,
     TableRow,
     TextField,
@@ -37,51 +37,99 @@ import {
     ShareOutlined,
     VisibilityOutlined,
 } from "@mui/icons-material";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import dayjs from "dayjs";
-
-import { Formik } from "formik";
-import * as Yup from "yup";
-import UpdateValueDialog from "@/components/UpdateValueDialog";
-import tableStyles from "@/assets/styles/tableStyles";
+import { characteristics, departments, depots, images, store_depots, warehouses } from "@prisma/client";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
+import UpdateValueDialog from "@/components/UpdateValueDialog";
 import warehouseDepots from "../requests/warehouseDepots";
+import { handleKeyDown } from "@/utils/handleKeyDown";
+import tableStyles from "@/assets/styles/tableStyles";
+import { useRouter } from "next/navigation";
+import { AxiosResponse } from "axios";
+import { Formik } from "formik";
+import Link from "next/link";
+import * as Yup from "yup";
+import dayjs from "dayjs";
+import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 
-export default function UserWarehouseMainTable(props) {
-    const { ownerId, warehouseDetails } = props
+interface UserWarehouseMainTableProps {
+    ownerId?: number;
+    warehouseDetails?: warehouses | null;
+}
 
-    const [data, setData] = React.useState([])
-    const [depositByDepartment, setDepositByDepartment] = React.useState([])
+interface productsProps {
+    id: number;
+    department_id: number | null;
+    owner_id: number | null;
+    name: string | null;
+    description: string | null;
+    buy_price: number | null;
+    created_at: Date;
+    depots?: depots[];
+    departments?: departments;
+    images?: images[];
+    characteristics?: characteristics[];
+    storesDistribution?: {
+        id: number;
+        owner_id: number | null;
+        name: string | null;
+        description: string | null;
+        slogan: string | null;
+        address: string | null;
+        seller_user_id: number | null;
+        created_at: Date;
+        online_reservation: boolean | null;
+        online_catalog: boolean | null;
+        auto_open_time: boolean | null;
+        auto_reservation_time: boolean | null;
+        fixed_seller_profit_percentage: number | null;
+        fixed_seller_profit_quantity: number | null;
+        fixed_seller_profit_unit: string | null;
+        store_depots?: store_depots[];
+    }[];
+}
 
-    const router = useRouter()
+export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: UserWarehouseMainTableProps) {
 
-    React.useEffect(() => {
-        if (depositByDepartment.length) {
-            let allProducts = []
+    const router = useRouter();
 
-            depositByDepartment.forEach((departmentItem) => {
+    const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
+    const [depositsByDepartment, setDepositsByDeparment] = useState<(departments & { products?: productsProps[], selected?: boolean })[] | null>(null);
+
+    //GET initial products data
+    useEffect(() => {
+        const getDepositsByDepartament = async () => {
+            const newDepositsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+            setDepositsByDeparment(newDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
+                {
+                    ...departments,
+                    selected: false
+                })));
+        }
+        getDepositsByDepartament();
+    }, [ownerId, warehouseDetails]);
+
+    useEffect(() => {
+        if (depositsByDepartment?.length) {
+            let allProducts: productsProps[] = [];
+
+            depositsByDepartment.forEach((departmentItem) => {
                 if (departmentItem.selected) {
-                    allProducts = [...allProducts, ...departmentItem.products]
+                    allProducts = [...allProducts, ...departmentItem.products!]
                 }
-            })
+            });
 
             allProducts.sort((a, b) => {
-                if (a.name < b.name)
-                    return -1
-
-                if (a.name > a.name)
-                    return 1
-
+                if (a?.name! < b?.name!) return -1;
+                if (a?.name! > a?.name!) return 1;
                 return 0
-            })
+            });
 
-            setData(allProducts)
+            setDataProducts(allProducts);
         } else {
-            setData([])
+            setDataProducts(null);
         }
+    }, [depositsByDepartment]);
 
-    }, [depositByDepartment])
 
     const initialValues = {
         searchBarValue: "",
@@ -100,89 +148,59 @@ export default function UserWarehouseMainTable(props) {
 
     const validationSchema = Yup.object({
         searchBarValue: Yup.string(),
-        productNewUnitsQuantity: Yup
-            .number()
-            .typeError("especifique un número entero mayor que cero")
-            .integer("especifique un número entero mayor que cero")
-            .min(0, "especifique un número entero mayor que cero"),
-        updateTotalUnitsQuantity: Yup
-            .number()
-            .typeError("especifique un número entero mayor que cero")
-            .integer("especifique un número entero mayor que cero")
-            .min(0, "especifique un número entero mayor que cero")
-            .nullable(),
-        updateRemainingUnitsQuantity: Yup
-            .number()
-            .typeError("especifique un número entero mayor que cero")
-            .integer("especifique un número entero mayor que cero")
-            .min(0, "especifique un número entero mayor que cero")
-            .nullable(),
+        productNewUnitsQuantity: Yup.number().min(0, "Tiene que ser mayor que cero"),
+        updateTotalUnitsQuantity: Yup.number().min(0, "Tiene que ser mayor que cero").nullable(),
+        updateRemainingUnitsQuantity: Yup.number().min(0, "Tiene que ser mayor que cero").nullable(),
         productStoreDepotDistribution: Yup.object({
             warehouseQuantity: Yup.number().integer(),
             storeQuantity: Yup.number().integer().nullable(),
             moveFromWarehouseToStoreQuantity: Yup
                 .number()
-                .typeError("número entero")
-                .integer("número entero")
-                .min(1, "cantidad mayor que 0")
-                .max(Yup.ref("warehouseQuantity"), "cantidad menor que lo disponible en almacén"),
+                .max(Yup.ref("warehouseQuantity"), "No existe esa cantidad en el almacén"),
             moveFromStoreToWarehouseQuantity: Yup
                 .number()
-                .typeError("número entero")
-                .integer("número entero")
-                .min(1, "cantidad mayor que 0")
-                .max(Yup.ref("storeQuantity"), "cantidad menor que lo disponible en tienda")
+                .max(Yup.ref("storeQuantity"), "No existe esa cantidad en la tienda")
         })
     })
 
     //ToDo: use global isLoading
     const isLoading = false
 
-    //get initial data
-    React.useEffect(() => {
-        const getDepositByDepartament = async () => {
-            const newDepositByDepartment = await warehouseDepots.allDepots(ownerId, warehouseDetails.id);
-            setDepositByDepartment(newDepositByDepartment.map((item: any) => (
-                {
-                    ...item,
-                    selected: false
-                })))
-        }
-
-        getDepositByDepartament();
-    }, [ownerId, warehouseDetails])
-
-    //table selected item
-    const [selected, setSelected] = React.useState(null)
-    const handleSelectItem = (item) => {
-        if (selected && (selected.id === item.id)) {
-            setSelected(null)
+    //SELECT product in table
+    const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
+    const handleSelectProduct = (product: productsProps) => {
+        if (selectedProduct && (selectedProduct?.id === product.id)) {
+            setSelectedProduct(null);
         } else {
-            setSelected(item)
+            setSelectedProduct(product);
         }
     }
 
-    async function handleRemove() {
-        const response = await warehouseDepots.deleteDepot(ownerId, warehouseDetails.id, selected.depots[0].id)
-        if (response) {
-            setSelected(null)
-            const allDepots = await warehouseDepots.allDepots(ownerId, warehouseDetails.id)
-            if (allDepots) setDepositByDepartment(allDepots.map(item => ({ ...item, selected: false })))
-        }
+    const refreshAfterAction = async () => {
+        const newDepositsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+        setDepositsByDeparment(newDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
+            {
+                ...departments,
+                selected: false
+            })));
+        setSelectedProduct(null);
     }
 
-    function handleNavigateBack() {
-        router.push(`/inventory`)
-    }
+    const handleRemove = async () => {
+        const response = await warehouseDepots.deleteDepot(ownerId, warehouseDetails?.id, selectedProduct?.depots![0].id);
+        if (response) await refreshAfterAction();
+    };
 
-    function handleStoreAssign() {
-        router.push(`/inventory/owner/store-assign?warehouseId=${warehouseDetails.id}`)
+    const handleNavigateBack = () => router.push('/inventory');
+
+    const handleStoreAssign = () => {
+        router.push(`/inventory/owner/store-assign?warehouseId=${warehouseDetails?.id}`)
     }
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Box sx={{ display: "flex", alignItems: "center", overflowX: "auto" }}>
                     <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
                         <ArrowLeft fontSize={"large"} />
                     </IconButton>
@@ -206,7 +224,7 @@ export default function UserWarehouseMainTable(props) {
                             : (
                                 <>
                                     {
-                                        selected && (
+                                        selectedProduct && (
                                             <Box sx={{ display: "flex" }}>
                                                 <IconButton color={"inherit"} onClick={handleRemove}>
                                                     <DeleteOutline fontSize={"small"} />
@@ -222,8 +240,8 @@ export default function UserWarehouseMainTable(props) {
                                         <ShareOutlined fontSize={"small"} />
                                     </IconButton>
 
-                                    <Link href={`/inventory/owner/warehouse/${warehouseDetails.id}/create`}>
-                                        <IconButton color={"inherit"}>
+                                    <Link href={`/inventory/owner/warehouse/${warehouseDetails?.id}/create`}>
+                                        <IconButton color={"inherit"} sx={{ color: 'white' }}>
                                             <AddOutlined />
                                         </IconButton>
                                     </Link>
@@ -232,17 +250,17 @@ export default function UserWarehouseMainTable(props) {
                     }
                 </Box>
             </Toolbar>
-        </AppBar>
+        </AppBar >
     )
 
     function handleSelectFilter(index: number) {
-        let filters = [...depositByDepartment]
-        filters[index].selected = !filters[index].selected
+        let filters = [...depositsByDepartment!];
+        filters[index].selected = !filters[index].selected;
 
-        setDepositByDepartment(filters)
+        setDepositsByDeparment(filters);
     }
 
-    const DepartmentsFilter = ({ formik }) => (
+    const DepartmentsFilter = ({ formik }: any) => (
         <Card variant={"outlined"} sx={{ padding: "15px" }}>
             <Grid container rowSpacing={2}>
                 <Grid item>
@@ -250,30 +268,23 @@ export default function UserWarehouseMainTable(props) {
                         Seleccione departamentos para encontrar el producto que busca
                     </Typography>
                 </Grid>
-                <Grid container item columnSpacing={2}>
+                <Grid container item spacing={2} flexWrap={"nowrap"} sx={{ overflowX: "auto", py: "7px" }}>
                     {
-                        depositByDepartment.map((item, index) => (
-                            <Grid key={item.id} item xs={"auto"}>
-                                <Button variant={item.selected ? "contained" : "outlined"}
-                                    onClick={() => handleSelectFilter(index)}>
-                                    <Grid container>
-                                        <Grid item xs={12}>
-                                            {item.name}
-                                        </Grid>
-                                        <Grid container item xs={12} justifyContent={"center"}>
-                                            <Typography variant={"caption"}>
-                                                {item.products.length} productos
-                                            </Typography>
-                                        </Grid>
-                                    </Grid>
-                                </Button>
+                        depositsByDepartment?.map((deposits, index) => (
+                            <Grid key={deposits.id} item xs={"auto"}>
+                                <DepartmentCustomButton
+                                    title={deposits.name!}
+                                    subtitle={`${deposits.products!.length!} productos`}
+                                    selected={deposits.selected!}
+                                    onClick={() => handleSelectFilter(index)}
+                                />
                             </Grid>
                         ))
                     }
                 </Grid>
 
                 {
-                    data?.length > 0 && (
+                    dataProducts?.length! > 0 && (
                         <Grid container item rowSpacing={1}>
                             <Grid item xs={12}>
                                 <Typography variant={"subtitle2"}>
@@ -296,41 +307,45 @@ export default function UserWarehouseMainTable(props) {
         </Card>
     )
 
-    const [displayNewUnitsForm, setDisplayNewUnitsForm] = React.useState(false)
-    const [displayUpdateUnitsForm, setDisplayUpdateUnitsForm] = React.useState(false)
-    const [displayUpdateDepotQuantityForm, setDisplayUpdateDepotQuantityForm] = React.useState(false)
-    const [storeDepotUpdateIndex, setStoreDepotUpdateIndex] = React.useState(null)
-    const [storeDepotUpdateName, setStoreDepotUpdateName] = React.useState("")
+    const [displayUpdateDepotQuantityForm, setDisplayUpdateDepotQuantityForm] = useState<boolean>(false);
+    const [storeDepotUpdateIndex, setStoreDepotUpdateIndex] = useState<number | null>(null);
+    const [displayUpdateUnitsForm, setDisplayUpdateUnitsForm] = useState<boolean>(false);
+    const [displayNewUnitsForm, setDisplayNewUnitsForm] = useState<boolean>(false);
+    const [storeDepotUpdateName, setStoreDepotUpdateName] = useState<string>("");
 
-    const NewUnitsQuantityForm = ({ formik }) => {
+    const afterUpdateDepot = (updatedDepot: AxiosResponse) => {
+        const newDepots = [...depositsByDepartment!];
+
+        for (const departmentItem of depositsByDepartment!) {
+            const departmentIndex = newDepots.indexOf(departmentItem);
+
+            const updatedIndex = departmentItem.products?.findIndex(productItem => productItem.depots![0].id === updatedDepot.data.id)
+            if (updatedIndex! > -1) {
+                newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_units = updatedDepot.data.product_total_units;
+                newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units;
+
+                setDepositsByDeparment(newDepots);
+                break;
+            }
+        }
+    }
+
+    const NewUnitsQuantityForm = ({ formik }: any) => {
         async function handleNewUnitsAdd() {
-            const updatedDepot = await warehouseDepots.increaseUnitsDepot(
+            const updatedDepot: AxiosResponse | boolean = await warehouseDepots.increaseUnitsDepot(
                 {
                     ownerId,
-                    warehouseId: warehouseDetails.id,
-                    depotId: selected.depots[0].id,
+                    warehouseId: warehouseDetails?.id!,
+                    depotId: selectedProduct?.depots![0].id!,
                     newUnits: formik.values.productNewUnitsQuantity
                 }
             )
 
+            if (!updatedDepot) return;
+
             if (updatedDepot?.data?.id) {
-                const newDepots = [...depositByDepartment]
-
-                for (const departmentItem of depositByDepartment) {
-                    const departmentIndex = newDepots.indexOf(departmentItem)
-
-                    const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.data.id)
-                    if (updatedIndex > -1) {
-                        newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_units = updatedDepot.data.product_total_units
-                        newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units
-
-                        setDepositByDepartment(newDepots)
-
-                        break
-                    }
-                }
-
-                setDisplayNewUnitsForm(false)
+                afterUpdateDepot(updatedDepot);
+                setDisplayNewUnitsForm(false);
             }
         }
 
@@ -342,6 +357,7 @@ export default function UserWarehouseMainTable(props) {
                             name={"productNewUnitsQuantity"}
                             label="Nuevas unidades"
                             size={"small"}
+                            onKeyDown={handleKeyDown}
                             {...formik.getFieldProps("productNewUnitsQuantity")}
                             error={formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity}
                             helperText={(formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity) && formik.errors.productNewUnitsQuantity}
@@ -358,36 +374,23 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
-    const UpdateUnitsQuantityForm = ({ formik }) => {
+    const UpdateUnitsQuantityForm = ({ formik }: any) => {
         async function handleUpdateUnits() {
             const updatedDepot = await warehouseDepots.updateUnitsDepot(
                 {
                     ownerId,
-                    warehouseId: warehouseDetails.id,
-                    depotId: selected.depots[0].id,
+                    warehouseId: warehouseDetails?.id!,
+                    depotId: selectedProduct?.depots![0].id,
                     productTotalUnits: formik.values.updateTotalUnitsQuantity,
                     productTotalRemainingUnits: formik.values.updateRemainingUnitsQuantity,
                 }
             )
 
+            if (!updatedDepot) return;
+
             if (updatedDepot?.data?.id) {
-                const newDepots = [...depositByDepartment]
-
-                for (const departmentItem of depositByDepartment) {
-                    const departmentIndex = newDepots.indexOf(departmentItem)
-
-                    const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.data.id)
-                    if (updatedIndex > -1) {
-                        newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_units = updatedDepot.data.product_total_units
-                        newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units
-
-                        setDepositByDepartment(newDepots)
-
-                        break
-                    }
-                }
-
-                setDisplayUpdateUnitsForm(false)
+                afterUpdateDepot(updatedDepot);
+                setDisplayUpdateUnitsForm(false);
             }
         }
 
@@ -399,6 +402,7 @@ export default function UserWarehouseMainTable(props) {
                             name={"updateTotalUnitsQuantity"}
                             label="Total de unidades"
                             size={"small"}
+                            onKeyDown={handleKeyDown}
                             {...formik.getFieldProps("updateTotalUnitsQuantity")}
                             error={formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity}
                             helperText={(formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity) && formik.errors.updateTotalUnitsQuantity}
@@ -410,6 +414,7 @@ export default function UserWarehouseMainTable(props) {
                             name={"updateRemainingUnitsQuantity"}
                             label="Unidades restantes"
                             size={"small"}
+                            onKeyDown={handleKeyDown}
                             {...formik.getFieldProps("updateRemainingUnitsQuantity")}
                             error={formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity}
                             helperText={(formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity) && formik.errors.updateRemainingUnitsQuantity}
@@ -426,31 +431,30 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
-    const UpdateStoreDepotQuantityForm = ({ formik }) => {
-        const { warehouseQuantity, storeQuantity, moveQuantity } = formik.values.productStoreDepotDistribution
+    const UpdateStoreDepotQuantityForm = ({ formik }: any) => {
+        const { warehouseQuantity, storeQuantity, moveQuantity } = formik.values.productStoreDepotDistribution;
 
-        function updateLocalData(updatedDepot, updatedStoreDepot) {
-            const newDepots = [...depositByDepartment]
+        function updateLocalData(updatedDepot: depots, updatedStoreDepot: store_depots) {
+            const newDepots = [...depositsByDepartment!];
 
-            for (const departmentItem of depositByDepartment) {
-                const departmentIndex = newDepots.indexOf(departmentItem)
+            for (const departmentItem of depositsByDepartment!) {
+                const departmentProducts = departmentItem.products;
+                const departmentIndex = newDepots.indexOf(departmentItem);
 
                 //find updatedDepot
-                const updatedIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === updatedDepot.id)
-                if (updatedIndex > -1) {
+                const updatedIndex = departmentProducts?.findIndex(productItem => productItem.depots![0].id === updatedDepot.id);
+                if (updatedIndex! > -1) {
                     //update depot data
-                    newDepots[departmentIndex].products[updatedIndex].depots[0].product_total_remaining_units = updatedDepot.product_total_remaining_units
-
+                    departmentProducts![updatedIndex!].depots![0].product_total_remaining_units = updatedDepot.product_total_remaining_units;
                     //find updated store_depot
-                    const updatedStoreDepotIndex = departmentItem.products[updatedIndex].storesDistribution.findIndex(
-                        storeItem => storeItem.id === updatedStoreDepot.store_id
-                    )
+                    const updatedStoreDepotIndex = departmentProducts![updatedIndex!].storesDistribution?.
+                        findIndex(storeItem => storeItem.id === updatedStoreDepot.store_id);
 
-                    if (updatedStoreDepotIndex > - 1) {
-                        newDepots[departmentIndex].products[updatedIndex].storesDistribution[updatedStoreDepotIndex].store_depots[0] = updatedStoreDepot
+                    if (updatedStoreDepotIndex! > - 1) {
+                        newDepots[departmentIndex].products![updatedIndex!].storesDistribution![updatedStoreDepotIndex!].store_depots![0] = updatedStoreDepot;
                     }
 
-                    setDepositByDepartment(newDepots)
+                    setDepositsByDeparment(newDepots);
 
                     break
                 }
@@ -461,10 +465,10 @@ export default function UserWarehouseMainTable(props) {
             const updateResponse = await warehouseDepots.sendDepotFromWarehouseToStore(
                 {
                     userId: ownerId,
-                    warehouseId: warehouseDetails.id,
-                    depotId: selected.depots[0].id,
-                    storeDepotId: selected.storesDistribution[storeDepotUpdateIndex]?.store_depots[0]?.id ?? null,
-                    storeId: selected.storesDistribution[storeDepotUpdateIndex].id,
+                    warehouseId: warehouseDetails?.id,
+                    depotId: selectedProduct?.depots![0].id,
+                    storeDepotId: selectedProduct?.storesDistribution![storeDepotUpdateIndex!]?.store_depots![0]?.id ?? null,
+                    storeId: selectedProduct?.storesDistribution![storeDepotUpdateIndex!].id,
                     moveUnitQuantity: formik.values.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity,
                 }
             )
@@ -472,29 +476,30 @@ export default function UserWarehouseMainTable(props) {
             if (updateResponse?.updatedDepot && updateResponse?.updatedStoreDepot) {
                 updateLocalData(updateResponse.updatedDepot, updateResponse.updatedStoreDepot)
 
-                formik.resetForm()
+                formik.resetForm();
 
-                setDisplayUpdateDepotQuantityForm(false)
+                setDisplayUpdateDepotQuantityForm(false);
             }
         }
+
 
         async function handleMoveToWarehouse() {
             const updateResponse = await warehouseDepots.sendDepotFromStoreToWarehouse(
                 {
                     userId: ownerId,
-                    warehouseId: warehouseDetails.id,
-                    depotId: selected.depots[0].id,
-                    storeDepotId: selected.storesDistribution[storeDepotUpdateIndex].store_depots[0].id,
+                    warehouseId: warehouseDetails?.id,
+                    depotId: selectedProduct?.depots![0].id,
+                    storeDepotId: selectedProduct?.storesDistribution![storeDepotUpdateIndex!].store_depots![0].id,
                     moveUnitQuantity: formik.values.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity,
                 }
-            )
+            );
 
             if (updateResponse?.updatedDepot && updateResponse?.updatedStoreDepot) {
                 updateLocalData(updateResponse.updatedDepot, updateResponse.updatedStoreDepot)
 
-                formik.resetForm()
+                formik.resetForm();
 
-                setDisplayUpdateDepotQuantityForm(false)
+                setDisplayUpdateDepotQuantityForm(false);
             }
         }
 
@@ -512,6 +517,7 @@ export default function UserWarehouseMainTable(props) {
                             color={"primary"}
                             type={"number"}
                             size={"small"}
+                            onKeyDown={handleKeyDown}
                             {...formik.getFieldProps("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity")}
                             error={
                                 formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity &&
@@ -536,7 +542,7 @@ export default function UserWarehouseMainTable(props) {
                     </Grid>
 
                     {
-                        storeQuantity && (
+                        !!storeQuantity && (
                             <>
                                 <Grid item xs={12}>
                                     <Divider flexItem sx={{ width: 1 }} />
@@ -553,6 +559,7 @@ export default function UserWarehouseMainTable(props) {
                                         color={"secondary"}
                                         type={"number"}
                                         size={"small"}
+                                        onKeyDown={handleKeyDown}
                                         {...formik.getFieldProps("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity")}
                                         error={
                                             formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity &&
@@ -605,6 +612,11 @@ export default function UserWarehouseMainTable(props) {
                 label: "Creación",
                 align: "left"
             },
+            {
+                id: "details",
+                label: "",
+                align: "left"
+            },
         ]
 
         return (
@@ -631,72 +643,72 @@ export default function UserWarehouseMainTable(props) {
         )
     }
 
-    const [openImageDialog, setOpenImagesDialog] = React.useState(false)
-    const [dialogImages, setDialogImages] = React.useState([])
+    const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
+    const [dialogImages, setDialogImages] = useState<images[] | null>(null);
 
-    function handleOpenImagesDialog(images) {
-        setDialogImages(images)
-        setOpenImagesDialog(true)
+    function handleOpenImagesDialog(images: images[]) {
+        setDialogImages(images);
+        setOpenImagesDialog(true);
     }
 
-    async function handleLoadStoresDistribution(depot) {
-        const response = await warehouseDepots.depotStoreDistribution(ownerId, warehouseDetails.id, depot.id)
+    async function handleLoadStoresDistribution(depot: depots) {
+        const response = await warehouseDepots.depotStoreDistribution(ownerId!, warehouseDetails?.id!, depot.id!)
         if (response) {
-            const newDepositByDepartment = [...depositByDepartment]
-            depositByDepartment.forEach((departmentItem, departmentIndex) => {
-                const productIndex = departmentItem.products.findIndex(productItem => productItem.depots[0].id === depot.id)
-                if (productIndex > -1) {
-                    newDepositByDepartment[departmentIndex].products[productIndex].storesDistribution = response
+            const newdepositsByDepartment = [...depositsByDepartment!];
+            depositsByDepartment?.forEach((departmentItem, departmentIndex) => {
+                const productIndex = departmentItem.products?.findIndex(productItem => productItem.depots![0].id === depot.id)
+                if (productIndex! > -1) {
+                    newdepositsByDepartment[departmentIndex].products![productIndex!].storesDistribution = response;
 
                     //ToDo: break loop
                 }
             })
 
-            setDepositByDepartment(newDepositByDepartment)
+            setDepositsByDeparment(newdepositsByDepartment);
         }
     }
 
     //expand description
-    const [expandIndex, setExpandIndex] = React.useState(null)
+    const [expandIndex, setExpandIndex] = useState<number | null>(null);
 
-    const TableContent = ({ formik }) => {
-        function handleOpenNewUnitsForm(e, row) {
-            e.stopPropagation()
+    const TableContent = ({ formik }: any) => {
+        function handleOpenNewUnitsForm(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: productsProps) {
+            event.stopPropagation();
 
-            if (!selected || (selected?.id !== row.id)) {
-                setSelected(row)
+            if (!selectedProduct || (selectedProduct?.id !== product.id)) {
+                setSelectedProduct(product);
             }
 
-            setDisplayNewUnitsForm(true)
+            setDisplayNewUnitsForm(true);
         }
 
-        function handleOpenUpdateUnitsForm(e, row) {
-            e.stopPropagation()
+        function handleOpenUpdateUnitsForm(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: productsProps) {
+            event.stopPropagation();
 
-            if (!selected || (selected?.id !== row.id)) {
-                setSelected(row)
+            if (!selectedProduct || (selectedProduct?.id !== product.id)) {
+                setSelectedProduct(product);
             }
 
-            formik.setFieldValue("updateTotalUnitsQuantity", row.depots[0].product_total_units)
-            formik.setFieldValue("updateRemainingUnitsQuantity", row.depots[0].product_total_remaining_units)
+            formik.setFieldValue("updateTotalUnitsQuantity", product.depots![0].product_total_units)
+            formik.setFieldValue("updateRemainingUnitsQuantity", product.depots![0].product_total_remaining_units)
 
             setDisplayUpdateUnitsForm(true)
         }
 
-        function handleOpenUpdateStoreDepotForm(e, row, storeIndex, storeName) {
-            e.stopPropagation()
+        function handleOpenUpdateStoreDepotForm(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: productsProps, storeIndex: number, storeName: string) {
+            event.stopPropagation();
 
-            if (!selected || (selected?.id !== row.id)) {
-                setSelected(row)
+            if (!selectedProduct || (selectedProduct?.id !== product.id)) {
+                setSelectedProduct(product)
             }
 
             formik.setFieldValue(
                 "productStoreDepotDistribution.warehouseQuantity",
-                row.depots[0].product_total_remaining_units
+                product.depots![0].product_total_remaining_units
             )
             formik.setFieldValue(
                 "productStoreDepotDistribution.storeQuantity",
-                row.storesDistribution[storeIndex]?.store_depots[0]?.product_remaining_units ?? null
+                product.storesDistribution![storeIndex]?.store_depots![0]?.product_remaining_units ?? null
             )
 
             setStoreDepotUpdateIndex(storeIndex)
@@ -704,76 +716,76 @@ export default function UserWarehouseMainTable(props) {
             setDisplayUpdateDepotQuantityForm(true)
         }
 
-        function handleExpand(e, rowIndex) {
-            e.stopPropagation()
+        function handleExpand(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, rowIndex: number) {
+            event.stopPropagation();
 
-            if (rowIndex === expandIndex)
-                return setExpandIndex(null)
+            if (rowIndex === expandIndex) return setExpandIndex(null);
 
-            return setExpandIndex(rowIndex)
+            return setExpandIndex(rowIndex);
         }
 
         return (
             <TableBody>
-                {data.filter(
-                    item =>
-                        item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
-                        item?.description?.toUpperCase()?.includes(formik.values.searchBarValue.toUpperCase())).map(
-                            (row, index) => (
-                                <React.Fragment key={row.id}>
+                {dataProducts?.filter(
+                    products =>
+                        products?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                        products?.description?.toUpperCase()?.includes(formik.values.searchBarValue.toUpperCase())).map(
+                            (product, index) => (
+                                <React.Fragment key={product.id}>
                                     <TableRow
                                         hover
                                         tabIndex={-1}
-                                        selected={selected && (row.id === selected.id)}
-                                        onClick={() => handleSelectItem(row)}
+                                        selected={!!selectedProduct && (product.id === selectedProduct.id)}
+                                        onClick={() => handleSelectProduct(product)}
                                         sx={tableStyles.row}
                                     >
                                         <TableCell>
-                                            <Checkbox size={"small"} checked={selected && (row.id === selected.id)} />
+                                            <Checkbox size={"small"} checked={!!selectedProduct && (product.id === selectedProduct.id)} />
                                         </TableCell>
                                         <TableCell>
                                             <div>
-                                                {row.name} <br />
+                                                {product.name} <br />
                                                 {
-                                                    row.description && (
+                                                    !!product.description && (
                                                         <small>
-                                                            {` ${row.description.slice(0, 20)}`}
+                                                            {`${product.description.slice(0, 20)}`}
                                                         </small>
                                                     )
                                                 }
                                             </div>
                                         </TableCell>
+                                        <TableCell>{product.departments?.name ?? "-"}</TableCell>
                                         <TableCell>
-                                            {row.departments?.name ?? "-"}
+                                            <Grid container direction="column" alignItems="flex-start">
+                                                <Grid item sx={{ marginLeft: "10px" }}>
+                                                    {product.depots![0].product_total_remaining_units ?? "-"} de {product.depots![0].product_total_units ?? "-"}
+                                                </Grid>
+                                                <Grid item display="flex" alignItems="flex-start">
+                                                    <IconButton
+                                                        color={"inherit"}
+                                                        onClick={(event) => handleOpenNewUnitsForm(event, product)}
+                                                    >
+                                                        <Add fontSize={"small"} />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        color={"inherit"}
+                                                        onClick={(event) => handleOpenUpdateUnitsForm(event, product)}
+                                                    >
+                                                        <EditOutlined fontSize={"small"} />
+                                                    </IconButton>
+                                                </Grid>
+                                            </Grid>
                                         </TableCell>
                                         <TableCell>
-                                            {row.depots[0].product_total_remaining_units ?? "-"} de {row.depots[0].product_total_units ?? "-"}
-
-                                            <IconButton
-                                                color={"inherit"}
-                                                onClick={(e) => handleOpenNewUnitsForm(e, row)}
-                                                sx={{ ml: "10px" }}
-                                            >
-                                                <Add fontSize={"small"} />
-                                            </IconButton>
-
-                                            <IconButton
-                                                color={"inherit"}
-                                                onClick={(e) => handleOpenUpdateUnitsForm(e, row)}
-                                                sx={{ ml: "5px" }}
-                                            >
-                                                <EditOutlined fontSize={"small"} />
-                                            </IconButton>
+                                            {dayjs(product.depots![0].created_at).format("DD/MM/YYYY HH:MM")}
                                         </TableCell>
                                         <TableCell>
-                                            {dayjs(row.depots[0].created_at).format("DD/MM/YYYY HH:MM")}
-
                                             <Box sx={tableStyles.actionColumn}>
                                                 <Tooltip title={"Details"}>
                                                     <IconButton
                                                         size={"small"}
                                                         sx={{ m: "3px" }}
-                                                        onClick={(e) => handleExpand(e, index)}
+                                                        onClick={(event) => handleExpand(event, index)}
                                                     >
                                                         {
                                                             expandIndex === index
@@ -799,11 +811,11 @@ export default function UserWarehouseMainTable(props) {
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Producto:</Grid>
                                                         <Grid item xs={true}>
-                                                            {row.name}
+                                                            {product.name}
                                                             {
-                                                                row.description && (
+                                                                product.description && (
                                                                     <small>
-                                                                        {` ${row.description}`}
+                                                                        {` ${product.description}`}
                                                                     </small>
                                                                 )
                                                             }
@@ -812,17 +824,17 @@ export default function UserWarehouseMainTable(props) {
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
-                                                        <Grid item xs={true}>{row.departments?.name ?? "-"}</Grid>
+                                                        <Grid item xs={true}>{product.departments?.name ?? "-"}</Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"}
                                                             sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
                                                         <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
-                                                            {row.characteristics.length > 0
-                                                                ? row.characteristics.map(item => (
+                                                            {product.characteristics?.length! > 0
+                                                                ? product.characteristics?.map(characteristic => (
                                                                     <Grid
-                                                                        key={item.id}
+                                                                        key={characteristic.id}
                                                                         sx={{
                                                                             display: "inline-flex",
                                                                             margin: "3px",
@@ -837,12 +849,12 @@ export default function UserWarehouseMainTable(props) {
                                                                             sx={{ marginRight: "3px" }}>
                                                                             <Typography variant={"caption"}
                                                                                 sx={{ color: "white", fontWeight: "600" }}>
-                                                                                {item.name.toUpperCase()}
+                                                                                {characteristic.name?.toUpperCase()}
                                                                             </Typography>
                                                                         </Grid>
                                                                         <Grid container item alignItems={"center"}
                                                                             sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                                            {item.value}
+                                                                            {characteristic.value}
                                                                         </Grid>
                                                                     </Grid>
                                                                 )
@@ -853,21 +865,20 @@ export default function UserWarehouseMainTable(props) {
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio de compra:</Grid>
-                                                        <Grid item xs={true}>{row.buy_price ?? "-"}</Grid>
+                                                        <Grid item xs={true}>{product.buy_price ?? "-"}</Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
                                                         <Grid item xs={true}>
                                                             {
-                                                                row.images.length > 0
+                                                                product.images?.length! > 0
                                                                     ? (
                                                                         <Box
                                                                             sx={{ cursor: "pointer", display: "inline-flex", alignItems: "center", color: "blue" }}
-                                                                            onClick={() => handleOpenImagesDialog(row.images)}
+                                                                            onClick={() => handleOpenImagesDialog(product.images!)}
                                                                         >
-                                                                            {row.images.length}
-
+                                                                            {product.images?.length!}
                                                                             <VisibilityOutlined fontSize={"small"}
                                                                                 sx={{ ml: "5px" }} />
                                                                         </Box>
@@ -879,7 +890,7 @@ export default function UserWarehouseMainTable(props) {
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Creación:</Grid>
                                                         <Grid item xs={true}>
-                                                            {`${dayjs(row.depots[0].created_at).format("DD/MM/YYYY HH:MM")} por ${row.depots[0].inserted_by_id}`}
+                                                            {`${dayjs(product.depots![0].created_at).format("DD/MM/YYYY HH:MM")} por ${product.depots![0].inserted_by_id}`}
                                                         </Grid>
                                                     </Grid>
 
@@ -887,20 +898,20 @@ export default function UserWarehouseMainTable(props) {
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades restantes de
                                                             total:</Grid>
                                                         <Grid item xs={true}>
-                                                            {row.depots[0].product_total_remaining_units ?? "-"} de {row.depots[0].product_total_units ?? "-"}
+                                                            {product.depots![0].product_total_remaining_units ?? "-"} de {product.depots![0].product_total_units ?? "-"}
                                                         </Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"}>
                                                             {
-                                                                row.storesDistribution ? (
+                                                                product.storesDistribution ? (
                                                                     <Box sx={{ display: "inline-flex", fontWeight: 600 }}>Distribución
                                                                         del producto</Box>
                                                                 ) : (
                                                                     <Box
                                                                         sx={{ cursor: "pointer", display: "flex", alignItems: "center", color: "blue" }}
-                                                                        onClick={() => handleLoadStoresDistribution(row.depots[0])}
+                                                                        onClick={() => handleLoadStoresDistribution(product.depots![0])}
                                                                     >
                                                                         Ver distribución del producto
                                                                         <ShareOutlined fontSize={"small"} sx={{ ml: "5px" }} />
@@ -911,18 +922,18 @@ export default function UserWarehouseMainTable(props) {
                                                     </Grid>
 
                                                     {
-                                                        row.storesDistribution && (
-                                                            row.storesDistribution.map((item, storeIndex) => (
-                                                                <Grid container item spacing={1} xs={12} key={item.id}>
+                                                        product.storesDistribution && (
+                                                            product.storesDistribution.map((store, storeIndex) => (
+                                                                <Grid container item spacing={1} xs={12} key={store.id}>
                                                                     <Grid item xs={"auto"}
                                                                         sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                                                         <ChevronRightOutlined fontSize={"small"} />
-                                                                        {item.name}:
+                                                                        {store.name}:
                                                                     </Grid>
                                                                     <Grid item xs={true}>
                                                                         {
-                                                                            item.store_depots.length > 0
-                                                                                ? `Total ${item.store_depots[0].product_units} | ${item.store_depots[0].product_remaining_units} Restantes`
+                                                                            store.store_depots?.length! > 0
+                                                                                ? `Total ${store.store_depots![0].product_units} | ${store.store_depots![0].product_remaining_units} Restantes`
                                                                                 : "no asignado"
                                                                         }
 
@@ -930,7 +941,7 @@ export default function UserWarehouseMainTable(props) {
                                                                             size={"small"}
                                                                             sx={{ ml: "10px" }}
                                                                             onClick={
-                                                                                (e) => handleOpenUpdateStoreDepotForm(e, row, storeIndex, item.name)
+                                                                                (e) => handleOpenUpdateStoreDepotForm(e, product, storeIndex, store.name!)
                                                                             }>
                                                                             <EditOutlined fontSize={"small"} />
                                                                         </IconButton>
@@ -944,8 +955,9 @@ export default function UserWarehouseMainTable(props) {
                                         </TableCell>
                                     </TableRow>
                                 </React.Fragment>
-                            ))}
-            </TableBody>
+                            ))
+                }
+            </TableBody >
         )
     }
 
@@ -996,7 +1008,7 @@ export default function UserWarehouseMainTable(props) {
                         <CardContent>
                             <Grid container rowSpacing={3}>
                                 {
-                                    depositByDepartment.length > 0 && (
+                                    depositsByDepartment?.length! > 0 && (
                                         <Grid item xs={12}>
                                             <DepartmentsFilter formik={formik} />
                                         </Grid>
@@ -1004,14 +1016,15 @@ export default function UserWarehouseMainTable(props) {
                                 }
 
                                 {
-                                    data?.length > 0
+                                    dataProducts?.length! > 0
                                         ? (
                                             <Grid item xs={12}>
-                                                <Table sx={{ width: "100%" }} size={"small"}>
-                                                    <TableHeader />
-
-                                                    <TableContent formik={formik} />
-                                                </Table>
+                                                <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                                    <Table sx={{ width: "100%" }} size={"small"}>
+                                                        <TableHeader />
+                                                        <TableContent formik={formik} />
+                                                    </Table>
+                                                </TableContainer>
                                             </Grid>
                                         ) : (
                                             <TableNoData />

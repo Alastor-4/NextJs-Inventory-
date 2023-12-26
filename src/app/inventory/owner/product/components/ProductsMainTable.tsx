@@ -151,7 +151,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                     }
 
                     <Link href={`/inventory/owner/product/create`}>
-                        <IconButton color={"inherit"} sx={{color: "white"}}>
+                        <IconButton color={"inherit"} sx={{ color: "white" }}>
                             <AddOutlined />
                         </IconButton>
                     </Link>
@@ -303,7 +303,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             Seleccione departamentos para encontrar el producto que busca
                         </Typography>
                     </Grid>
-                    <Grid container item spacing={2} flexWrap={"nowrap"} sx={{overflowX: "auto", py: "7px"}}>
+                    <Grid container item spacing={2} flexWrap={"nowrap"} sx={{ overflowX: "auto", py: "7px" }}>
                         {
                             allProductsByDepartment.map((item, index) => (
                                 <Grid key={item.id} item xs={"auto"}>
@@ -383,7 +383,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             {
                                 data?.length > 0
                                     ? (
-                                        <TableContainer sx={{width: "100%", overflowX: "auto"}}>
+                                        <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
                                             <Table sx={{ width: "100%" }} size={"small"}>
                                                 <TableHeader />
 

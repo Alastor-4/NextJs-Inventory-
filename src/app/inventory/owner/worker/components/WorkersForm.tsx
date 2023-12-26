@@ -13,7 +13,7 @@ import { users } from "@prisma/client";
 import { AxiosResponse } from "axios";
 
 interface WorkersFormProps {
-    ownerId: number;
+    ownerId?: number;
 }
 
 export default function WorkersForm({ ownerId }: WorkersFormProps) {

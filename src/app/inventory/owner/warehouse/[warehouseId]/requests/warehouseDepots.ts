@@ -6,7 +6,7 @@ const urlCreate = (warehouseId: string) => `/inventory/owner/warehouse/${warehou
 const urlDepotAssign = (warehouseId: string) => `/inventory/owner/warehouse/${warehouseId}/depot-assign/api`
 
 const warehouseDepots = {
-    allDepots: async function (userId: string, warehouseId: string) {
+    allDepots: async function (userId?: number, warehouseId?: number) {
         try {
             const response = await apiRequest.get(url(warehouseId), { params: { userId: userId } })
             return response.data
@@ -28,7 +28,7 @@ const warehouseDepots = {
         return false
     },
 
-    depotStoreDistribution: async function (userId: string, warehouseId: string, depotId: string) {
+    depotStoreDistribution: async function (userId: number, warehouseId: number, depotId: number) {
         try {
             const response = await apiRequest.get(urlDepotAssign(warehouseId), { params: { userId: userId, depotId: depotId } })
             return response.data
@@ -91,7 +91,7 @@ const warehouseDepots = {
         return false
     },
 
-    deleteDepot: async function (userId: string, warehouseId: string, depotId: string) {
+    deleteDepot: async function (userId?: number, warehouseId?: number, depotId?: number) {
         try {
             const response = await apiRequest.delete(url(warehouseId), { params: { depotId: depotId } })
             if (response.status === 200) return true

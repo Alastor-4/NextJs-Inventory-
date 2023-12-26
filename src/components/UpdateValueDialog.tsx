@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
     Box,
     Button,
@@ -7,22 +6,26 @@ import {
     DialogContent,
     DialogTitle,
 } from "@mui/material";
-import React from "react";
+import React, { ReactNode } from "react";
 
-export default function UpdateValueDialog(props) {
-    const { open, setOpen, dialogTitle } = props
+interface UpdateValueDialogProps {
+    open: boolean;
+    setOpen: (boolean: boolean) => void;
+    dialogTitle: string;
+    children: ReactNode;
+}
+export default function UpdateValueDialog({ dialogTitle, open, setOpen, children }: UpdateValueDialogProps) {
 
-    const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
+    const handleClose = () => {
         setOpen(false);
     };
-
 
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>{dialogTitle}</DialogTitle>
             <DialogContent>
                 <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {props.children}
+                    {children}
                 </Box>
             </DialogContent>
             <DialogActions>

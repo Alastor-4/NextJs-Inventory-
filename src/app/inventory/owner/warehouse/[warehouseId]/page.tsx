@@ -8,7 +8,7 @@ export default async function Page({ params }: { params: { warehouseId: string }
     const userId = session?.user.id;
 
     const warehouseId = params.warehouseId;
-    const warehouseDetails = await prisma.warehouses.findFirst({ where: { id: parseInt(warehouseId) } });
+    const warehouseDetails = await prisma.warehouses.findUnique({ where: { id: +warehouseId } });
 
     return (
         <main>
