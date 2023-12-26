@@ -26,8 +26,6 @@ import { notifyError } from "@/utils/generalFunctions";
 
 
 export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: number, storeId: string | undefined, sellerUsers: any }) {
-
-
     const router = useRouter()
 
     //Url de las api
@@ -278,7 +276,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
         }
 
         let openDaysResponse: any;
-        values.openingDays.forEach(async (item: any) => {
+        for (const item of values.openingDays) {
             if (item.id !== null) {
                 item.open
                     ? openDaysResponse = await openDaysStores.update(urlApiStoreOpenDays, item)
@@ -288,11 +286,10 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                     let newItem = item;
                     openDaysResponse = await openDaysStores.create(urlApiStoreOpenDays, newItem, response.data.id)
                 }
-
-        })
+        }
 
         let daysReservationsResponse: any;
-        values.reservationDays.forEach(async (item: any) => {
+        for (const item of values.reservationDays) {
             if (item.id !== null) {
                 item.open
                     ? daysReservationsResponse = await openDaysStores.update(urlApiStoreOpenReservations, item)
@@ -302,8 +299,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                     let newItem = item;
                     daysReservationsResponse = await openDaysStores.create(urlApiStoreOpenReservations, newItem, response.data.id)
                 }
-        })
-
+        }
 
         if (response.status === 200) {
             router.push(`/inventory/owner/store`)
@@ -334,9 +330,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
             </Grid>
 
             <Grid item alignSelf={"center"}>
-
                 <Typography variant="h6" >%</Typography>
-
             </Grid>
 
         </Grid>
@@ -372,7 +366,6 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                     </Grid>
 
                     <Grid container item rowSpacing={4} sx={{ padding: "25px" }}>
-
                         <Grid item xs={12}>
                             <TextField
                                 name={"Nombre"}
@@ -545,12 +538,9 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                                 sx={{ m: 1 }}
                                 disabled={!formik.isValid}
                             >
-                                {updateItem ? "Update" : "Crear"}
+                                {updateItem ? "Modificar" : "Crear"}
                             </Button>
-
                         </Grid>
-
-
                     </Grid>
                 </Grid>
             </form>
