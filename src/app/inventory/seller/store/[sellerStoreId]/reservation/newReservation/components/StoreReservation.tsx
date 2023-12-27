@@ -256,7 +256,7 @@ export default function StoreReservation({ userId, storeId }: { userId: string, 
                                                             </IconButton>
                                                         </Box>
 
-                                                        <Grid container direction={"column"} sx={{ padding: "8px 26px" }} spacing={2} fontSize={13}>
+                                                        <Grid container direction={"column"} sx={{ padding: "8px 26px" }} spacing={2} fontSize={14.5}>
                                                             <Grid item container spacing={2} alignItems={'center'} position={'relative'} >
                                                                 <Grid item position={"absolute"} >
                                                                     <IconButton
