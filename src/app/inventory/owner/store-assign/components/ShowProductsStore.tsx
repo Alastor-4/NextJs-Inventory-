@@ -26,16 +26,16 @@ import {
     RemoveOutlined,
     VisibilityOutlined
 } from '@mui/icons-material';
+import { characteristics, departments, depots, images, store_depots, stores, warehouses } from '@prisma/client';
 import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
+import DepartmentCustomButton from '@/components/DepartmentCustomButton';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import ModalStoreAssign from './Modal/ModalStoreAssign';
 import ManageQuantity from './Modal/ManageQuantity';
 import storeAssign from '../requests/store-assign';
-import { Formik } from 'formik';
-import { characteristics, departments, depots, images, products, store_depots, stores, warehouses } from '@prisma/client';
-import DepartmentCustomButton from '@/components/DepartmentCustomButton';
 import { AxiosResponse } from 'axios';
+import { Formik } from 'formik';
 
 interface ShowProductsStoreProps {
     userId?: number;
