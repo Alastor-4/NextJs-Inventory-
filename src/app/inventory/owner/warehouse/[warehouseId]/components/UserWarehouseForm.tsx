@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client"
 
 import {
@@ -12,28 +11,34 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup"
 import { useRouter } from 'next/navigation';
 import DepartmentProductsSelect from "@/components/DepartmentProductsSelect";
 import { notifyError } from "@/utils/generalFunctions";
 import warehouseDepots from "../requests/warehouseDepots";
+import { AxiosResponse } from "axios";
 
-export default function UserWarehouseForm({ ownerId, warehouseId }) {
-    const router = useRouter()
+interface UserWarehouseFormProps {
+    ownerId?: number;
+    warehouseId?: number;
+}
 
-    const [departmentProductsList, setDepartmentProductsList] = React.useState([])
+export default function UserWarehouseForm({ ownerId, warehouseId }: UserWarehouseFormProps) {
+    const router = useRouter();
 
-    React.useEffect(() => {
+    const [departmentProductsList, setDepartmentProductsList] = useState([]);
+
+    useEffect(() => {
         async function fetchData() {
-            const departmentProductsList = await warehouseDepots.allProductsWithoutDepots(ownerId, warehouseId)
+            const departmentProductsList = await warehouseDepots.allProductsWithoutDepots(ownerId!, warehouseId!)
 
-            setDepartmentProductsList(departmentProductsList)
+            setDepartmentProductsList(departmentProductsList);
         }
 
         fetchData()
-    }, [ownerId, warehouseId])
+    }, [ownerId, warehouseId]);
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -61,12 +66,12 @@ export default function UserWarehouseForm({ ownerId, warehouseId }) {
     }
 
     const validationSchema = Yup.object({
-        product: Yup.object().required("seleccione un producto"),
-        productTotalUnits: Yup.number().integer().required("especifique cantidad"),
+        product: Yup.object().required("Seleccione un producto"),
+        productTotalUnits: Yup.number().integer().required("Especifique cantidad"),
     })
 
-    const handleSubmit = async (values) => {
-        let response = await warehouseDepots.createDepot(
+    const handleSubmit = async (values: any) => {
+        let response: boolean | AxiosResponse = await warehouseDepots.createDepot(
             {
                 warehouseId: warehouseId,
                 userId: ownerId,
@@ -75,6 +80,7 @@ export default function UserWarehouseForm({ ownerId, warehouseId }) {
                 insertedById: ownerId,
             }
         )
+        if (!response) return;
 
         if (response?.status === 200) {
             router.push(`/inventory/owner/warehouse/${warehouseId}`)
@@ -101,11 +107,11 @@ export default function UserWarehouseForm({ ownerId, warehouseId }) {
                     <Grid container item rowSpacing={2} sx={{ padding: "25px" }}>
                         <Grid item xs={12}>
                             <TextField
-                                name={"productTotalUnits"}
+
                                 label="Cantidad de unidades"
                                 size={"small"}
                                 {...formik.getFieldProps("productTotalUnits")}
-                                error={formik.errors.productTotalUnits && formik.touched.productTotalUnits}
+                                error={!!formik.errors.productTotalUnits && formik.touched.productTotalUnits}
                                 helperText={(formik.errors.productTotalUnits && formik.touched.productTotalUnits) && formik.errors.productTotalUnits}
                             />
                         </Grid>
@@ -115,7 +121,7 @@ export default function UserWarehouseForm({ ownerId, warehouseId }) {
                                 departmentProductsList={departmentProductsList}
                                 setDepartmentProductsList={setDepartmentProductsList}
                                 selectedProduct={formik.values.product}
-                                setSelectedProduct={(value) => formik.setFieldValue("product", value)}
+                                setSelectedProduct={(value: any) => formik.setFieldValue("product", value)}
                             />
                             <FormHelperText sx={{ color: "red" }}>
                                 {formik.errors.product}
