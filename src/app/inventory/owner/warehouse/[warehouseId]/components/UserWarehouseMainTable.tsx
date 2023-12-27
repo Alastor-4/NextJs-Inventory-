@@ -505,42 +505,43 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
 
         return (
             <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
-                <Grid container item spacing={2}>
+                <Grid container item direction="column" spacing={2}>
                     <Grid item xs={12}>
                         Mover de almacén hacia tienda: {warehouseQuantity} disponibles
                     </Grid>
-
-                    <Grid item xs={12}>
-                        <TextField
-                            name={"productStoreDepotDistribution"}
-                            label={"Enviar a tienda"}
-                            color={"primary"}
-                            type={"number"}
-                            size={"small"}
-                            onKeyDown={handleKeyDown}
-                            {...formik.getFieldProps("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity")}
-                            error={
-                                formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity &&
-                                formik.touched.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
-                            }
-                            helperText={
-                                (
+                    <Grid item container alignItems="center" xs={12} md={8}>
+                        <Grid item xs={10} md={6}>
+                            <TextField
+                                name={"productStoreDepotDistribution"}
+                                label={"Enviar a tienda"}
+                                color={"primary"}
+                                type={"number"}
+                                size={"small"}
+                                onKeyDown={handleKeyDown}
+                                {...formik.getFieldProps("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity")}
+                                error={
                                     formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity &&
                                     formik.touched.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
-                                ) && formik.errors.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity
-                            }
-                        />
-
-                        <IconButton
-                            color={"primary"}
-                            onClick={handleMoveToStore}
-                            sx={{ ml: "10px" }}
-                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity}
-                        >
-                            <Done />
-                        </IconButton>
+                                }
+                                helperText={
+                                    (
+                                        formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity &&
+                                        formik.touched.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
+                                    ) && formik.errors.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity
+                                }
+                            />
+                        </Grid>
+                        <Grid item xs={2} md={6}>
+                            <IconButton
+                                color={"primary"}
+                                onClick={handleMoveToStore}
+                                sx={{ ml: "10px" }}
+                                disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity}
+                            >
+                                <Done />
+                            </IconButton>
+                        </Grid>
                     </Grid>
-
                     {
                         !!storeQuantity && (
                             <>
@@ -552,35 +553,38 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                     Retirar de tienda hacia el almacén: {storeQuantity} disponibles
                                 </Grid>
 
-                                <Grid item xs={12}>
-                                    <TextField
-                                        name={"productStoreDepotDistribution"}
-                                        label={"Retirar de tienda"}
-                                        color={"secondary"}
-                                        type={"number"}
-                                        size={"small"}
-                                        onKeyDown={handleKeyDown}
-                                        {...formik.getFieldProps("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity")}
-                                        error={
-                                            formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity &&
-                                            formik.touched.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
-                                        }
-                                        helperText={
-                                            (
+                                <Grid item container alignItems="center" xs={12} md={8}>
+                                    <Grid item xs={10} md={6}>
+                                        <TextField
+                                            name={"productStoreDepotDistribution"}
+                                            label={"Retirar de tienda"}
+                                            color={"secondary"}
+                                            type={"number"}
+                                            size={"small"}
+                                            onKeyDown={handleKeyDown}
+                                            {...formik.getFieldProps("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity")}
+                                            error={
                                                 formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity &&
                                                 formik.touched.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
-                                            ) && formik.errors.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity
-                                        }
-                                    />
-
-                                    <IconButton
-                                        color={"secondary"}
-                                        onClick={handleMoveToWarehouse}
-                                        sx={{ ml: "10px" }}
-                                        disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity}
-                                    >
-                                        <Done />
-                                    </IconButton>
+                                            }
+                                            helperText={
+                                                (
+                                                    formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity &&
+                                                    formik.touched.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
+                                                ) && formik.errors.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity
+                                            }
+                                        />
+                                    </Grid>
+                                    <Grid item xs={2} md={6}>
+                                        <IconButton
+                                            color={"secondary"}
+                                            onClick={handleMoveToWarehouse}
+                                            sx={{ ml: "10px" }}
+                                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity}
+                                        >
+                                            <Done />
+                                        </IconButton>
+                                    </Grid>
                                 </Grid>
                             </>
                         )
