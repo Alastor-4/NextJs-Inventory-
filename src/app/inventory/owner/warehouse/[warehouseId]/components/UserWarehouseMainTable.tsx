@@ -972,6 +972,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                             dialogTitle={"Agregar nuevos productos a este depósito"}
                             open={displayNewUnitsForm}
                             setOpen={setDisplayNewUnitsForm}
+                            formik={formik}
                         >
                             <NewUnitsQuantityForm formik={formik} />
                         </UpdateValueDialog>
@@ -988,6 +989,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                             dialogTitle={"Redistribuir productos en " + storeDepotUpdateName}
                             open={displayUpdateDepotQuantityForm}
                             setOpen={setDisplayUpdateDepotQuantityForm}
+                            formik={formik}
                         >
                             <UpdateStoreDepotQuantityForm formik={formik} />
                         </UpdateValueDialog>
