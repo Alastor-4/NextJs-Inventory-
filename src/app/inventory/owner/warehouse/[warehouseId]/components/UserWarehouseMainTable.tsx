@@ -38,6 +38,7 @@ import {
     VisibilityOutlined,
 } from "@mui/icons-material";
 import { characteristics, departments, depots, images, store_depots, warehouses } from "@prisma/client";
+import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import warehouseDepots from "../requests/warehouseDepots";
@@ -49,7 +50,6 @@ import { Formik } from "formik";
 import Link from "next/link";
 import * as Yup from "yup";
 import dayjs from "dayjs";
-import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 
 interface UserWarehouseMainTableProps {
     ownerId?: number;
