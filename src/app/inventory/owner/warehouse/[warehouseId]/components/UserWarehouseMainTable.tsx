@@ -93,13 +93,13 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
     const router = useRouter();
 
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
-    const [depositsByDepartment, setDepositsByDeparment] = useState<(departments & { products?: productsProps[], selected?: boolean })[] | null>(null);
+    const [depositsByDepartment, setDepositsByDepartment] = useState<(departments & { products?: productsProps[], selected?: boolean })[] | null>(null);
 
     //GET initial products data
     useEffect(() => {
         const getDepositsByDepartament = async () => {
             const newDepositsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
-            setDepositsByDeparment(newDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
+            setDepositsByDepartment(newDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
                 {
                     ...departments,
                     selected: false
@@ -178,7 +178,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
 
     const refreshAfterAction = async () => {
         const newDepositsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
-        setDepositsByDeparment(newDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
+        setDepositsByDepartment(newDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
             {
                 ...departments,
                 selected: false
@@ -257,7 +257,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
         let filters = [...depositsByDepartment!];
         filters[index].selected = !filters[index].selected;
 
-        setDepositsByDeparment(filters);
+        setDepositsByDepartment(filters);
     }
 
     const DepartmentsFilter = ({ formik }: any) => (
@@ -324,7 +324,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                 newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_units = updatedDepot.data.product_total_units;
                 newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units;
 
-                setDepositsByDeparment(newDepots);
+                setDepositsByDepartment(newDepots);
                 break;
             }
         }
@@ -454,7 +454,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                         newDepots[departmentIndex].products![updatedIndex!].storesDistribution![updatedStoreDepotIndex!].store_depots![0] = updatedStoreDepot;
                     }
 
-                    setDepositsByDeparment(newDepots);
+                    setDepositsByDepartment(newDepots);
 
                     break
                 }
@@ -668,7 +668,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                 }
             })
 
-            setDepositsByDeparment(newdepositsByDepartment);
+            setDepositsByDepartment(newdepositsByDepartment);
         }
     }
 

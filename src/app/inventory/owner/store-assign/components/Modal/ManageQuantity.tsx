@@ -5,7 +5,6 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 import React, { useState } from 'react'
 import storeAssign from '../../requests/store-assign'
-import { useParams } from 'next/navigation'
 
 function ManageQuantity({ userId, nameStore, nameWarehouse, productDetails, updateDepot, setActiveManageQuantity }:
   { userId: number, nameStore: any, nameWarehouse: any, productDetails: any, updateDepot: any, setActiveManageQuantity: any }) {

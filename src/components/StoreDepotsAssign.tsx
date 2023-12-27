@@ -12,62 +12,51 @@ import {
     Toolbar,
     Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
+import ShowProductsStore from "@/app/inventory/owner/store-assign/components/ShowProductsStore";
+import { stores, warehouses } from "@prisma/client";
 import { ArrowLeft } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
-import ShowProductsStore from "@/app/inventory/owner/store-assign/components/ShowProductsStore";
 
-export default function StoreDepotsAssign(
-    { warehouseListProp, selectedWarehouseIdProp, selectedStoreIdProp, storeListProp, userId }:
-        { userId?: number, warehouseListProp: any[], selectedWarehouseIdProp: number | null, selectedStoreIdProp: number | null, storeListProp: any[] }
-) {
-    const router = useRouter()
+interface StoreDepotsAssignProps {
+    userId?: number;
+    selectedWarehouseId?: number;
+    storeList?: stores[];
+    warehouseList?: warehouses[];
+}
 
-    const [selectedWarehouse, setSelectedWarehouse] = useState<any>("")
-    const [selectedStore, setSelectedStore] = useState<any>("")
+export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, storeList, userId }: StoreDepotsAssignProps) {
 
+    const router = useRouter();
 
-    //initial make selected a warehouse
-    React.useEffect(() => {
-        if (selectedWarehouseIdProp !== null) {
-            const index = warehouseListProp.findIndex(item => item.id === selectedWarehouseIdProp)
-            if (index > -1) {
-                setSelectedWarehouse(warehouseListProp[index])
+    const [selectedWarehouse, setSelectedWarehouse] = useState<warehouses | null>(null);
+    const [selectedStore, setSelectedStore] = useState<stores | null>(null);
+
+    //SELECT initial warehouse
+    useEffect(() => {
+        if (selectedWarehouseId) {
+            const index = warehouseList?.findIndex(item => item.id === selectedWarehouseId);
+            if (warehouseList && (index! > -1)) {
+                setSelectedWarehouse(warehouseList[index!]);
             }
         }
-    }, [selectedWarehouseIdProp, warehouseListProp])
-
-    //initial make selected a store
-
-    React.useEffect(() => {
-        if (selectedStoreIdProp) {
-            const index = storeListProp.findIndex(item => item.id === selectedStoreIdProp)
-            if (index > -1) {
-                setSelectedStore(storeListProp[index])
-            }
-        }
-
-    }, [selectedStoreIdProp, storeListProp])
+    }, [selectedWarehouseId, warehouseList]);
 
     const initialValues = {
-        selectedWarehouse: selectedWarehouse ?? '',
-        selectedStore: selectedStore ?? '',
+        selectedWarehouse: selectedWarehouse?.name ?? "",
+        selectedStore: selectedStore?.name ?? "",
     }
 
     const validationSchema = Yup.object({
-        selectedWarehouse: Yup.object().required("seleccione un almacén"),
-        selectedStore: Yup.object().required("seleccione una tienda"),
+        selectedWarehouse: Yup.string().required("Seleccione un almacén"),
+        selectedStore: Yup.string().required("Seleccione una tienda"),
     })
 
     function handleNavigateBack() {
-        /*  selectedStoreIdProp
-              ? router.push(`/inventory/owner/store-details/${selectedStoreIdProp}`)
-              : router.push(`/inventory/owner/warehouse/${selectedWarehouseIdProp}`)
-  */
-        router.back()
+        router.back();
     }
 
     const CustomToolbar = () => (
@@ -98,18 +87,15 @@ export default function StoreDepotsAssign(
             initialValues={initialValues}
             validationSchema={validationSchema}
             enableReinitialize={true}
-            onSubmit={() => {
-
-            }}
+            onSubmit={() => { }}
         >
             {
                 (formik) => (
                     <Card variant={"outlined"}>
                         <CustomToolbar />
-
                         <CardContent>
-                            <Grid container rowSpacing={2} direction={"column"}>
-                                <Grid item xs={12}>
+                            <Grid container rowSpacing={2} xs={12} direction={"column"}>
+                                <Grid item>
                                     <TextField
                                         label="Almacén"
                                         size={"small"}
@@ -117,16 +103,13 @@ export default function StoreDepotsAssign(
                                         select
                                         {...formik.getFieldProps("selectedWarehouse")}
                                         error={!!formik.errors.selectedWarehouse && !!formik.touched.selectedWarehouse}
-                                        // @ts-ignore
+
                                         helperText={(formik.errors.selectedWarehouse && formik.touched.selectedWarehouse) && formik.errors.selectedWarehouse}
                                     >
                                         {
-                                            warehouseListProp.map(item => (
-                                                <MenuItem
-                                                    key={item.id}
-                                                    value={item}
-                                                >
-                                                    {`${item.name} (${item.description ?? ''})`}
+                                            warehouseList?.map((warehouse: warehouses) => (
+                                                <MenuItem key={warehouse.id} value={warehouse.name!}>
+                                                    {`${warehouse.name} (${warehouse.description?.slice(0, 20) ?? ''})`}
                                                 </MenuItem>
                                             ))
                                         }
@@ -141,13 +124,11 @@ export default function StoreDepotsAssign(
                                         select
                                         {...formik.getFieldProps("selectedStore")}
                                         error={!!formik.errors.selectedStore && !!formik.touched.selectedStore}
-                                        // @ts-ignore
                                         helperText={(formik.errors.selectedStore && formik.touched.selectedStore) && formik.errors.selectedStore}
                                     >
                                         {
-                                            storeListProp.map(item => (
-                                                <MenuItem key={item.id}
-                                                    value={item}>{`${item.name} (${item.description ?? ''})`}</MenuItem>
+                                            storeList?.map((store: stores) => (
+                                                <MenuItem key={store.id} onClick={() => { setSelectedStore(store) }} value={store.name!}>{`${store.name} (${store.description?.slice(0, 20) ?? ''})`}</MenuItem>
                                             ))
                                         }
                                     </TextField>
@@ -157,11 +138,8 @@ export default function StoreDepotsAssign(
                                     formik.values.selectedWarehouse && formik.values.selectedStore && (
                                         <Grid item xs={12}>
                                             <ShowProductsStore
-                                                storeId={formik.values.selectedStore.id}
-                                                nameStore={formik.values.selectedStore.name}
-                                                dataStore={formik.values.selectedStore}
-                                                nameWarehouse={formik.values.selectedWarehouse.name}
-                                                warehouseId={formik.values.selectedWarehouse.id}
+                                                dataStore={selectedStore!}
+                                                dataWarehouse={selectedWarehouse!}
                                                 userId={userId}
                                             />
                                         </Grid>
