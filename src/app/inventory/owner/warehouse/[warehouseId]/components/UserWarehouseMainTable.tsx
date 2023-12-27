@@ -719,8 +719,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
             setStoreDepotUpdateName(storeName)
             setDisplayUpdateDepotQuantityForm(true)
         }
-
-        function handleExpand(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, rowIndex: number) {
+        function handleExpand(event: React.MouseEvent<HTMLButtonElement | HTMLTableCellElement, MouseEvent>, rowIndex: number) {
             event.stopPropagation();
 
             if (rowIndex === expandIndex) return setExpandIndex(null);
@@ -740,13 +739,12 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                         hover
                                         tabIndex={-1}
                                         selected={!!selectedProduct && (product.id === selectedProduct.id)}
-                                        onClick={() => handleSelectProduct(product)}
                                         sx={tableStyles.row}
                                     >
                                         <TableCell>
-                                            <Checkbox size={"small"} checked={!!selectedProduct && (product.id === selectedProduct.id)} />
+                                            <Checkbox size={"small"} onClick={() => handleSelectProduct(product)} checked={!!selectedProduct && (product.id === selectedProduct.id)} />
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell onClick={(event) => handleExpand(event, index)}>
                                             <div>
                                                 {product.name} <br />
                                                 {
@@ -758,7 +756,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                                 }
                                             </div>
                                         </TableCell>
-                                        <TableCell>{product.departments?.name ?? "-"}</TableCell>
+                                        <TableCell onClick={(event) => handleExpand(event, index)}>{product.departments?.name ?? "-"}</TableCell>
                                         <TableCell>
                                             <Grid container direction="column" alignItems="flex-start">
                                                 <Grid item sx={{ marginLeft: "10px" }}>
@@ -780,7 +778,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                                 </Grid>
                                             </Grid>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell onClick={(event) => handleExpand(event, index)}>
                                             {dayjs(product.depots![0].created_at).format("DD/MM/YYYY HH:MM")}
                                         </TableCell>
                                         <TableCell>
