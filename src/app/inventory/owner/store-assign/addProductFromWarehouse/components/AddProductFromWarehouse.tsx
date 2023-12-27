@@ -33,6 +33,7 @@ import { TableNoData } from '@/components/TableNoData';
 import { Formik } from 'formik';
 import * as Yup from "yup"
 import { notifyError, notifySuccess, notifyWarning } from "@/utils/generalFunctions";
+import { handleKeyDown } from '@/utils/handleKeyDown';
 
 export default function AddProductFromWarehouse(props: any) {
     const { userId, dataStore, warehouseId } = props
@@ -437,9 +438,7 @@ export default function AddProductFromWarehouse(props: any) {
     const setValidationSchema = (
         Yup.object({
             units: Yup.number()
-                .typeError("Cantidad numérica")
-                .min(0, "Cantidad positiva")
-                .max(data[selectedDepot ?? 0]?.product_total_remaining_units, "Cantidad no existente en almacén")
+                .max(data[selectedDepot ?? 0]?.product_total_remaining_units, "No existe esta cantidad")
                 .required("Cantidad requerida")
         })
     )
@@ -641,6 +640,7 @@ export default function AddProductFromWarehouse(props: any) {
                                             {...formik.getFieldProps("units")}
                                             label={"Cantidad"}
                                             value={formik.values.units}
+                                            onKeyDown={handleKeyDown}
                                             size={'small'}
                                             disabled={selectedDepot === undefined}
                                             error={formik.errors.units && formik.touched.units}
@@ -653,7 +653,7 @@ export default function AddProductFromWarehouse(props: any) {
                                             variant='contained'
                                             size='small'
                                             type='submit'
-                                            disabled={selectedDepot === undefined}
+                                            disabled={formik.values.units === 0 || selectedDepot === undefined}
                                         >
                                             Agregar
                                         </Button>
