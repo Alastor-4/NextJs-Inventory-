@@ -66,14 +66,14 @@ export async function GET(req: Request) {
     return NextResponse.json(result)
 }
 export async function PUT(req: Request) {
-    const { id, store_id, depot_id, product_units, product_remaining_units, sell_price, sell_price_units, price_discount_percentage, price_discount_quantity, seller_profit_percentage, seller_profit_quantity, is_active } = await req.json();
+    const { id, store_id, depot_id, product_units, product_remaining_units, sell_price, sell_price_unit, price_discount_percentage, price_discount_quantity, seller_profit_percentage, seller_profit_quantity, is_active } = await req.json();
     const data = {
         store_id,
         depot_id,
         product_units,
         product_remaining_units,
         sell_price,
-        sell_price_units,
+        sell_price_unit,
         price_discount_percentage,
         price_discount_quantity,
         seller_profit_percentage,

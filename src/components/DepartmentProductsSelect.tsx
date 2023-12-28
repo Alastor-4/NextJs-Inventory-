@@ -1,6 +1,5 @@
 // @ts-nocheck
 import {
-    Button,
     Card,
     CardContent,
     Checkbox,
@@ -9,22 +8,24 @@ import {
     TableBody,
     TableCell,
     TableHead,
+    TableContainer,
     TableRow,
     TextField,
     Typography
 } from "@mui/material";
 import React from "react";
-import { Formik } from "formik";
 import { TableNoData } from "@/components/TableNoData";
+import { Formik } from "formik";
+import DepartmentCustomButton from "./DepartmentCustomButton";
 
 export default function DepartmentProductsSelect(
     { departmentProductsList, setDepartmentProductsList, selectedProduct, setSelectedProduct }: any
 ) {
-    const [data, setData] = React.useState([])
+    const [data, setData] = React.useState([]);
 
     React.useEffect(() => {
         if (departmentProductsList.length) {
-            let allProducts = []
+            let allProducts = [];
 
             departmentProductsList.forEach((departmentItem) => {
                 if (departmentItem.selected) {
@@ -70,18 +71,12 @@ export default function DepartmentProductsSelect(
                     {
                         departmentProductsList.map((item, index) => (
                             <Grid key={item.id} item xs={"auto"}>
-                                <Button variant={item.selected ? "contained" : "outlined"} onClick={() => handleSelectFilter(index)}>
-                                    <Grid container>
-                                        <Grid item xs={12}>
-                                            {item.name}
-                                        </Grid>
-                                        <Grid container item xs={12} justifyContent={"center"}>
-                                            <Typography variant={"caption"}>
-                                                {item.products.length} productos
-                                            </Typography>
-                                        </Grid>
-                                    </Grid>
-                                </Button>
+                                <DepartmentCustomButton
+                                    title={item.name!}
+                                    subtitle={item.products?.length === 1 ? `${item.products.length!}` + " producto" : `${item.products?.length!}` + " productos"}
+                                    selected={item.selected!}
+                                    onClick={() => handleSelectFilter(index)}
+                                />
                             </Grid>
                         ))
                     }
@@ -261,11 +256,14 @@ export default function DepartmentProductsSelect(
                             {
                                 data?.length > 0
                                     ? (
-                                        <Table sx={{ width: "100%" }} size={"small"}>
-                                            <TableHeader />
-
-                                            <TableContent formik={formik} />
-                                        </Table>
+                                        <Grid item xs={12}>
+                                            <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                                <Table sx={{ width: "100%" }} size={"small"}>
+                                                    <TableHeader />
+                                                    <TableContent formik={formik} />
+                                                </Table>
+                                            </TableContainer>
+                                        </Grid>
                                     ) : (
                                         <TableNoData />
                                     )

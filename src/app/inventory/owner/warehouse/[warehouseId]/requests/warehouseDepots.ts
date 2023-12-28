@@ -17,7 +17,7 @@ const warehouseDepots = {
         return false
     },
 
-    allProductsWithoutDepots: async function (userId: string, warehouseId: string) {
+    allProductsWithoutDepots: async function (userId?: number, warehouseId?: number) {
         try {
             const response = await apiRequest.get(urlCreate(warehouseId), { params: { userId: userId } })
             return response.data

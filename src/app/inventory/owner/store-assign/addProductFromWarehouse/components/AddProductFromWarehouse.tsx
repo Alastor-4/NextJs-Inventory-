@@ -33,6 +33,7 @@ import { TableNoData } from '@/components/TableNoData';
 import { Formik } from 'formik';
 import * as Yup from "yup"
 import { notifyError, notifySuccess, notifyWarning } from "@/utils/generalFunctions";
+import { handleKeyDown } from '@/utils/handleKeyDown';
 
 export default function AddProductFromWarehouse(props: any) {
     const { userId, dataStore, warehouseId } = props
@@ -437,9 +438,7 @@ export default function AddProductFromWarehouse(props: any) {
     const setValidationSchema = (
         Yup.object({
             units: Yup.number()
-                .typeError("Cantidad numérica")
-                .min(0, "Cantidad positiva")
-                .max(data[selectedDepot ?? 0]?.product_total_remaining_units, "Cantidad no existente en almacén")
+                .max(data[selectedDepot ?? 0]?.product_total_remaining_units, "No existe esta cantidad")
                 .required("Cantidad requerida")
         })
     )
@@ -577,110 +576,113 @@ export default function AddProductFromWarehouse(props: any) {
             >
                 {
                     (formik: any) => (
-                        <form onSubmit={formik.handleSubmit} style={{ width: "100%" }}>
-                            <Grid container rowSpacing={2}>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        name="selectedWarehouse"
-                                        label={"Selecciona un almacén"}
-                                        size='small'
-                                        select
-                                        value={selectedWarehouse}
-                                        onChange={(e) => {
-                                            loadDepartamentsFromSelectedWarehouse(parseInt(e.target.value), dataDepotsWarehouses)
-                                            setSelectedWarehouse(e.target.value)
-                                        }}
-                                    >
-                                        {
-                                            dataDepotsWarehouses.map((warehouse: any, index: number) => (
-                                                <MenuItem key={index} value={index}>{warehouse.name}</MenuItem>
-                                            ))
-                                        }
-                                    </TextField>
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    <InputLabel id="selectedDepartments">Departamentos</InputLabel>
-                                    <Select
-                                        id="selectedDepartments"
-                                        name="selectedDepartments"
-                                        fullWidth
-                                        multiple
-                                        size={"small"}
-                                        value={selectedDepartments}
-                                        onChange={handleSelectDepartment}
-                                        MenuProps={MenuProps}
-                                        renderValue={(selected: any) => (
-                                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                                                {
-                                                    selected.map((item: any) => (
-                                                        <Chip
-                                                            key={item}
-                                                            label={dataProductsByDepartment[item].departmentName}
-                                                            variant='outlined'
-                                                            size={"small"}
-                                                        />
-                                                    ))
-                                                }
-                                            </Box>
-                                        )}
-                                    >
-                                        {
-                                            dataProductsByDepartment.map((element: any, index: any) => (
-                                                <MenuItem key={index} value={index}>{element.departmentName}</MenuItem>
-                                            ))
-                                        }
-                                    </Select>
-                                </Grid>
-
-                                <Grid item container columnSpacing={1} alignItems={"center"}>
-                                    <Grid item xs={5} md={3}>
+                        <Grid sx={{ width: "100%" }}>
+                            <form onSubmit={formik.handleSubmit} >
+                                <Grid container rowSpacing={2} >
+                                    <Grid item xs={12}>
                                         <TextField
-                                            name={"units"}
-                                            {...formik.getFieldProps("units")}
-                                            label={"Cantidad"}
-                                            value={formik.values.units}
-                                            size={'small'}
-                                            disabled={selectedDepot === undefined}
-                                            error={formik.errors.units && formik.touched.units}
-                                            helperText={(formik.errors.units && formik.touched.units) && formik.errors.units}
-                                        />
-                                    </Grid>
-
-                                    <Grid container item xs={true} justifyContent={"center"}>
-                                        <Button
-                                            variant='contained'
+                                            fullWidth
+                                            name="selectedWarehouse"
+                                            label={"Selecciona un almacén"}
                                             size='small'
-                                            type='submit'
-                                            disabled={selectedDepot === undefined}
+                                            select
+                                            value={selectedWarehouse}
+                                            onChange={(e) => {
+                                                loadDepartamentsFromSelectedWarehouse(parseInt(e.target.value), dataDepotsWarehouses)
+                                                setSelectedWarehouse(e.target.value)
+                                            }}
                                         >
-                                            Agregar
-                                        </Button>
+                                            {
+                                                dataDepotsWarehouses.map((warehouse: any, index: number) => (
+                                                    <MenuItem key={index} value={index}>{warehouse.name}</MenuItem>
+                                                ))
+                                            }
+                                        </TextField>
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <InputLabel id="selectedDepartments">Departamentos</InputLabel>
+                                        <Select
+                                            id="selectedDepartments"
+                                            name="selectedDepartments"
+                                            fullWidth
+                                            multiple
+                                            size={"small"}
+                                            value={selectedDepartments}
+                                            onChange={handleSelectDepartment}
+                                            MenuProps={MenuProps}
+                                            renderValue={(selected: any) => (
+                                                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                                                    {
+                                                        selected.map((item: any) => (
+                                                            <Chip
+                                                                key={item}
+                                                                label={dataProductsByDepartment[item].departmentName}
+                                                                variant='outlined'
+                                                                size={"small"}
+                                                            />
+                                                        ))
+                                                    }
+                                                </Box>
+                                            )}
+                                        >
+                                            {
+                                                dataProductsByDepartment.map((element: any, index: any) => (
+                                                    <MenuItem key={index} value={index}>{element.departmentName}</MenuItem>
+                                                ))
+                                            }
+                                        </Select>
+                                    </Grid>
+
+                                    <Grid item container columnSpacing={1} alignItems={"center"}>
+                                        <Grid item xs={5} md={3}>
+                                            <TextField
+                                                name={"units"}
+                                                {...formik.getFieldProps("units")}
+                                                label={"Cantidad"}
+                                                value={formik.values.units}
+                                                onKeyDown={handleKeyDown}
+                                                size={'small'}
+                                                disabled={selectedDepot === undefined}
+                                                error={formik.errors.units && formik.touched.units}
+                                                helperText={(formik.errors.units && formik.touched.units) && formik.errors.units}
+                                            />
+                                        </Grid>
+
+                                        <Grid container item xs={true} justifyContent={"center"}>
+                                            <Button
+                                                variant='contained'
+                                                size='small'
+                                                type='submit'
+                                                disabled={formik.values.units === 0 || selectedDepot === undefined}
+                                            >
+                                                Agregar
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        <Card variant='outlined' sx={{ width: 1 }}>
+                                            <Grid container>
+                                                {
+                                                    data?.length > 0
+                                                        ? (
+                                                            <TableContainer sx={{ width: "100%", maxHeight: "450px" }}>
+                                                                <Table sx={{ width: "100%" }} size={"small"}>
+                                                                    <TableHeader />
+                                                                    <TableContent />
+                                                                </Table>
+                                                            </TableContainer>
+                                                        ) : (
+                                                            <TableNoData />
+                                                        )
+                                                }
+                                            </Grid>
+                                        </Card>
                                     </Grid>
                                 </Grid>
-
-                                <Grid item xs={12}>
-                                    <Card variant='outlined' sx={{ width: 1 }}>
-                                        <Grid container>
-                                            {
-                                                data?.length > 0
-                                                    ? (
-                                                        <TableContainer sx={{ width: "100%", maxHeight: "450px" }}>
-                                                            <Table sx={{ width: "100%" }} size={"small"}>
-                                                                <TableHeader />
-                                                                <TableContent />
-                                                            </Table>
-                                                        </TableContainer>
-                                                    ) : (
-                                                        <TableNoData />
-                                                    )
-                                            }
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                            </Grid>
-                        </form>
+                            </form>
+                        </Grid>
                     )
                 }
             </Formik>

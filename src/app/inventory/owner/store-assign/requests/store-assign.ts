@@ -17,8 +17,7 @@ const storeAssign = {
 
     updateProductStore: async function (userId: number, data: any) {
         try {
-            const response = await apiRequest.put(showProductStoreUrl, data)
-            return response.status
+            return await apiRequest.put(showProductStoreUrl, data)
         } catch (e) {
             //ToDo: notify error here
         }

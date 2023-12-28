@@ -13,10 +13,12 @@ interface UpdateValueDialogProps {
     setOpen: (boolean: boolean) => void;
     dialogTitle: string;
     children: ReactNode;
+    formik?: any;
 }
-export default function UpdateValueDialog({ dialogTitle, open, setOpen, children }: UpdateValueDialogProps) {
+export default function UpdateValueDialog({ dialogTitle, open, formik, setOpen, children }: UpdateValueDialogProps) {
 
     const handleClose = () => {
+        !!formik && formik.resetForm();
         setOpen(false);
     };
 

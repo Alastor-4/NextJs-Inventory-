@@ -5,11 +5,11 @@ import { getServerSession } from "next-auth";
 export default async function Page({ params }: { params: { warehouseId: string } }) {
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
-    const warehouseId = params.warehouseId;
+    const warehouseId = +params.warehouseId;
 
     return (
         <main>
-            <UserWarehouseForm ownerId={userId} warehouseId={warehouseId} />
+            <UserWarehouseForm ownerId={userId!} warehouseId={warehouseId} />
         </main>
     )
 }

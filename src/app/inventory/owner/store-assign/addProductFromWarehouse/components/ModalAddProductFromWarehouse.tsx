@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
     AppBar,
     Box,
@@ -8,13 +7,20 @@ import {
     Toolbar,
     Typography,
 } from "@mui/material";
-import React from "react";
 import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
+import React, { ReactNode } from "react";
 
-export default function ModalAddProductFromWarehouse(props) {
-    const { open, setOpen, dialogTitle, loadData } = props
+interface ModalAddProductFromWarehouseProps {
+    open: boolean;
+    setOpen: (bool: boolean) => void;
+    dialogTitle?: string;
+    loadData: () => Promise<void>;
+    children?: ReactNode;
+}
 
-    const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
+export default function ModalAddProductFromWarehouse({ loadData, dialogTitle, open, setOpen, children }: ModalAddProductFromWarehouseProps) {
+
+    const handleClose = () => {
         setOpen(false);
         loadData();
     };
@@ -38,7 +44,7 @@ export default function ModalAddProductFromWarehouse(props) {
             </AppBar>
             <DialogContent>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {props.children}
+                    {children}
                 </Box>
             </DialogContent>
         </Dialog>
