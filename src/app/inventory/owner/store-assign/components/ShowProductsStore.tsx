@@ -160,7 +160,7 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
 
     const DepartmentsFilter = ({ formik }: any) => (
         <Card variant={"outlined"} sx={{ padding: "15px" }}>
-            <Grid container xs={12} direction="column">
+            <Grid container item xs={12} direction="column">
                 <Grid item>
                     <Typography variant={"subtitle2"}>
                         Seleccione departamentos para encontrar el producto que busca
