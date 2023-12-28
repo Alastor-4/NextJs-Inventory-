@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
     Box,
     Button,
@@ -7,12 +6,18 @@ import {
     DialogContent,
     DialogTitle,
 } from "@mui/material";
-import React from "react";
+import React, { ReactNode } from "react";
 
-export default function ModalStoreAssign(props) {
-    const { open, setOpen, dialogTitle } = props
+interface ModalStoreAssignProps {
+    open: boolean;
+    setOpen: (bool: boolean) => void;
+    dialogTitle: string;
+    children?: ReactNode;
+}
 
-    const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
+export default function ModalStoreAssign({ dialogTitle, open, setOpen, children }: ModalStoreAssignProps) {
+
+    const handleClose = () => {
         setOpen(false);
     };
 
@@ -22,14 +27,12 @@ export default function ModalStoreAssign(props) {
             <DialogTitle>{dialogTitle}</DialogTitle>
             <DialogContent>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {props.children}
+                    {children}
                 </Box>
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>Cancelar</Button>
             </DialogActions>
         </Dialog>
-
-
     )
 }

@@ -47,7 +47,7 @@ interface ShowProductsStoreProps {
     nameWarehouse?: string | null;
 }
 
-interface productsProps {
+export interface productsProps {
     id: number;
     department_id: number | null;
     owner_id: number | null;
@@ -500,15 +500,15 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                     (formik) => (
                         <Card variant={"outlined"}>
                             <ModalStoreAssign
-                                dialogTitle={"Administrar la cantidad del producto"}
+                                dialogTitle={"Administrar cantidad del producto"}
                                 open={activeManageQuantity}
                                 setOpen={setActiveManageQuantity}
                             >
                                 <ManageQuantity
                                     userId={userId!}
-                                    nameStore={dataStore?.name}
-                                    nameWarehouse={dataWarehouse?.name}
-                                    productDetails={selectedProduct}
+                                    nameStore={dataStore?.name!}
+                                    nameWarehouse={dataWarehouse?.name!}
+                                    productDetails={selectedProduct!}
                                     updateDepot={updateDepot}
                                     setActiveManageQuantity={setActiveManageQuantity}
                                 />
