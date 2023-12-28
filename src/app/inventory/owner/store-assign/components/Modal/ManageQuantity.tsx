@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { AxiosResponse } from 'axios';
+import { handleKeyDown } from '@/utils/handleKeyDown';
 
 interface ManageQuantityProps {
   userId: number;
@@ -109,6 +110,7 @@ function ManageQuantity({ userId, nameStore, nameWarehouse, productDetails, upda
                   <TextField
                     label=" Trasladar unidades"
                     {...formik.getFieldProps("units")}
+                    onKeyDown={handleKeyDown}
                     error={!!formik.errors.units && formik.touched.units}
                     helperText={(formik.errors.units && formik.touched.units) && formik.errors.units}
                   />
