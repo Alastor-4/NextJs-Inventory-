@@ -94,7 +94,7 @@ export default function ProductsForm(props: any) {
         buyPrice: Yup.number().nullable(),
         images: Yup.array(),
         imagesMaxErrorField: Yup.string(),
-        department: Yup.object(),
+        department: Yup.object().required("Debes seleccionar un departamento"),
         characteristics: Yup.array().of(Yup.object()),
         characteristicName: Yup.string().nullable(),
         characteristicValue: Yup.string().nullable(),
