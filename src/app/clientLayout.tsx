@@ -5,7 +5,7 @@ import React from "react";
 import { useStore } from "@/app/store/store"
 import { Backdrop, CircularProgress } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
-import {ImageUploadProvider} from "@/components/ImageUploadProvider";
+import {ImageUploadProvider} from "@/providers/ImageUploadProvider";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
 

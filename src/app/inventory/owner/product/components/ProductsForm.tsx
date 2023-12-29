@@ -24,7 +24,7 @@ import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-mate
 import { handleKeyDownWithDot } from "@/utils/handleKeyDown";
 import { useDropzone } from "react-dropzone";
 import products from "../requests/products";
-import useImageUploadContext from "@/components/ImageUploadProvider";
+import useImageUploadContext from "@/providers/ImageUploadProvider";
 
 export default function ProductsForm(props: any) {
     const { userId, departments } = props

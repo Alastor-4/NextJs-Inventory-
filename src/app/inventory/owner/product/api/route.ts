@@ -109,7 +109,7 @@ export async function PATCH(req: Request) {
     try {
         const { productId, productImages } = await req.json()
 
-        const data = productImages.map((item: any) => ({product_id: +productId, fileKey: item.fileKey, fileUrl: item.fileUrl }))
+        const data = productImages.map((item: any) => ({product_id: +productId, fileKey: item.key, fileUrl: item.url }))
 
         //insert new images for an existing product
         const updatedProduct = await prisma.images.createMany({ data: data})
