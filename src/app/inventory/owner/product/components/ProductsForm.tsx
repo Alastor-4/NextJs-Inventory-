@@ -205,7 +205,7 @@ export default function ProductsForm(props: any) {
                 },
                 multiple: true,
                 maxFiles: 1,
-                maxSize: 4000000,
+                maxSize: 4 * 1024 * 1024, //~4MB
                 onDrop: onDrop,
             }
         )
