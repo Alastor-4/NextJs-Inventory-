@@ -2,7 +2,6 @@
 "use client"
 
 import {
-    AppBar,
     Avatar,
     Badge,
     Box,
@@ -17,20 +16,17 @@ import {
 import React from "react";
 import { Formik } from "formik";
 import * as Yup from "yup"
-import { useParams, useRouter } from 'next/navigation';
 import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-material";
 import { handleKeyDownWithDot } from "@/utils/handleKeyDown";
 import { useDropzone } from "react-dropzone";
 import products from "../requests/products";
 import useImageUploadContext from "@/providers/ImageUploadProvider";
+import {notifyError, notifySuccess} from "@/utils/generalFunctions";
 
 export default function ProductsForm(props: any) {
     const { userId, departments, productId, setForceRender, setOpen } = props
 
     const [updateItem, setUpdateItem] = React.useState()
-
-    const params = useParams()
-    const router = useRouter()
 
     const { startImagesUpload } = useImageUploadContext()
 
@@ -115,8 +111,15 @@ export default function ProductsForm(props: any) {
         }
 
         if (response.status === 200) {
+            if (values.images.length) {
+                const newImages = values.images.filter(item => !item.fileKey)
+                if (newImages.length) {
+                    startImagesUpload(response.data.id, newImages)
+                }
+            }
+
             setForceRender(true)
-            setOpen(false)
+
             notifySuccess(
                 updateItem
                     ? "Se ha modificado el producto"
@@ -130,6 +133,8 @@ export default function ProductsForm(props: any) {
             )
 
         }
+
+        setOpen(false)
     }
 
     function handleAddCharacteristic(formik) {

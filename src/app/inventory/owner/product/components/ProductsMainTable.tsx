@@ -42,7 +42,6 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
     const [data, setData] = React.useState(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
 
-
     const [forceRender, setForceRender] = React.useState(false)
     const [activateModalCreateProduct, setActivateModalCreateProduct] = React.useState(false)
     const [activateModalUpdateProduct, setActivateModalUpdateProduct] = React.useState(false)
@@ -115,7 +114,6 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
     async function handleRemove() {
         const response = await products.delete(userId, selected.id)
         if (response) {
-            //ToDo: remove product images from uploadthing
             setSelected(null)
 
             const selectedFilters = allProductsByDepartment.filter(item => item.selected).map(item => item.id)
