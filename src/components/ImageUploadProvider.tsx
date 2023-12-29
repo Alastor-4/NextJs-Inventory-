@@ -11,15 +11,15 @@ export const ImageUploadContext = React.createContext(null)
 
 export function ImageUploadProvider({ children }: { children: React.ReactNode }) {
     const { startUpload, isUploading } = useUploadThing("imageUploader", {
-        onClientUploadComplete: () => notifySuccess("Imágenes subidas satisfactoriamente"),
+        onClientUploadComplete: () => notifySuccess("Imagen subida satisfactoriamente. Recargue la página si no ve la imagen en su producto"),
         onUploadError: (res) => {
             switch (res.code) {
                 case "BAD_REQUEST":
-                    notifyError("Permitido solo un archivo con 4MB o menos")
+                    notifyError("Error. Permitido solo un archivo con 4MB o menos. Vuelva a intentarlo modificando el producto", true)
                     break
 
                 default:
-                    notifyError("Ha ocurrido un error durante la subida de las imágenes")
+                    notifyError("Ha ocurrido un error durante la subida de las imágenes. Vuelva a intentarlo modificando el producto", true)
                     break
             }
         },

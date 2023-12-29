@@ -276,7 +276,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                     <TableCell>
                                         {
                                             row.images.length > 0
-                                                ? `${row.images.length} imagen(es)` : "-"
+                                                ? `${row.images.length} imagen` : "-"
                                         }
                                     </TableCell>
                                 </TableRow>
