@@ -1,22 +1,16 @@
 "use client"
 
 import {
-    AppBar,
-    Box,
     Button,
-    Card,
     FormHelperText,
     Grid,
     TextField,
-    Toolbar,
-    Typography
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup"
-import { useRouter } from 'next/navigation';
 import DepartmentProductsSelect from "@/components/DepartmentProductsSelect";
-import { notifyError } from "@/utils/generalFunctions";
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import warehouseDepots from "../requests/warehouseDepots";
 import { AxiosResponse } from "axios";
 
@@ -26,7 +20,6 @@ interface UserWarehouseFormProps {
 }
 
 export default function UserWarehouseForm({ ownerId, warehouseId }: UserWarehouseFormProps) {
-    const router = useRouter();
 
     const [departmentProductsList, setDepartmentProductsList] = useState([]);
 
@@ -39,26 +32,6 @@ export default function UserWarehouseForm({ ownerId, warehouseId }: UserWarehous
 
         fetchData()
     }, [ownerId, warehouseId]);
-
-    const CustomToolbar = () => (
-        <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        sx={{
-                            fontWeight: 700,
-                            letterSpacing: ".2rem",
-                            color: "white",
-                        }}
-                    >
-                        Nuevo depósito
-                    </Typography>
-                </Box>
-            </Toolbar>
-        </AppBar>
-    )
 
     const initialValues = {
         product: null,
@@ -83,7 +56,31 @@ export default function UserWarehouseForm({ ownerId, warehouseId }: UserWarehous
         if (!response) return;
 
         if (response?.status === 200) {
-            router.push(`/inventory/owner/warehouse/${warehouseId}`)
+
+            let selectedDepartments = new Map();
+            departmentProductsList.forEach((element: any) => {
+                if (element.selected) {
+                    selectedDepartments.set(element.id, true)
+                }
+            })
+
+
+            let newDepartmentProductsList = await warehouseDepots.allProductsWithoutDepots(ownerId!, warehouseId!)
+
+            if (newDepartmentProductsList) {
+
+                newDepartmentProductsList.forEach((element: any, index: number) => {
+                    if (selectedDepartments.has(element.id)) {
+                        newDepartmentProductsList[index].selected = true
+                    }
+                })
+
+                formik.resetForm()
+                setDepartmentProductsList(newDepartmentProductsList);
+                notifySuccess("Se ha creado un nuevo depósito")
+
+            } else notifyError("Error al cargar los datos")
+
         } else {
             //ToDo: catch validation errors
             notifyError("Hay un error en la creación de depósitos")
@@ -97,62 +94,49 @@ export default function UserWarehouseForm({ ownerId, warehouseId }: UserWarehous
     })
 
     return (
-        <Card variant={"outlined"}>
-            <form onSubmit={formik.handleSubmit}>
-                <Grid container rowSpacing={2}>
+        <form onSubmit={formik.handleSubmit} >
+            <Grid container rowSpacing={2}>
+
+                <Grid container item rowSpacing={2}>
                     <Grid item xs={12}>
-                        <CustomToolbar />
+                        <TextField
+
+                            label="Cantidad de unidades"
+                            size={"small"}
+                            {...formik.getFieldProps("productTotalUnits")}
+                            error={!!formik.errors.productTotalUnits && formik.touched.productTotalUnits}
+                            helperText={(formik.errors.productTotalUnits && formik.touched.productTotalUnits) && formik.errors.productTotalUnits}
+                        />
                     </Grid>
 
-                    <Grid container item rowSpacing={2} sx={{ padding: "25px" }}>
-                        <Grid item xs={12}>
-                            <TextField
-
-                                label="Cantidad de unidades"
-                                size={"small"}
-                                {...formik.getFieldProps("productTotalUnits")}
-                                error={!!formik.errors.productTotalUnits && formik.touched.productTotalUnits}
-                                helperText={(formik.errors.productTotalUnits && formik.touched.productTotalUnits) && formik.errors.productTotalUnits}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <DepartmentProductsSelect
-                                departmentProductsList={departmentProductsList}
-                                setDepartmentProductsList={setDepartmentProductsList}
-                                selectedProduct={formik.values.product}
-                                setSelectedProduct={(value: any) => formik.setFieldValue("product", value)}
-                            />
-                            <FormHelperText sx={{ color: "red" }}>
-                                {formik.errors.product}
-                            </FormHelperText>
-                        </Grid>
-                    </Grid>
-
-                    <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
-                        <Button
-                            color={"secondary"}
-                            variant={"outlined"}
-                            size={"small"}
-                            sx={{ m: 1 }}
-                            onClick={() => router.push(`/inventory/owner/warehouse/${warehouseId}`)}
-                        >
-                            Cancel
-                        </Button>
-
-                        <Button
-                            type={"submit"}
-                            color={"primary"}
-                            variant={"outlined"}
-                            size={"small"}
-                            sx={{ m: 1 }}
-                            disabled={!formik.isValid}
-                        >
-                            Crear
-                        </Button>
+                    <Grid item xs={12}>
+                        <DepartmentProductsSelect
+                            departmentProductsList={departmentProductsList}
+                            setDepartmentProductsList={setDepartmentProductsList}
+                            selectedProduct={formik.values.product}
+                            setSelectedProduct={(value: any) => formik.setFieldValue("product", value)}
+                        />
+                        <FormHelperText sx={{ color: "red" }}>
+                            {formik.errors.product}
+                        </FormHelperText>
                     </Grid>
                 </Grid>
-            </form>
-        </Card>
+
+                <Grid item xs={12} paddingX={5}>
+
+                    <Button
+                        fullWidth
+                        type={"submit"}
+                        color={"primary"}
+                        variant={"contained"}
+                        size={"small"}
+                        // sx={{ m: 1 }}
+                        disabled={!formik.isValid}
+                    >
+                        Crear
+                    </Button>
+                </Grid>
+            </Grid>
+        </form>
     )
 }
