@@ -50,6 +50,8 @@ import { Formik } from "formik";
 import Link from "next/link";
 import * as Yup from "yup";
 import dayjs from "dayjs";
+import ModalAddProduct from "./ModalAddProduct";
+import UserWarehouseForm from "./UserWarehouseForm";
 
 interface UserWarehouseMainTableProps {
     ownerId?: number;
@@ -95,6 +97,9 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [depositsByDepartment, setDepositsByDepartment] = useState<(departments & { products?: productsProps[], selected?: boolean })[] | null>(null);
 
+    const [activeModalAddProduct, setActiveModalAddProduct] = useState(false)
+
+    const [forceRender, setForceRender] = useState(true)
     //GET initial products data
     useEffect(() => {
         const getDepositsByDepartament = async () => {
@@ -104,9 +109,12 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                     ...departments,
                     selected: false
                 })));
+            setForceRender(false)
         }
-        getDepositsByDepartament();
-    }, [ownerId, warehouseDetails]);
+        if (forceRender) {
+            getDepositsByDepartament();
+        }
+    }, [ownerId, warehouseDetails, forceRender]);
 
     useEffect(() => {
         if (depositsByDepartment?.length) {
@@ -240,11 +248,9 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                         <ShareOutlined fontSize={"small"} />
                                     </IconButton>
 
-                                    <Link href={`/inventory/owner/warehouse/${warehouseDetails?.id}/create`}>
-                                        <IconButton color={"inherit"} sx={{ color: 'white' }}>
-                                            <AddOutlined />
-                                        </IconButton>
-                                    </Link>
+                                    <IconButton color={"inherit"} sx={{ color: 'white' }} onClick={() => setActiveModalAddProduct(true)} >
+                                        <AddOutlined />
+                                    </IconButton>
                                 </>
                             )
                     }
@@ -970,6 +976,19 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
             {
                 (formik) => (
                     <Card variant={"outlined"}>
+
+                        <ModalAddProduct
+                            open={activeModalAddProduct}
+                            setOpen={setActiveModalAddProduct}
+                            dialogTitle="Nuevo Depósito"
+                            setForceRender={setForceRender}
+                        >
+                            <UserWarehouseForm
+                                ownerId={ownerId}
+                                warehouseId={warehouseDetails?.id}
+                            />
+                        </ModalAddProduct>
+
                         <UpdateValueDialog
                             dialogTitle={"Agregar nuevos productos a este depósito"}
                             open={displayNewUnitsForm}

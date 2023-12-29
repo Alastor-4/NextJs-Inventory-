@@ -1,4 +1,4 @@
-// @ts-nocheck
+//@ts-nocheck
 import {
     Card,
     CardContent,
@@ -10,8 +10,8 @@ import {
     TableHead,
     TableContainer,
     TableRow,
-    TextField,
-    Typography
+    Typography,
+    TextField
 } from "@mui/material";
 import React from "react";
 import { TableNoData } from "@/components/TableNoData";
@@ -67,7 +67,7 @@ export default function DepartmentProductsSelect(
                         Seleccione departamentos para encontrar el producto que busca
                     </Typography>
                 </Grid>
-                <Grid container item columnSpacing={2}>
+                <Grid container item spacing={2} flexWrap={"nowrap"} sx={{ overflowX: "auto", py: "7px" }}>
                     {
                         departmentProductsList.map((item, index) => (
                             <Grid key={item.id} item xs={"auto"}>
@@ -180,6 +180,7 @@ export default function DepartmentProductsSelect(
                                     hover
                                     tabIndex={-1}
                                     selected={selectedProduct && (row.id === selectedProduct.id)}
+
                                     onClick={() => handleSelectItem(row)}
                                 >
                                     <TableCell>
@@ -237,41 +238,53 @@ export default function DepartmentProductsSelect(
     }
 
     return (
-        <Formik
-            initialValues={initialValues}
-            onSubmit={() => {
+        <Card variant={"outlined"}>
+            <Formik
+                initialValues={initialValues}
+                onSubmit={() => {
 
-            }}
-        >
-            {
-                (formik) => (
-                    <Card variant={"outlined"}>
+                }}
+            >
+                {
+                    (formik) => (
+
                         <CardContent>
-                            {
-                                departmentProductsList.length > 0 && (
-                                    <DepartmentsFilter formik={formik} />
-                                )
-                            }
+                            <Grid container rowSpacing={3} width={'100%'}>
 
-                            {
-                                data?.length > 0
-                                    ? (
-                                        <Grid item xs={12}>
-                                            <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
-                                                <Table sx={{ width: "100%" }} size={"small"}>
-                                                    <TableHeader />
-                                                    <TableContent formik={formik} />
-                                                </Table>
-                                            </TableContainer>
+                                {
+                                    departmentProductsList.length > 0 && (
+                                        <Grid item xs={12} >
+                                            <DepartmentsFilter formik={formik} />
                                         </Grid>
-                                    ) : (
-                                        <TableNoData />
                                     )
-                            }
+                                }
+
+
+
+                                {
+                                    data?.length > 0
+                                        ? (
+                                            <Grid item xs={12}>
+                                                <TableContainer sx={{ height: "18em", width: "100%", overflowX: "auto" }}>
+                                                    <Table sx={{ width: "100%" }} size={"small"}>
+                                                        <TableHeader />
+                                                        <TableContent formik={formik} />
+                                                    </Table>
+                                                </TableContainer>
+                                            </Grid>
+
+                                        ) : (
+                                            <TableNoData />
+                                        )
+                                }
+
+                            </Grid>
+
                         </CardContent>
-                    </Card>
-                )
-            }
-        </Formik>
+
+                    )
+                }
+            </Formik>
+        </Card>
     )
 }
