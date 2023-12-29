@@ -4,7 +4,7 @@ import { notifyError } from "@/utils/generalFunctions";
 
 const url = `/inventory/owner/product/api`
 const updateUrl = `/inventory/owner/product/update/api`
-
+const urlApiDepartments = `/inventory/owner/product/apiDepartments`
 const products = {
     allUserProducts: async function (userId: number, departmentIds) {
         try {
@@ -79,6 +79,17 @@ const products = {
 
         return false
     },
+    getDepartments: async function () {
+        try {
+            const response = await apiRequest.get(urlApiDepartments)
+
+            return response.data
+
+        } catch (e) {
+            notifyError("Error al obtener los departamentos")
+        }
+        return false
+    }
 }
 
 export default products;

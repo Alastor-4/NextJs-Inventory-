@@ -1,7 +1,7 @@
 //@ts-nocheck
 "use client"
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
     AppBar,
     Box,
@@ -28,17 +28,26 @@ import {
     ExpandLessOutlined,
     ExpandMoreOutlined
 } from "@mui/icons-material";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import products from "../requests/products";
 import { Formik } from "formik";
 import DepartmentCustomButton from "@/components/DepartmentCustomButton";
+import ModalUpdateProduct from "./ModalUpdateProduct";
+import ProductsForm from "./ProductsForm";
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 
 export default function ProductsMainTable({ userId }: { userId: number }) {
     const router = useRouter()
 
     const [data, setData] = React.useState(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
+
+
+    const [forceRender, setForceRender] = React.useState(false)
+    const [activateModalCreateProduct, setActivateModalCreateProduct] = React.useState(false)
+    const [activateModalUpdateProduct, setActivateModalUpdateProduct] = React.useState(false)
+
+    const [selected, setSelected] = React.useState(null)
 
     //get initial data
     React.useEffect(() => {
@@ -48,10 +57,12 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                 ...item,
                 selected: false
             })))
+            setForceRender(false)
+            setSelected(null)
         }
         getAllProductsByDepartment()
 
-    }, [userId])
+    }, [userId, forceRender])
 
     React.useEffect(() => {
         if (allProductsByDepartment.length) {
@@ -78,8 +89,21 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
 
     }, [allProductsByDepartment])
 
+    //get All Departments
+    const [departments, setDepartments] = React.useState(null)
+    useEffect(() => {
+
+        const getAllDepartments = async () => {
+            const result = await products.getDepartments()
+            setDepartments(result)
+        }
+
+        if (departments === null) {
+            getAllDepartments()
+        }
+    }, [departments])
+
     //table selected item
-    const [selected, setSelected] = React.useState(null)
     const handleSelectItem = (item) => {
         if (selected && (selected.id === item.id)) {
             setSelected(null)
@@ -100,16 +124,21 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
 
             if (updatedProducts) {
                 setAllProductsByDepartment(updatedProducts.map(item => ({ ...item, selected: selectedFilters.includes(item.id) })))
-            }
+                notifySuccess("Se ha eliminado el producto")
+            } else notifyError("Error al eliminar el producto")
         }
     }
 
     async function handleUpdate() {
-        await router.push(`/inventory/owner/product/update/${selected.id}`)
+        router.push(`/inventory/owner/product/update/${selected.id}`)
     }
 
     function handleNavigateBack() {
         router.push(`/inventory`)
+    }
+
+    const activeModal = (setOpen: (bool: boolean) => void) => {
+        setOpen(true)
     }
 
     const CustomToolbar = () => (
@@ -136,7 +165,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                     {
                         selected && (
                             <Box sx={{ display: "flex" }}>
-                                <IconButton color={"inherit"} onClick={handleUpdate}>
+                                <IconButton color={"inherit"} onClick={() => activeModal(setActivateModalUpdateProduct)}>
                                     <EditOutlined fontSize={"small"} />
                                 </IconButton>
 
@@ -149,12 +178,9 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             </Box>
                         )
                     }
-
-                    <Link href={`/inventory/owner/product/create`}>
-                        <IconButton color={"inherit"} sx={{ color: "white" }}>
-                            <AddOutlined />
-                        </IconButton>
-                    </Link>
+                    <IconButton sx={{ color: "white" }} onClick={() => activeModal(setActivateModalCreateProduct)}>
+                        <AddOutlined />
+                    </IconButton>
                 </Box>
             </Toolbar>
         </AppBar>
@@ -303,7 +329,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             Seleccione departamentos para encontrar el producto que busca
                         </Typography>
                     </Grid>
-                    <Grid container item columnSpacing={2} flexWrap={"nowrap"} sx={{overflowX: "auto", py: "7px"}}>
+                    <Grid container item columnSpacing={2} flexWrap={"nowrap"} sx={{ overflowX: "auto", py: "7px" }}>
                         {
                             allProductsByDepartment.map((item, index) => (
                                 <Grid key={item.id} item xs={"auto"}>
@@ -362,42 +388,72 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
     }
 
     return (
-        <Formik
-            initialValues={initialValues}
-            onSubmit={() => {
+        <>
+            <ModalUpdateProduct
+                open={activateModalCreateProduct}
+                setOpen={setActivateModalCreateProduct}
+                dialogTitle="Crear Producto"
+            >
+                <ProductsForm
+                    userId={userId}
+                    departments={departments}
+                    productId={null}
+                    setForceRender={setForceRender}
+                    setOpen={setActivateModalCreateProduct}
+                />
+            </ModalUpdateProduct>
 
-            }}
-        >
-            {
-                (formik) => (
-                    <Card variant={"outlined"}>
-                        <CustomToolbar />
+            <ModalUpdateProduct
+                open={activateModalUpdateProduct}
+                setOpen={setActivateModalUpdateProduct}
+                dialogTitle="Modificar Producto"
+            >
+                <ProductsForm
+                    userId={userId}
+                    departments={departments}
+                    productId={selected?.id}
+                    setForceRender={setForceRender}
+                    setOpen={setActivateModalUpdateProduct}
+                />
+            </ModalUpdateProduct>
 
-                        <CardContent>
-                            {
-                                allProductsByDepartment.length > 0 && (
-                                    <DepartmentsFilter formik={formik} />
-                                )
-                            }
+            <Formik
+                initialValues={initialValues}
+                onSubmit={() => {
 
-                            {
-                                data?.length > 0
-                                    ? (
-                                        <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
-                                            <Table sx={{ width: "100%" }} size={"small"}>
-                                                <TableHeader />
+                }}
+            >
+                {
+                    (formik) => (
+                        <Card variant={"outlined"}>
+                            <CustomToolbar />
 
-                                                <TableContent formik={formik} />
-                                            </Table>
-                                        </TableContainer>
-                                    ) : (
-                                        <TableNoData />
+                            <CardContent>
+                                {
+                                    allProductsByDepartment.length > 0 && (
+                                        <DepartmentsFilter formik={formik} />
                                     )
-                            }
-                        </CardContent>
-                    </Card>
-                )
-            }
-        </Formik>
+                                }
+
+                                {
+                                    data?.length > 0
+                                        ? (
+                                            <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                                <Table sx={{ width: "100%" }} size={"small"}>
+                                                    <TableHeader />
+
+                                                    <TableContent formik={formik} />
+                                                </Table>
+                                            </TableContainer>
+                                        ) : (
+                                            <TableNoData />
+                                        )
+                                }
+                            </CardContent>
+                        </Card>
+                    )
+                }
+            </Formik>
+        </>
     )
 }

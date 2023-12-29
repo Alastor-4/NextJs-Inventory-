@@ -17,21 +17,18 @@ import {
 import React from "react";
 import { Formik } from "formik";
 import * as Yup from "yup"
-import { useParams, useRouter } from 'next/navigation';
-
+import { useRouter } from 'next/navigation';
 import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-material";
 import { handleKeyDownWithDot } from "@/utils/handleKeyDown";
 import { useUploadThing } from "@/app/api/uploadthing/utils";
 import { useDropzone } from "react-dropzone";
 import products from "../requests/products";
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 
 export default function ProductsForm(props: any) {
-    const { userId, departments } = props
+    const { userId, departments, productId, setForceRender, setOpen } = props
 
     const [updateItem, setUpdateItem] = React.useState()
-
-    const params = useParams()
-    const router = useRouter()
 
     //initial values
     const [department, setDepartment] = React.useState("");
@@ -48,30 +45,10 @@ export default function ProductsForm(props: any) {
                 }
             }
         }
-        if (params?.productId !== undefined) {
-            fetchProduct(params.productId)
+        if (productId !== null) {
+            fetchProduct(productId)
         }
-    }, [params.productId, userId, setUpdateItem, departments])
-
-    const CustomToolbar = () => (
-        <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        sx={{
-                            fontWeight: 700,
-                            letterSpacing: ".2rem",
-                            color: "white",
-                        }}
-                    >
-                        {updateItem ? "Modificar producto" : "Crear producto"}
-                    </Typography>
-                </Box>
-            </Toolbar>
-        </AppBar>
-    )
+    }, [productId, userId, setUpdateItem, departments])
 
     const initialValues = {
         name: updateItem ? updateItem.name : "",
@@ -154,9 +131,20 @@ export default function ProductsForm(props: any) {
         }
 
         if (response.status === 200) {
-            router.push(`/inventory/owner/product`)
+            setForceRender(true)
+            setOpen(false)
+            notifySuccess(
+                updateItem
+                    ? "Se ha modificado el producto"
+                    : "Se ha creado el producto"
+            )
         } else {
-            //ToDo: catch validation errors
+            notifyError(
+                updateItem
+                    ? "Error al modificar el producto"
+                    : "Error al crear el producto"
+            )
+
         }
     }
 
@@ -295,194 +283,182 @@ export default function ProductsForm(props: any) {
         >
             {
                 (formik) => (
-                    <Card variant={"outlined"}>
-                        <form onSubmit={formik.handleSubmit}>
-                            <Grid container rowSpacing={2}>
+
+                    <form onSubmit={formik.handleSubmit}>
+                        <Grid container rowSpacing={2}>
+
+                            <Grid container item rowSpacing={4} >
                                 <Grid item xs={12}>
-                                    <CustomToolbar />
+                                    <TextField
+                                        name={"Nombre*"}
+                                        label="Nombre"
+                                        size={"small"}
+                                        fullWidth
+                                        {...formik.getFieldProps("name")}
+                                        error={formik.errors.name && formik.touched.name}
+                                        helperText={(formik.errors.name && formik.touched.name) && formik.errors.name}
+                                    />
                                 </Grid>
 
-                                <Grid container item rowSpacing={4} sx={{ padding: "25px" }}>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            name={"Nombre*"}
-                                            label="Nombre"
-                                            size={"small"}
-                                            fullWidth
-                                            {...formik.getFieldProps("name")}
-                                            error={formik.errors.name && formik.touched.name}
-                                            helperText={(formik.errors.name && formik.touched.name) && formik.errors.name}
-                                        />
-                                    </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name={"description"}
+                                        label="Descripción"
+                                        size={"small"}
+                                        fullWidth
+                                        {...formik.getFieldProps("description")}
+                                        error={formik.errors.description && formik.touched.description}
+                                        helperText={(formik.errors.description && formik.touched.description) && formik.errors.description}
+                                    />
+                                </Grid>
 
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            name={"description"}
-                                            label="Descripción"
-                                            size={"small"}
-                                            fullWidth
-                                            {...formik.getFieldProps("description")}
-                                            error={formik.errors.description && formik.touched.description}
-                                            helperText={(formik.errors.description && formik.touched.description) && formik.errors.description}
-                                        />
-                                    </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name={"buyPrice"}
+                                        label="Precio de compra"
+                                        size={"small"}
+                                        onKeyDown={handleKeyDownWithDot}
+                                        fullWidth
+                                        {...formik.getFieldProps("buyPrice")}
+                                        error={formik.errors.buyPrice && formik.touched.buyPrice}
+                                        helperText={(formik.errors.buyPrice && formik.touched.buyPrice) && formik.errors.buyPrice}
+                                    />
+                                </Grid>
 
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            name={"buyPrice"}
-                                            label="Precio de compra"
-                                            size={"small"}
-                                            onKeyDown={handleKeyDownWithDot}
-                                            fullWidth
-                                            {...formik.getFieldProps("buyPrice")}
-                                            error={formik.errors.buyPrice && formik.touched.buyPrice}
-                                            helperText={(formik.errors.buyPrice && formik.touched.buyPrice) && formik.errors.buyPrice}
-                                        />
-                                    </Grid>
-
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            name={"department"}
-                                            label="Departamento"
-                                            size={"small"}
-                                            fullWidth
-                                            select
-                                            {...formik.getFieldProps("department")}
-                                            error={formik.errors.department && formik.touched.department}
-                                            helperText={(formik.errors.department && formik.touched.department) && formik.errors.department}
-                                        >
-                                            {
-                                                departments.map(item => (<MenuItem key={item.id} value={item}>{item.name}</MenuItem>))
-                                            }
-                                        </TextField>
-                                    </Grid>
-
-                                    <Grid item container xs={12} rowSpacing={2}>
-                                        <Grid item xs={12} sx={{ paddingX: "15px" }}>
-                                            <FormControlLabel
-                                                label={
-                                                    <Typography variant={"subtitle2"}>
-                                                        Agregue características que describan el producto. Ej: Talla: XL, Color: Negro, Material: Aluminio
-                                                    </Typography>
-                                                }
-                                                control={<></>}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            {
-                                                formik.values.characteristics.map((item, index) => (
-                                                    <Grid
-                                                        key={index}
-                                                        sx={{
-                                                            display: "inline-flex",
-                                                            margin: "3px",
-                                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                            padding: "2px 4px",
-                                                            borderRadius: "5px 2px 2px 2px",
-                                                            border: "1px solid rgba(130, 130, 130)",
-                                                            fontSize: 14,
-                                                        }}
-                                                    >
-                                                        <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
-                                                            <Typography variant={"caption"} sx={{ color: "white", fontWeight: "600" }}>
-                                                                {item.name.toUpperCase()}
-                                                            </Typography>
-                                                        </Grid>
-                                                        <Grid container item alignItems={"center"} sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                            {item.value}
-                                                        </Grid>
-                                                        <Grid item sx={{ marginLeft: "3px" }}>
-                                                            <DeleteOutline
-                                                                fontSize={"small"}
-                                                                color={"secondary"}
-                                                                onClick={() => handleRemoveCharacteristic(formik, index)}
-                                                                sx={{ cursor: "pointer" }}
-                                                            />
-                                                        </Grid>
-                                                    </Grid>
-                                                ))
-                                            }
-                                            {
-                                                !formik?.values?.displayCharacteristicForm && (
-                                                    <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm", true)}>
-                                                        <AddOutlined />
-                                                    </IconButton>
-                                                )
-                                            }
-                                        </Grid>
-
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name={"department"}
+                                        label="Departamento"
+                                        size={"small"}
+                                        fullWidth
+                                        select
+                                        {...formik.getFieldProps("department")}
+                                        error={formik.errors.department && formik.touched.department}
+                                        helperText={(formik.errors.department && formik.touched.department) && formik.errors.department}
+                                    >
                                         {
-                                            formik?.values?.displayCharacteristicForm && (
-                                                <Grid container item xs={12} spacing={2}>
-                                                    <Grid item xs={12}>
-                                                        <TextField
-                                                            name={"characteristicName"}
-                                                            label="Característica"
-                                                            size={"small"}
-                                                            fullWidth
-                                                            {...formik.getFieldProps("characteristicName")}
-                                                            error={formik.errors.characteristicName && formik.touched.characteristicName}
-                                                            helperText={(formik.errors.characteristicName && formik.touched.characteristicName) && formik.errors.characteristicName}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item xs={12}>
-                                                        <TextField
-                                                            name={"characteristicValue"}
-                                                            label="Valor"
-                                                            size={"small"}
-                                                            fullWidth
-                                                            {...formik.getFieldProps("characteristicValue")}
-                                                            error={formik.errors.characteristicValue && formik.touched.characteristicValue}
-                                                            helperText={(formik.errors.characteristicValue && formik.touched.characteristicValue) && formik.errors.characteristicValue}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item xs={12}>
-                                                        <IconButton color={"primary"} onClick={() => handleAddCharacteristic(formik)}>
-                                                            <Done color={"primary"} />
-                                                        </IconButton>
+                                            departments?.map(item => (<MenuItem key={item.id} value={item}>{item.name}</MenuItem>))
+                                        }
+                                    </TextField>
+                                </Grid>
 
-                                                        <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm", false)}>
-                                                            <Close />
-                                                        </IconButton>
+                                <Grid item container xs={12} rowSpacing={2}>
+                                    <Grid item xs={12} sx={{ paddingX: "15px" }}>
+                                        <FormControlLabel
+                                            label={
+                                                <Typography variant={"subtitle2"}>
+                                                    Agregue características que describan el producto. Ej: Talla: XL, Color: Negro, Material: Aluminio
+                                                </Typography>
+                                            }
+                                            control={<></>}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {
+                                            formik.values.characteristics.map((item, index) => (
+                                                <Grid
+                                                    key={index}
+                                                    sx={{
+                                                        display: "inline-flex",
+                                                        margin: "3px",
+                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                        padding: "2px 4px",
+                                                        borderRadius: "5px 2px 2px 2px",
+                                                        border: "1px solid rgba(130, 130, 130)",
+                                                        fontSize: 14,
+                                                    }}
+                                                >
+                                                    <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
+                                                        <Typography variant={"caption"} sx={{ color: "white", fontWeight: "600" }}>
+                                                            {item.name.toUpperCase()}
+                                                        </Typography>
+                                                    </Grid>
+                                                    <Grid container item alignItems={"center"} sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                        {item.value}
+                                                    </Grid>
+                                                    <Grid item sx={{ marginLeft: "3px" }}>
+                                                        <DeleteOutline
+                                                            fontSize={"small"}
+                                                            color={"secondary"}
+                                                            onClick={() => handleRemoveCharacteristic(formik, index)}
+                                                            sx={{ cursor: "pointer" }}
+                                                        />
                                                     </Grid>
                                                 </Grid>
+                                            ))
+                                        }
+                                        {
+                                            !formik?.values?.displayCharacteristicForm && (
+                                                <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm", true)}>
+                                                    <AddOutlined />
+                                                </IconButton>
                                             )
                                         }
+                                    </Grid>
 
-                                        <Grid item xs={12} sx={{ mt: "15px" }}>
-                                            <MyDropzone formik={formik} />
-                                        </Grid>
-                                        <Grid item container xs={12} justifyContent={"center"}>
-                                            <aside>{thumbs(formik)}</aside>
-                                        </Grid>
+                                    {
+                                        formik?.values?.displayCharacteristicForm && (
+                                            <Grid container item xs={12} spacing={2}>
+                                                <Grid item xs={12}>
+                                                    <TextField
+                                                        name={"characteristicName"}
+                                                        label="Característica"
+                                                        size={"small"}
+                                                        fullWidth
+                                                        {...formik.getFieldProps("characteristicName")}
+                                                        error={formik.errors.characteristicName && formik.touched.characteristicName}
+                                                        helperText={(formik.errors.characteristicName && formik.touched.characteristicName) && formik.errors.characteristicName}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <TextField
+                                                        name={"characteristicValue"}
+                                                        label="Valor"
+                                                        size={"small"}
+                                                        fullWidth
+                                                        {...formik.getFieldProps("characteristicValue")}
+                                                        error={formik.errors.characteristicValue && formik.touched.characteristicValue}
+                                                        helperText={(formik.errors.characteristicValue && formik.touched.characteristicValue) && formik.errors.characteristicValue}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <IconButton color={"primary"} onClick={() => handleAddCharacteristic(formik)}>
+                                                        <Done color={"primary"} />
+                                                    </IconButton>
+
+                                                    <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm", false)}>
+                                                        <Close />
+                                                    </IconButton>
+                                                </Grid>
+                                            </Grid>
+                                        )
+                                    }
+
+                                    <Grid item xs={12} sx={{ mt: "15px" }}>
+                                        <MyDropzone formik={formik} />
+                                    </Grid>
+                                    <Grid item container xs={12} justifyContent={"center"}>
+                                        <aside>{thumbs(formik)}</aside>
                                     </Grid>
                                 </Grid>
-
-                                <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
-                                    <Button
-                                        color={"secondary"}
-                                        variant={"outlined"}
-                                        size={"small"}
-                                        sx={{ m: 1 }}
-                                        onClick={() => router.push(`/inventory/owner/product`)}
-                                    >
-                                        Cancel
-                                    </Button>
-
-                                    <Button
-                                        type={"submit"}
-                                        color={"primary"}
-                                        variant={"outlined"}
-                                        size={"small"}
-                                        sx={{ m: 1 }}
-                                        disabled={!formik.isValid}
-                                    >
-                                        {updateItem ? "Actualizar" : "Crear"}
-                                    </Button>
-                                </Grid>
                             </Grid>
-                        </form>
-                    </Card>
+
+                            <Grid item sx={{ paddingX: "1.5em" }} xs={12} >
+
+                                <Button
+                                    type={"submit"}
+                                    fullWidth
+                                    color={"primary"}
+                                    variant={"contained"}
+                                    size={"small"}
+                                    disabled={!formik.isValid}
+                                >
+                                    {updateItem ? "Actualizar" : "Crear"}
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </form>
+
                 )
             }
         </Formik>
