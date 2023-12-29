@@ -2,7 +2,9 @@
 "use client"
 
 import {
-    AppBar, Avatar, Badge,
+    AppBar,
+    Avatar,
+    Badge,
     Box,
     Button,
     Card,
@@ -18,12 +20,11 @@ import React from "react";
 import { Formik } from "formik";
 import * as Yup from "yup"
 import { useParams, useRouter } from 'next/navigation';
-
 import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-material";
 import { handleKeyDownWithDot } from "@/utils/handleKeyDown";
-import { useUploadThing } from "@/app/api/uploadthing/utils";
 import { useDropzone } from "react-dropzone";
 import products from "../requests/products";
+import useImageUploadContext from "@/components/ImageUploadProvider";
 
 export default function ProductsForm(props: any) {
     const { userId, departments } = props
@@ -33,12 +34,14 @@ export default function ProductsForm(props: any) {
     const params = useParams()
     const router = useRouter()
 
+    const { startImagesUpload } = useImageUploadContext()
+
     //initial values
     const [department, setDepartment] = React.useState("");
 
     React.useEffect(() => {
         async function fetchProduct(id: string) {
-            const product = await products.productDetails(userId, id)
+            const product = await products.productDetails(id)
             setUpdateItem(product)
 
             if (product?.departments?.id) {
@@ -100,15 +103,6 @@ export default function ProductsForm(props: any) {
         characteristicValue: Yup.string().nullable(),
     })
 
-    const { startUpload } = useUploadThing("imageUploader", {
-        onClientUploadComplete: (res) => {
-            return res
-        },
-        onUploadError: () => {
-            return false
-        },
-    });
-
     const handleSubmit = async (values) => {
         let data = {
             id: undefined,
@@ -132,28 +126,24 @@ export default function ProductsForm(props: any) {
             data.deletedImages = values.deletedImages.map(item => ({ id: item.id, fileKey: item.fileKey }))
         }
 
-        if (values.images.length) {
-            //ToDo: images upload and save data in db must be done in background
-            const newImages = values.images.filter((item) => !item.fileKey)
-            if (newImages.length) {
-                const files = await startUpload(newImages)
-                if (files) {
-                    data.images = files.map(item => ({ fileKey: item.fileKey, fileUrl: item.fileUrl }))
-                }
-            }
-        }
-
         let response
 
         if (updateItem) {
             data.id = updateItem.id
 
-            response = await products.update(userId, data)
+            response = await products.update(data)
         } else {
-            response = await products.create(userId, data)
+            response = await products.create(data)
         }
 
         if (response.status === 200) {
+            if (values.images.length) {
+                const newImages = values.images.filter((item) => !item.fileKey)
+                if (newImages.length) {
+                    startImagesUpload(response.data.id, newImages)
+                }
+            }
+
             router.push(`/inventory/owner/product`)
         } else {
             //ToDo: catch validation errors

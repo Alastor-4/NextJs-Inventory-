@@ -5,6 +5,7 @@ import React from "react";
 import { useStore } from "@/app/store/store"
 import { Backdrop, CircularProgress } from "@mui/material";
 import { SessionProvider } from "next-auth/react";
+import {ImageUploadProvider} from "@/components/ImageUploadProvider";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
 
@@ -13,7 +14,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     return (
         <SessionProvider>
             <SnackbarProvider maxSnack={3} dense anchorOrigin={{ horizontal: "center", vertical: "bottom" }}>
-                {children}
+                <ImageUploadProvider>
+                    {children}
+                </ImageUploadProvider>
                 <Backdrop
                     sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.modal + 1 }}
                     open={loading}

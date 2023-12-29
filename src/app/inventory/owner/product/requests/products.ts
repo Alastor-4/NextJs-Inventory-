@@ -6,17 +6,6 @@ const url = `/inventory/owner/product/api`
 const updateUrl = `/inventory/owner/product/update/api`
 
 const products = {
-    allUserProducts: async function (userId: number, departmentIds) {
-        try {
-            const response = await apiRequest.get(url, { params: { userId: userId, departmentIds: departmentIds } })
-            return response.data
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
-
     allUserProductDepartments: async function (userId) {
         try {
             const response = await apiRequest.get(url, { params: { userId: userId } })
@@ -28,7 +17,7 @@ const products = {
         return false
     },
 
-    productDetails: async function (userId, productId) {
+    productDetails: async function (productId) {
         try {
             const response = await apiRequest.get(updateUrl, { params: { productId: productId } })
             return response.data
@@ -39,7 +28,7 @@ const products = {
         return false
     },
 
-    create: async function (userId, data) {
+    create: async function (data) {
         try {
             return await apiRequest.post(url, data)
         } catch (e) {
@@ -49,9 +38,9 @@ const products = {
         return false
     },
 
-    syncImages: async function ({ userId, productId, productImages }) {
+    update: async function (data) {
         try {
-            return await apiRequest.patch(url, { productId, productImages })
+            return await apiRequest.put(url, data)
         } catch (e) {
             //ToDo: notify error here
         }
@@ -59,9 +48,9 @@ const products = {
         return false
     },
 
-    update: async function (userId, data) {
+    insertImages: async function ({ productId, productImages }) {
         try {
-            return await apiRequest.put(url, data)
+            return await apiRequest.patch(url, { productId, productImages })
         } catch (e) {
             //ToDo: notify error here
         }
