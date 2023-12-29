@@ -1,11 +1,10 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { NextResponse } from 'next/server';
-import * as process from "process";
 import { prisma } from "db";
 //import logger from "@/utils/logger";
 import { withAxiom, AxiomRequest } from "next-axiom"
-import { Resend } from 'resend';
 import VerifyUserTemplate from '@/components/email-templates/VerifyUserTemplate';
+import resend from "@/utils/resendInit";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
@@ -42,8 +41,6 @@ export async function GET(req: Request) {
         return new NextResponse("No fue proporcionado el token de verificación del usuario", { status: 400 });
     }
 }
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const POST = withAxiom(async (req: AxiomRequest) => {
     req.log.info("Ejecutada función de registrar usuario")
