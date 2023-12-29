@@ -129,10 +129,6 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
         }
     }
 
-    async function handleUpdate() {
-        router.push(`/inventory/owner/product/update/${selected.id}`)
-    }
-
     function handleNavigateBack() {
         router.push(`/inventory`)
     }
