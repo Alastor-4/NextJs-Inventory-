@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
-import { enqueueSnackbar } from "notistack";
+import { enqueueSnackbar, closeSnackbar } from "notistack";
+import {Button} from "@mui/material";
+import React from "react";
 
 export const numberFormat = (number: string) => parseFloat((Math.round(parseFloat(number.toString()) * 100) / 100).toFixed(2))
 
@@ -15,8 +17,15 @@ export const daysMap = {
     7: "Sábado",
 }
 
+const actionClose = (snackbarId: number) => (<Button size={"small"} color={"inherit"} variant={"outlined"} onClick={() => closeSnackbar(snackbarId)}>Ok</Button>)
+
 export const notifySuccess = (message: string) => enqueueSnackbar(message, { variant: "success" })
-export const notifyError = (message: string) => enqueueSnackbar(message, { variant: "error" })
+
+export const notifyError = (message: string, requireUserConfirm?: boolean) => requireUserConfirm
+    // @ts-ignore
+    ? enqueueSnackbar(message, { variant: "error", persist: true, action: actionClose})
+    : enqueueSnackbar(message, { variant: "error", autoHideDuration: 6000})
+
 export const notifyWarning = (message: string) => enqueueSnackbar(message, { variant: "warning" })
 
 //return offer price per unit from first applicable offer found. return false if no applicable offer found

@@ -1,6 +1,6 @@
-import { utapi } from 'uploadthing/server';
 import { NextResponse } from 'next/server'
 import { prisma } from "db";
+import {utapi} from "@/server/uploadthing";
 
 // GET all user products
 export async function GET(req: Request) {
@@ -29,7 +29,7 @@ export async function GET(req: Request) {
 // CREATE new user product
 export async function POST(req: Request) {
     try {
-        const { userId, name, description, departmentId, buyPrice, characteristics, images } = await req.json();
+        const { userId, name, description, departmentId, buyPrice, characteristics } = await req.json();
 
         let createObj = {
             data: {
@@ -46,13 +46,6 @@ export async function POST(req: Request) {
             createObj.data.characteristics = { createMany: { data: characteristics } }
             // @ts-ignore
             createObj.include = { characteristics: true }
-        }
-
-        if (images) {
-            // @ts-ignore
-            createObj.data.images = { createMany: { data: images } }
-            // @ts-ignore
-            createObj.include = createObj.include ? { ...createObj.include, images: true } : { images: true }
         }
 
         const newProduct = await prisma.products.create(createObj)
@@ -75,7 +68,6 @@ export async function PUT(req: Request) {
             buyPrice,
             characteristics,
             deletedCharacteristics,
-            images,
             deletedImages
         } = await req.json()
 
@@ -99,10 +91,6 @@ export async function PUT(req: Request) {
             await prisma.characteristics.createMany({ data: characteristics.map((item: any) => ({ ...item, product_id: id })) })
         }
 
-        if (images) {
-            await prisma.images.createMany({ data: images.map((item: any) => ({ ...item, product_id: id })) })
-        }
-
         const updatedProduct = await prisma.products.update(
             {
                 data: updateObj, where: { id: parseInt(id) }
@@ -116,12 +104,15 @@ export async function PUT(req: Request) {
     }
 }
 
-// INSERT metadata from already uploaded images to a user product
+// INSERT images metadata from already uploaded product images
 export async function PATCH(req: Request) {
     try {
-        const { productId, name, description, departmentId, buyPrice } = await req.json()
-        //sync product images
-        const updatedProduct = await prisma.products.update({ data: { name, description, department_id: parseInt(departmentId), buy_price: parseFloat(buyPrice) }, where: { id: parseInt(productId) } })
+        const { productId, productImages } = await req.json()
+
+        const data = productImages.map((item: any) => ({product_id: +productId, fileKey: item.key, fileUrl: item.url }))
+
+        //insert new images for an existing product
+        const updatedProduct = await prisma.images.createMany({ data: data})
 
         return NextResponse.json(updatedProduct);
     } catch (error) {
