@@ -185,8 +185,8 @@ export default function ProductsForm(props: any) {
             let addedFiles = [...formik.values.images]
 
             newFiles.forEach((newFile) => {
-                //only 3 images allowed
-                if (addedFiles.length < 3) {
+                //only 1 image allowed
+                if (addedFiles.length < 1) {
                     const index = formik.values.images.findIndex((item) => item.name === newFile.name)
                     if (index < 0) {
                         newFile.fileUrl = URL.createObjectURL(newFile)
@@ -204,7 +204,7 @@ export default function ProductsForm(props: any) {
                     'image/*': ['.jpeg', '.jpg', '.png']
                 },
                 multiple: true,
-                maxFiles: 3,
+                maxFiles: 1,
                 maxSize: 4000000,
                 onDrop: onDrop,
             }
@@ -238,8 +238,8 @@ export default function ProductsForm(props: any) {
                     {
                         isDragActive ?
                             <p>Suelte las imágenes aquí ...</p> :
-                            <p>Arrastre imágenes hasta aquí o click para seleccionar. <br />
-                                Sube hasta 3 archivos menores de 4MB cada uno. <br />
+                            <p>Arrastre una imágen hasta aquí o click para seleccionar. <br />
+                                Solo un archivo menor de 4MB. <br />
                                 Formatos permitidos .jpeg, .jpg o .png
                             </p>
                     }
