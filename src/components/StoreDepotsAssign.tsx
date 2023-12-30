@@ -24,11 +24,12 @@ import { useRouter } from "next/navigation";
 interface StoreDepotsAssignProps {
     userId?: number;
     selectedWarehouseId?: number;
+    selectedStoreId?: number;
     storeList?: stores[];
     warehouseList?: warehouses[];
 }
 
-export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, storeList, userId }: StoreDepotsAssignProps) {
+export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, selectedStoreId, storeList, userId }: StoreDepotsAssignProps) {
 
     const router = useRouter();
 
@@ -44,6 +45,15 @@ export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, 
             }
         }
     }, [selectedWarehouseId, warehouseList]);
+
+    useEffect(() => {
+        if (selectedStoreId) {
+            const index = storeList?.findIndex(item => item.id === selectedStoreId);
+            if (storeList && (index! > -1)) {
+                setSelectedStore(storeList[index!]);
+            }
+        }
+    }, [selectedStoreId, storeList]);
 
     const initialValues = {
         selectedWarehouse: selectedWarehouse?.name ?? "",
@@ -94,7 +104,7 @@ export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, 
                     <Card variant={"outlined"}>
                         <CustomToolbar />
                         <CardContent>
-                            <Grid container rowSpacing={2} xs={12} direction={"column"}>
+                            <Grid container rowSpacing={2} direction={"column"}>
                                 <Grid item>
                                     <TextField
                                         label="Almacén"

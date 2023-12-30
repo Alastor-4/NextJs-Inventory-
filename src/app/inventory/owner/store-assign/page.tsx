@@ -8,7 +8,7 @@ export default async function Page({ searchParams }: { searchParams: { storeId: 
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
 
-    const { warehouseId } = searchParams;
+    const { storeId, warehouseId } = searchParams;
 
     const ownerWarehouses: warehouses[] = await prisma.warehouses.findMany({ where: { owner_id: userId } });
     const ownerStores: stores[] = await prisma.stores.findMany({ where: { owner_id: userId } });
@@ -17,6 +17,7 @@ export default async function Page({ searchParams }: { searchParams: { storeId: 
         <main>
             <StoreDepotsAssign
                 selectedWarehouseId={+warehouseId!}
+                selectedStoreId={+storeId}
                 warehouseList={ownerWarehouses}
                 storeList={ownerStores}
                 userId={userId}
