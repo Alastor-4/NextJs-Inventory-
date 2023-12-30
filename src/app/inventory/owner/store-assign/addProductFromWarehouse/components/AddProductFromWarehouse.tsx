@@ -403,12 +403,11 @@ export default function AddProductFromWarehouse(props: any) {
                                                                             alignItems: "center",
                                                                             color: "blue"
                                                                         }}
-                                                                        onClick={() => handleOpenImagesDialog(row.images)}
+                                                                        onClick={() => handleOpenImagesDialog(row.products.images)}
                                                                     >
-                                                                        {row.images.length}
-
+                                                                        {row.products.images.length}
                                                                         <VisibilityOutlined fontSize={"small"}
-                                                                            sx={{ ml: "5px" }} />
+                                                                                            sx={{ ml: "5px" }} />
                                                                     </Box>
                                                                 ) : "no"
                                                         }

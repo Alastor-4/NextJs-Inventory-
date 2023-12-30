@@ -214,7 +214,7 @@ export default function UserProfileMain(props) {
                                     <ChevronRightOutlined fontSize={"small"} />
                                 </Grid>
                                 <Grid item xs={"auto"}>
-                                    {ownerProductsCount} producto(s)
+                                    {`${ownerProductsCount} ${ownerProductsCount === 1 ? "producto" : "productos"}`}
                                 </Grid>
                             </Grid>
                         </Link>
@@ -235,7 +235,7 @@ export default function UserProfileMain(props) {
                                     <ChevronRightOutlined fontSize={"small"} />
                                 </Grid>
                                 <Grid item xs={"auto"}>
-                                    {ownerWorkersCount} trabajador(es)
+                                    {`${ownerWorkersCount} ${ownerWorkersCount === 1 ? "trabajador" : "trabajadores"}`}
                                 </Grid>
                             </Grid>
                         </Link>
