@@ -42,7 +42,7 @@ export function ImageUploadProvider({ children }: { children: React.ReactNode })
     const UploadingImagesIndicator = () => (
         <Grid container alignItems={"center"} sx={{my: "5px", border: "1px solid black", borderRadius: "3px", p: "3px 5px"}}>
             <WarningOutlined sx={{fontSize: 18, mr: "5px"}}/>
-            Subiendo imágenes. Mantenga conexión a internet
+            Subiendo imágenes. Mantenga su conexión a internet. No cierre ni refresque esta ventana del navegador.
             <CircularProgress color="inherit" size={16} sx={{ml: "10px"}}/>
         </Grid>
     )
