@@ -1,9 +1,9 @@
 //@ts-nocheck
 "use client"
 
-import React, { useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import {
-    AppBar,
+    AppBar, Avatar,
     Box,
     Card,
     CardContent,
@@ -35,6 +35,7 @@ import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 import ModalUpdateProduct from "./ModalUpdateProduct";
 import ProductsForm from "./ProductsForm";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 
 export default function ProductsMainTable({ userId }: { userId: number }) {
     const router = useRouter()
@@ -233,6 +234,14 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
         )
     }
 
+    const [openImageDialog, setOpenImageDialog] = useState(false)
+    const [dialogImages, setDialogImages] = useState([])
+
+    function handleOpenImagesDialog(images: any) {
+        setDialogImages(images)
+        setOpenImageDialog(true)
+    }
+
     const TableContent = ({ formik }) => {
         return (
             <TableBody>
@@ -296,7 +305,18 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                     <TableCell>
                                         {
                                             row.images.length > 0
-                                                ? `${row.images.length} imagen` : "-"
+                                                ? row.images.map(
+                                                    imageItem =>
+                                                        <Avatar
+                                                            variant={"rounded"}
+                                                            key={`producto-${imageItem.id}`}
+                                                            alt={`producto-${imageItem.id}`}
+                                                            src={imageItem.fileUrl}
+                                                            onClick={() => handleOpenImagesDialog(row.images)}
+                                                            sx={{cursor: "pointer"}}
+                                                        />
+                                                )
+                                                : "-"
                                         }
                                     </TableCell>
                                 </TableRow>
@@ -383,6 +403,13 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
 
     return (
         <>
+            <ImagesDisplayDialog
+                dialogTitle={"Imágenes del producto"}
+                open={openImageDialog}
+                setOpen={setOpenImageDialog}
+                images={dialogImages}
+            />
+
             <ModalUpdateProduct
                 open={activateModalCreateProduct}
                 setOpen={setActivateModalCreateProduct}
