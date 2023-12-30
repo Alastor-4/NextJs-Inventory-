@@ -24,7 +24,7 @@ export default function ModalUpdateProduct({ open, setOpen, dialogTitle, childre
     };
 
     return (
-        <Dialog open={open} onClose={handleClose} >
+        <Dialog open={open} onClose={handleClose} fullScreen >
             <AppBar sx={{ position: 'relative' }}>
                 <Toolbar>
                     <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
