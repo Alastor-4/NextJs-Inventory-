@@ -24,7 +24,7 @@ export default function DepartmentProductsSelect(
     const [data, setData] = React.useState([]);
 
     React.useEffect(() => {
-        if (departmentProductsList.length) {
+        if (departmentProductsList.length >= 0) {
             let allProducts = [];
 
             departmentProductsList.forEach((departmentItem) => {
@@ -45,7 +45,6 @@ export default function DepartmentProductsSelect(
 
             setData(allProducts)
         }
-
     }, [departmentProductsList])
 
     function handleSelectFilter(index: number) {
