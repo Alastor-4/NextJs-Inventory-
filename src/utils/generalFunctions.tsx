@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { enqueueSnackbar, closeSnackbar } from "notistack";
-import {Button} from "@mui/material";
+import { Button } from "@mui/material";
 import React from "react";
 
 export const numberFormat = (number: string) => parseFloat((Math.round(parseFloat(number.toString()) * 100) / 100).toFixed(2))
@@ -23,8 +23,8 @@ export const notifySuccess = (message: string) => enqueueSnackbar(message, { var
 
 export const notifyError = (message: string, requireUserConfirm?: boolean) => requireUserConfirm
     // @ts-ignore
-    ? enqueueSnackbar(message, { variant: "error", persist: true, action: actionClose})
-    : enqueueSnackbar(message, { variant: "error", autoHideDuration: 6000})
+    ? enqueueSnackbar(message, { variant: "error", persist: true, action: actionClose })
+    : enqueueSnackbar(message, { variant: "error", autoHideDuration: 6000 })
 
 export const notifyWarning = (message: string) => enqueueSnackbar(message, { variant: "warning" })
 
@@ -70,3 +70,7 @@ export function computeDepotPricePerUnit(storeDepotWithOffersRelation: any, unit
                 ? storeDepotWithOffersRelation.sell_price - (storeDepotWithOffersRelation.price_discount_percentage * storeDepotWithOffersRelation.sell_price / 100)
                 : storeDepotWithOffersRelation.sell_price
 }
+
+// transaction address
+export const transactionToWarehouse: string = "1"
+export const transactionToStore: string = "2"
