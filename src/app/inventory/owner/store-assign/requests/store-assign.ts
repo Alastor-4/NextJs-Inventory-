@@ -1,6 +1,9 @@
 import apiRequest from "@/api"
+import { notifyError } from "@/utils/generalFunctions"
+
 const showProductWarehouseUrl = `/inventory/owner/store-assign/showProductApi/apiWarehouse`
 const showProductStoreUrl = `/inventory/owner/store-assign/showProductApi/apiStore`
+const transactionUrl = `/inventory/owner/store-assign/showProductApi/apiTransactions`
 
 const storeAssign = {
     //Peticiones del component ShowProductStore
@@ -55,6 +58,15 @@ const storeAssign = {
             //ToDo: notify error here
         }
 
+        return false
+    },
+    createTransaction: async function (data: any) {
+        try {
+            const response = await apiRequest.post(transactionUrl, data)
+            return response.status
+        } catch (e) {
+            notifyError("Error al registar la transacción")
+        }
         return false
     }
 }

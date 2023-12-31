@@ -37,6 +37,7 @@ import ManageQuantity from './Modal/ManageQuantity';
 import storeAssign from '../requests/store-assign';
 import { AxiosResponse } from 'axios';
 import { Formik } from 'formik';
+import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
 
 interface ShowProductsStoreProps {
     userId?: number;
@@ -263,12 +264,29 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
         setDepositsByDeparment(newDepositsByDepartment);
     }
 
+    //Objetivo: crea un registro en la bd de cada transaccion q se hace
+    // direction es true si las unidades transferidas se le suamn al almacen
+    //           es false en caso contrario  
+    const recordTransaction = async (direction: boolean, transferredUnits: number) => {
+        const data = {
+            store_depot_id: selectedProduct!.depots![0].store_depots![0].id,
+            units_transferred_quantity: transferredUnits,
+            transfer_direction: direction ? transactionToWarehouse : transactionToStore
+        }
+        const response = await storeAssign.createTransaction(data)
+
+        return response ? true : false
+    }
+
     const updateDepot = async (addUnits: number, depot: depots) => {
         depot.product_total_remaining_units! += addUnits;
         const result: boolean | AxiosResponse = await storeAssign.updateProductWarehouse(userId!, depot);
         if (!result) return;
         if (result.status === 200) {
-            loadData();
+
+            const correctTransaction = await recordTransaction(addUnits > 0 ? true : false, Math.abs(addUnits));
+
+            if (correctTransaction) loadData();
         }
     }
     // No borra el elemento de la tabla sino q cambia el valor
@@ -325,7 +343,7 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         <Grid container item xs={12} justifyContent={"center"}>
                                                             <AvatarGroup
                                                                 max={3}
-                                                                sx={{flexDirection: "row", width: "fit-content"}}
+                                                                sx={{ flexDirection: "row", width: "fit-content" }}
                                                                 onClick={(e) => {
                                                                     e.stopPropagation()
                                                                     handleOpenImagesDialog(product.images!)
@@ -337,7 +355,7 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                                         key={`producto-${imageItem.id}`}
                                                                         alt={`producto-${imageItem.id}`}
                                                                         src={imageItem.fileUrl!}
-                                                                        sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                                        sx={{ cursor: "pointer", border: "1px solid lightblue" }}
                                                                     />
                                                                 )}
                                                             </AvatarGroup>
@@ -359,7 +377,7 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
 
                                                 <Grid item>
                                                     <IconButton
-                                                        sx={{padding: 0}}
+                                                        sx={{ padding: 0 }}
                                                         size='small'
                                                         onClick={(e) => {
                                                             e.stopPropagation()
