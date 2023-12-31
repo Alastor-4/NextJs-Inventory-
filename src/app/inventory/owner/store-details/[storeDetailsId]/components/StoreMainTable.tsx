@@ -1,8 +1,8 @@
 "use client"
 
-import React from "react";
+import React, {useState} from "react";
 import {
-    AppBar,
+    AppBar, Avatar, AvatarGroup,
     Box,
     Card,
     CardContent,
@@ -22,7 +22,7 @@ import {
 import { TableNoData } from "@/components/TableNoData";
 import {
     AddOutlined,
-    ArrowLeft,
+    ArrowLeft, CircleOutlined,
     DescriptionOutlined,
     EditOutlined,
     ExpandLessOutlined,
@@ -45,6 +45,7 @@ import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import { numberFormat } from "@/utils/generalFunctions";
 import stores from "../../../store/requests/stores";
 import DepartmentCustomButton from "@/components/DepartmentCustomButton";
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 
 const fetcher = (url: any) => fetch(url).then((res) => res.json())
 
@@ -203,8 +204,6 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                 label: "",
                 align: "left"
             },
-
-
         ]
 
         return (
@@ -234,6 +233,14 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
             selected: (selectedDepartment.includes(element.id))
         }))
         setAllProductsByDepartment(newAllProductsByDepartment);
+    }
+
+    const [openImageDialog, setOpenImageDialog] = useState(false);
+    const [dialogImages, setDialogImages] = useState([])
+
+    function handleOpenImagesDialog(images: any) {
+        setDialogImages(images)
+        setOpenImageDialog(true)
     }
 
     const TableContent = ({ formik }: { formik: any }) => {
@@ -278,21 +285,34 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                                             onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
                                         >
                                             <TableCell>
-                                                <div>
-                                                    <Grid item container >
-                                                        <Grid>
-                                                            {row.name}
-                                                        </Grid>
+                                                {
+                                                    row.images?.length! > 0 && (
+                                                        <Box display={"flex"} justifyContent={"center"}>
+                                                            <AvatarGroup
+                                                                max={2}
+                                                                sx={{flexDirection: "row", width: "fit-content"}}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    handleOpenImagesDialog(row.images!)
+                                                                }}
+                                                            >
+                                                                {row.images.map(
+                                                                    (imageItem: any) => <Avatar
+                                                                        variant={"rounded"}
+                                                                        key={`producto-${imageItem.id}`}
+                                                                        alt={`producto-${imageItem.id}`}
+                                                                        src={imageItem.fileUrl!}
+                                                                        sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                                    />
+                                                                )}
+                                                            </AvatarGroup>
+                                                        </Box>
+                                                    )
+                                                }
 
-                                                    </Grid>
-                                                    {
-                                                        row.description && (
-                                                            <small>
-                                                                {` ${row.description.slice(0, 20)}`}
-                                                            </small>
-                                                        )
-                                                    }
-                                                </div>
+                                                <Box display={"flex"} justifyContent={"center"}>
+                                                    {row.name}
+                                                </Box>
                                             </TableCell>
 
                                             <TableCell>
@@ -300,50 +320,70 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                                             </TableCell>
 
                                             <TableCell>
-                                                <Grid container alignItems={"center"} columnGap={1}>
-                                                    <Grid item>
-                                                        <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice} />
+                                                <Grid container rowSpacing={1}>
+                                                    <Grid item xs={12}>
+                                                        <div
+                                                            onClick={(e: any) => {
+                                                                e.stopPropagation()
+                                                                setActiveModalPrice({ active: true, storeDepot: { ...row.depots[0].store_depots[0] } })
+                                                            }}
+                                                        >
+                                                            <MoneyInfoTag
+                                                                value={displayProductPrice}
+                                                                errorColor={!baseProductPrice}
+                                                            />
+                                                        </div>
+
                                                         {row.depots[0].store_depots[0]._count.product_offers > 0 && (
                                                             <DescriptionOutlined fontSize={"small"} />
                                                         )}
-                                                        <br />
-                                                        {
-                                                            displayPriceDiscount && <InfoTag value={`- ${displayPriceDiscount}`} />
-                                                        }
                                                     </Grid>
 
-                                                    <Grid item>
-                                                        <IconButton size="small" color="primary"
-                                                            onClick={() => setActiveModalPrice({ active: true, storeDepot: { ...row.depots[0].store_depots[0] } })}>
-                                                            <EditOutlined fontSize="small" />
-                                                        </IconButton>
-                                                    </Grid>
+                                                    {
+                                                        displayPriceDiscount && (
+                                                            <Grid item xs={12}>
+                                                                <div
+                                                                    onClick={(e: any) => {
+                                                                        e.stopPropagation()
+                                                                        setActiveModalPrice({
+                                                                            active: true,
+                                                                            storeDepot: {...row.depots[0].store_depots[0]}
+                                                                        })
+                                                                    }}
+                                                                >
+                                                                    <InfoTag value={`- ${displayPriceDiscount}`}/>
+                                                                </div>
+                                                            </Grid>
+                                                        )
+                                                    }
                                                 </Grid>
                                             </TableCell>
 
                                             <TableCell>
-                                                <Grid container columnSpacing={1}>
-                                                    <Grid item>
+                                                <Grid container rowSpacing={1}>
+                                                    <Grid container item xs={12} justifyContent={"center"}>
                                                         {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
                                                     </Grid>
 
-                                                    <Grid item>
-                                                        <IconButton sx={{ padding: 0 }} size="small" color="primary"
-                                                            onClick={() => {
+                                                    <Grid container item xs={12} justifyContent={"center"} flexWrap={"nowrap"}>
+                                                        <IconButton
+                                                            size={"small"}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
                                                                 setActiveModalTransferUnits(true);
                                                                 setSelectedRowInd(index)
                                                             }}>
-                                                            <SwapHoriz fontSize="small" />
+                                                            <SwapHoriz />
                                                         </IconButton>
-                                                    </Grid>
 
-                                                    <Grid item>
-                                                        <IconButton sx={{ padding: 0 }} size="small" color="primary"
-                                                            onClick={() => {
+                                                        <IconButton
+                                                            size={"small"}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
                                                                 setActiveModalEditUnits(true);
                                                                 setSelectedRowInd(index)
                                                             }}>
-                                                            <EditOutlined fontSize="small" />
+                                                            <EditOutlined/>
                                                         </IconButton>
                                                     </Grid>
                                                 </Grid>
@@ -351,7 +391,7 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
 
                                             <TableCell>
                                                 <Grid container>
-                                                    <Grid container item xs={12} justifyContent={"center"}>
+                                                    <Grid container item xs={12} justifyContent={"center"} flexWrap={"nowrap"} sx={{whiteSpace: "nowrap"}}>
                                                         <Typography variant={"button"}>
                                                             {row.depots[0].store_depots[0].is_active
                                                                 ? "en venta"
@@ -365,7 +405,10 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                                                             checked={row.depots[0].store_depots[0].is_active}
                                                             color={'success'}
                                                             disabled={!baseProductPrice}
-                                                            onChange={() => updateProductActive(row.depots[0].store_depots[0])}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                return updateProductActive(row.depots[0].store_depots[0])
+                                                            }}
                                                         />
                                                     </Grid>
                                                 </Grid>
@@ -497,6 +540,12 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                 (formik) => (
                     <Card variant={"outlined"}>
                         <CustomToolbar />
+
+                        <ImagesDisplayDialog
+                            open={openImageDialog}
+                            setOpen={setOpenImageDialog}
+                            images={dialogImages}
+                        />
 
                         <StoreModalPrice
                             dialogTitle={"Editar Precio"}

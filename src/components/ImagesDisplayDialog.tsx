@@ -13,7 +13,7 @@ import { images } from "@prisma/client";
 interface ImagesDisplayDialogProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
-    dialogTitle: string;
+    dialogTitle?: string;
     images: images[] | null;
 }
 
@@ -33,8 +33,13 @@ export default function ImagesDisplayDialog({ dialogTitle, images, open, setOpen
 
     return (
         <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{dialogTitle}</DialogTitle>
-            <DialogContent>
+            {
+                dialogTitle && (
+                    <DialogTitle>{dialogTitle}</DialogTitle>
+                )
+            }
+
+            <DialogContent sx={{p: "5px"}}>
                 <Grid container rowSpacing={2}>
                     <Grid container item xs={12} justifyContent={"center"}>
                         {
@@ -42,7 +47,7 @@ export default function ImagesDisplayDialog({ dialogTitle, images, open, setOpen
                                 <Avatar
                                     src={images[imageIndex]?.fileUrl ?? ""}
                                     variant={"rounded"}
-                                    sx={{ width: "250px", maxWidth: "300px", height: "auto" }}
+                                    sx={{ width: "300px", maxWidth: "300px", height: "auto" }}
                                 />
                             )
                         }
