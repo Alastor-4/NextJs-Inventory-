@@ -97,7 +97,7 @@ export default function AddProductFromWarehouse(props: any) {
         }
 
         if (dataDepotsWarehouses.length === 0) {
-            if (warehouseId === null) getData()
+            if (!warehouseId) getData()
             else getDataSpecificWarehouse();
         }
 

@@ -471,7 +471,7 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
-                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{`Unidades en almacén (${dataWarehouse?.name}):`}</Grid>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{`Unidades en almacén:`}</Grid>
                                                             <Grid item xs={true}>
                                                                 {product.depots![0].product_total_remaining_units}
                                                             </Grid>
