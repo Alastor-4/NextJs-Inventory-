@@ -104,8 +104,8 @@ export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, 
                     <Card variant={"outlined"}>
                         <CustomToolbar />
                         <CardContent>
-                            <Grid container rowSpacing={2} direction={"column"}>
-                                <Grid item>
+                            <Grid container rowSpacing={2}>
+                                <Grid item xs={12}>
                                     <TextField
                                         label="Almacén"
                                         size={"small"}

@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react'
 import { TableNoData } from "@/components/TableNoData";
 import {
-    Box,
+    Avatar,
+    AvatarGroup,
     Button,
     Card,
     CardContent,
@@ -13,6 +14,7 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableContainer,
     TableHead,
     TableRow,
     TextField,
@@ -24,7 +26,6 @@ import {
     ExpandLessOutlined,
     ExpandMoreOutlined,
     RemoveOutlined,
-    VisibilityOutlined
 } from '@mui/icons-material';
 import { characteristics, departments, depots, images, store_depots, stores, warehouses } from '@prisma/client';
 import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse';
@@ -98,7 +99,6 @@ interface departmentsProps {
 }
 
 function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) {
-
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [depositsByDepartment, setDepositsByDeparment] = useState<(departments & { products?: productsProps[], selected?: boolean })[] | null>(null);
 
@@ -159,14 +159,14 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
     }
 
     const DepartmentsFilter = ({ formik }: any) => (
-        <Card variant={"outlined"} sx={{ padding: "15px" }}>
-            <Grid container item xs={12} direction="column">
-                <Grid item>
+        <Card variant={"outlined"} sx={{ padding: "10px" }}>
+            <Grid container item xs={12}>
+                <Grid item xs={12}>
                     <Typography variant={"subtitle2"}>
                         Seleccione departamentos para encontrar el producto que busca
                     </Typography>
                 </Grid>
-                <Grid container flexWrap="nowrap" item spacing={2} sx={{ overflowX: "auto", py: "7px", width: "75vw" }}>
+                <Grid container item xs={12} flexWrap="nowrap" columnSpacing={2} sx={{ overflowX: "auto", p: "7px 0px" }}>
                     {
                         depositsByDepartment?.map((deposits, index) => (
                             <Grid key={deposits.id} item xs={"auto"}>
@@ -182,7 +182,7 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                 </Grid>
                 {
                     dataProducts?.length! > 0 && (
-                        <Grid container item mt={"5px"} rowSpacing={1}>
+                        <Grid container item xs={12} mt={"5px"} rowSpacing={1}>
                             <Grid item xs={12}>
                                 <Typography variant={"subtitle2"}>
                                     Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
@@ -316,17 +316,39 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                         key={product.id}
                                         hover
                                         tabIndex={-1}
+                                        onClick={() => setShowDetails((showDetails !== index) ? index : -1)}
                                     >
                                         <TableCell>
-                                            {product.name}
-                                            <br />
-                                            {
-                                                product.description && (
-                                                    <small>
-                                                        {`${product.description.slice(0, 20)}`}
-                                                    </small>
-                                                )
-                                            }
+                                            <Grid container>
+                                                {
+                                                    product.images?.length! > 0 && (
+                                                        <Grid container item xs={12} justifyContent={"center"}>
+                                                            <AvatarGroup
+                                                                max={3}
+                                                                sx={{flexDirection: "row", width: "fit-content"}}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation()
+                                                                    handleOpenImagesDialog(product.images!)
+                                                                }}
+                                                            >
+                                                                {product.images!.map(
+                                                                    imageItem => <Avatar
+                                                                        variant={"rounded"}
+                                                                        key={`producto-${imageItem.id}`}
+                                                                        alt={`producto-${imageItem.id}`}
+                                                                        src={imageItem.fileUrl!}
+                                                                        sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                                    />
+                                                                )}
+                                                            </AvatarGroup>
+                                                        </Grid>
+                                                    )
+                                                }
+
+                                                <Grid container item xs={12} justifyContent={"center"}>
+                                                    {product.name}
+                                                </Grid>
+                                            </Grid>
                                         </TableCell>
 
                                         <TableCell>
@@ -336,10 +358,14 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                 </Grid>
 
                                                 <Grid item>
-                                                    <IconButton sx={{ padding: 0 }} size='small' onClick={() => {
-                                                        setActiveManageQuantity(true)
-                                                        setSelectedProduct(product)
-                                                    }}
+                                                    <IconButton
+                                                        sx={{padding: 0}}
+                                                        size='small'
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            setActiveManageQuantity(true)
+                                                            setSelectedProduct(product)
+                                                        }}
                                                     >
                                                         <EditOutlined fontSize="small" color='primary' />
                                                     </IconButton>
@@ -348,7 +374,10 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                         </TableCell>
 
                                         <TableCell >
-                                            <IconButton color={"primary"} onClick={() => removeProduct(index)}>
+                                            <IconButton color={"primary"} onClick={(e) => {
+                                                e.stopPropagation()
+                                                return removeProduct(index)
+                                            }}>
                                                 <RemoveOutlined />
                                             </IconButton>
                                         </TableCell>
@@ -383,16 +412,15 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                             <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
                                                             <Grid item xs={true}>
                                                                 {product.name}
-                                                                {
-                                                                    product.description && (
-                                                                        <small>
-                                                                            {` ${product.description}`}
-                                                                        </small>
-                                                                    )
-                                                                }
                                                             </Grid>
                                                         </Grid>
 
+                                                        <Grid container item spacing={1} xs={12}>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Descripción:</Grid>
+                                                            <Grid item xs={true}>
+                                                                {product.description ?? "-"}
+                                                            </Grid>
+                                                        </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
                                                             <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
@@ -437,26 +465,6 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
-                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
-                                                            <Grid item xs={true}>
-                                                                {
-                                                                    product.images?.length! > 0
-                                                                        ? (
-                                                                            <Box
-                                                                                sx={{ cursor: "pointer", display: "inline-flex", alignItems: "center", color: "blue" }}
-                                                                                onClick={() => handleOpenImagesDialog(product.images!)}
-                                                                            >
-                                                                                {product.images?.length!}
-                                                                                <VisibilityOutlined fontSize={"small"}
-                                                                                    sx={{ ml: "5px" }} />
-                                                                            </Box>
-                                                                        ) : "no"
-                                                                }
-                                                            </Grid>
-                                                        </Grid>
-
-
-                                                        <Grid container item spacing={1} xs={12}>
                                                             <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades en tienda:</Grid>
                                                             <Grid item xs={true}>
                                                                 {product.depots![0].store_depots![0].product_remaining_units}
@@ -464,14 +472,14 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
-                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Total histórico de unidades ingresadas:</Grid>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Total de unidades ingresadas:</Grid>
                                                             <Grid item xs={true}>
                                                                 {product.depots![0].store_depots![0].product_units}
                                                             </Grid>
                                                         </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
-                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{`Unidades en almacén:`}</Grid>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades en almacén</Grid>
                                                             <Grid item xs={true}>
                                                                 {product.depots![0].product_total_remaining_units}
                                                             </Grid>
@@ -489,88 +497,87 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
     }
 
     return (
-        <div>
-            <Formik
-                initialValues={initialValues}
-                onSubmit={() => {
+        <Formik
+            initialValues={initialValues}
+            onSubmit={() => {
 
-                }}
-            >
-                {
-                    (formik) => (
-                        <Card variant={"outlined"}>
-                            <ModalStoreAssign
-                                dialogTitle={"Administrar cantidad del producto"}
-                                open={activeManageQuantity}
-                                setOpen={setActiveManageQuantity}
-                            >
-                                <ManageQuantity
-                                    userId={userId!}
-                                    nameStore={dataStore?.name!}
-                                    nameWarehouse={dataWarehouse?.name!}
-                                    productDetails={selectedProduct!}
-                                    updateDepot={updateDepot}
-                                    setActiveManageQuantity={setActiveManageQuantity}
-                                />
-                            </ModalStoreAssign>
-
-                            <ModalAddProductFromWarehouse
-                                dialogTitle={"Agregar productos"}
-                                open={activeAddProductFromWarehouse}
-                                setOpen={setActiveAddProductFromWarehouse}
-                                loadData={loadData}
-                            >
-                                <AddProductFromWarehouse dataStore={dataStore} warehouseId={dataWarehouse?.id} />
-                            </ModalAddProductFromWarehouse>
-
-                            <ImagesDisplayDialog
-                                dialogTitle={"Imágenes del producto"}
-                                open={openImageDialog}
-                                setOpen={setOpenImagesDialog}
-                                images={dialogImages}
+            }}
+        >
+            {
+                (formik) => (
+                    <Card variant={"outlined"}>
+                        <ModalStoreAssign
+                            dialogTitle={"Administrar cantidad del producto"}
+                            open={activeManageQuantity}
+                            setOpen={setActiveManageQuantity}
+                        >
+                            <ManageQuantity
+                                userId={userId!}
+                                nameStore={dataStore?.name!}
+                                nameWarehouse={dataWarehouse?.name!}
+                                productDetails={selectedProduct!}
+                                updateDepot={updateDepot}
+                                setActiveManageQuantity={setActiveManageQuantity}
                             />
+                        </ModalStoreAssign>
 
-                            <CardContent>
-                                <Grid container rowSpacing={2}>
-                                    <Grid container item xs={12} justifyContent={"space-between"}>
-                                        <Grid item xs={6} md={10}>
-                                            <Typography variant={"subtitle1"}>Productos en tienda</Typography>
-                                        </Grid>
-                                        <Grid item xs={6} md={2}>
-                                            <Button size={"small"} variant={"contained"} onClick={() => setActiveAddProductFromWarehouse(true)}>
-                                                Agregar nuevo
-                                            </Button>
-                                        </Grid>
+                        <ModalAddProductFromWarehouse
+                            dialogTitle={"Agregar productos"}
+                            open={activeAddProductFromWarehouse}
+                            setOpen={setActiveAddProductFromWarehouse}
+                            loadData={loadData}
+                        >
+                            <AddProductFromWarehouse dataStore={dataStore} warehouseId={dataWarehouse?.id} />
+                        </ModalAddProductFromWarehouse>
+
+                        <ImagesDisplayDialog
+                            open={openImageDialog}
+                            setOpen={setOpenImagesDialog}
+                            images={dialogImages}
+                        />
+
+                        <CardContent>
+                            <Grid container rowSpacing={2}>
+                                <Grid container item xs={12} justifyContent={"space-between"}>
+                                    <Grid item xs={6} md={10}>
+                                        <Typography variant={"subtitle1"}>Productos en tienda</Typography>
                                     </Grid>
+                                    <Grid item xs={6} md={2}>
+                                        <Button size={"small"} variant={"contained"} onClick={() => setActiveAddProductFromWarehouse(true)}>
+                                            Agregar nuevo
+                                        </Button>
+                                    </Grid>
+                                </Grid>
 
+                                {
+                                    depositsByDepartment?.length! > 0 && (
+                                        <Grid item xs={12}>
+                                            <DepartmentsFilter formik={formik} />
+                                        </Grid>
+                                    )
+                                }
+
+                                <Grid item xs={12}>
                                     {
-                                        depositsByDepartment?.length! > 0 && (
-                                            <Grid item xs={12}>
-                                                <DepartmentsFilter formik={formik} />
-                                            </Grid>
-                                        )
-                                    }
-
-                                    <Grid item xs={12}>
-                                        {
-                                            dataProducts?.length! > 0
-                                                ? (
+                                        dataProducts?.length! > 0
+                                            ? (
+                                                <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
                                                     <Table sx={{ width: "100%" }} size={"small"}>
                                                         <TableHeader />
                                                         <TableContent formik={formik} />
                                                     </Table>
-                                                ) : (
-                                                    <TableNoData />
-                                                )
-                                        }
-                                    </Grid>
+                                                </TableContainer>
+                                            ) : (
+                                                <TableNoData />
+                                            )
+                                    }
                                 </Grid>
-                            </CardContent>
-                        </Card>
-                    )
-                }
-            </Formik>
-        </div>
+                            </Grid>
+                        </CardContent>
+                    </Card>
+                )
+            }
+        </Formik>
     )
 }
 
