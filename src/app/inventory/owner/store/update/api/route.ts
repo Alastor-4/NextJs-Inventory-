@@ -18,7 +18,6 @@ export async function GET(req: Request) {
 
         return NextResponse.json(store);
     } catch (error) {
-        console.log('[STORE_GET_ONE_BY_ID]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

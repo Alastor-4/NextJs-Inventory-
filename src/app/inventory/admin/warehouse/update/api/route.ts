@@ -11,7 +11,6 @@ export async function GET(req: Request) {
 
         return NextResponse.json(warehouse);
     } catch (error) {
-        console.log('[USER_GET_ONE_BY_ID]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -28,7 +27,6 @@ export async function PATCH(req: Request) {
 
         return NextResponse.json(updatedWarehouse);
     } catch (error) {
-        console.log('[USER_UPDATE_ROLE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

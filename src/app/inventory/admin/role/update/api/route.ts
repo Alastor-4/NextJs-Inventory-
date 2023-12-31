@@ -11,7 +11,6 @@ export async function GET(req: Request) {
 
         return NextResponse.json(role);
     } catch (error) {
-        console.log('[ROLE_GET_ONE_BY_ID]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
