@@ -1,18 +1,14 @@
-import { EditOutlined, VisibilityOutlined } from '@mui/icons-material'
-import { Box, Collapse, Grid, IconButton, Typography } from '@mui/material'
+import { EditOutlined } from '@mui/icons-material'
+import { Collapse, Grid, IconButton, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import StoreListOffers from './offers/components/StoreListOffers'
 import StoreModalDefault from './Modal/StoreModalDefault'
-import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import StoreEditSellerProfit from './Modal/StoreEditSellerProfit'
 
 function StoreMoreDetails(props: any) {
     const { userId, details, show, loadDates, row } = props
 
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
-
-    const [openImageDialog, setOpenImageDialog] = useState(false);
-    const [dialogImages, setDialogImages] = useState([])
 
     const showSellerProfit = (priceProductStore: any, discountQuantity: any, discountPorcentage: any) => {
         let pricePorcentage = (discountPorcentage !== null) ? (discountPorcentage * priceProductStore / 100).toFixed(2) : null;
@@ -23,12 +19,6 @@ function StoreMoreDetails(props: any) {
         if (valuePercentage !== null) return `${details.seller_profit_percentage}%  (${valuePercentage} ${details.sell_price_unit})`
         return `${details.seller_profit_quantity} CUP`
     }
-
-    function handleOpenImagesDialog(images: any) {
-        setDialogImages(images)
-        setOpenImageDialog(true)
-    }
-
 
     return (
         <>
@@ -44,13 +34,6 @@ function StoreMoreDetails(props: any) {
                     loadDates={loadDates}
                 />
             </StoreModalDefault>
-
-            <ImagesDisplayDialog
-                dialogTitle={"Imágenes del producto"}
-                open={openImageDialog}
-                setOpen={setOpenImageDialog}
-                images={dialogImages}
-            />
 
             <Collapse in={show} timeout="auto" unmountOnExit>
                 <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
@@ -111,27 +94,6 @@ function StoreMoreDetails(props: any) {
                             }
                         </Grid>
                     </Grid>
-
-                    <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
-                        <Grid item xs={true}>
-                            {
-                                row.images.length > 0
-                                    ? (
-                                        <Box
-                                            sx={{ cursor: "pointer", display: "inline-flex", alignItems: "center", color: "blue" }}
-                                            onClick={() => handleOpenImagesDialog(row.images)}
-                                        >
-                                            {row.images.length}
-
-                                            <VisibilityOutlined fontSize={"small"}
-                                                sx={{ ml: "5px" }} />
-                                        </Box>
-                                    ) : "no"
-                            }
-                        </Grid>
-                    </Grid>
-
 
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ganancia del vendedor por producto:</Grid>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
+    Avatar,
+    AvatarGroup,
     Box,
     Button,
     Card,
@@ -26,7 +28,6 @@ import requestWarehouse from '../request/requestWarehouse';
 import {
     ExpandLessOutlined,
     ExpandMoreOutlined,
-    VisibilityOutlined
 } from '@mui/icons-material';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import { TableNoData } from '@/components/TableNoData';
@@ -207,11 +208,6 @@ export default function AddProductFromWarehouse(props: any) {
                 align: "left"
             },
             {
-                id: "image",
-                label: "Imagen",
-                align: "left"
-            },
-            {
                 id: "more_details",
                 label: "",
                 align: "left"
@@ -271,32 +267,38 @@ export default function AddProductFromWarehouse(props: any) {
                                 </TableCell>
 
                                 <TableCell>
-                                    {row.products.name}
-                                    <br />
                                     {
-                                        row.products.description && (
-                                            <small>
-                                                {` ${row.products.description}`}
-                                            </small>
+                                        row.products.images?.length! > 0 && (
+                                            <Box display={"flex"} justifyContent={"center"}>
+                                                <AvatarGroup
+                                                    max={2}
+                                                    sx={{flexDirection: "row", width: "fit-content"}}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation()
+                                                        handleOpenImagesDialog(row.products.images!)
+                                                    }}
+                                                >
+                                                    {row.products.images!.map(
+                                                        (imageItem: any) => <Avatar
+                                                            variant={"rounded"}
+                                                            key={`producto-${imageItem.id}`}
+                                                            alt={`producto-${imageItem.id}`}
+                                                            src={imageItem.fileUrl!}
+                                                            sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                        />
+                                                    )}
+                                                </AvatarGroup>
+                                            </Box>
                                         )
                                     }
+
+                                    <Box display={"flex"} justifyContent={"center"}>
+                                        {row.products.name}
+                                    </Box>
                                 </TableCell>
 
                                 <TableCell>
                                     {row.product_total_remaining_units}
-                                </TableCell>
-
-                                <TableCell>
-                                    {
-                                        row.products.images.length
-                                            ? (
-                                                <IconButton size='small'
-                                                    onClick={() => handleOpenImagesDialog(row.products.image)}>
-                                                    <VisibilityOutlined color='primary' fontSize='small' />
-                                                </IconButton>
-                                            )
-                                            : "no"
-                                    }
                                 </TableCell>
 
                                 <TableCell style={{ padding: 0 }} colSpan={5}>
@@ -391,30 +393,6 @@ export default function AddProductFromWarehouse(props: any) {
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
-                                                    <Grid item xs={true}>
-                                                        {
-                                                            row.products.images.length > 0
-                                                                ? (
-                                                                    <Box
-                                                                        sx={{
-                                                                            cursor: "pointer",
-                                                                            display: "inline-flex",
-                                                                            alignItems: "center",
-                                                                            color: "blue"
-                                                                        }}
-                                                                        onClick={() => handleOpenImagesDialog(row.products.images)}
-                                                                    >
-                                                                        {row.products.images.length}
-                                                                        <VisibilityOutlined fontSize={"small"}
-                                                                                            sx={{ ml: "5px" }} />
-                                                                    </Box>
-                                                                ) : "no"
-                                                        }
-                                                    </Grid>
-                                                </Grid>
-
-                                                <Grid container item spacing={1} xs={12}>
                                                     <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades en el
                                                         almacén:</Grid>
                                                     <Grid item xs={true}>
@@ -423,8 +401,7 @@ export default function AddProductFromWarehouse(props: any) {
                                                 </Grid>
                                             </Grid>
                                         </Collapse>
-                                    )
-                                    }
+                                    )}
                                 </TableCell>
                             </TableRow>
                         </React.Fragment>
@@ -432,7 +409,6 @@ export default function AddProductFromWarehouse(props: any) {
             </TableBody>
         )
     }
-
 
     const setValidationSchema = (
         Yup.object({
@@ -562,7 +538,6 @@ export default function AddProductFromWarehouse(props: any) {
     return (
         <>
             <ImagesDisplayDialog
-                dialogTitle={"Imágenes del producto"}
                 open={openImageDialog}
                 setOpen={setOpenImageDialog}
                 images={dialogImages}

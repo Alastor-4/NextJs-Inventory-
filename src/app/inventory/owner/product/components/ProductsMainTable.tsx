@@ -3,7 +3,7 @@
 
 import React, {useEffect, useState} from "react";
 import {
-    AppBar, Avatar,
+    AppBar, Avatar, AvatarGroup,
     Box,
     Card,
     CardContent,
@@ -305,17 +305,22 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                     <TableCell>
                                         {
                                             row.images.length > 0
-                                                ? row.images.map(
-                                                    imageItem =>
-                                                        <Avatar
+                                                ? <AvatarGroup
+                                                    max={3}
+                                                    sx={{flexDirection: "row", width: "fit-content"}}
+                                                    onClick={() => handleOpenImagesDialog(row.images)}
+                                                >
+                                                    {row.images.map(
+                                                        imageItem => <Avatar
                                                             variant={"rounded"}
                                                             key={`producto-${imageItem.id}`}
                                                             alt={`producto-${imageItem.id}`}
                                                             src={imageItem.fileUrl}
-                                                            onClick={() => handleOpenImagesDialog(row.images)}
-                                                            sx={{cursor: "pointer"}}
+                                                            sx={{cursor: "pointer", border: "1px solid lightblue"}}
                                                         />
-                                                )
+                                                    )}
+                                                </AvatarGroup>
+
                                                 : "-"
                                         }
                                     </TableCell>
@@ -404,7 +409,6 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
     return (
         <>
             <ImagesDisplayDialog
-                dialogTitle={"Imágenes del producto"}
                 open={openImageDialog}
                 setOpen={setOpenImageDialog}
                 images={dialogImages}

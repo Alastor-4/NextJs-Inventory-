@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    AppBar,
+    AppBar, Avatar, AvatarGroup,
     Box,
     Card,
     CardContent,
     Checkbox,
-    CircularProgress,
     Collapse,
     Divider,
     Grid,
@@ -35,7 +34,6 @@ import {
     ExpandLessOutlined,
     ExpandMoreOutlined,
     ShareOutlined,
-    VisibilityOutlined,
 } from "@mui/icons-material";
 import { characteristics, departments, depots, images, store_depots, warehouses } from "@prisma/client";
 import DepartmentCustomButton from "@/components/DepartmentCustomButton";
@@ -47,7 +45,6 @@ import tableStyles from "@/assets/styles/tableStyles";
 import { useRouter } from "next/navigation";
 import { AxiosResponse } from "axios";
 import { Formik } from "formik";
-import Link from "next/link";
 import * as Yup from "yup";
 import dayjs from "dayjs";
 import ModalAddProduct from "./ModalAddProduct";
@@ -91,7 +88,6 @@ interface productsProps {
 }
 
 export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: UserWarehouseMainTableProps) {
-
     const router = useRouter();
 
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
@@ -171,9 +167,6 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
         })
     })
 
-    //ToDo: use global isLoading
-    const isLoading = false
-
     //SELECT product in table
     const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
     const handleSelectProduct = (product: productsProps) => {
@@ -226,34 +219,28 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                 </Box>
 
                 <Box sx={{ display: "flex" }}>
-                    {
-                        isLoading
-                            ? <CircularProgress size={24} color={"inherit"} />
-                            : (
-                                <>
-                                    {
-                                        selectedProduct && (
-                                            <Box sx={{ display: "flex" }}>
-                                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                                    <DeleteOutline fontSize={"small"} />
-                                                </IconButton>
+                    <>
+                        <IconButton color={"inherit"} onClick={handleStoreAssign}>
+                            <ShareOutlined fontSize={"small"} />
+                        </IconButton>
 
-                                                <Divider orientation="vertical" variant="middle" flexItem
-                                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
-                                            </Box>
-                                        )
-                                    }
+                        <IconButton color={"inherit"} sx={{ color: 'white' }} onClick={() => setActiveModalAddProduct(true)} >
+                            <AddOutlined />
+                        </IconButton>
 
-                                    <IconButton color={"inherit"} onClick={handleStoreAssign}>
-                                        <ShareOutlined fontSize={"small"} />
+                        {
+                            selectedProduct && (
+                                <Box sx={{ display: "flex" }}>
+                                    <Divider orientation="vertical" variant="middle" flexItem
+                                             sx={{ borderRight: "2px solid white", mx: "5px" }} />
+
+                                    <IconButton color={"inherit"} onClick={handleRemove}>
+                                        <DeleteOutline fontSize={"small"} />
                                     </IconButton>
-
-                                    <IconButton color={"inherit"} sx={{ color: 'white' }} onClick={() => setActiveModalAddProduct(true)} >
-                                        <AddOutlined />
-                                    </IconButton>
-                                </>
+                                </Box>
                             )
-                    }
+                        }
+                    </>
                 </Box>
             </Toolbar>
         </AppBar >
@@ -751,16 +738,34 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                             <Checkbox size={"small"} onClick={() => handleSelectProduct(product)} checked={!!selectedProduct && (product.id === selectedProduct.id)} />
                                         </TableCell>
                                         <TableCell onClick={(event) => handleExpand(event, index)}>
-                                            <div>
-                                                {product.name} <br />
-                                                {
-                                                    !!product.description && (
-                                                        <small>
-                                                            {`${product.description.slice(0, 20)}`}
-                                                        </small>
-                                                    )
-                                                }
-                                            </div>
+                                            {
+                                                product.images?.length! > 0 && (
+                                                    <Box display={"flex"} justifyContent={"center"}>
+                                                        <AvatarGroup
+                                                            max={2}
+                                                            sx={{flexDirection: "row", width: "fit-content"}}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                handleOpenImagesDialog(product.images!)
+                                                            }}
+                                                        >
+                                                            {product.images!.map(
+                                                                imageItem => <Avatar
+                                                                    variant={"rounded"}
+                                                                    key={`producto-${imageItem.id}`}
+                                                                    alt={`producto-${imageItem.id}`}
+                                                                    src={imageItem.fileUrl!}
+                                                                    sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                                />
+                                                            )}
+                                                        </AvatarGroup>
+                                                    </Box>
+                                                )
+                                            }
+
+                                            <Box display={"flex"} justifyContent={"center"}>
+                                                {product.name}
+                                            </Box>
                                         </TableCell>
                                         <TableCell onClick={(event) => handleExpand(event, index)}>{product.departments?.name ?? "-"}</TableCell>
                                         <TableCell>
@@ -870,25 +875,6 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio de compra:</Grid>
                                                         <Grid item xs={true}>{product.buy_price ?? "-"}</Grid>
-                                                    </Grid>
-
-                                                    <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
-                                                        <Grid item xs={true}>
-                                                            {
-                                                                product.images?.length! > 0
-                                                                    ? (
-                                                                        <Box
-                                                                            sx={{ cursor: "pointer", display: "inline-flex", alignItems: "center", color: "blue" }}
-                                                                            onClick={() => handleOpenImagesDialog(product.images!)}
-                                                                        >
-                                                                            {product.images?.length!}
-                                                                            <VisibilityOutlined fontSize={"small"}
-                                                                                sx={{ ml: "5px" }} />
-                                                                        </Box>
-                                                                    ) : "no"
-                                                            }
-                                                        </Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
@@ -1016,7 +1002,6 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                         </UpdateValueDialog>
 
                         <ImagesDisplayDialog
-                            dialogTitle={"Imágenes del producto"}
                             open={openImageDialog}
                             setOpen={setOpenImagesDialog}
                             images={dialogImages}
