@@ -1,9 +1,7 @@
 
-import { SwapHoriz } from '@mui/icons-material'
+import {SwapVerticalCircle} from '@mui/icons-material'
 import {
-    Box,
     Button,
-    Card,
     Grid,
     IconButton,
     MenuItem,
@@ -31,7 +29,6 @@ function TransferUnits(props: any) {
 
     const [swap, setSwap] = useState(false)
 
-
     useEffect(() => {
         const getDataWareHouses = async () => {
             const data = await storeDetails.getDataWarehouseDepots(params.storeDetailsId, productId)
@@ -46,35 +43,30 @@ function TransferUnits(props: any) {
 
 
     const maxUnits = {
-        cant: (!swap)
-            ? selectedWarehouseDepot?.product_total_remaining_units
-            : storeDepot.product_remaining_units,
+        cant: (swap)
+            ? storeDepot.product_remaining_units
+            : selectedWarehouseDepot?.product_total_remaining_units,
 
-        text: `No hay esa cantidad en ${!swap
-            ? 'el almacen'
-            : 'la tienda'
-            }`
+        text: `Cantidad insuficiente en ${swap
+            ? 'la tienda'
+            : 'el almacén'}`
     }
 
     const setValidationSchema = () => (
         Yup.object({
-
             units: Yup.number()
-                .min(0, "No puedes pasar una cantidad negativa")
+                .min(0, "Cantidad positiva")
                 .max(maxUnits.cant, maxUnits.text)
                 .required("Campo obligatorio")
-
         })
     )
 
     const handleSubmit = async (values: any) => {
-
         let data: any;
         const valueUnits = parseInt(values.units)
 
         if (!swap) {
             data = {
-
                 depotId: selectedWarehouseDepot.id,
                 product_total_remaining_units: selectedWarehouseDepot.product_total_remaining_units - valueUnits,
 
@@ -83,10 +75,8 @@ function TransferUnits(props: any) {
                 product_units: storeDepot.product_units + valueUnits
             }
 
-
         } else {
             data = {
-
                 depotId: selectedWarehouseDepot.id,
                 product_total_remaining_units: selectedWarehouseDepot.product_total_remaining_units + valueUnits,
 
@@ -105,15 +95,11 @@ function TransferUnits(props: any) {
     }
 
     const selectWarehouse = (formik: any) => (
-
         <TextField
             name="selectedWarehouse"
             size='small'
             select
             value={dataWarehouses !== null ? formik.values.warehouseInd : ''}
-            variant='standard'
-            sx={{ paddingTop: "0", '& .MuiInput-underline:before': { borderBottom: 'none' } }}
-
         >
             {dataWarehouses !== null
                 ? (
@@ -121,99 +107,77 @@ function TransferUnits(props: any) {
                         <MenuItem
                             key={index}
                             value={index}
-                        >{element.name}</MenuItem>
+                        >
+                            {element.name}
+                        </MenuItem>
                     ))
                 )
                 : <MenuItem value={0}></MenuItem>
             }
-
         </TextField>
     )
 
-
     return (
-        <>
-
-            <Formik
-                initialValues={{ units: "", warehouseInd: "0" }}
-                validationSchema={setValidationSchema}
-                onSubmit={handleSubmit}
-            >
-                {(formik: any) => (
-                    <Card variant='outlined' sx={{ padding: '10px' }}>
-                        <Grid container direction={'column'} rowGap={3} >
-
-                            <Grid item container justifyContent={"space-between"}>
-
-                                <Stack alignItems={"center"}>
-                                    <Typography variant='subtitle1'  >Unidades en la tienda</Typography>
-                                    <Box> {storeDepot.product_remaining_units} </Box>
-                                </Stack>
-
-                                <Stack alignItems={"center"}>
-                                    <Typography variant='subtitle1'  >Unidades en el almacén</Typography>
-                                    <Box> {selectedWarehouseDepot?.product_total_remaining_units} </Box>
-                                </Stack>
-
-                            </Grid>
-
-
-                            <Grid item container justifyContent={"space-evenly"}>
-
-                                <Stack spacing={1} margin={1}>
-
-                                    <small>{`Proveedor ( ${!swap ? "Almacén" : "Tienda"}  )`}</small>
-
-                                    <Box>{!swap ? selectWarehouse(formik) : nameStore}</Box>
-
-                                </Stack>
-
-                                <Grid item margin={1}>
-
-                                    <IconButton onClick={() => setSwap(!swap)} sx={{ boxShadow: "0px 1px 2px 0px black" }}>
-                                        <SwapHoriz color='primary' />
-                                    </IconButton>
-
-                                </Grid>
-
-                                <Stack spacing={1} margin={1}>
-
-                                    <small>{`Destinatario ( ${!swap ? "Tienda" : "Almacén"}  )`}</small>
-
-                                    <Box>{!swap ? nameStore : selectWarehouse(formik)}</Box>
-
-                                </Stack>
-
-                            </Grid>
-
-
-                            <form onSubmit={formik.handleSubmit}>
-                                <Stack alignContent={"center"} spacing={1} paddingX={3} >
-
-                                    <TextField
-                                        label=" Trasladar unidades"
-                                        {...formik.getFieldProps("units")}
-                                        error={formik.errors.units && formik.touched.units}
-                                        helperText={(formik.errors.units && formik.touched.units) && formik.errors.units}
-                                    />
-
-                                    <Button type='submit' size='small' variant='contained' >Aceptar</Button>
-
-                                </Stack>
-                            </form>
-
-
-
-
-
+        <Formik
+            initialValues={{ units: "", warehouseInd: "0" }}
+            validationSchema={setValidationSchema}
+            onSubmit={handleSubmit}
+        >
+            {(formik: any) => (
+                <Grid container rowGap={2}>
+                    <Grid container item xs={12} rowSpacing={1}>
+                        <Grid item xs={12} order={swap ? 2 : 1}>
+                            <Typography variant='subtitle1'>Unidades en almacén: {selectedWarehouseDepot?.product_total_remaining_units}</Typography>
                         </Grid>
-                    </Card >
-                )}
-            </Formik>
 
+                        <Grid item xs={12} order={swap ? 1 : 2}>
+                            <Typography variant='subtitle1'>Unidades en tienda: {storeDepot.product_remaining_units}</Typography>
+                        </Grid>
+                    </Grid>
 
+                    <Grid container item xs={12} spacing={1}>
+                        <Grid item xs={12} md={6}>
+                            Proveedor {swap ? "Tienda" : "Almacén"}
+                        </Grid>
 
-        </>
+                        <Grid item xs={12} md={6}>
+                            {swap ? nameStore : selectWarehouse(formik)}
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item xs={12} justifyContent={"center"}>
+                        <IconButton onClick={() => setSwap(!swap)}>
+                            <SwapVerticalCircle fontSize={"large"}/>
+                        </IconButton>
+                    </Grid>
+
+                    <Grid container item xs={12} spacing={1}>
+                        <Grid item xs={12} md={6}>
+                            Destinatario {swap ? "Almacén" : "Tienda"}
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                            {swap ? selectWarehouse(formik) : nameStore}
+                        </Grid>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <form onSubmit={formik.handleSubmit}>
+                            <Stack alignContent={"center"} spacing={1}>
+                                <TextField
+                                    label=" Trasladar unidades"
+                                    {...formik.getFieldProps("units")}
+                                    error={formik.errors.units && formik.touched.units}
+                                    helperText={(formik.errors.units && formik.touched.units) && formik.errors.units}
+                                />
+
+                                <Button type='submit' size='small' variant='contained'>Aceptar</Button>
+                            </Stack>
+                        </form>
+                    </Grid>
+                </Grid>
+            )}
+        </Formik>
     )
 }
 

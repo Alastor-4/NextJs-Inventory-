@@ -2,7 +2,9 @@
 
 import React, {useState} from "react";
 import {
-    AppBar, Avatar, AvatarGroup,
+    AppBar,
+    Avatar,
+    AvatarGroup,
     Box,
     Card,
     CardContent,
@@ -11,7 +13,8 @@ import {
     Switch,
     Table,
     TableBody,
-    TableCell, TableContainer,
+    TableCell,
+    TableContainer,
     TableHead,
     TableRow,
     TextField,
@@ -22,7 +25,7 @@ import {
 import { TableNoData } from "@/components/TableNoData";
 import {
     AddOutlined,
-    ArrowLeft, CircleOutlined,
+    ArrowLeft,
     DescriptionOutlined,
     EditOutlined,
     ExpandLessOutlined,
@@ -556,14 +559,13 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                         </StoreModalPrice>
 
                         <StoreModalDefault
-                            dialogTitle={"Modificar unidades"}
-                            open={activeModalTransferUnits ? false : activeModalEditUnits}
+                            dialogTitle={"Modificar Total"}
+                            open={activeModalEditUnits}
                             setOpen={setActiveModalEditUnits}
                         >
                             <StoreEditUnits
                                 dataRow={data[selectedRowInd]?.depots[0].store_depots[0]}
                                 setActiveModalEditUnits={setActiveModalEditUnits}
-                                setActiveModalTransferUnits={setActiveModalTransferUnits}
                                 loadDates={loadDates}
                                 userId={userId}
                             />
