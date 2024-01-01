@@ -11,12 +11,13 @@ import {
     TableContainer,
     TableRow,
     Typography,
-    TextField
+    TextField, AvatarGroup, Avatar
 } from "@mui/material";
-import React from "react";
+import React, {useState} from "react";
 import { TableNoData } from "@/components/TableNoData";
 import { Formik } from "formik";
 import DepartmentCustomButton from "./DepartmentCustomButton";
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 
 export default function DepartmentProductsSelect(
     { departmentProductsList, setDepartmentProductsList, selectedProduct, setSelectedProduct }: any
@@ -166,6 +167,14 @@ export default function DepartmentProductsSelect(
         }
     }
 
+    const [openImageDialog, setOpenImageDialog] = useState(false)
+    const [dialogImages, setDialogImages] = useState([])
+
+    function handleOpenImagesDialog(images: any) {
+        setDialogImages(images)
+        setOpenImageDialog(true)
+    }
+
     const TableContent = ({ formik }) => {
         return (
             <TableBody>
@@ -180,13 +189,42 @@ export default function DepartmentProductsSelect(
                                     tabIndex={-1}
                                     selected={selectedProduct && (row.id === selectedProduct.id)}
 
-                                    onClick={() => handleSelectItem(row)}
                                 >
                                     <TableCell>
-                                        <Checkbox size={"small"} checked={selectedProduct && (row.id === selectedProduct.id)} />
+                                        <Checkbox
+                                            size={"small"}
+                                            checked={selectedProduct && (row.id === selectedProduct.id)}
+                                            onClick={() => handleSelectItem(row)}
+                                        />
                                     </TableCell>
                                     <TableCell>
-                                        {row.name}
+                                        <Grid container>
+                                            {
+                                                row.images.length > 0 && (
+                                                    <Grid container item xs={12} justifyContent={"center"}>
+                                                        <AvatarGroup
+                                                            max={3}
+                                                            sx={{flexDirection: "row", width: "fit-content"}}
+                                                            onClick={() => handleOpenImagesDialog(row.images)}
+                                                        >
+                                                            {row.images.map(
+                                                                imageItem => <Avatar
+                                                                    variant={"rounded"}
+                                                                    key={`producto-${imageItem.id}`}
+                                                                    alt={`producto-${imageItem.id}`}
+                                                                    src={imageItem.fileUrl}
+                                                                    sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                                />
+                                                            )}
+                                                        </AvatarGroup>
+                                                    </Grid>
+                                                )
+                                            }
+
+                                            <Grid container item xs={12} justifyContent={"center"}>
+                                                {row.name}
+                                            </Grid>
+                                        </Grid>
                                     </TableCell>
                                     <TableCell>
                                         {row.description ?? "-"}
@@ -224,12 +262,6 @@ export default function DepartmentProductsSelect(
                                             ) : "-"
                                         }
                                     </TableCell>
-                                    <TableCell>
-                                        {
-                                            row.images.length > 0
-                                                ? `${row.images.length} imagen(es)` : "-"
-                                        }
-                                    </TableCell>
                                 </TableRow>
                             ))}
             </TableBody>
@@ -246,10 +278,14 @@ export default function DepartmentProductsSelect(
             >
                 {
                     (formik) => (
-
                         <CardContent>
-                            <Grid container rowSpacing={3} width={'100%'}>
+                            <ImagesDisplayDialog
+                                open={openImageDialog}
+                                setOpen={setOpenImageDialog}
+                                images={dialogImages}
+                            />
 
+                            <Grid container rowSpacing={3} width={'100%'}>
                                 {
                                     departmentProductsList.length > 0 && (
                                         <Grid item xs={12} >
@@ -257,8 +293,6 @@ export default function DepartmentProductsSelect(
                                         </Grid>
                                     )
                                 }
-
-
 
                                 {
                                     data?.length > 0
@@ -271,16 +305,12 @@ export default function DepartmentProductsSelect(
                                                     </Table>
                                                 </TableContainer>
                                             </Grid>
-
                                         ) : (
                                             <TableNoData />
                                         )
                                 }
-
                             </Grid>
-
                         </CardContent>
-
                     )
                 }
             </Formik>
