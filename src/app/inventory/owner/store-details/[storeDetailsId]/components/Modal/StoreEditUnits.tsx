@@ -1,5 +1,4 @@
-import { SwapHoriz } from '@mui/icons-material';
-import { Box, Button, Card, Grid, IconButton, Stack, TextField, Typography } from '@mui/material';
+import { Button, Grid, TextField, Typography } from '@mui/material';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import React, { useState, useEffect } from 'react'
@@ -7,7 +6,7 @@ import { storeDetails } from '../../request/storeDetails';
 import { useParams } from 'next/navigation';
 
 function StoreEditUnits(props: any) {
-    const { dataRow, setActiveModalEditUnits, setActiveModalTransferUnits, loadDates } = props;
+    const { dataRow, setActiveModalEditUnits, loadDates } = props;
 
     const params = useParams();
 
@@ -21,14 +20,11 @@ function StoreEditUnits(props: any) {
         }
     }, [dataRow, remainingUnits])
 
-
     const setValidationSchema = (
         Yup.object({
-
             units: Yup.number()
-                .min(remainingUnits, `El minimo ingresado debe coincidir con las unidades restantes en la tienda(${remainingUnits})`)
-                .required("Es obligatorio este campo")
-
+                .min(remainingUnits, `valor mayor que las unidades restantes en la tienda (${remainingUnits})`)
+                .required("valor requerido")
         })
     )
 
@@ -45,59 +41,49 @@ function StoreEditUnits(props: any) {
     }
 
     return (
-        <>
-            <Formik
-                initialValues={{ units: totalUnits }}
-                validationSchema={setValidationSchema}
-                onSubmit={handleSubmit}
-            >
-                {
-                    (formik: any) => (
-                        <Card variant='outlined' sx={{ padding: "10px" }}>
-                            <form onSubmit={formik.handleSubmit}>
+        <Formik
+            initialValues={{ units: totalUnits }}
+            validationSchema={setValidationSchema}
+            onSubmit={handleSubmit}
+        >
+            {
+                (formik: any) => (
+                    <form onSubmit={formik.handleSubmit}>
+                        <Grid container rowSpacing={2}>
+                            <Grid item xs={12}>
+                                <Typography variant='subtitle1'>
+                                    Unidades transferidas a la tienda: {totalUnits}
+                                </Typography>
+                            </Grid>
 
-                                <Typography variant='h6' >{`Unidades restantes de total: ${remainingUnits} de ${totalUnits}`}</Typography>
+                            <Grid item xs={12}>
+                                <Typography variant='subtitle1'>
+                                    Unidades restante en la tienda: {remainingUnits}
+                                </Typography>
+                            </Grid>
 
-                                <Stack marginTop={1} rowGap={1} marginLeft={1}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    size='small'
+                                    label={"Modificar total ingresado a la tienda"}
+                                    fullWidth
+                                    {...formik.getFieldProps("units")}
+                                    value={formik.values.units}
+                                    error={formik.errors.units && formik.touched.units}
+                                    helperText={(formik.errors.units && formik.touched.units) && formik.errors.units}
+                                />
+                            </Grid>
 
-                                    <Box>
-                                        {`Unidades restantes: ${remainingUnits}`}
-                                        <IconButton onClick={() => setActiveModalTransferUnits(true)} >
-                                            <SwapHoriz
-                                                color='primary'
-                                            />
-                                        </IconButton>
-                                    </Box>
-
-                                    <Grid container alignItems={"center"} gap={1}>
-                                        <Grid item>
-                                            {`Total ingresado: `}
-                                        </Grid>
-
-                                        <Grid item >
-                                            <TextField
-                                                size='small'
-                                                {...formik.getFieldProps("units")}
-                                                value={formik.values.units}
-                                                error={formik.errors.units && formik.touched.units}
-                                                helperText={(formik.errors.units && formik.touched.units) && formik.errors.units}
-                                            //sx={{ width: "100px" }}
-                                            />
-                                        </Grid>
-
-                                    </Grid>
-
-                                </Stack>
-                                <Button fullWidth type='submit' variant='contained' sx={{ marginTop: "15px" }} >Aceptar</Button>
-
-
-                            </form>
-                        </Card>
-                    )
-                }
-            </Formik>
-
-        </>
+                            <Grid item xs={12}>
+                                <Button fullWidth type='submit' variant='contained' sx={{marginTop: "15px"}}>
+                                    Aceptar
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </form>
+                )
+            }
+        </Formik>
     )
 }
 
