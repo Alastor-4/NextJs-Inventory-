@@ -8,29 +8,41 @@ import * as Yup from "yup"
 import { useParams, useRouter } from 'next/navigation';
 import warehouses from "../requests/warehouses";
 
-export default function WarehousesForm(props) {
-    const { ownerUsers, userId } = props
-
+export default function WarehousesForm() {
+    const [ownerUsers, setOwnerUsers] = React.useState([]);
+    
     const [updateItem, setUpdateItem] = React.useState();
 
     const params = useParams();
     const router = useRouter();
 
     React.useEffect(() => {
-        async function fetchWarehouse(id: any) {
-            let item = await warehouses.warehouseDetails(userId, id)
+        async function fetchOwnerUsers(id: any) {
+            let ownerUsers = await warehouses.allOwnerUsers()
 
             if (ownerUsers.length) {
-                const userIndex = ownerUsers.findIndex(userItem => userItem.id === item.users.id)
-                item.users = ownerUsers[userIndex]
+                setOwnerUsers(ownerUsers)
             }
+        }
+        
+        fetchOwnerUsers()
+    }, [])
+    
+    React.useEffect(() => {
+        async function fetchWarehouse(id: any) {
+            let item = await warehouses.warehouseDetails(id)
+
+            const userIndex = ownerUsers.findIndex(userItem => userItem.id === item.users.id)
+
+            item.users = ownerUsers[userIndex]
+
             setUpdateItem(item)
         }
-        if (params?.warehouseId !== undefined) {
+        if (params?.warehouseId && ownerUsers.length) {
             fetchWarehouse(params.warehouseId)
         }
-    }, [ownerUsers, params.warehouseId, userId, setUpdateItem])
-
+    }, [ownerUsers, params.warehouseId, setUpdateItem])
+    
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
@@ -71,7 +83,6 @@ export default function WarehousesForm(props) {
         if (updateItem) {
             response = await warehouses.update(
                 {
-                    userId: userId,
                     id: updateItem.id,
                     name: values.name,
                     description: values.description,
@@ -81,7 +92,6 @@ export default function WarehousesForm(props) {
         } else {
             response = await warehouses.create(
                 {
-                    userId: userId,
                     name: values.name,
                     description: values.description,
                     address: values.address,
