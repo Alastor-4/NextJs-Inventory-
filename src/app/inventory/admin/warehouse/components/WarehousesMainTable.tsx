@@ -32,14 +32,14 @@ export default function WarehousesMainTable({ userId }) {
     //get initial data
     React.useEffect(() => {
         const getAllWarehouse = async () => {
-            const newData = await warehouses.allWarehouses(userId)
+            const newData = await warehouses.allWarehouses()
             setData(newData)
         }
 
         if (data === null) {
             getAllWarehouse()
         }
-    }, [data, userId]);
+    }, [data]);
 
     //table selected item
     const [selected, setSelected] = React.useState(null)
@@ -52,7 +52,7 @@ export default function WarehousesMainTable({ userId }) {
     }
 
     async function handleRemove() {
-        const response = await warehouses.delete(userId, selected.id)
+        const response = await warehouses.delete(selected.id)
         if (response) {
             const updatedWarehouses = await warehouses.allWarehouses()
             if (updatedWarehouses) setData(updatedWarehouses)
