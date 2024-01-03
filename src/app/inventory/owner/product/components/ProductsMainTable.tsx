@@ -1,139 +1,187 @@
-//@ts-nocheck
 "use client"
 
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     AppBar, Avatar, AvatarGroup,
-    Box,
-    Card,
-    CardContent,
-    Checkbox,
-    Divider, Grid,
-    IconButton,
-    Table,
-    TableBody,
-    TableCell, TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Toolbar,
-    Typography
+    Box, Button, Card, CardContent,
+    Checkbox, Chip, Dialog, DialogActions,
+    DialogContent, DialogTitle, Divider, Grid,
+    IconButton, InputBase, Stack, Table,
+    TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Toolbar, Typography,
 } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
 import { TableNoData } from "@/components/TableNoData";
 import {
-    AddOutlined,
-    ArrowLeft,
-    DeleteOutline,
-    EditOutlined,
-    ExpandLessOutlined,
-    ExpandMoreOutlined
+    AddOutlined, ArrowLeft, CheckBoxOutlineBlank, CheckBoxOutlined,
+    DeleteOutline, EditOutlined, FilterAlt, FilterAltOff
 } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
-import products from "../requests/products";
-import { Formik } from "formik";
-import DepartmentCustomButton from "@/components/DepartmentCustomButton";
-import ModalUpdateProduct from "./ModalUpdateProduct";
-import ProductsForm from "./ProductsForm";
+import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
+import { images, characteristics, departments } from '@prisma/client';
+import ModalUpdateProduct from "./ModalUpdateProduct";
+import { useStore } from "@/app/store/store";
+import products from "../requests/products";
+import { useRouter } from "next/navigation";
+import ProductsForm from "./ProductsForm";
+import { Formik } from "formik";
 
-export default function ProductsMainTable({ userId }: { userId: number }) {
-    const router = useRouter()
+export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
+    const router = useRouter();
+    const productsCount = useStore((state) => state.ownerProductsCount);
 
-    const [data, setData] = React.useState(null)
-    const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
+    //Products data
+    const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
+    const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
 
-    const [forceRender, setForceRender] = React.useState(false)
-    const [activateModalCreateProduct, setActivateModalCreateProduct] = React.useState(false)
-    const [activateModalUpdateProduct, setActivateModalUpdateProduct] = React.useState(false)
+    const [forceRender, setForceRender] = useState<boolean>(false);
 
-    const [selected, setSelected] = React.useState(null)
-
-    //get initial data
-    React.useEffect(() => {
+    //GET initial data
+    useEffect(() => {
         const getAllProductsByDepartment = async () => {
             const newAllProductsByDepartment = await products.allUserProductDepartments(userId);
-            setAllProductsByDepartment(newAllProductsByDepartment.map((item: any) => ({
-                ...item,
+            setAllProductsByDepartment(newAllProductsByDepartment.map((department: allProductsByDepartmentProps) => ({
+                ...department,
                 selected: false
             })))
-            setForceRender(false)
-            setSelected(null)
+            setForceRender(false);
+            setSelectedProduct(null);
         }
-        getAllProductsByDepartment()
+        getAllProductsByDepartment();
+    }, [userId, forceRender]);
 
-    }, [userId, forceRender])
-
-    React.useEffect(() => {
-        if (allProductsByDepartment.length) {
-            let allProducts = []
-
-            allProductsByDepartment.forEach((departmentItem) => {
-                if (departmentItem.selected) {
-                    allProducts = [...allProducts, ...departmentItem.products]
-                }
-            })
-
-            allProducts.sort((a, b) => {
-                if (a.name < b.name)
-                    return -1
-
-                if (a.name > a.name)
-                    return 1
-
-                return 0
-            })
-
-            setData(allProducts)
-        }
-
-    }, [allProductsByDepartment])
-
-    //get All Departments
-    const [departments, setDepartments] = React.useState(null)
+    //GET all departments
+    const [departments, setDepartments] = React.useState<departments[] | null>(null);
     useEffect(() => {
-
         const getAllDepartments = async () => {
-            const result = await products.getDepartments()
-            setDepartments(result)
+            const departments = await products.getDepartments()
+            setDepartments(departments);
         }
+        if (departments === null) getAllDepartments();
+    }, [departments]);
 
-        if (departments === null) {
-            getAllDepartments()
+    //Update allProducts at change
+    useEffect(() => {
+        if (allProductsByDepartment?.length) {
+            let allProducts: productsProps[] = [];
+
+            allProductsByDepartment?.forEach((departmentItem) => {
+                // if (departmentItem.selected) {//TODO
+                allProducts = [...allProducts, ...departmentItem.products!]
+                // }
+            })
+
+            allProducts.sort((a: productsProps, b: productsProps) => {
+                if (a?.name! < b?.name!) return -1;
+                if (a?.name! > a?.name!) return 1;
+                return 0;
+            });
+            setDataProducts(allProducts);
         }
-    }, [departments])
+    }, [allProductsByDepartment]);
 
-    //table selected item
-    const handleSelectItem = (item) => {
-        if (selected && (selected.id === item.id)) {
-            setSelected(null)
+    //Modals handlers
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
+
+    const toggleModalCreate = () => setIsCreateModalOpen(!isCreateModalOpen);
+    const toggleModalUpdate = () => setIsUpdateModalOpen(!isUpdateModalOpen);
+    const toggleModalFilter = () => setIsFilterModalOpen(!isFilterModalOpen);
+
+    //Handle selected product
+    const handleSelectProduct = (product: productsProps) => {
+        if (selectedProduct && (selectedProduct.id === product.id)) {
+            setSelectedProduct(null);
         } else {
-            setSelected(item)
+            setSelectedProduct(product);
         }
     }
 
-    async function handleRemove() {
-        const response = await products.delete(userId, selected.id)
+    //Handle delete product
+    const handleRemove = async () => {
+        const response = await products.delete(userId, selectedProduct?.id!)
         if (response) {
-            setSelected(null)
-
-            const selectedFilters = allProductsByDepartment.filter(item => item.selected).map(item => item.id)
-
+            setSelectedProduct(null);
+            const selectedFilters = allProductsByDepartment?.filter(department => department.selected).map(department => department.id);
             const updatedProducts = await products.allUserProductDepartments(userId)
-
             if (updatedProducts) {
-                setAllProductsByDepartment(updatedProducts.map(item => ({ ...item, selected: selectedFilters.includes(item.id) })))
-                notifySuccess("Se ha eliminado el producto")
-            } else notifyError("Error al eliminar el producto")
+                setAllProductsByDepartment(updatedProducts.map((department: allProductsByDepartmentProps) => ({ ...department, selected: selectedFilters?.includes(department.id) })))
+                notifySuccess("Se ha eliminado el producto");
+            } else notifyError("Error al eliminar el producto");
         }
     }
 
-    function handleNavigateBack() {
-        router.push(`/inventory`)
+    const handleNavigateBack = () => { router.push(`/inventory`); }
+
+    //Image handlers
+    const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
+    const [dialogImages, setDialogImages] = useState<images[] | null>(null);
+
+    const handleOpenImagesDialog = (images: images[]) => {
+        setDialogImages(images);
+        setOpenImagesDialog(true);
     }
 
-    const activeModal = (setOpen: (bool: boolean) => void) => {
-        setOpen(true)
+
+    // interface FilterDepartmentsModalProps {
+    //     allProductsByDepartment: allProductsByDepartmentProps[] | null;
+    // }
+
+    //{ allProductsByDepartment }: FilterDepartmentsModalProps
+    const FilterDepartmentsModal = () => {
+        const [filterDepartments, setFilterDepartments] = useState<allProductsByDepartmentProps[] | null>();
+
+        useEffect(() => {
+            const handleFilters = () => {
+                // setFilterDepartments()
+            }
+            handleFilters();
+        }, [filterDepartments]);
+
+        const handleRemoveFilter = () => {
+            handleDepartmentClick(0, true);
+            setFilterDepartments(null);
+        }
+
+        const handleDepartmentClick = (index: number, remove?: boolean) => {
+            let filters = [...allProductsByDepartment!]
+            if (remove) {
+                filters.forEach((department: allProductsByDepartmentProps) => { department.selected = false });
+            }
+            else {
+                filters.forEach((department: allProductsByDepartmentProps) => { if (department.id === index) { department.selected = !department.selected } });
+            }
+            setFilterDepartments(filters);
+        }
+
+        return (
+            <Dialog open={isFilterModalOpen} fullWidth onClose={toggleModalFilter}>
+                <DialogTitle m="auto">Filtrar por departamentos</DialogTitle>
+                <DialogContent dividers sx={{ marginX: "20px" }}>
+                    <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap" >
+                        {allProductsByDepartment?.map((department: any) => (
+                            <Chip
+                                key={department.id!}
+                                label={department.name}
+                                clickable={true}
+                                size="medium"
+                                onClick={() => handleDepartmentClick(department.id)}
+                                variant={department.selected ? "filled" : "outlined"}
+                                sx={{ display: "flex" }}
+                                icon={department.selected ? <CheckBoxOutlined /> : <CheckBoxOutlineBlank />}
+                                color="primary"
+                            />
+                        ))}
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ marginRight: "15px" }}>
+                    <Button startIcon={<FilterAltOff />} color="error" variant="outlined" onClick={handleRemoveFilter}>Limpiar</Button>
+                </DialogActions>
+            </Dialog>
+        );
     }
 
     const CustomToolbar = () => (
@@ -158,9 +206,9 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
 
                 <Box sx={{ display: "flex" }}>
                     {
-                        selected && (
+                        selectedProduct && (
                             <Box sx={{ display: "flex" }}>
-                                <IconButton color={"inherit"} onClick={() => activeModal(setActivateModalUpdateProduct)}>
+                                <IconButton color={"inherit"} onClick={toggleModalUpdate}>
                                     <EditOutlined fontSize={"small"} />
                                 </IconButton>
 
@@ -173,7 +221,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             </Box>
                         )
                     }
-                    <IconButton sx={{ color: "white" }} onClick={() => activeModal(setActivateModalCreateProduct)}>
+                    <IconButton sx={{ color: "white" }} onClick={toggleModalCreate}>
                         <AddOutlined />
                     </IconButton>
                 </Box>
@@ -212,6 +260,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                         key={"checkbox"}
                         align={"left"}
                         padding={'checkbox'}
+                        sx={{ width: "5px" }}
                     >
 
                     </TableCell>
@@ -220,6 +269,7 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                             key={headCell.id}
                             align={"left"}
                             padding={'normal'}
+                            sx={{ width: "auto" }}
                         >
                             {headCell.label}
                         </TableCell>
@@ -229,52 +279,46 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
         )
     }
 
-    const [openImageDialog, setOpenImageDialog] = useState(false)
-    const [dialogImages, setDialogImages] = useState([])
-
-    function handleOpenImagesDialog(images: any) {
-        setDialogImages(images)
-        setOpenImageDialog(true)
-    }
-
-    const TableContent = ({ formik }) => {
+    const TableContent = ({ formik }: any) => {
         return (
             <TableBody>
-                {data.filter(
-                    item =>
-                        item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
-                        item.description.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                            row => (
+                {dataProducts?.filter(
+                    (product: productsProps) =>
+                        product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                        product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
+                            (product: productsProps) => (
                                 <TableRow
-                                    key={row.id}
+                                    key={product.id}
                                     hover
                                     tabIndex={-1}
-                                    selected={selected && (row.id === selected.id)}
+                                    selected={!!selectedProduct && (product.id === selectedProduct.id)}
                                 >
                                     <TableCell>
                                         <Checkbox
                                             size={"small"}
-                                            checked={selected && (row.id === selected.id)}
-                                            onClick={() => handleSelectItem(row)}
+                                            checked={!!selectedProduct && (product.id === selectedProduct.id)}
+                                            onClick={() => handleSelectProduct(product)}
+                                            sx={{ width: "5px" }}
+
                                         />
                                     </TableCell>
                                     <TableCell>
-                                        <Grid container>
+                                        <Grid container >
                                             {
-                                                row.images.length > 0 && (
+                                                product?.images?.length! > 0 && (
                                                     <Grid container item xs={12} justifyContent={"center"}>
                                                         <AvatarGroup
                                                             max={3}
-                                                            sx={{flexDirection: "row", width: "fit-content"}}
-                                                            onClick={() => handleOpenImagesDialog(row.images)}
+                                                            sx={{ flexDirection: "row", width: "fit-content" }}
+                                                            onClick={() => handleOpenImagesDialog(product?.images!)}
                                                         >
-                                                            {row.images.map(
-                                                                imageItem => <Avatar
+                                                            {product?.images?.map(
+                                                                (imageItem: images) => <Avatar
                                                                     variant={"rounded"}
                                                                     key={`producto-${imageItem.id}`}
                                                                     alt={`producto-${imageItem.id}`}
-                                                                    src={imageItem.fileUrl}
-                                                                    sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                                    src={imageItem.fileUrl!}
+                                                                    sx={{ cursor: "pointer", border: "1px solid lightblue" }}
                                                                 />
                                                             )}
                                                         </AvatarGroup>
@@ -283,21 +327,21 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                             }
 
                                             <Grid container item xs={12} justifyContent={"center"}>
-                                                {row.name}
+                                                {product.name}
                                             </Grid>
                                         </Grid>
                                     </TableCell>
                                     <TableCell>
-                                        {row.description ?? "-"}
+                                        {product.description ?? "-"}
                                     </TableCell>
                                     <TableCell>
-                                        {row?.departments?.name ?? "-"}
+                                        {product?.departments?.name ?? "-"}
                                     </TableCell>
                                     <TableCell>
-                                        {row.characteristics.length > 0
-                                            ? row.characteristics.map(item => (
+                                        {product.characteristics?.length! > 0
+                                            ? product.characteristics?.map((characteristics: characteristics) => (
                                                 <Grid
-                                                    key={item.id}
+                                                    key={characteristics.id}
                                                     sx={{
                                                         display: "inline-flex",
                                                         margin: "3px",
@@ -311,12 +355,12 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                                                     <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
                                                         <Typography variant={"caption"}
                                                             sx={{ color: "white", fontWeight: "600" }}>
-                                                            {item.name.toUpperCase()}
+                                                            {characteristics.name?.toUpperCase()}
                                                         </Typography>
                                                     </Grid>
                                                     <Grid container item alignItems={"center"}
                                                         sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                        {item.value}
+                                                        {characteristics.value}
                                                     </Grid>
                                                 </Grid>
                                             )
@@ -329,93 +373,21 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
         )
     }
 
-    async function handleSelectFilter(index: number) {
-        let filters = [...allProductsByDepartment]
-        filters[index].selected = !filters[index].selected
-
-        setAllProductsByDepartment(filters)
-    }
-
-    const DepartmentsFilter = ({ formik }) => {
-        const [displaySearchBar, setDisplaySearchBar] = React.useState(false)
-
-        return (
-            <Card variant={"outlined"} sx={{ padding: "15px" }}>
-                <Grid container rowSpacing={2}>
-                    <Grid item>
-                        <Typography variant={"subtitle2"}>
-                            Seleccione departamentos para encontrar el producto que busca
-                        </Typography>
-                    </Grid>
-                    <Grid container item columnSpacing={2} flexWrap={"nowrap"} sx={{ overflowX: "auto", py: "7px" }}>
-                        {
-                            allProductsByDepartment.map((item, index) => (
-                                <Grid key={item.id} item xs={"auto"}>
-                                    <DepartmentCustomButton
-                                        title={item.name}
-                                        subtitle={item.products?.length === 1 ? `${item.products.length!}` + " producto" : `${item.products?.length!}` + " productos"}
-                                        selected={item.selected}
-                                        onClick={() => handleSelectFilter(index)}
-                                    />
-                                </Grid>
-                            ))
-                        }
-                    </Grid>
-
-                    {
-                        data?.length > 0 && (
-                            <Grid container item rowSpacing={1}>
-                                <Grid item xs={12}>
-                                    <Typography variant={"subtitle2"}>
-                                        Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
-                                        <IconButton
-                                            onClick={() => setDisplaySearchBar(!displaySearchBar)}
-                                            sx={{ ml: "5px" }}
-                                        >
-                                            {displaySearchBar
-                                                ? <ExpandMoreOutlined fontSize={"small"} />
-                                                : <ExpandLessOutlined fontSize={"small"} />
-                                            }
-                                        </IconButton>
-                                    </Typography>
-                                </Grid>
-                                {
-                                    displaySearchBar && (
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                name={"handleChangeSearchBarValue"}
-                                                placeholder="Buscar producto..."
-                                                size={"small"}
-                                                fullWidth
-                                                {...formik.getFieldProps("searchBarValue")}
-                                            />
-                                        </Grid>
-                                    )
-                                }
-                            </Grid>
-                        )
-                    }
-                </Grid>
-
-            </Card>
-        )
-    }
-
-    const initialValues = {
-        searchBarValue: ""
-    }
-
     return (
         <>
+            <FilterDepartmentsModal
+            //  allProductsByDepartment={allProductsByDepartment!}
+            />
+
             <ImagesDisplayDialog
                 open={openImageDialog}
-                setOpen={setOpenImageDialog}
+                setOpen={setOpenImagesDialog}
                 images={dialogImages}
             />
 
             <ModalUpdateProduct
-                open={activateModalCreateProduct}
-                setOpen={setActivateModalCreateProduct}
+                open={isCreateModalOpen}
+                setOpen={setIsCreateModalOpen}
                 dialogTitle="Crear Producto"
             >
                 <ProductsForm
@@ -423,61 +395,86 @@ export default function ProductsMainTable({ userId }: { userId: number }) {
                     departments={departments}
                     productId={null}
                     setForceRender={setForceRender}
-                    setOpen={setActivateModalCreateProduct}
+                    setOpen={setIsCreateModalOpen}
                 />
             </ModalUpdateProduct>
 
             <ModalUpdateProduct
-                open={activateModalUpdateProduct}
-                setOpen={setActivateModalUpdateProduct}
+                open={isUpdateModalOpen}
+                setOpen={setIsUpdateModalOpen}
                 dialogTitle="Modificar Producto"
             >
                 <ProductsForm
                     userId={userId}
                     departments={departments}
-                    productId={selected?.id}
+                    productId={selectedProduct?.id}
                     setForceRender={setForceRender}
-                    setOpen={setActivateModalUpdateProduct}
+                    setOpen={setIsUpdateModalOpen}
                 />
             </ModalUpdateProduct>
 
             <Formik
-                initialValues={initialValues}
-                onSubmit={() => {
-
-                }}
+                initialValues={{ searchBarValue: "" }}
+                onSubmit={() => { }}
             >
                 {
                     (formik) => (
                         <Card variant={"outlined"}>
                             <CustomToolbar />
-
                             <CardContent>
-                                {
-                                    allProductsByDepartment.length > 0 && (
-                                        <DepartmentsFilter formik={formik} />
-                                    )
-                                }
+                                <Card variant={"outlined"} sx={{ padding: "15px", marginBottom: "10px" }}>
+                                    <Grid item alignContent="center">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: "400", marginBottom: "5px" }}>Poner algo con Tooltip</Typography>
+                                    </Grid>
+                                    <Grid container direction="row" rowSpacing={2} alignItems="center" justifyContent="center">
+                                        <Grid item xs={8} >
+                                            <Card variant="outlined">
+                                                <Grid item container borderRadius={"5px"} margin="4px" width="100%" position="relative" >
+                                                    <Grid item position="absolute" height="100%" paddingLeft="4px" display="flex" alignItems="center" justifyContent="center" >
+                                                        <SearchIcon color="action" />
+                                                    </Grid>
+                                                    <Grid item width="100%" paddingLeft="35px" >
+                                                        <InputBase
+                                                            placeholder="Buscar producto..."
+                                                            inputProps={{ 'aria-label': 'search' }}
+                                                            {...formik.getFieldProps("searchBarValue")}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+                                            </Card>
+                                        </Grid>
+                                        <Grid item xs={4} paddingX="10px">
+                                            <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                        </Grid>
+                                    </Grid>
 
-                                {
-                                    data?.length > 0
-                                        ? (
-                                            <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
-                                                <Table sx={{ width: "100%" }} size={"small"}>
-                                                    <TableHeader />
+                                </Card>
+                                <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
+                                    <Grid container rowSpacing={2}>
 
-                                                    <TableContent formik={formik} />
-                                                </Table>
-                                            </TableContainer>
-                                        ) : (
-                                            <TableNoData />
-                                        )
-                                }
+                                        {
+                                            dataProducts?.length! > 0
+                                                ? (
+                                                    <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                                        <Table sx={{ width: "100%" }} size={"small"}>
+                                                            <TableHeader />
+
+                                                            <TableContent formik={formik} />
+                                                        </Table>
+                                                    </TableContainer>
+                                                ) : (
+                                                    <TableNoData hasData={productsCount} />
+                                                )
+                                        }
+                                    </Grid>
+                                </Card>
                             </CardContent>
-                        </Card>
+                        </Card >
                     )
                 }
-            </Formik>
+            </Formik >
         </>
     )
 }
+
+export default ProductsMainTable;
