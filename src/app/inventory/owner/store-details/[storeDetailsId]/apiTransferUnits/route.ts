@@ -24,6 +24,20 @@ export async function GET(req: Request) {
     return NextResponse.json(result);
 }
 
+export async function POST(req: Request) {
+    const { store_depot_id, units_transferred_quantity, transfer_direction } = await req.json()
+
+    const data = {
+        store_depot_id,
+        units_transferred_quantity,
+        transfer_direction
+    }
+
+    const result = await prisma.store_depot_transfers.create({ data })
+
+    return NextResponse.json(result)
+}
+
 export async function PUT(req: Request) {
     const { depotId, product_total_remaining_units, storeDepotId, product_remaining_units, product_units } = await req.json()
 

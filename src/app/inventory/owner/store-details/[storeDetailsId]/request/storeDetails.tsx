@@ -1,4 +1,5 @@
 import apiRequest from '@/api';
+import { notifyError } from '@/utils/generalFunctions';
 
 const url = (storeId: any) => `/inventory/owner/store-details/${storeId}/api`
 const urlTransferUnits = (storeId: any) => `/inventory/owner/store-details/${storeId}/apiTransferUnits`
@@ -101,6 +102,15 @@ export const storeDetails = {
             return response.data
         } catch (e) {
             //ToDo: notify error here
+        }
+        return false
+    },
+    createTransaction: async function (storeId: any, data: any) {
+        try {
+            const response = await apiRequest.post(urlTransferUnits(storeId), data)
+            return response.status
+        } catch (e) {
+            notifyError("Error al registar la transacción")
         }
         return false
     }
