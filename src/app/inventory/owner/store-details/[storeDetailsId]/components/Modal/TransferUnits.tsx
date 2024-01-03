@@ -1,5 +1,5 @@
 
-import {SwapVerticalCircle} from '@mui/icons-material'
+import { SwapVerticalCircle } from '@mui/icons-material'
 import {
     Button,
     Grid,
@@ -14,6 +14,7 @@ import * as Yup from 'yup'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { storeDetails } from '../../request/storeDetails'
+import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions'
 
 function TransferUnits(props: any) {
     const { nameStore, storeDepot, productId, setActiveTransferUnits, loadDates } = props;
@@ -61,6 +62,17 @@ function TransferUnits(props: any) {
         })
     )
 
+    const recordTransaction = async (direction: boolean, transferredUnits: number) => {
+        const data = {
+            store_depot_id: storeDepot.id,
+            units_transferred_quantity: transferredUnits,
+            transfer_direction: direction ? transactionToWarehouse : transactionToStore
+        }
+        const response = await storeDetails.createTransaction(params.storeDetailsId, data)
+
+        return response ? true : false
+    }
+
     const handleSubmit = async (values: any) => {
         let data: any;
         const valueUnits = parseInt(values.units)
@@ -89,6 +101,7 @@ function TransferUnits(props: any) {
         const result = await storeDetails.updateDepotsAndStoreDepots(params.storeDetailsId, data)
 
         if (result === 200) {
+            recordTransaction(swap, valueUnits)
             loadDates()
         }
         setActiveTransferUnits(false);
@@ -147,7 +160,7 @@ function TransferUnits(props: any) {
 
                     <Grid container item xs={12} justifyContent={"center"}>
                         <IconButton onClick={() => setSwap(!swap)}>
-                            <SwapVerticalCircle fontSize={"large"}/>
+                            <SwapVerticalCircle fontSize={"large"} />
                         </IconButton>
                     </Grid>
 
