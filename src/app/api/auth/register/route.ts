@@ -1,10 +1,9 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { NextResponse } from 'next/server';
-import { prisma } from "db";
+import jwt, { JwtPayload } from "jsonwebtoken"
+import { NextResponse } from 'next/server'
+import { prisma } from "db"
 //import logger from "@/utils/logger";
 import { withAxiom, AxiomRequest } from "next-axiom"
-import VerifyUserTemplate from '@/components/email-templates/VerifyUserTemplate';
-import resend from "@/utils/resendInit";
+import {sendVerifyMail} from "@/utils/serverActions";
 
 export const GET = withAxiom(async (req: AxiomRequest)=> {
     const { searchParams } = new URL(req.url)
@@ -71,21 +70,9 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
         }
     });
 
-    const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
-    const verificationToken = jwt.sign({ username: username }, jwtPrivateKey, { expiresIn: "24h" });
-
-    const {error } = await resend.emails.send({
-        from: 'Inventario Plus <onboarding@inventarioplus.online>',
-        to: newUser.mail,
-        subject: "Verificación de usuario",
-        react: VerifyUserTemplate({ link: `${process.env.NEXTAUTH_URL}/register/verify/${verificationToken}` }),
-    });
-
-    if (error) {
-        log.error(`Ha fallado el envio del email al usuario ${username}`)
-    }
-
     log.info("Nuevo usuario registrado")
+
+    sendVerifyMail(username, newUser.mail)
 
     return NextResponse.json(
         {
