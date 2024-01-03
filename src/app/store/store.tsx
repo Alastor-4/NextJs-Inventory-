@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 type StoreType = {
     loading: boolean;
@@ -8,13 +9,19 @@ type StoreType = {
     setProductsCount: (productsCount: number) => void;
 }
 
-export const useStore = create<StoreType>((set) => ({
-    loading: false,
-    ownerProductsCount: 0,
-    setProductsCount: (productsCount) => set(() => ({ ownerProductsCount: productsCount })),
-    startLoading: () => set(() => ({ loading: true })),
-    stopLoading: () => set(() => ({ loading: false })),
-}))
+export const useStore = create<StoreType>()(
+    persist(
+        (set) => ({
+            loading: false,
+            ownerProductsCount: 0,
+            setProductsCount: (productsCount) => set(() => ({ ownerProductsCount: productsCount })),
+            startLoading: () => set(() => ({ loading: true })),
+            stopLoading: () => set(() => ({ loading: false })),
+        }),
+        {
+            name: 'store',
+        })
+);
 
 export const startLoading = useStore.getState().startLoading;
 export const stopLoading = useStore.getState().stopLoading;
