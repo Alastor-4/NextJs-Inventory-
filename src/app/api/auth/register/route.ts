@@ -33,6 +33,8 @@ export const GET = withAxiom(async (req: AxiomRequest)=> {
                 } else {
                     return new NextResponse("Este usuario no existe o no esta activo", { status: 406 });
                 }
+            } else {
+                return new NextResponse("El token de verificación proporcionado no es correcto", { status: 406 });
             }
         } catch (e) {
             return new NextResponse("El token de verificación proporcionado no es correcto", { status: 406 });
