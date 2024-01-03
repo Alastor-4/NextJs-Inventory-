@@ -20,6 +20,7 @@ export const useStore = create<StoreType>()(
         }),
         {
             name: 'store',
+            partialize: (state) => ({ ownerProductsCount: state.ownerProductsCount }),
         })
 );
 
