@@ -1,15 +1,16 @@
 import apiRequest from "@/api"
+import {notifyError} from "@/utils/generalFunctions";
 
-const url = (userId: any) => `/inventory/admin/user/api`
-const updateUrl = (userId: any) => `/inventory/admin/user/update/api`
+const url = `/inventory/admin/user/api`
+const updateUrl = `/inventory/admin/user/update/api`
 
 const users = {
     allUsers: async function (userId: any) {
         try {
-            const response = await apiRequest.get(url(userId))
+            const response = await apiRequest.get(url)
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Ha fallado la acción de obtener los detalles de los usuarios")
         }
 
         return false
@@ -17,43 +18,54 @@ const users = {
 
     userDetails: async function (userId: any) {
         try {
-            const response = await apiRequest.get(updateUrl(userId), { params: { userId: userId } })
+            const response = await apiRequest.get(updateUrl, { params: { userId: userId } })
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Ha fallado la acción de obtener los detalles del usuario")
         }
 
         return false
     },
 
-    verifyUser: async function (userId: any, id: any) {
+    verifyUser: async function (id: any) {
         try {
-            const response = await apiRequest.put(url(userId), { userId: id });
+            const response = await apiRequest.put(url, { userId: id });
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Ha fallado la acción de verificar el usuario")
         }
 
         return false
     },
 
-    toggleActivateUser: async function (userId: any, id: any, isActive: any) {
+    toggleActivateUser: async function (id: any, isActive: any) {
         try {
-            const response = await apiRequest.patch(url(userId), { isActive: isActive }, { params: { userId: id } })
+            const response = await apiRequest.patch(url, { isActive: isActive }, { params: { userId: id } })
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Ha fallado la acción de habilitar/deshabilitar el usuario")
         }
 
         return false
     },
 
-    changeRol: async function (userId: any, id: any, roleId: any) {
+    changeRol: async function (id: any, roleId: any) {
         try {
-            const response = await apiRequest.patch(updateUrl(userId), { roleId: roleId }, { params: { userId: id } })
+            const response = await apiRequest.patch(updateUrl, { roleId: roleId }, { params: { userId: id } })
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Ha fallado la acción de cambiar el rol")
+        }
+
+        return false
+    },
+
+    createMainWarehouse: async function (ownerId: number) {
+        try {
+            const response = await apiRequest.post(updateUrl, { ownerId })
+            return response.data
+        } catch (e) {
+            notifyError("Ha fallado la creación del almacén para el owner")
         }
 
         return false

@@ -1,20 +1,25 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
+import {AxiomRequest, withAxiom} from "next-axiom";
 
 // GET all users
-export async function GET(req: Request) {
+export const GET = withAxiom(async (req: AxiomRequest)=> {
+    const log = req.log.with({ scope: 'admin/user' })
+
     try {
         const users = await prisma.users.findMany({ include: { roles: true } });
 
         return NextResponse.json(users);
     } catch (error) {
-        console.log('[USER_GET_ALL]', error);
+        log.error(String(error))
         return new NextResponse("Internal Error", { status: 500 });
     }
-}
+})
 
 // VERIFY user
-export async function PUT(req: Request) {
+export const PUT = withAxiom(async (req: AxiomRequest)=> {
+    const log = req.log.with({ scope: 'admin/user' })
+
     try {
         const { userId } = await req.json();
 
@@ -25,13 +30,15 @@ export async function PUT(req: Request) {
 
         return NextResponse.json(verifiedUser);
     } catch (error) {
-        console.log('[USER_VERIFY]', error);
+        log.error(String(error))
         return new NextResponse("Internal Error", { status: 500 });
     }
-}
+})
 
 // TOGGLE isActive user
-export async function PATCH(req: Request) {
+export const PATCH = withAxiom(async (req: AxiomRequest)=> {
+    const log = req.log.with({ scope: 'admin/user' })
+
     try {
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get("userId");
@@ -45,7 +52,7 @@ export async function PATCH(req: Request) {
 
         return NextResponse.json(updatedUser);
     } catch (error) {
-        console.log('[USER_TOGGLE_ACTIVE_STATE]', error);
+        log.error(String(error))
         return new NextResponse("Internal Error", { status: 500 });
     }
-}
+})

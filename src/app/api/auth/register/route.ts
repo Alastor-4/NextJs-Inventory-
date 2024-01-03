@@ -6,7 +6,7 @@ import { withAxiom, AxiomRequest } from "next-axiom"
 import VerifyUserTemplate from '@/components/email-templates/VerifyUserTemplate';
 import resend from "@/utils/resendInit";
 
-export async function GET(req: Request) {
+export const GET = withAxiom(async (req: AxiomRequest)=> {
     const { searchParams } = new URL(req.url)
     const token = searchParams.get("token")
 
@@ -40,10 +40,10 @@ export async function GET(req: Request) {
     } else {
         return new NextResponse("No fue proporcionado el token de verificación del usuario", { status: 400 });
     }
-}
+})
 
 export const POST = withAxiom(async (req: AxiomRequest) => {
-    req.log.info("Ejecutada función de registrar usuario")
+    const log = req.log.with({ scope: 'auth/register' })
 
     const { username, passwordHash, name, mail, phone } = await req.json()
 
@@ -72,9 +72,6 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
     const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
     const verificationToken = jwt.sign({ username: username }, jwtPrivateKey, { expiresIn: "24h" });
 
-    // You can create intermediate loggers
-    const log = req.log.with({ scope: 'register' })
-
     const {error } = await resend.emails.send({
         from: 'Inventario Plus <onboarding@inventarioplus.online>',
         to: newUser.mail,
@@ -84,9 +81,9 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
 
     if (error) {
         log.error(`Ha fallado el envio del email al usuario ${username}`)
-    } else {
-        log.info('Usuario verificado correctamente', newUser)
     }
+
+    log.info("Nuevo usuario registrado")
 
     return NextResponse.json(
         {

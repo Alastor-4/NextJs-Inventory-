@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
+import {AxiomRequest, withAxiom} from "next-axiom";
 
 // GET user details
-export async function GET(req: Request) {
+export const GET = withAxiom(async (req: AxiomRequest)=> {
+    const log = req.log.with({ scope: 'admin/user' })
+
     try {
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get("userId");
@@ -11,12 +14,15 @@ export async function GET(req: Request) {
 
         return NextResponse.json(user);
     } catch (error) {
+        log.error(String(error))
         return new NextResponse("Internal Error", { status: 500 });
     }
-}
+})
 
 // UPDATE user role
-export async function PATCH(req: Request) {
+export const PATCH = withAxiom(async (req: AxiomRequest)=> {
+    const log = req.log.with({ scope: 'admin/user' })
+
     try {
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get("userId");
@@ -27,6 +33,23 @@ export async function PATCH(req: Request) {
 
         return NextResponse.json(userWithRoleUpdated);
     } catch (error) {
+        log.error(String(error))
         return new NextResponse("Internal Error", { status: 500 });
     }
-}
+})
+
+// CREATE main warehouse for an owner user
+export const POST = withAxiom(async (req: AxiomRequest)=> {
+    const log = req.log.with({ scope: 'admin/user' })
+
+    try {
+        const { ownerId } = await req.json();
+
+        const warehouse = await prisma.warehouses.create({data: {owner_id: +ownerId, name: "Almacén 1", description: "Almacén principal"}})
+
+        return NextResponse.json(warehouse);
+    } catch (error) {
+        log.error(String(error))
+        return new NextResponse("Internal Error", { status: 500 });
+    }
+})
