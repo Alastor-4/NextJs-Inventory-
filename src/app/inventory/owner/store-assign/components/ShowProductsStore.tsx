@@ -27,7 +27,7 @@ import {
     ExpandMoreOutlined,
     RemoveOutlined,
 } from '@mui/icons-material';
-import { characteristics, departments, depots, images, store_depots, stores, warehouses } from '@prisma/client';
+import { characteristics, departments, depots, images } from '@prisma/client';
 import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
 import DepartmentCustomButton from '@/components/DepartmentCustomButton';
@@ -38,70 +38,12 @@ import storeAssign from '../requests/store-assign';
 import { AxiosResponse } from 'axios';
 import { Formik } from 'formik';
 import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
+import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
 
-interface ShowProductsStoreProps {
-    userId?: number;
-    storeId?: number;
-    nameStore?: string | null;
-    dataStore?: stores;
-    dataWarehouse?: warehouses;
-    warehouseId?: number;
-    nameWarehouse?: string | null;
-}
-
-export interface productsProps {
-    id: number;
-    department_id: number | null;
-    owner_id: number | null;
-    name: string | null;
-    description: string | null;
-    buy_price: number | null;
-    created_at: Date;
-    depots?: {
-        id: number;
-        product_id: number | null;
-        warehouse_id: number | null;
-        inserted_by_id: number | null;
-        product_total_units: number | null;
-        product_total_remaining_units: number | null;
-        created_at: Date;
-        store_depots?: store_depots[];
-    }[];
-    departments?: departments;
-    images?: images[];
-    characteristics?: characteristics[];
-    storesDistribution?: {
-        id: number;
-        owner_id: number | null;
-        name: string | null;
-        description: string | null;
-        slogan: string | null;
-        address: string | null;
-        seller_user_id: number | null;
-        created_at: Date;
-        online_reservation: boolean | null;
-        online_catalog: boolean | null;
-        auto_open_time: boolean | null;
-        auto_reservation_time: boolean | null;
-        fixed_seller_profit_percentage: number | null;
-        fixed_seller_profit_quantity: number | null;
-        fixed_seller_profit_unit: string | null;
-        store_depots?: store_depots[];
-    }[];
-}
-
-interface departmentsProps {
-    id: number;
-    name: string | null;
-    description: string | null;
-    created_at: Date;
-    products?: productsProps[];
-    selected?: boolean
-}
 
 function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) {
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
-    const [depositsByDepartment, setDepositsByDeparment] = useState<(departments & { products?: productsProps[], selected?: boolean })[] | null>(null);
+    const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
 
     const [activeManageQuantity, setActiveManageQuantity] = useState(false);
     const [showDetails, setShowDetails] = useState<number>(-1);
@@ -114,16 +56,16 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
     const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
 
     useEffect(() => {
-        setDepositsByDeparment(null);
+        setAllProductsByDepartment(null);
     }, [dataStore?.id]);
 
     useEffect(() => {
         const getDepositsByDepartament = async () => {
-            const newDepositsByDepartment: departmentsProps[] = await storeAssign.allProductsByDepartmentStore(userId!, dataStore?.id);
+            const newProductsByDepartment: allProductsByDepartmentProps[] = await storeAssign.allProductsByDepartmentStore(userId!, dataStore?.id);
 
-            setDepositsByDeparment(newDepositsByDepartment?.map((departments: departmentsProps) => (
+            setAllProductsByDepartment(newProductsByDepartment?.map((productsByDepartments: allProductsByDepartmentProps) => (
                 {
-                    ...departments,
+                    ...productsByDepartments,
                     selected: false
                 })));
         }
@@ -131,16 +73,16 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
     }, [dataStore?.id, userId]);
 
     useEffect(() => {
-        if (depositsByDepartment?.length) {
+        if (allProductsByDepartment?.length) {
             let allProducts: productsProps[] = [];
 
-            depositsByDepartment.forEach((departmentItem) => {
+            allProductsByDepartment.forEach((departmentItem) => {
                 if (departmentItem.selected) {
                     allProducts = [...allProducts, ...departmentItem.products!]
                 }
             });
 
-            allProducts.sort((a, b) => {
+            allProducts.sort((a: productsProps, b: productsProps) => {
                 if (a?.name! < b?.name!) return -1;
                 if (a?.name! > a?.name!) return 1;
                 return 0
@@ -150,13 +92,13 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
         } else {
             setDataProducts(null);
         }
-    }, [depositsByDepartment]);
+    }, [allProductsByDepartment]);
 
     function handleSelectFilter(index: number) {
-        let filters = [...depositsByDepartment!];
+        let filters = [...allProductsByDepartment!];
         filters[index].selected = !filters[index].selected;
 
-        setDepositsByDeparment(filters);
+        setAllProductsByDepartment(filters);
     }
 
     const DepartmentsFilter = ({ formik }: any) => (
@@ -169,7 +111,7 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                 </Grid>
                 <Grid container item xs={12} flexWrap="nowrap" columnSpacing={2} sx={{ overflowX: "auto", p: "7px 0px" }}>
                     {
-                        depositsByDepartment?.map((deposits, index) => (
+                        allProductsByDepartment?.map((deposits, index) => (
                             <Grid key={deposits.id} item xs={"auto"}>
                                 <DepartmentCustomButton
                                     title={deposits.name!}
@@ -253,15 +195,15 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
     }
 
     const loadData = async () => {
-        let newDepositsByDepartment = await storeAssign.allProductsByDepartmentStore(userId!, dataStore?.id);
+        let newProductsByDepartment = await storeAssign.allProductsByDepartmentStore(userId!, dataStore?.id);
 
-        let selectedDepartment = depositsByDepartment?.filter((department: (departments & { products?: productsProps[], selected?: boolean })) => (department.selected)).map(department => department.id)
+        let selectedDepartment = allProductsByDepartment?.filter((productsByDepartments: allProductsByDepartmentProps) => (productsByDepartments.selected)).map(department => department.id)
 
-        newDepositsByDepartment = newDepositsByDepartment.map((department: (departments & { products?: productsProps[], selected?: boolean })) => ({
-            ...department,
-            selected: (selectedDepartment?.includes(department.id))
+        newProductsByDepartment = newProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
+            ...productsByDepartments,
+            selected: (selectedDepartment?.includes(productsByDepartments.id))
         }))
-        setDepositsByDeparment(newDepositsByDepartment);
+        setAllProductsByDepartment(newProductsByDepartment);
     }
 
     //Objetivo: crea un registro en la bd de cada transaccion q se hace
@@ -568,7 +510,7 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                 </Grid>
 
                                 {
-                                    depositsByDepartment?.length! > 0 && (
+                                    allProductsByDepartment?.length! > 0 && (
                                         <Grid item xs={12}>
                                             <DepartmentsFilter formik={formik} />
                                         </Grid>
