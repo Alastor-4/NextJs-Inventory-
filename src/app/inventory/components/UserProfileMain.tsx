@@ -1,7 +1,7 @@
 //@ts-nocheck
 "use client"
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
     AppBar,
     Box,
@@ -24,9 +24,15 @@ import userProfileStyles from "@/assets/styles/userProfileStyles"
 import Link from "next/link";
 import dayjs from "dayjs";
 import { signOut } from "next-auth/react";
+import { setProductsCount } from "@/app/store/store";
 
 export default function UserProfileMain(props) {
-    const { userDetails, userRole, ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount, sellerStores } = props
+    const { userDetails, userRole, ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount, sellerStores } = props;
+
+    useEffect(() => {
+        setProductsCount(ownerProductsCount);
+    }, [ownerProductsCount])
+
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>

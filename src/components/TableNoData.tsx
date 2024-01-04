@@ -1,8 +1,12 @@
-// @ts-nocheck
 import { Box } from "@mui/material";
-import { InfoOutlined } from "@mui/icons-material";
+import { Cached, InfoOutlined, SearchOff } from "@mui/icons-material";
 
-export const TableNoData = () => {
+interface TableNoDataProps {
+    hasData?: number | null;
+    searchCoincidence?: boolean;
+}
+
+export const TableNoData = ({ hasData, searchCoincidence }: TableNoDataProps) => {
     return (
         <Box
             sx={
@@ -16,8 +20,12 @@ export const TableNoData = () => {
                 }
             }
         >
-            <InfoOutlined sx={{ mr: "5px" }} />
-            No hay datos que mostrar
+            {searchCoincidence ? <><SearchOff sx={{ mr: "5px" }} /> No se encontraron coincidencias...</> :
+                !hasData ?
+                    <><InfoOutlined sx={{ mr: "5px" }} />No hay datos que mostrar</>
+                    : <><Cached sx={{ mr: "5px" }} /> Cargando datos...</>
+
+            }
         </Box>
     )
 }
