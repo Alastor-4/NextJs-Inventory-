@@ -2,21 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    AppBar, Avatar, AvatarGroup,
-    Box, Button, Card, CardContent,
-    Checkbox, Chip, Dialog, DialogActions,
-    DialogContent, DialogTitle, Divider, Grid,
-    IconButton, InputBase, Stack, Table,
-    TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Toolbar, Typography,
+    AppBar, Avatar, AvatarGroup, Box, Button,
+    Card, CardContent, Checkbox, ClickAwayListener,
+    Divider, Grid, IconButton, InputBase, Table, TableBody,
+    TableCell, TableContainer, TableHead, TableRow, Toolbar, Tooltip, Typography,
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { TableNoData } from "@/components/TableNoData";
-import {
-    AddOutlined, ArrowLeft, CheckBoxOutlineBlank, CheckBoxOutlined,
-    DeleteOutline, EditOutlined, FilterAlt, FilterAltOff
-} from "@mui/icons-material";
+import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined, FilterAlt, HelpOutline } from "@mui/icons-material";
 import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
+import FilterProductsByDepartmentsModal from "@/components/nodals/FilterProductsByDepartmentsModal";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import { images, characteristics, departments } from '@prisma/client';
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
@@ -27,7 +22,6 @@ import products from "../requests/products";
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
-import FilterProductsByDepartmentsModal from "@/components/nodals/FilterProductsByDepartmentsModal";
 
 export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const router = useRouter();
@@ -112,6 +106,11 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
         } else {
             setSelectedProduct(product);
         }
+    }
+
+    const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
+    const handleToggleTooltip = () => {
+        setIsOpenTooltip(!isOpenTooltip);
     }
 
     //Handle delete product
@@ -383,8 +382,31 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                             <CustomToolbar />
                             <CardContent>
                                 <Card variant={"outlined"} sx={{ padding: "15px", marginBottom: "10px" }}>
-                                    <Grid item alignContent="center">
-                                        <Typography variant="subtitle1" sx={{ fontWeight: "400", marginBottom: "5px" }}>Poner algo con Tooltip</Typography>
+                                    <Grid item container alignContent="center" alignItems="center" justifyContent="center">
+                                        <Grid item>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: "400", marginBottom: "5px" }}>Búsqueda avanzada</Typography>
+                                        </Grid>
+                                        <Grid item>
+                                            <ClickAwayListener onClickAway={handleToggleTooltip}>
+                                                <Tooltip
+                                                    PopperProps={{ disablePortal: true, }}
+                                                    onClose={handleToggleTooltip}
+                                                    open={isOpenTooltip}
+                                                    disableFocusListener
+                                                    disableHoverListener
+                                                    placement="bottom-start"
+                                                    disableTouchListener
+                                                    title={<Typography variant="subtitle2">
+                                                        Puede buscar por nombre y descripción
+                                                        <br /> ó filtrar por departamentos
+                                                    </Typography>}
+                                                >
+                                                    <IconButton onClick={handleToggleTooltip}>
+                                                        <HelpOutline />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </ClickAwayListener>
+                                        </Grid>
                                     </Grid>
                                     <Grid container direction="row" rowSpacing={2} alignItems="center" justifyContent="center">
                                         <Grid item xs={8} >
