@@ -18,8 +18,8 @@ import {
 } from "@mui/icons-material";
 import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
-import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { images, characteristics, departments } from '@prisma/client';
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { useStoreHook } from "@/app/store/useStoreHook";
 import ModalUpdateProduct from "./ModalUpdateProduct";
 import { useStore } from "@/app/store/store";
@@ -294,95 +294,96 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     }
 
     const TableContent = ({ formik }: any) => {
+        const filteredProducts = dataProducts?.filter(
+            (product: productsProps) =>
+                product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()));
         return (
             <TableBody >
-                {dataProducts?.filter(
-                    (product: productsProps) =>
-                        product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
-                        product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                            (product: productsProps) => (
-                                <TableRow
-                                    key={product.id}
-                                    hover
-                                    tabIndex={-1}
-                                    selected={!!selectedProduct && (product.id === selectedProduct.id)}
-                                >
-                                    <TableCell>
-                                        <Checkbox
-                                            size={"small"}
-                                            checked={!!selectedProduct && (product.id === selectedProduct.id)}
-                                            onClick={() => handleSelectProduct(product)}
-                                            sx={{ width: "5px" }}
+                {filteredProducts?.map(
+                    (product: productsProps) => (
+                        <TableRow
+                            key={product.id}
+                            hover
+                            tabIndex={-1}
+                            selected={!!selectedProduct && (product.id === selectedProduct.id)}
+                        >
+                            <TableCell>
+                                <Checkbox
+                                    size={"small"}
+                                    checked={!!selectedProduct && (product.id === selectedProduct.id)}
+                                    onClick={() => handleSelectProduct(product)}
+                                    sx={{ width: "5px" }}
 
-                                        />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Grid container >
-                                            {
-                                                product?.images?.length! > 0 && (
-                                                    <Grid container item xs={12} justifyContent={"center"}>
-                                                        <AvatarGroup
-                                                            max={3}
-                                                            sx={{ flexDirection: "row", width: "fit-content" }}
-                                                            onClick={() => handleOpenImagesDialog(product?.images!)}
-                                                        >
-                                                            {product?.images?.map(
-                                                                (imageItem: images) => <Avatar
-                                                                    variant={"rounded"}
-                                                                    key={`producto-${imageItem.id}`}
-                                                                    alt={`producto-${imageItem.id}`}
-                                                                    src={imageItem.fileUrl!}
-                                                                    sx={{ cursor: "pointer", border: "1px solid lightblue" }}
-                                                                />
-                                                            )}
-                                                        </AvatarGroup>
-                                                    </Grid>
-                                                )
-                                            }
-
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <Grid container >
+                                    {
+                                        product?.images?.length! > 0 && (
                                             <Grid container item xs={12} justifyContent={"center"}>
-                                                {product.name}
+                                                <AvatarGroup
+                                                    max={3}
+                                                    sx={{ flexDirection: "row", width: "fit-content" }}
+                                                    onClick={() => handleOpenImagesDialog(product?.images!)}
+                                                >
+                                                    {product?.images?.map(
+                                                        (imageItem: images) => <Avatar
+                                                            variant={"rounded"}
+                                                            key={`producto-${imageItem.id}`}
+                                                            alt={`producto-${imageItem.id}`}
+                                                            src={imageItem.fileUrl!}
+                                                            sx={{ cursor: "pointer", border: "1px solid lightblue" }}
+                                                        />
+                                                    )}
+                                                </AvatarGroup>
+                                            </Grid>
+                                        )
+                                    }
+
+                                    <Grid container item xs={12} justifyContent={"center"}>
+                                        {product.name}
+                                    </Grid>
+                                </Grid>
+                            </TableCell>
+                            <TableCell>
+                                {product.description ?? "-"}
+                            </TableCell>
+                            <TableCell>
+                                {product?.departments?.name ?? "-"}
+                            </TableCell>
+                            <TableCell>
+                                {product.characteristics?.length! > 0
+                                    ? product.characteristics?.map((characteristics: characteristics) => (
+                                        <Grid
+                                            key={characteristics.id}
+                                            sx={{
+                                                display: "inline-flex",
+                                                margin: "3px",
+                                                backgroundColor: "rgba(170, 170, 170, 0.8)",
+                                                padding: "2px 4px",
+                                                borderRadius: "5px 2px 2px 2px",
+                                                border: "1px solid rgba(130, 130, 130)",
+                                                fontSize: 14,
+                                            }}
+                                        >
+                                            <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
+                                                <Typography variant={"caption"}
+                                                    sx={{ color: "white", fontWeight: "600" }}>
+                                                    {characteristics.name?.toUpperCase()}
+                                                </Typography>
+                                            </Grid>
+                                            <Grid container item alignItems={"center"}
+                                                sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                {characteristics.value}
                                             </Grid>
                                         </Grid>
-                                    </TableCell>
-                                    <TableCell>
-                                        {product.description ?? "-"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {product?.departments?.name ?? "-"}
-                                    </TableCell>
-                                    <TableCell>
-                                        {product.characteristics?.length! > 0
-                                            ? product.characteristics?.map((characteristics: characteristics) => (
-                                                <Grid
-                                                    key={characteristics.id}
-                                                    sx={{
-                                                        display: "inline-flex",
-                                                        margin: "3px",
-                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                        padding: "2px 4px",
-                                                        borderRadius: "5px 2px 2px 2px",
-                                                        border: "1px solid rgba(130, 130, 130)",
-                                                        fontSize: 14,
-                                                    }}
-                                                >
-                                                    <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
-                                                        <Typography variant={"caption"}
-                                                            sx={{ color: "white", fontWeight: "600" }}>
-                                                            {characteristics.name?.toUpperCase()}
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid container item alignItems={"center"}
-                                                        sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                        {characteristics.value}
-                                                    </Grid>
-                                                </Grid>
-                                            )
-                                            ) : "-"
-                                        }
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                    )
+                                    ) : "-"
+                                }
+                            </TableCell>
+                        </TableRow>
+                    ))}
             </TableBody>
         )
     }
@@ -461,21 +462,23 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                             <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
                                         </Grid>
                                     </Grid>
-
                                 </Card>
                                 <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
                                     <Grid container rowSpacing={2}>
 
                                         {
                                             dataProducts?.length! > 0
-                                                ? (
-                                                    <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                                ? (dataProducts?.filter(
+                                                    (product: productsProps) =>
+                                                        product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                                                        product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
+                                                    (<TableContainer sx={{ width: "100%", overflowX: "auto" }}>
                                                         <Table sx={{ width: "100%" }} size={"small"}>
                                                             <TableHeader />
 
                                                             <TableContent formik={formik} />
                                                         </Table>
-                                                    </TableContainer>
+                                                    </TableContainer>) : <TableNoData searchCoincidence />
                                                 ) : (
                                                     <TableNoData hasData={store} />
                                                 )
