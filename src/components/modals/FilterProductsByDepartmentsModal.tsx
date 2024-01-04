@@ -20,7 +20,6 @@ const FilterProductsByDepartmentsModal = (
         setFilteredDepartments(allProductsByDepartment);
     }, [allProductsByDepartment])
 
-
     const handleRemoveFilter = () => {
         handleDepartmentClick(null, true);
     }
@@ -61,7 +60,7 @@ const FilterProductsByDepartmentsModal = (
                             onClick={() => handleDepartmentClick(department)}
                             variant={department.selected ? "filled" : "outlined"}
                             sx={{ display: "flex" }}
-                            icon={department.selected ? <CheckBoxOutlined /> : <CheckBoxOutlineBlank />}
+                            icon={department.selected ? <CheckBoxOutlined fontSize={"small"}/> : <CheckBoxOutlineBlank fontSize={"small"}/>}
                             color="primary"
                         />
                     ))}

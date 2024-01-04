@@ -2,10 +2,26 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    AppBar, Avatar, AvatarGroup, Box, Button,
-    Card, CardContent, Checkbox, ClickAwayListener,
-    Divider, Grid, IconButton, InputBase, Table, TableBody,
-    TableCell, TableContainer, TableHead, TableRow, Toolbar, Tooltip, Typography,
+    AppBar,
+    Avatar,
+    AvatarGroup,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Checkbox,
+    Divider,
+    Grid,
+    IconButton,
+    InputBase,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Toolbar,
+    Typography,
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { TableNoData } from "@/components/TableNoData";
@@ -22,6 +38,7 @@ import products from "../requests/products";
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
+import InfoTooltip from "@/components/InfoTooltip";
 
 export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const router = useRouter();
@@ -384,58 +401,45 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                         <Card variant={"outlined"}>
                             <CustomToolbar />
                             <CardContent>
-                                <Card variant={"outlined"} sx={{ padding: "15px", marginBottom: "10px" }}>
-                                    <Grid item container alignContent="center" alignItems="center" justifyContent="center">
-                                        <Grid item>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: "400", marginBottom: "5px" }}>Búsqueda avanzada</Typography>
+                                <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>
+                                    <Grid item container alignItems="center" justifyContent="center">
+                                        <Grid container item xs={"auto"} alignItems={"center"}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: "400" }}>Búsqueda avanzada</Typography>
                                         </Grid>
-                                        <Grid item>
-                                            <ClickAwayListener onClickAway={handleTooltipClose}>
-                                                <Tooltip
-                                                    PopperProps={{ disablePortal: true, }}
-                                                    onClose={handleTooltipClose}
-                                                    open={isOpenTooltip}
-                                                    disableFocusListener
-                                                    disableHoverListener
-                                                    placement="bottom-start"
-                                                    disableTouchListener
-                                                    title={<Typography variant="subtitle2">
-                                                        Puede buscar por nombre y descripción
-                                                        <br /> ó filtrar por departamentos
-                                                    </Typography>}
-                                                >
-                                                    <IconButton onClick={handleTooltipOpen}>
-                                                        <HelpOutline />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </ClickAwayListener>
+                                        <Grid container item xs={"auto"} alignItems={"center"}>
+                                            <InfoTooltip
+                                                isOpenTooltip={isOpenTooltip}
+                                                handleTooltipClose={handleTooltipClose}
+                                                message={"Puede buscar por nombre y descripción ó filtrar por departamentos"}
+                                            >
+                                                <IconButton onClick={handleTooltipOpen}>
+                                                    <HelpOutline />
+                                                </IconButton>
+                                            </InfoTooltip>
                                         </Grid>
                                     </Grid>
-                                    <Grid container direction="row" rowSpacing={2} alignItems="center" justifyContent="center">
-                                        <Grid item xs={8} >
-                                            <Card variant="outlined">
-                                                <Grid item container borderRadius={"5px"} margin="4px" width="100%" position="relative" >
-                                                    <Grid item position="absolute" height="100%" paddingLeft="4px" display="flex" alignItems="center" justifyContent="center" >
-                                                        <SearchIcon color="action" />
-                                                    </Grid>
-                                                    <Grid item width="100%" paddingLeft="35px" >
-                                                        <InputBase
-                                                            placeholder="Buscar producto..."
-                                                            inputProps={{ 'aria-label': 'search' }}
-                                                            {...formik.getFieldProps("searchBarValue")}
-                                                        />
-                                                    </Grid>
+                                    <Grid container spacing={2} alignItems="center">
+                                        <Grid item xs={true} md={8}>
+                                            <Grid item container xs={12} border={"1px solid gray"} borderRadius={"5px"} margin="4px" position="relative" >
+                                                <Grid item position="absolute" height="100%" paddingLeft="4px" display="flex" alignItems="center" justifyContent="center" >
+                                                    <SearchIcon color="action" />
                                                 </Grid>
-                                            </Card>
+                                                <Grid item width="100%" paddingLeft="35px" >
+                                                    <InputBase
+                                                        placeholder="Buscar producto..."
+                                                        inputProps={{ 'aria-label': 'search' }}
+                                                        {...formik.getFieldProps("searchBarValue")}
+                                                    />
+                                                </Grid>
+                                            </Grid>
                                         </Grid>
-                                        <Grid item xs={4} paddingX="10px">
+                                        <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
                                             <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
                                         </Grid>
                                     </Grid>
                                 </Card>
                                 <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
                                     <Grid container rowSpacing={2}>
-
                                         {
                                             dataProducts?.length! > 0
                                                 ? (dataProducts?.filter(
