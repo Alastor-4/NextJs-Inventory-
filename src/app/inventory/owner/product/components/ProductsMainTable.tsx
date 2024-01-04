@@ -27,6 +27,7 @@ import products from "../requests/products";
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
+import FilterProductsByDepartmentsModal from "@/components/nodals/FilterProductsByDepartmentsModal";
 
 export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const router = useRouter();
@@ -66,9 +67,19 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
         if (departments === null) getAllDepartments();
     }, [departments]);
 
+    //Modals handlers
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
+
+    const toggleModalCreate = () => setIsCreateModalOpen(!isCreateModalOpen);
+    const toggleModalUpdate = () => setIsUpdateModalOpen(!isUpdateModalOpen);
+    const toggleModalFilter = () => setIsFilterModalOpen(!isFilterModalOpen);
+
     //Update allProducts at change
     useEffect(() => {
         if (allProductsByDepartment?.length) {
+
             let allProducts: productsProps[] = [];
             let bool = false;
             if (selectedDepartments) {
@@ -92,16 +103,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
             });
             setDataProducts(allProducts);
         }
-    }, [allProductsByDepartment, selectedDepartments]);
-
-    //Modals handlers
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
-    const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
-
-    const toggleModalCreate = () => setIsCreateModalOpen(!isCreateModalOpen);
-    const toggleModalUpdate = () => setIsUpdateModalOpen(!isUpdateModalOpen);
-    const toggleModalFilter = () => setIsFilterModalOpen(!isFilterModalOpen);
+    }, [allProductsByDepartment, selectedDepartments, isFilterModalOpen]);
 
     //Handle selected product
     const handleSelectProduct = (product: productsProps) => {
@@ -137,66 +139,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
         setOpenImagesDialog(true);
     }
 
-    interface FilterDepartmentsModalProps {
-        allProducts: allProductsByDepartmentProps[] | null;
-    }
-
-    const FilterDepartmentsModal = ({ allProducts }: FilterDepartmentsModalProps) => {
-        const [filteredDepartments, setFilteredDepartments] = useState<allProductsByDepartmentProps[] | null>(allProducts);
-
-        const handleRemoveFilter = () => {
-            handleDepartmentClick(null, true);
-        }
-
-        const handleAddFilter = () => {
-            setSelectedDepartments(filteredDepartments);
-            toggleModalFilter();
-        };
-
-        const handleDepartmentClick = (departmentSelected: allProductsByDepartmentProps | null, remove?: boolean) => {
-            if (!filteredDepartments) return;
-            let departments = [...filteredDepartments!];
-            if (remove) {
-                departments?.forEach((department: allProductsByDepartmentProps) => department.selected = false);
-                setFilteredDepartments(departments);
-            }
-            else {
-                departments?.forEach((department: allProductsByDepartmentProps) => {
-                    if (department.id === departmentSelected?.id) {
-                        department.selected = !department.selected;
-                    }
-                });
-                setFilteredDepartments(departments);
-            }
-        }
-
-        return (
-            <Dialog open={isFilterModalOpen} fullWidth>
-                <DialogTitle m="auto">Filtrar por departamentos</DialogTitle>
-                <DialogContent dividers sx={{ marginX: "20px" }}>
-                    <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap" >
-                        {allProductsByDepartment?.map((department: allProductsByDepartmentProps) => (
-                            <Chip
-                                key={department.id!}
-                                label={department.name}
-                                clickable={true}
-                                size="medium"
-                                onClick={() => handleDepartmentClick(department)}
-                                variant={department.selected ? "filled" : "outlined"}
-                                sx={{ display: "flex" }}
-                                icon={department.selected ? <CheckBoxOutlined /> : <CheckBoxOutlineBlank />}
-                                color="primary"
-                            />
-                        ))}
-                    </Stack>
-                </DialogContent>
-                <DialogActions sx={{ marginRight: "15px" }}>
-                    <Button startIcon={<FilterAltOff />} color="error" variant="outlined" onClick={handleRemoveFilter}>Limpiar</Button>
-                    <Button color="primary" variant="outlined" onClick={handleAddFilter}>Aceptar</Button>
-                </DialogActions>
-            </Dialog>
-        );
-    }
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -390,8 +332,11 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
     return (
         <>
-            <FilterDepartmentsModal
-                allProducts={allProductsByDepartment!}
+            <FilterProductsByDepartmentsModal
+                allProductsByDepartment={allProductsByDepartment!}
+                setSelectedDepartments={setSelectedDepartments}
+                isFilterModalOpen={isFilterModalOpen}
+                toggleModalFilter={toggleModalFilter}
             />
 
             <ImagesDisplayDialog
