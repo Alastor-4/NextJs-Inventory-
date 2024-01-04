@@ -109,8 +109,11 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     }
 
     const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
-    const handleToggleTooltip = () => {
-        setIsOpenTooltip(!isOpenTooltip);
+    const handleTooltipClose = () => {
+        setIsOpenTooltip(false);
+    }
+    const handleTooltipOpen = () => {
+        setIsOpenTooltip(true);
     }
 
     //Handle delete product
@@ -387,10 +390,10 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                             <Typography variant="subtitle1" sx={{ fontWeight: "400", marginBottom: "5px" }}>Búsqueda avanzada</Typography>
                                         </Grid>
                                         <Grid item>
-                                            <ClickAwayListener onClickAway={handleToggleTooltip}>
+                                            <ClickAwayListener onClickAway={handleTooltipClose}>
                                                 <Tooltip
                                                     PopperProps={{ disablePortal: true, }}
-                                                    onClose={handleToggleTooltip}
+                                                    onClose={handleTooltipClose}
                                                     open={isOpenTooltip}
                                                     disableFocusListener
                                                     disableHoverListener
@@ -401,7 +404,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                                         <br /> ó filtrar por departamentos
                                                     </Typography>}
                                                 >
-                                                    <IconButton onClick={handleToggleTooltip}>
+                                                    <IconButton onClick={handleTooltipOpen}>
                                                         <HelpOutline />
                                                     </IconButton>
                                                 </Tooltip>
