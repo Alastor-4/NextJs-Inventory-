@@ -20,6 +20,7 @@ import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } f
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { images, characteristics, departments } from '@prisma/client';
+import { useStoreHook } from "@/app/store/useStoreHook";
 import ModalUpdateProduct from "./ModalUpdateProduct";
 import { useStore } from "@/app/store/store";
 import products from "../requests/products";
@@ -29,12 +30,15 @@ import { Formik } from "formik";
 
 export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const router = useRouter();
-    const productsCount = useStore((state) => state.ownerProductsCount);
+
+    const store = useStoreHook(useStore, (state) => state.ownerProductsCount);
 
     //Products data
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
+
+    const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
 
     const [forceRender, setForceRender] = useState<boolean>(false);
 
@@ -53,7 +57,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     }, [userId, forceRender]);
 
     //GET all departments
-    const [departments, setDepartments] = React.useState<departments[] | null>(null);
+    const [departments, setDepartments] = useState<departments[] | null>(null);
     useEffect(() => {
         const getAllDepartments = async () => {
             const departments = await products.getDepartments()
@@ -66,11 +70,19 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     useEffect(() => {
         if (allProductsByDepartment?.length) {
             let allProducts: productsProps[] = [];
-
+            let bool = false;
+            if (selectedDepartments) {
+                for (const department of selectedDepartments!) if (department.selected === true) bool = true;
+            }
             allProductsByDepartment?.forEach((departmentItem) => {
-                // if (departmentItem.selected) {//TODO
-                allProducts = [...allProducts, ...departmentItem.products!]
-                // }
+                if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
+                    allProducts = [...allProducts, ...departmentItem.products!];
+                }
+                if (selectedDepartments?.length! > 0 && bool) {
+                    if (departmentItem.selected) {
+                        allProducts = [...allProducts, ...departmentItem.products!];
+                    }
+                }
             })
 
             allProducts.sort((a: productsProps, b: productsProps) => {
@@ -80,7 +92,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
             });
             setDataProducts(allProducts);
         }
-    }, [allProductsByDepartment]);
+    }, [allProductsByDepartment, selectedDepartments]);
 
     //Modals handlers
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
@@ -125,50 +137,51 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
         setOpenImagesDialog(true);
     }
 
+    interface FilterDepartmentsModalProps {
+        allProducts: allProductsByDepartmentProps[] | null;
+    }
 
-    // interface FilterDepartmentsModalProps {
-    //     allProductsByDepartment: allProductsByDepartmentProps[] | null;
-    // }
-
-    //{ allProductsByDepartment }: FilterDepartmentsModalProps
-    const FilterDepartmentsModal = () => {
-        const [filterDepartments, setFilterDepartments] = useState<allProductsByDepartmentProps[] | null>();
-
-        useEffect(() => {
-            const handleFilters = () => {
-                // setFilterDepartments()
-            }
-            handleFilters();
-        }, [filterDepartments]);
+    const FilterDepartmentsModal = ({ allProducts }: FilterDepartmentsModalProps) => {
+        const [filteredDepartments, setFilteredDepartments] = useState<allProductsByDepartmentProps[] | null>(allProducts);
 
         const handleRemoveFilter = () => {
-            handleDepartmentClick(0, true);
-            setFilterDepartments(null);
+            handleDepartmentClick(null, true);
         }
 
-        const handleDepartmentClick = (index: number, remove?: boolean) => {
-            let filters = [...allProductsByDepartment!]
+        const handleAddFilter = () => {
+            setSelectedDepartments(filteredDepartments);
+            toggleModalFilter();
+        };
+
+        const handleDepartmentClick = (departmentSelected: allProductsByDepartmentProps | null, remove?: boolean) => {
+            if (!filteredDepartments) return;
+            let departments = [...filteredDepartments!];
             if (remove) {
-                filters.forEach((department: allProductsByDepartmentProps) => { department.selected = false });
+                departments?.forEach((department: allProductsByDepartmentProps) => department.selected = false);
+                setFilteredDepartments(departments);
             }
             else {
-                filters.forEach((department: allProductsByDepartmentProps) => { if (department.id === index) { department.selected = !department.selected } });
+                departments?.forEach((department: allProductsByDepartmentProps) => {
+                    if (department.id === departmentSelected?.id) {
+                        department.selected = !department.selected;
+                    }
+                });
+                setFilteredDepartments(departments);
             }
-            setFilterDepartments(filters);
         }
 
         return (
-            <Dialog open={isFilterModalOpen} fullWidth onClose={toggleModalFilter}>
+            <Dialog open={isFilterModalOpen} fullWidth>
                 <DialogTitle m="auto">Filtrar por departamentos</DialogTitle>
                 <DialogContent dividers sx={{ marginX: "20px" }}>
                     <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap" >
-                        {allProductsByDepartment?.map((department: any) => (
+                        {allProductsByDepartment?.map((department: allProductsByDepartmentProps) => (
                             <Chip
                                 key={department.id!}
                                 label={department.name}
                                 clickable={true}
                                 size="medium"
-                                onClick={() => handleDepartmentClick(department.id)}
+                                onClick={() => handleDepartmentClick(department)}
                                 variant={department.selected ? "filled" : "outlined"}
                                 sx={{ display: "flex" }}
                                 icon={department.selected ? <CheckBoxOutlined /> : <CheckBoxOutlineBlank />}
@@ -179,6 +192,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 </DialogContent>
                 <DialogActions sx={{ marginRight: "15px" }}>
                     <Button startIcon={<FilterAltOff />} color="error" variant="outlined" onClick={handleRemoveFilter}>Limpiar</Button>
+                    <Button color="primary" variant="outlined" onClick={handleAddFilter}>Aceptar</Button>
                 </DialogActions>
             </Dialog>
         );
@@ -281,7 +295,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
     const TableContent = ({ formik }: any) => {
         return (
-            <TableBody>
+            <TableBody >
                 {dataProducts?.filter(
                     (product: productsProps) =>
                         product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
@@ -376,7 +390,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     return (
         <>
             <FilterDepartmentsModal
-            //  allProductsByDepartment={allProductsByDepartment!}
+                allProducts={allProductsByDepartment!}
             />
 
             <ImagesDisplayDialog
@@ -463,7 +477,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                                         </Table>
                                                     </TableContainer>
                                                 ) : (
-                                                    <TableNoData hasData={productsCount} />
+                                                    <TableNoData hasData={store} />
                                                 )
                                         }
                                     </Grid>
