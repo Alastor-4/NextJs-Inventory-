@@ -472,7 +472,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                                     (product: productsProps) =>
                                                         product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                                                         product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
-                                                    (<TableContainer sx={{ width: "100%", height: "70vh", overflowX: "auto" }}>
+                                                    (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
                                                         <Table sx={{ width: "100%" }} size={"small"}>
                                                             <TableHeader />
 
