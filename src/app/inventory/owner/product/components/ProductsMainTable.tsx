@@ -11,7 +11,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined, FilterAlt, HelpOutline } from "@mui/icons-material";
 import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
-import FilterProductsByDepartmentsModal from "@/components/nodals/FilterProductsByDepartmentsModal";
+import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import { images, characteristics, departments } from '@prisma/client';
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";

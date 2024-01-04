@@ -1,3 +1,4 @@
+import { ModalUpdateProductProps } from "@/types/interfaces";
 import {
     AppBar,
     Box,
@@ -9,13 +10,6 @@ import {
 } from "@mui/material";
 import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import React, { ReactNode } from "react";
-
-interface ModalUpdateProductProps {
-    open: boolean;
-    setOpen: (bool: boolean) => void;
-    dialogTitle: string;
-    children?: ReactNode;
-}
 
 export default function ModalUpdateProduct({ open, setOpen, dialogTitle, children }: ModalUpdateProductProps) {
 

@@ -13,11 +13,7 @@ import DepartmentProductsSelect from "@/components/DepartmentProductsSelect";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import warehouseDepots from "../requests/warehouseDepots";
 import { AxiosResponse } from "axios";
-
-interface UserWarehouseFormProps {
-    ownerId?: number;
-    warehouseId?: number;
-}
+import { UserWarehouseFormProps } from "@/types/interfaces";
 
 export default function UserWarehouseForm({ ownerId, warehouseId }: UserWarehouseFormProps) {
 

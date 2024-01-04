@@ -35,7 +35,8 @@ import {
     ExpandMoreOutlined,
     ShareOutlined,
 } from "@mui/icons-material";
-import { characteristics, departments, depots, images, store_depots, warehouses } from "@prisma/client";
+import { UserWarehouseMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
+import { departments, depots, images, store_depots } from "@prisma/client";
 import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
@@ -50,48 +51,11 @@ import dayjs from "dayjs";
 import ModalAddProduct from "./ModalAddProduct";
 import UserWarehouseForm from "./UserWarehouseForm";
 
-interface UserWarehouseMainTableProps {
-    ownerId?: number;
-    warehouseDetails?: warehouses | null;
-}
-
-interface productsProps {
-    id: number;
-    department_id: number | null;
-    owner_id: number | null;
-    name: string | null;
-    description: string | null;
-    buy_price: number | null;
-    created_at: Date;
-    depots?: depots[];
-    departments?: departments;
-    images?: images[];
-    characteristics?: characteristics[];
-    storesDistribution?: {
-        id: number;
-        owner_id: number | null;
-        name: string | null;
-        description: string | null;
-        slogan: string | null;
-        address: string | null;
-        seller_user_id: number | null;
-        created_at: Date;
-        online_reservation: boolean | null;
-        online_catalog: boolean | null;
-        auto_open_time: boolean | null;
-        auto_reservation_time: boolean | null;
-        fixed_seller_profit_percentage: number | null;
-        fixed_seller_profit_quantity: number | null;
-        fixed_seller_profit_unit: string | null;
-        store_depots?: store_depots[];
-    }[];
-}
-
 export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: UserWarehouseMainTableProps) {
     const router = useRouter();
 
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
-    const [depositsByDepartment, setDepositsByDepartment] = useState<(departments & { products?: productsProps[], selected?: boolean })[] | null>(null);
+    const [depositsByDepartment, setDepositsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
 
     const [activeModalAddProduct, setActiveModalAddProduct] = useState(false)
 
@@ -232,7 +196,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                             selectedProduct && (
                                 <Box sx={{ display: "flex" }}>
                                     <Divider orientation="vertical" variant="middle" flexItem
-                                             sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                        sx={{ borderRight: "2px solid white", mx: "5px" }} />
 
                                     <IconButton color={"inherit"} onClick={handleRemove}>
                                         <DeleteOutline fontSize={"small"} />
@@ -743,7 +707,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                                     <Box display={"flex"} justifyContent={"center"}>
                                                         <AvatarGroup
                                                             max={2}
-                                                            sx={{flexDirection: "row", width: "fit-content"}}
+                                                            sx={{ flexDirection: "row", width: "fit-content" }}
                                                             onClick={(e) => {
                                                                 e.stopPropagation()
                                                                 handleOpenImagesDialog(product.images!)
@@ -755,7 +719,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                                                     key={`producto-${imageItem.id}`}
                                                                     alt={`producto-${imageItem.id}`}
                                                                     src={imageItem.fileUrl!}
-                                                                    sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                                    sx={{ cursor: "pointer", border: "1px solid lightblue" }}
                                                                 />
                                                             )}
                                                         </AvatarGroup>

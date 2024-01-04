@@ -1,3 +1,4 @@
+import { ModalAddProductFromWarehouseProps } from "@/types/interfaces";
 import {
     AppBar,
     Box,
@@ -8,15 +9,7 @@ import {
     Typography,
 } from "@mui/material";
 import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
-import React, { ReactNode } from "react";
-
-interface ModalAddProductFromWarehouseProps {
-    open: boolean;
-    setOpen: (bool: boolean) => void;
-    dialogTitle?: string;
-    loadData: () => Promise<void>;
-    children?: ReactNode;
-}
+import React from "react";
 
 export default function ModalAddProductFromWarehouse({ loadData, dialogTitle, open, setOpen, children }: ModalAddProductFromWarehouseProps) {
 

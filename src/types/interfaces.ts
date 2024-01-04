@@ -1,4 +1,5 @@
-import { characteristics, departments, images, store_depots, stores, warehouses } from "@prisma/client";
+import { characteristics, departments, depots, images, store_depots, stores, warehouses } from "@prisma/client";
+import { ReactNode } from "react";
 
 export interface ShowProductsStoreProps {
     userId?: number;
@@ -10,10 +11,48 @@ export interface ShowProductsStoreProps {
     nameWarehouse?: string | null;
 }
 
+export interface ModalUpdateProductProps {
+    open: boolean;
+    setOpen: (bool: boolean) => void;
+    dialogTitle: string;
+    children?: ReactNode;
+}
+
+export interface ManageQuantityProps {
+    userId: number;
+    nameStore: string;
+    nameWarehouse: string;
+    productDetails: productsProps;
+    updateDepot: (addUnits: number, depot: depots) => Promise<void>;
+    setActiveManageQuantity: (bool: boolean) => void;
+}
+
+export interface UpdateValueDialogProps {
+    open: boolean;
+    setOpen: (boolean: boolean) => void;
+    dialogTitle: string;
+    children: ReactNode;
+    formik?: any;
+}
+
 export interface ProductsMainTableProps {
     userId: number;
 }
 
+export interface ModalAddProductFromWarehouseProps {
+    open: boolean;
+    setOpen: (bool: boolean) => void;
+    dialogTitle?: string;
+    loadData: () => Promise<void>;
+    children?: ReactNode;
+}
+
+export interface ModalStoreAssignProps {
+    open: boolean;
+    setOpen: (bool: boolean) => void;
+    dialogTitle: string;
+    children?: ReactNode;
+}
 export interface productsProps {
     id: number;
     department_id: number | null;
@@ -62,4 +101,14 @@ export interface allProductsByDepartmentProps {
     created_at: Date;
     products?: productsProps[];
     selected?: boolean
+}
+
+export interface UserWarehouseFormProps {
+    ownerId?: number;
+    warehouseId?: number;
+}
+
+export interface UserWarehouseMainTableProps {
+    ownerId?: number;
+    warehouseDetails?: warehouses | null;
 }

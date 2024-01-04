@@ -1,22 +1,12 @@
 import { Box, Button, Card, Grid, IconButton, Stack, TextField, Typography } from '@mui/material';
+import { ManageQuantityProps } from '@/types/interfaces';
 import storeAssign from '../../requests/store-assign';
-import { productsProps } from '../ShowProductsStore';
+import { handleKeyDown } from '@/utils/handleKeyDown';
 import { SwapHoriz } from '@mui/icons-material';
-import { depots } from '@prisma/client';
 import React, { useState } from 'react';
+import { AxiosResponse } from 'axios';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { AxiosResponse } from 'axios';
-import { handleKeyDown } from '@/utils/handleKeyDown';
-
-interface ManageQuantityProps {
-  userId: number;
-  nameStore: string;
-  nameWarehouse: string;
-  productDetails: productsProps;
-  updateDepot: (addUnits: number, depot: depots) => Promise<void>;
-  setActiveManageQuantity: (bool: boolean) => void;
-}
 
 function ManageQuantity({ userId, nameStore, nameWarehouse, productDetails, updateDepot, setActiveManageQuantity }: ManageQuantityProps) {
 

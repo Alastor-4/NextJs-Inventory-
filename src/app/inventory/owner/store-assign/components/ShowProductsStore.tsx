@@ -40,7 +40,6 @@ import { Formik } from 'formik';
 import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
 import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
 
-
 function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) {
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);

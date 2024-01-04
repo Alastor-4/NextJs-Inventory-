@@ -1,3 +1,4 @@
+import { ModalStoreAssignProps } from "@/types/interfaces";
 import {
     Box,
     Button,
@@ -7,13 +8,6 @@ import {
     DialogTitle,
 } from "@mui/material";
 import React, { ReactNode } from "react";
-
-interface ModalStoreAssignProps {
-    open: boolean;
-    setOpen: (bool: boolean) => void;
-    dialogTitle: string;
-    children?: ReactNode;
-}
 
 export default function ModalStoreAssign({ dialogTitle, open, setOpen, children }: ModalStoreAssignProps) {
 

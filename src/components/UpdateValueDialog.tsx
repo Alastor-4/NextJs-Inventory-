@@ -1,3 +1,4 @@
+import { UpdateValueDialogProps } from "@/types/interfaces";
 import {
     Box,
     Button,
@@ -6,15 +7,8 @@ import {
     DialogContent,
     DialogTitle,
 } from "@mui/material";
-import React, { ReactNode } from "react";
+import React from "react";
 
-interface UpdateValueDialogProps {
-    open: boolean;
-    setOpen: (boolean: boolean) => void;
-    dialogTitle: string;
-    children: ReactNode;
-    formik?: any;
-}
 export default function UpdateValueDialog({ dialogTitle, open, formik, setOpen, children }: UpdateValueDialogProps) {
 
     const handleClose = () => {
