@@ -898,7 +898,6 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                 ownerId={ownerId}
                                 warehouseId={warehouseDetails?.id}
                                 dataAllProducts={dataProducts!}
-
                                 depotsInWarehouses={depotsInWarehouses}
                             />
                         </ModalAddProduct>

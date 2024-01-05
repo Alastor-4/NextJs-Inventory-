@@ -126,8 +126,8 @@ export interface departmentWithoutDepots {
 export interface UserWarehouseFormProps {
     ownerId?: number;
     warehouseId?: number;
-    dataAllProducts: productsProps[] | null;
-    depotsInWarehouses: number | null;
+    dataAllProducts?: productsProps[] | null;
+    depotsInWarehouses?: number | null;
 }
 
 export interface UserWarehouseMainTableProps {
