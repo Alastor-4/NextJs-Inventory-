@@ -336,7 +336,7 @@ export const UserWarehouseForm = ({ ownerId, warehouseId, depotsInWarehouses }: 
                                     color={"primary"}
                                     variant={"contained"}
                                     size={"small"}
-                                    disabled={!formik.isValid}
+                                    disabled={!formik.getFieldProps('product').value || !formik.getFieldProps('productTotalUnits').value || !formik.isValid}
                                 >
                                     Crear
                                 </Button>
