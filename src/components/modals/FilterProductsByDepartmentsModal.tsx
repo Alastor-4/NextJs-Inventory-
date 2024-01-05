@@ -17,22 +17,19 @@ const FilterProductsByDepartmentsModal = (
     const [filteredDepartments, setFilteredDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
 
     useEffect(() => {
-        setFilteredDepartments(allProductsByDepartment);
-    }, [allProductsByDepartment])
+        if (allProductsByDepartment) setFilteredDepartments([...allProductsByDepartment!]);
+    }, [allProductsByDepartment]);
 
+    const handleRemoveFilter = () => handleDepartmentClick(null, true);
 
-    const handleRemoveFilter = () => {
-        handleDepartmentClick(null, true);
-    }
-
-    const handleAddFilter = () => {
-        setSelectedDepartments(filteredDepartments);
+    const handleCloseModal = () => {
+        setSelectedDepartments([...filteredDepartments!]);
         toggleModalFilter();
-    };
+    }
 
     const handleDepartmentClick = (departmentSelected: allProductsByDepartmentProps | null, remove?: boolean) => {
         if (!filteredDepartments) return;
-        let departments = [...filteredDepartments!];
+        let departments = Array.from([...filteredDepartments!]);
         if (remove) {
             departments?.forEach((department: allProductsByDepartmentProps) => department.selected = false);
             setFilteredDepartments(departments);
@@ -48,11 +45,11 @@ const FilterProductsByDepartmentsModal = (
     }
 
     return (
-        <Dialog open={isFilterModalOpen} fullWidth>
+        <Dialog open={isFilterModalOpen} fullWidth onClose={handleCloseModal}>
             <DialogTitle m="auto">Filtrar por departamentos</DialogTitle>
-            <DialogContent dividers sx={{ marginX: "20px" }}>
+            <DialogContent dividers sx={{ marginX: "5px" }}>
                 <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap" >
-                    {allProductsByDepartment?.map((department: allProductsByDepartmentProps) => (
+                    {filteredDepartments?.map((department: allProductsByDepartmentProps) => (
                         <Chip
                             key={department.id!}
                             label={department.name}
@@ -68,8 +65,7 @@ const FilterProductsByDepartmentsModal = (
                 </Stack>
             </DialogContent>
             <DialogActions sx={{ marginRight: "15px" }}>
-                <Button startIcon={<FilterAltOff />} color="error" variant="outlined" onClick={handleRemoveFilter}>Limpiar</Button>
-                <Button color="primary" variant="outlined" onClick={handleAddFilter}>Aceptar</Button>
+                <Button startIcon={<FilterAltOff />} color="error" variant="outlined" onClick={handleRemoveFilter}>Limpiar filtros</Button>
             </DialogActions>
         </Dialog>
     );
