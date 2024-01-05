@@ -90,7 +90,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     //Update allProducts at change
     useEffect(() => {
         if (allProductsByDepartment?.length) {
-
             let allProducts: productsProps[] = [];
             let bool = false;
             if (selectedDepartments) {
@@ -126,12 +125,8 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     }
 
     const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
-    const handleTooltipClose = () => {
-        setIsOpenTooltip(false);
-    }
-    const handleTooltipOpen = () => {
-        setIsOpenTooltip(true);
-    }
+    const handleTooltipClose = () => setIsOpenTooltip(false);
+    const handleTooltipOpen = () => setIsOpenTooltip(true);
 
     //Handle delete product
     const handleRemove = async () => {
@@ -157,7 +152,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
         setDialogImages(images);
         setOpenImagesDialog(true);
     }
-
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -209,22 +203,18 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
             {
                 id: "name",
                 label: "Nombre",
-                align: "left"
             },
             {
                 id: "description",
                 label: "Descripción",
-                align: "left"
             },
             {
                 id: "department",
                 label: "Departamento",
-                align: "left"
             },
             {
                 id: "characteristics",
                 label: "Características",
-                align: "left"
             },
         ]
 
@@ -275,7 +265,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                     checked={!!selectedProduct && (product.id === selectedProduct.id)}
                                     onClick={() => handleSelectProduct(product)}
                                     sx={{ width: "5px" }}
-
                                 />
                             </TableCell>
                             <TableCell>
@@ -301,7 +290,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                             </Grid>
                                         )
                                     }
-
                                     <Grid container item xs={12} justifyContent={"center"}>
                                         {product.name}
                                     </Grid>
@@ -368,6 +356,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 open={isCreateModalOpen}
                 setOpen={setIsCreateModalOpen}
                 dialogTitle="Crear Producto"
+                setForceRender={setForceRender}
             >
                 <ProductsForm
                     userId={userId}
@@ -382,6 +371,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 open={isUpdateModalOpen}
                 setOpen={setIsUpdateModalOpen}
                 dialogTitle="Modificar Producto"
+                setForceRender={setForceRender}
             >
                 <ProductsForm
                     userId={userId}
@@ -402,8 +392,8 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                             <CustomToolbar />
                             <CardContent>
                                 <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>
-                                    <Grid item container alignItems="center" justifyContent="center">
-                                        <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <Grid item container alignItems="center" justifyContent="center" sx={{ marginTop: "-10px" }}>
+                                        <Grid container item xs={"auto"} alignItems={"center"} >
                                             <Typography variant="subtitle1" sx={{ fontWeight: "400" }}>Búsqueda avanzada</Typography>
                                         </Grid>
                                         <Grid container item xs={"auto"} alignItems={"center"}>

@@ -4,8 +4,8 @@ import { prisma } from "db";
 // Get all products without depots in warehouse
 export async function GET(req: Request, { params }: { params: { warehouseId: string } }) {
     const { searchParams } = new URL(req.url)
-    const ownerId = parseInt(<string>searchParams.get("userId"))
-    const warehouseId = params.warehouseId
+    const ownerId = +searchParams.get("userId")!
+    const warehouseId = +params.warehouseId
 
     if (ownerId && warehouseId) {
         const warehouseDepots = await prisma.departments.findMany(
@@ -19,14 +19,14 @@ export async function GET(req: Request, { params }: { params: { warehouseId: str
                         },
                         {
                             products: {
-                                some: { depots: { none: { warehouse_id: parseInt(warehouseId) } } }
+                                some: { depots: { none: { warehouse_id: warehouseId } } }
                             },
                         },
                     ]
                 },
                 include: {
                     products: {
-                        where: { depots: { none: { warehouse_id: parseInt(warehouseId) } } },
+                        where: { depots: { none: { warehouse_id: warehouseId } } },
                         include: { departments: true, characteristics: true, images: true },
                     }
                 }

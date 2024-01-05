@@ -1,20 +1,13 @@
-import { ModalUpdateProductProps } from "@/types/interfaces";
-import {
-    AppBar,
-    Box,
-    Dialog,
-    DialogContent,
-    IconButton,
-    Toolbar,
-    Typography,
-} from "@mui/material";
 import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
-import React, { ReactNode } from "react";
+import { AppBar, Box, Dialog, DialogContent, IconButton, Toolbar, Typography } from "@mui/material";
+import { ModalUpdateProductProps } from "@/types/interfaces";
+import React from "react";
 
-export default function ModalUpdateProduct({ open, setOpen, dialogTitle, children }: ModalUpdateProductProps) {
+export default function ModalUpdateProduct({ open, setOpen, dialogTitle, children, setForceRender }: ModalUpdateProductProps) {
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
         setOpen(false);
+        setForceRender(true);
     };
 
     return (

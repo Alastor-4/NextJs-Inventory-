@@ -24,15 +24,15 @@ import userProfileStyles from "@/assets/styles/userProfileStyles"
 import Link from "next/link";
 import dayjs from "dayjs";
 import { signOut } from "next-auth/react";
-import { setProductsCount } from "@/app/store/store";
+import { setProductsCount, setOwnerwarehouses } from "@/app/store/store";
 
 export default function UserProfileMain(props) {
     const { userDetails, userRole, ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount, sellerStores } = props;
 
     useEffect(() => {
         setProductsCount(ownerProductsCount);
-    }, [ownerProductsCount])
-
+        setOwnerwarehouses(ownerWarehouses);
+    }, [ownerProductsCount, ownerWarehouses]);
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
