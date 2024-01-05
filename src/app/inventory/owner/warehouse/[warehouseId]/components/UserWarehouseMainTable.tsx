@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import {
     AppBar, Avatar, AvatarGroup,
     Box,
+    Button,
     Card,
     CardContent,
     Checkbox,
@@ -11,6 +12,7 @@ import {
     Divider,
     Grid,
     IconButton,
+    InputBase,
     Table,
     TableBody,
     TableCell,
@@ -22,7 +24,6 @@ import {
     Tooltip,
     Typography
 } from "@mui/material";
-import { TableNoData } from "@/components/TableNoData";
 import {
     Add,
     AddOutlined,
@@ -33,70 +34,103 @@ import {
     EditOutlined,
     ExpandLessOutlined,
     ExpandMoreOutlined,
+    FilterAlt,
+    HelpOutline,
     ShareOutlined,
 } from "@mui/icons-material";
 import { UserWarehouseMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
+import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import { departments, depots, images, store_depots } from "@prisma/client";
-import DepartmentCustomButton from "@/components/DepartmentCustomButton";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import warehouseDepots from "../requests/warehouseDepots";
+import { useStoreHook } from "@/app/store/useStoreHook";
+import { TableNoData } from "@/components/TableNoData";
 import { handleKeyDown } from "@/utils/handleKeyDown";
 import tableStyles from "@/assets/styles/tableStyles";
+import UserWarehouseForm from "./UserWarehouseForm";
+import SearchIcon from '@mui/icons-material/Search';
+import InfoTooltip from "@/components/InfoTooltip";
+import ModalAddProduct from "./ModalAddProduct";
+import { useStore } from "@/app/store/store";
 import { useRouter } from "next/navigation";
 import { AxiosResponse } from "axios";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import dayjs from "dayjs";
-import ModalAddProduct from "./ModalAddProduct";
-import UserWarehouseForm from "./UserWarehouseForm";
 
-export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: UserWarehouseMainTableProps) {
+const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMainTableProps) => {
     const router = useRouter();
 
+    const warehouseState = useStoreHook(useStore, (state) => state.ownerWarehouses);
+    const [depotsInWarehouses, setDepotsInWarehouses] = useState<number>(0);
+
+    useEffect(() => {
+        let depotsCount = 0;
+        const productsInWarehousesQuantity = () => {
+            for (const warehouse of warehouseState!) depotsCount += warehouse.depots?.length!;
+            setDepotsInWarehouses(depotsCount);
+        }
+        if (warehouseState) productsInWarehousesQuantity();
+    }), [warehouseState];
+
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
-    const [depositsByDepartment, setDepositsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [allDepositsByDepartment, setAllDepositsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
 
     const [activeModalAddProduct, setActiveModalAddProduct] = useState(false)
 
-    const [forceRender, setForceRender] = useState(true)
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
+    const toggleModalFilter = () => setIsFilterModalOpen(!isFilterModalOpen);
+
+    const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
+    const handleTooltipClose = () => setIsOpenTooltip(false);
+    const handleTooltipOpen = () => setIsOpenTooltip(true);
+
+    const [forceRender, setForceRender] = useState(true);
+
     //GET initial products data
     useEffect(() => {
-        const getDepositsByDepartament = async () => {
-            const newDepositsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
-            setDepositsByDepartment(newDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
-                {
-                    ...departments,
-                    selected: false
-                })));
-            setForceRender(false)
+        const getAllDepositsByDepartment = async () => {
+            const newAllDepositsByDepartment = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+            setAllDepositsByDepartment(newAllDepositsByDepartment.map((department: allProductsByDepartmentProps) => ({
+                ...department,
+                selected: false
+            })))
+            setForceRender(false);
+            setSelectedProduct(null);
         }
-        if (forceRender) {
-            getDepositsByDepartament();
-        }
+        getAllDepositsByDepartment();
     }, [ownerId, warehouseDetails, forceRender]);
 
     useEffect(() => {
-        if (depositsByDepartment?.length) {
+        if (allDepositsByDepartment?.length) {
             let allProducts: productsProps[] = [];
-
-            depositsByDepartment.forEach((departmentItem) => {
-                if (departmentItem.selected) {
-                    allProducts = [...allProducts, ...departmentItem.products!]
+            let bool = false;
+            if (selectedDepartments) {
+                for (const department of selectedDepartments!) if (department.selected === true) bool = true;
+            }
+            allDepositsByDepartment?.forEach((departmentItem) => {
+                if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
+                    allProducts = [...allProducts, ...departmentItem.products!];
                 }
-            });
+                if (selectedDepartments?.length! > 0 && bool) {
+                    if (departmentItem.selected) {
+                        allProducts = [...allProducts, ...departmentItem.products!];
+                    }
+                }
+            })
 
-            allProducts.sort((a, b) => {
+            allProducts.sort((a: productsProps, b: productsProps) => {
                 if (a?.name! < b?.name!) return -1;
                 if (a?.name! > a?.name!) return 1;
-                return 0
+                return 0;
             });
-
             setDataProducts(allProducts);
         } else {
             setDataProducts(null);
         }
-    }, [depositsByDepartment]);
+    }, [allDepositsByDepartment, selectedDepartments]);
 
 
     const initialValues = {
@@ -142,8 +176,8 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
     }
 
     const refreshAfterAction = async () => {
-        const newDepositsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
-        setDepositsByDepartment(newDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
+        const newAllDepositsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+        setAllDepositsByDepartment(newAllDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
             {
                 ...departments,
                 selected: false
@@ -174,11 +208,11 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                         noWrap
                         sx={{
                             fontWeight: 700,
-                            // letterSpacing: ".1rem",
+                            letterSpacing: "0.15rem",
                             color: "white",
                         }}
                     >
-                        Depósitos en almacén
+                        Depósitos
                     </Typography>
                 </Box>
 
@@ -210,60 +244,6 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
         </AppBar >
     )
 
-    function handleSelectFilter(index: number) {
-        let filters = [...depositsByDepartment!];
-        filters[index].selected = !filters[index].selected;
-
-        setDepositsByDepartment(filters);
-    }
-
-    const DepartmentsFilter = ({ formik }: any) => (
-        <Card variant={"outlined"} sx={{ padding: "15px" }}>
-            <Grid container rowSpacing={2}>
-                <Grid item>
-                    <Typography variant={"subtitle2"}>
-                        Seleccione departamentos para encontrar el producto que busca
-                    </Typography>
-                </Grid>
-                <Grid container item spacing={2} flexWrap={"nowrap"} sx={{ overflowX: "auto", py: "7px" }}>
-                    {
-                        depositsByDepartment?.map((deposits, index) => (
-                            <Grid key={deposits.id} item xs={"auto"}>
-                                <DepartmentCustomButton
-                                    title={deposits.name!}
-                                    subtitle={deposits.products?.length === 1 ? `${deposits.products.length!}` + " producto" : `${deposits.products?.length!}` + " productos"}
-                                    selected={deposits.selected!}
-                                    onClick={() => handleSelectFilter(index)}
-                                />
-                            </Grid>
-                        ))
-                    }
-                </Grid>
-
-                {
-                    dataProducts?.length! > 0 && (
-                        <Grid container item rowSpacing={1}>
-                            <Grid item xs={12}>
-                                <Typography variant={"subtitle2"}>
-                                    Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    name={"handleChangeSearchBarValue"}
-                                    placeholder="Buscar producto..."
-                                    size={"small"}
-                                    fullWidth
-                                    {...formik.getFieldProps("searchBarValue")}
-                                />
-                            </Grid>
-                        </Grid>
-                    )
-                }
-            </Grid>
-        </Card>
-    )
-
     const [displayUpdateDepotQuantityForm, setDisplayUpdateDepotQuantityForm] = useState<boolean>(false);
     const [storeDepotUpdateIndex, setStoreDepotUpdateIndex] = useState<number | null>(null);
     const [displayUpdateUnitsForm, setDisplayUpdateUnitsForm] = useState<boolean>(false);
@@ -271,9 +251,9 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
     const [storeDepotUpdateName, setStoreDepotUpdateName] = useState<string>("");
 
     const afterUpdateDepot = (updatedDepot: AxiosResponse) => {
-        const newDepots = [...depositsByDepartment!];
+        const newDepots = [...allDepositsByDepartment!];
 
-        for (const departmentItem of depositsByDepartment!) {
+        for (const departmentItem of allDepositsByDepartment!) {
             const departmentIndex = newDepots.indexOf(departmentItem);
 
             const updatedIndex = departmentItem.products?.findIndex(productItem => productItem.depots![0].id === updatedDepot.data.id)
@@ -281,7 +261,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                 newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_units = updatedDepot.data.product_total_units;
                 newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units;
 
-                setDepositsByDepartment(newDepots);
+                setAllDepositsByDepartment(newDepots);
                 break;
             }
         }
@@ -392,9 +372,9 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
         const { warehouseQuantity, storeQuantity, moveQuantity } = formik.values.productStoreDepotDistribution;
 
         function updateLocalData(updatedDepot: depots, updatedStoreDepot: store_depots) {
-            const newDepots = [...depositsByDepartment!];
+            const newDepots = [...allDepositsByDepartment!];
 
-            for (const departmentItem of depositsByDepartment!) {
+            for (const departmentItem of allDepositsByDepartment!) {
                 const departmentProducts = departmentItem.products;
                 const departmentIndex = newDepots.indexOf(departmentItem);
 
@@ -411,7 +391,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                         newDepots[departmentIndex].products![updatedIndex!].storesDistribution![updatedStoreDepotIndex!].store_depots![0] = updatedStoreDepot;
                     }
 
-                    setDepositsByDepartment(newDepots);
+                    setAllDepositsByDepartment(newDepots);
 
                     break
                 }
@@ -556,27 +536,22 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
             {
                 id: "name",
                 label: "Nombre",
-                align: "left"
             },
             {
                 id: "department",
                 label: "Departamento",
-                align: "left"
             },
             {
                 id: "units",
                 label: "Unidades",
-                align: "left"
             },
             {
                 id: "created_at",
                 label: "Creación",
-                align: "left"
             },
             {
                 id: "details",
                 label: "",
-                align: "left"
             },
         ]
 
@@ -585,15 +560,13 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                 <TableRow>
                     <TableCell
                         key={"checkbox"}
-                        align={"left"}
                         padding={'checkbox'}
+                        sx={{ width: "5px" }}
                     >
-
                     </TableCell>
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
-                            align={"left"}
                             padding={'normal'}
                         >
                             {headCell.label}
@@ -615,17 +588,17 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
     async function handleLoadStoresDistribution(depot: depots) {
         const response = await warehouseDepots.depotStoreDistribution(ownerId!, warehouseDetails?.id!, depot.id!)
         if (response) {
-            const newdepositsByDepartment = [...depositsByDepartment!];
-            depositsByDepartment?.forEach((departmentItem, departmentIndex) => {
+            const newAllDepositsByDepartment = [...allDepositsByDepartment!];
+            allDepositsByDepartment?.forEach((departmentItem, departmentIndex) => {
                 const productIndex = departmentItem.products?.findIndex(productItem => productItem.depots![0].id === depot.id)
                 if (productIndex! > -1) {
-                    newdepositsByDepartment[departmentIndex].products![productIndex!].storesDistribution = response;
+                    newAllDepositsByDepartment[departmentIndex].products![productIndex!].storesDistribution = response;
 
                     //ToDo: break loop
                 }
             })
 
-            setDepositsByDepartment(newdepositsByDepartment);
+            setAllDepositsByDepartment(newAllDepositsByDepartment);
         }
     }
 
@@ -699,7 +672,12 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                         sx={tableStyles.row}
                                     >
                                         <TableCell>
-                                            <Checkbox size={"small"} onClick={() => handleSelectProduct(product)} checked={!!selectedProduct && (product.id === selectedProduct.id)} />
+                                            <Checkbox
+                                                size={"small"}
+                                                checked={!!selectedProduct && (product.id === selectedProduct.id)}
+                                                onClick={() => handleSelectProduct(product)}
+                                                sx={{ width: "5px" }}
+                                            />
                                         </TableCell>
                                         <TableCell onClick={(event) => handleExpand(event, index)}>
                                             {
@@ -727,14 +705,20 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                                 )
                                             }
 
-                                            <Box display={"flex"} justifyContent={"center"}>
+                                            <Box display={"flex"}>
                                                 {product.name}
                                             </Box>
                                         </TableCell>
-                                        <TableCell onClick={(event) => handleExpand(event, index)}>{product.departments?.name ?? "-"}</TableCell>
+                                        <TableCell
+                                            onClick={(event) => handleExpand(event, index)}
+                                        >
+                                            <Box display={"flex"}>
+                                                {product.departments?.name ?? "-"}
+                                            </Box>
+                                        </TableCell>
                                         <TableCell>
                                             <Grid container direction="column" alignItems="flex-start">
-                                                <Grid item sx={{ marginLeft: "10px" }}>
+                                                <Grid item sx={{ marginLeft: "10px", width: "100%" }}>
                                                     {product.depots![0].product_total_remaining_units ?? "-"} de {product.depots![0].product_total_units ?? "-"}
                                                 </Grid>
                                                 <Grid item display="flex" alignItems="flex-start">
@@ -757,7 +741,7 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                                             {dayjs(product.depots![0].created_at).format("DD/MM/YYYY HH:MM")}
                                         </TableCell>
                                         <TableCell>
-                                            <Tooltip title={"Details"}>
+                                            <Tooltip title={"Detalles"}>
                                                 <IconButton
                                                     size={"small"}
                                                     onClick={(event) => handleExpand(event, index)}
@@ -919,14 +903,17 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
         <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={() => {
-
-            }}
+            onSubmit={() => { }}
         >
             {
                 (formik) => (
                     <Card variant={"outlined"}>
-
+                        <FilterProductsByDepartmentsModal
+                            allProductsByDepartment={allDepositsByDepartment!}
+                            setSelectedDepartments={setSelectedDepartments}
+                            isFilterModalOpen={isFilterModalOpen}
+                            toggleModalFilter={toggleModalFilter}
+                        />
                         <ModalAddProduct
                             open={activeModalAddProduct}
                             setOpen={setActiveModalAddProduct}
@@ -974,31 +961,63 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
                         <CustomToolbar />
 
                         <CardContent>
-                            <Grid container rowSpacing={3}>
-                                {
-                                    depositsByDepartment?.length! > 0 && (
-                                        <Grid item xs={12}>
-                                            <DepartmentsFilter formik={formik} />
+                            <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>
+                                <Grid item container alignItems="center" justifyContent="center">
+                                    <Grid container item xs={"auto"} alignItems={"center"}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: "400" }}>Búsqueda avanzada</Typography>
+                                    </Grid>
+                                    <Grid container item xs={"auto"} alignItems={"center"}>
+                                        <InfoTooltip
+                                            isOpenTooltip={isOpenTooltip}
+                                            handleTooltipClose={handleTooltipClose}
+                                            message={"Puede buscar por nombre y descripción ó filtrar por departamentos"}
+                                        >
+                                            <IconButton onClick={handleTooltipOpen}>
+                                                <HelpOutline />
+                                            </IconButton>
+                                        </InfoTooltip>
+                                    </Grid>
+                                </Grid>
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item xs={true} md={8}>
+                                        <Grid item container xs={12} border={"1px solid gray"} borderRadius={"5px"} margin="4px" position="relative" >
+                                            <Grid item position="absolute" height="100%" paddingLeft="4px" display="flex" alignItems="center" justifyContent="center" >
+                                                <SearchIcon color="action" />
+                                            </Grid>
+                                            <Grid item width="100%" paddingLeft="35px" >
+                                                <InputBase
+                                                    placeholder="Buscar depósito..."
+                                                    inputProps={{ 'aria-label': 'search' }}
+                                                    {...formik.getFieldProps("searchBarValue")}
+                                                />
+                                            </Grid>
                                         </Grid>
-                                    )
-                                }
-
-                                {
-                                    dataProducts?.length! > 0
-                                        ? (
-                                            <Grid item xs={12}>
-                                                <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                    </Grid>
+                                    <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
+                                        <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                    </Grid>
+                                </Grid>
+                            </Card>
+                            <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
+                                <Grid container rowSpacing={2}>
+                                    {
+                                        dataProducts?.length! > 0
+                                            ? (dataProducts?.filter(
+                                                (product: productsProps) =>
+                                                    product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                                                    product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
+                                                (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
                                                     <Table sx={{ width: "100%" }} size={"small"}>
                                                         <TableHeader />
                                                         <TableContent formik={formik} />
                                                     </Table>
-                                                </TableContainer>
-                                            </Grid>
-                                        ) : (
-                                            <TableNoData />
-                                        )
-                                }
-                            </Grid>
+                                                </TableContainer>) : <TableNoData searchCoincidence />
+                                            ) : (
+                                                <TableNoData hasData={depotsInWarehouses} />
+                                            )
+                                    }
+                                </Grid>
+                            </Card>
                         </CardContent>
                     </Card>
                 )
@@ -1006,3 +1025,5 @@ export default function UserWarehouseMainTable({ ownerId, warehouseDetails }: Us
         </Formik>
     )
 }
+
+export default UserWarehouseMainTable
