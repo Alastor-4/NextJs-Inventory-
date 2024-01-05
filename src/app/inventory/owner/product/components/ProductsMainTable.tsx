@@ -153,7 +153,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
         setOpenImagesDialog(true);
     }
 
-
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
@@ -204,22 +203,18 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
             {
                 id: "name",
                 label: "Nombre",
-                align: "left"
             },
             {
                 id: "description",
                 label: "Descripción",
-                align: "left"
             },
             {
                 id: "department",
                 label: "Departamento",
-                align: "left"
             },
             {
                 id: "characteristics",
                 label: "Características",
-                align: "left"
             },
         ]
 
@@ -361,6 +356,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 open={isCreateModalOpen}
                 setOpen={setIsCreateModalOpen}
                 dialogTitle="Crear Producto"
+                setForceRender={setForceRender}
             >
                 <ProductsForm
                     userId={userId}
@@ -375,6 +371,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 open={isUpdateModalOpen}
                 setOpen={setIsUpdateModalOpen}
                 dialogTitle="Modificar Producto"
+                setForceRender={setForceRender}
             >
                 <ProductsForm
                     userId={userId}
