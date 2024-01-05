@@ -20,6 +20,12 @@ const FilterProductsByDepartmentsModal = (
         if (allProductsByDepartment) setFilteredDepartments([...allProductsByDepartment!]);
     }, [allProductsByDepartment]);
 
+    const handleRemoveFilter = () => {
+        handleDepartmentClick(null, true);
+    }
+
+    const handleAddFilter = () => {
+        setSelectedDepartments(filteredDepartments);
     const handleRemoveFilter = () => handleDepartmentClick(null, true);
 
     const handleCloseModal = () => {
@@ -58,7 +64,7 @@ const FilterProductsByDepartmentsModal = (
                             onClick={() => handleDepartmentClick(department)}
                             variant={department.selected ? "filled" : "outlined"}
                             sx={{ display: "flex" }}
-                            icon={department.selected ? <CheckBoxOutlined /> : <CheckBoxOutlineBlank />}
+                            icon={department.selected ? <CheckBoxOutlined fontSize={"small"}/> : <CheckBoxOutlineBlank fontSize={"small"}/>}
                             color="primary"
                         />
                     ))}
