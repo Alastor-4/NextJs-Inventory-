@@ -55,6 +55,8 @@ import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/pro
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import { storeDetails } from "@/app/inventory/owner/store-details/[storeDetailsId]/request/storeDetails";
 import DepartmentCustomButton from "@/components/DepartmentCustomButton";
+import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
+import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
 
 export default function StoreActionsMain({ userId, storeId }: { userId: number, storeId: string }) {
     const router = useRouter()
@@ -62,11 +64,15 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
     const [data, setData] = React.useState<null | any[]>(null)
     const [allProductsByDepartment, setAllProductsByDepartment] = React.useState<any[]>([])
 
+    const [activeModalTransfer, setActiveModalTransfer] = React.useState(false)
+    const [productSelectedForTransfer, setProductSelectedForTransfer] = React.useState<null | any>(null)
+
     //get initial data
     React.useEffect(() => {
         async function loadInitialData(userId: string, storeId: string) {
             const response = await sellerStoreProduct.allProductByDepartments(userId, storeId)
             if (response) {
+
                 setAllProductsByDepartment(response.map((item: any) => ({
                     ...item,
                     selected: false
@@ -199,6 +205,14 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
         }
     }
 
+    //selected products
+    const [selected, setSelected] = React.useState<any[]>([])
+
+    const cancelChecked = (badItem: any) => {
+        const newSelected = selected.filter((item: any) => item.id !== badItem)
+        setSelected(newSelected)
+    }
+
     const [openImageDialog, setOpenImagesDialog] = React.useState(false)
     const [dialogImages, setDialogImages] = React.useState<any[]>([])
 
@@ -207,7 +221,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
         setOpenImagesDialog(true)
     }
 
-    async function handleToggleIsActive(e: any, storeDepotId: number) {
+    async function handleToggleIsActive(e: any, badItem: number, storeDepotId: number) {
         e.stopPropagation()
 
         const updatedDepot = await sellerStoreProduct.toggleIsActiveStoreDepot(userId, storeId, storeDepotId)
@@ -228,12 +242,13 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
             if (updatedDepot.is_active) {
                 notifySuccess("Producto en venta ahora")
             } else {
+                cancelChecked(badItem)
                 notifyWarning("Producto quitado de la venta")
             }
         }
     }
 
-    async function handleSellProduct(e: any, storeDepotId: number) {
+    async function handleSellProduct(e: any, storeDepotId: number, badItem: number) {
         e.stopPropagation()
 
         const updatedDepot = await sellerStoreProduct.sellStoreDepotDefault(userId, storeId, storeDepotId)
@@ -250,6 +265,8 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
             }
 
             setAllProductsByDepartment(newDepartments)
+
+            if (updatedDepot.product_remaining_units === 0) cancelChecked(badItem)
 
             notifySuccess("Vendida una unidad del producto")
         }
@@ -268,6 +285,11 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
         }
 
         setSelected(newSelected)
+    }
+
+    const handleClickTransfer = (row: any) => {
+        setActiveModalTransfer(true)
+        setProductSelectedForTransfer(row)
     }
 
     const TableContent = ({ formik }: { formik: any }) => {
@@ -486,7 +508,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         color={"success"}
                                                         disabled={!baseProductPrice}
                                                         checked={row.depots[0].store_depots[0].is_active}
-                                                        onClick={(e) => handleToggleIsActive(e, row.depots[0].store_depots[0].id)}
+                                                        onClick={(e) => handleToggleIsActive(e, row.id, row.depots[0].store_depots[0].id)}
                                                     />
                                                 </Grid>
                                             </Grid>
@@ -499,7 +521,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                     <Grid container>
                                                         <IconButton
                                                             color={"primary"}
-                                                            onClick={(e) => handleSellProduct(e, row.depots[0].store_depots[0].id)}
+                                                            onClick={(e) => handleSellProduct(e, row.depots[0].store_depots[0].id, row.id)}
                                                         >
                                                             <SellOutlined fontSize={"small"} />
                                                         </IconButton>
@@ -520,6 +542,8 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                             <Button
                                                                 size={"small"}
                                                                 variant={"outlined"}
+                                                                disabled={row.depots[0].store_depots[0].product_remaining_units === 0}
+                                                                onClick={() => handleClickTransfer(row)}
                                                             >
                                                                 Transferir
                                                             </Button>
@@ -704,6 +728,18 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
     async function handleSelectFilter(index: number) {
         let filters = [...allProductsByDepartment]
         filters[index].selected = !filters[index].selected
+
+        let selectedProduct = new Map()
+
+        selected.forEach((element: any) => selectedProduct.set(element.id, true))
+
+        let newSelected: any = [];
+        filters.filter((department: any) => department.selected === true)
+            .forEach((department: any) => {
+                const aux = department.products.filter((item: any) => selectedProduct.get(item.id) === true)
+                newSelected = [...newSelected, ...aux]
+            })
+        setSelected(newSelected)
 
         setAllProductsByDepartment(filters)
     }
@@ -962,9 +998,6 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
         )
     }
 
-    //selected products
-    const [selected, setSelected] = React.useState<any[]>([])
-
     const [displayProductSellForm, setDisplayProductSellForm] = React.useState<boolean>(false)
     function handleOpenSellProduct(formik: any) {
         let productsData: any = []
@@ -1029,9 +1062,11 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
 
                 notifySuccess("La venta ha sido registrada")
             }
-
             formik.resetForm()
             closeForm()
+            setSelected([])
+
+
         }
 
         const paymentMethods = ["Efectivo CUP", "Transferencia CUP", "Efectivo USD", "Transferencia MLC", "Otro"]
@@ -1052,10 +1087,11 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
 
             return { totalProducts, totalPrice }
         }
-
         return (
             <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
+
                 <Grid container item spacing={3}>
+
                     <Grid container item xs={12} rowSpacing={1}>
                         {
                             formik.values.productSell.products.map((item: any, index: number) => {
@@ -1132,10 +1168,31 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                         </IconButton>
                     </Grid>
                 </Grid>
+
             </Card>
         )
     }
 
+    const loadData = async () => {
+        let selectedDepartment = new Map();
+
+        allProductsByDepartment.forEach((element: any) => {
+            if (element.selected) selectedDepartment.set(element.id, true)
+        })
+
+        const newAllProductByDepartments = await sellerStoreProduct.allProductByDepartments(userId, storeId)
+
+        if (newAllProductByDepartments) {
+            setAllProductsByDepartment(
+                newAllProductByDepartments.map((item: any) => ({
+                    ...item,
+                    selected: selectedDepartment.has(item.id) ? true : false
+                })))
+        }
+
+        setActiveModalTransfer(false)
+
+    }
 
     return (
         <Formik
@@ -1160,11 +1217,35 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                             open={displayProductSellForm}
                             setOpen={setDisplayProductSellForm}
                         >
-                            <ProductSellForm
-                                formik={formik}
-                                closeForm={() => setDisplayProductSellForm(false)}
-                            />
+                            {
+                                displayProductSellForm && (
+                                    <ProductSellForm
+                                        formik={formik}
+                                        closeForm={() => setDisplayProductSellForm(false)}
+                                    />
+                                )
+                            }
+
                         </UpdateValueDialog>
+
+                        <ModalTransfer
+                            open={activeModalTransfer}
+                            setOpen={setActiveModalTransfer}
+                            dialogTitle="Transferencia entre tiendas"
+                        >
+                            {
+                                activeModalTransfer &&
+                                <TransferBetweenStores
+                                    storeId={storeId}
+                                    storeDepot={productSelectedForTransfer.depots[0].store_depots[0]}
+                                    badItem={productSelectedForTransfer.id}
+                                    cancelChecked={cancelChecked}
+                                    loadData={loadData}
+                                />
+
+                            }
+
+                        </ModalTransfer>
 
                         <CustomToolbar />
 
