@@ -90,7 +90,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     //Update allProducts at change
     useEffect(() => {
         if (allProductsByDepartment?.length) {
-
             let allProducts: productsProps[] = [];
             let bool = false;
             if (selectedDepartments) {
@@ -126,12 +125,8 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     }
 
     const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
-    const handleTooltipClose = () => {
-        setIsOpenTooltip(false);
-    }
-    const handleTooltipOpen = () => {
-        setIsOpenTooltip(true);
-    }
+    const handleTooltipClose = () => setIsOpenTooltip(false);
+    const handleTooltipOpen = () => setIsOpenTooltip(true);
 
     //Handle delete product
     const handleRemove = async () => {
@@ -275,7 +270,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                     checked={!!selectedProduct && (product.id === selectedProduct.id)}
                                     onClick={() => handleSelectProduct(product)}
                                     sx={{ width: "5px" }}
-
                                 />
                             </TableCell>
                             <TableCell>
@@ -301,7 +295,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                             </Grid>
                                         )
                                     }
-
                                     <Grid container item xs={12} justifyContent={"center"}>
                                         {product.name}
                                     </Grid>
