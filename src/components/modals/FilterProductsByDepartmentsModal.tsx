@@ -20,12 +20,6 @@ const FilterProductsByDepartmentsModal = (
         if (allProductsByDepartment) setFilteredDepartments([...allProductsByDepartment!]);
     }, [allProductsByDepartment]);
 
-    const handleRemoveFilter = () => {
-        handleDepartmentClick(null, true);
-    }
-
-    const handleAddFilter = () => {
-        setSelectedDepartments(filteredDepartments);
     const handleRemoveFilter = () => handleDepartmentClick(null, true);
 
     const handleCloseModal = () => {
@@ -53,7 +47,7 @@ const FilterProductsByDepartmentsModal = (
     return (
         <Dialog open={isFilterModalOpen} fullWidth onClose={handleCloseModal}>
             <DialogTitle m="auto">Filtrar por departamentos</DialogTitle>
-            <DialogContent dividers sx={{ marginX: "5px" }}>
+            <DialogContent dividers >
                 <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap" >
                     {filteredDepartments?.map((department: allProductsByDepartmentProps) => (
                         <Chip
@@ -64,7 +58,7 @@ const FilterProductsByDepartmentsModal = (
                             onClick={() => handleDepartmentClick(department)}
                             variant={department.selected ? "filled" : "outlined"}
                             sx={{ display: "flex" }}
-                            icon={department.selected ? <CheckBoxOutlined fontSize={"small"}/> : <CheckBoxOutlineBlank fontSize={"small"}/>}
+                            icon={department.selected ? <CheckBoxOutlined fontSize={"small"} /> : <CheckBoxOutlineBlank fontSize={"small"} />}
                             color="primary"
                         />
                     ))}

@@ -33,12 +33,12 @@ import { images, characteristics, departments } from '@prisma/client';
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { useStoreHook } from "@/app/store/useStoreHook";
 import ModalUpdateProduct from "./ModalUpdateProduct";
+import InfoTooltip from "@/components/InfoTooltip";
 import { useStore } from "@/app/store/store";
 import products from "../requests/products";
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
-import InfoTooltip from "@/components/InfoTooltip";
 
 export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const router = useRouter();
