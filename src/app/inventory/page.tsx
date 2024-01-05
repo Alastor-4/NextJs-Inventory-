@@ -19,7 +19,7 @@ export default async function Page() {
     let sellerStores = null
 
     if (userRole === "store_owner") {
-        const ownerWarehousesPromise = prisma.warehouses.findMany({ where: { owner_id: userId } })
+        const ownerWarehousesPromise = prisma.warehouses.findMany({ where: { owner_id: userId }, include: { depots: true } })
         const ownerStoresPromise = prisma.stores.findMany({ where: { owner_id: userId } })
         const productsCountPromise = prisma.products.count({ where: { owner_id: userId } })
         const workersCountPromise = prisma.users.count({ where: { work_for_user_id: userId } })
