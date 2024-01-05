@@ -1,4 +1,4 @@
-import { characteristics, departments, depots, images, store_depots, stores, users, warehouses } from "@prisma/client";
+import { characteristics, departments, depots, images, products, store_depots, stores, users, warehouses } from "@prisma/client";
 import { ReactNode } from "react";
 
 export interface ShowProductsStoreProps {
@@ -15,9 +15,9 @@ export interface ModalUpdateProductProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
     dialogTitle: string;
+    setForceRender: (bool: boolean) => void;
     children?: ReactNode;
 }
-
 export interface ManageQuantityProps {
     userId: number;
     nameStore: string;
@@ -114,9 +114,20 @@ export interface allProductsByDepartmentProps {
     selected?: boolean
 }
 
+export interface departmentWithoutDepots {
+    id: number;
+    name: string | null;
+    description: string | null;
+    created_at: Date;
+    selected?: boolean
+    products?: products | null
+}
+
 export interface UserWarehouseFormProps {
     ownerId?: number;
     warehouseId?: number;
+    dataAllProducts: productsProps[] | null;
+    depotsInWarehouses: number | null;
 }
 
 export interface UserWarehouseMainTableProps {
