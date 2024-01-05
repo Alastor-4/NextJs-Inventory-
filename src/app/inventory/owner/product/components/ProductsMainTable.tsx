@@ -392,8 +392,8 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                             <CustomToolbar />
                             <CardContent>
                                 <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>
-                                    <Grid item container alignItems="center" justifyContent="center">
-                                        <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <Grid item container alignItems="center" justifyContent="center" sx={{ marginTop: "-10px" }}>
+                                        <Grid container item xs={"auto"} alignItems={"center"} >
                                             <Typography variant="subtitle1" sx={{ fontWeight: "400" }}>Búsqueda avanzada</Typography>
                                         </Grid>
                                         <Grid container item xs={"auto"} alignItems={"center"}>

@@ -281,7 +281,7 @@ export const UserWarehouseForm = ({ ownerId, warehouseId, depotsInWarehouses }: 
             <form onSubmit={formik.handleSubmit} >
                 <CardContent sx={{ width: "100%", marginLeft: "-15px", marginTop: "-15px" }}>
                     <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>
-                        <Grid item container alignItems="center" justifyContent="center">
+                        <Grid item container alignItems="center" justifyContent="center" sx={{ marginTop: "-10px" }}>
                             <Grid container item xs={"auto"} alignItems={"center"}>
                                 <Typography variant="subtitle1" sx={{ fontWeight: "400" }}>Búsqueda avanzada</Typography>
                             </Grid>
