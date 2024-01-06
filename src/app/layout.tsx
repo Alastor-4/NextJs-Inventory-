@@ -10,9 +10,10 @@ import { AxiomWebVitals } from 'next-axiom'
 const roboto = Roboto_Serif({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Inventario+',
-  description: 'Inventario y ventas online',
+  title: 'Inventario Plus',
+  description: 'Inventario y Ventas Online',
   manifest: "/manifest.json",
+  generator: "Next.js",
 }
 
 export default function RootLayout({
