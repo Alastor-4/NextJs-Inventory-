@@ -1,0 +1,17 @@
+{
+  "name": "Inventario Plus",
+  "short_name": "inventario+",
+  "icons": [
+    {
+      "src": "logo200.png",
+      "sizes": "200x200",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait"
+}

@@ -12,6 +12,7 @@ const roboto = Roboto_Serif({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Inventario+',
   description: 'Inventario y ventas online',
+  manifest: "/manifest.json",
 }
 
 export default function RootLayout({
