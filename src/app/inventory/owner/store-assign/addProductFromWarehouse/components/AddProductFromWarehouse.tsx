@@ -1,43 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import {
-    Avatar,
-    AvatarGroup,
-    Box,
-    Button,
-    Card,
-    Checkbox,
-    Chip,
-    Collapse,
-    Grid,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Tooltip,
-    Typography
+    Avatar, AvatarGroup, Box, Button, Card, Checkbox, Chip, Collapse, Grid,
+    IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Table, TableBody,
+    TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography
 } from '@mui/material';
-import requestWarehouse from '../request/requestWarehouse';
-import {
-    ExpandLessOutlined,
-    ExpandMoreOutlined,
-} from '@mui/icons-material';
+import { notifyError, notifySuccess, notifyWarning } from "@/utils/generalFunctions";
+import { ExpandLessOutlined, ExpandMoreOutlined, } from '@mui/icons-material';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
+import { AddProductFromWarehouseProps } from '@/types/interfaces';
+import requestWarehouse from '../request/requestWarehouse';
 import { TableNoData } from '@/components/TableNoData';
+import { handleKeyDown } from '@/utils/handleKeyDown';
+import { images } from '@prisma/client';
 import { Formik } from 'formik';
 import * as Yup from "yup"
-import { notifyError, notifySuccess, notifyWarning } from "@/utils/generalFunctions";
-import { handleKeyDown } from '@/utils/handleKeyDown';
 
-export default function AddProductFromWarehouse(props: any) {
-    const { userId, dataStore, warehouseId } = props
+export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFromWarehouseProps) => {
 
     const [dataDepotsWarehouses, setDataDepotsWarehouse] = useState<any>([]);
     const [dataProductsByDepartment, setDataProductsByDepartment] = useState<any>([])
@@ -49,15 +27,15 @@ export default function AddProductFromWarehouse(props: any) {
 
     const [showDetails, setShowDetails] = useState('')
 
-    const [openImageDialog, setOpenImageDialog] = useState(false)
-    const [dialogImages, setDialogImages] = useState([]);
+    const [openImagesDialog, setOpenImagesDialog] = useState<boolean>(false);
+    const [dialogImages, setDialogImages] = useState<images[] | null>(null);
 
     // Obtener todos los datos para esta interfaz
     // Wharehouse -> depots -> storeDepots
     //                      -> products -> departments
     useEffect(() => {
         const getData = async () => {
-            const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(userId, dataStore.id)
+            const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(dataStore?.id!)
 
             newDataDepotsWarehouses.length === 0 && dataDepotsWarehouses.length === 0
                 ? notifyWarning("No hay almacenes que tengan productos para agregar")
@@ -87,7 +65,7 @@ export default function AddProductFromWarehouse(props: any) {
         }
 
         const getDataSpecificWarehouse = async () => {
-            const newDataDepotsWarehouses = await requestWarehouse.getWarehouseWithTheirDepots(userId, dataStore.id, warehouseId)
+            const newDataDepotsWarehouses = await requestWarehouse.getWarehouseWithTheirDepots(dataStore?.id!, warehouseId!)
             loadDepartamentsFromSelectedInitialWarehouse(0, newDataDepotsWarehouses);
             setSelectedWarehouse(0);
             setDataDepotsWarehouse(newDataDepotsWarehouses)
@@ -102,7 +80,7 @@ export default function AddProductFromWarehouse(props: any) {
             else getDataSpecificWarehouse();
         }
 
-    }, [dataDepotsWarehouses, dataStore.id, userId, warehouseId])
+    }, [dataDepotsWarehouses, dataStore?.id, warehouseId])
 
     // Puede pasar que q se oculte el último depósito
     // existente de un departamento seleccionado,por lo
@@ -200,17 +178,14 @@ export default function AddProductFromWarehouse(props: any) {
             {
                 id: "name",
                 label: "Nombre",
-                align: "left"
             },
             {
                 id: "store_units",
                 label: "Cantidad disponible",
-                align: "left"
             },
             {
                 id: "more_details",
                 label: "",
-                align: "left"
             },
 
         ]
@@ -220,8 +195,8 @@ export default function AddProductFromWarehouse(props: any) {
                 <TableRow>
                     <TableCell
                         key={"checkbox"}
-                        align={"left"}
                         padding={'checkbox'}
+                        sx={{ width: '5px' }}
                     >
 
                     </TableCell>
@@ -230,7 +205,7 @@ export default function AddProductFromWarehouse(props: any) {
                         <TableCell
                             key={headCell.id}
                             align={"left"}
-                            padding={'normal'}
+                        // padding={'normal'}
                         >
                             {headCell.label}
                         </TableCell>
@@ -240,9 +215,9 @@ export default function AddProductFromWarehouse(props: any) {
         )
     }
 
-    function handleOpenImagesDialog(images: any) {
-        setDialogImages(images)
-        setOpenImageDialog(true)
+    const handleOpenImagesDialog = (images: images[]) => {
+        setDialogImages(images);
+        setOpenImagesDialog(true);
     }
 
     const TableContent = () => {
@@ -263,6 +238,7 @@ export default function AddProductFromWarehouse(props: any) {
                                         size='small'
                                         checked={selectedDepot === index}
                                         onClick={() => setSelectedDepot(selectedDepot === index ? undefined : index)}
+                                        sx={{ width: "5px" }}
                                     />
                                 </TableCell>
 
@@ -272,7 +248,7 @@ export default function AddProductFromWarehouse(props: any) {
                                             <Box display={"flex"} justifyContent={"center"}>
                                                 <AvatarGroup
                                                     max={2}
-                                                    sx={{flexDirection: "row", width: "fit-content"}}
+                                                    sx={{ flexDirection: "row", width: "fit-content" }}
                                                     onClick={(e) => {
                                                         e.stopPropagation()
                                                         handleOpenImagesDialog(row.products.images!)
@@ -284,7 +260,7 @@ export default function AddProductFromWarehouse(props: any) {
                                                             key={`producto-${imageItem.id}`}
                                                             alt={`producto-${imageItem.id}`}
                                                             src={imageItem.fileUrl!}
-                                                            sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                            sx={{ cursor: "pointer", border: "1px solid lightblue" }}
                                                         />
                                                     )}
                                                 </AvatarGroup>
@@ -292,7 +268,7 @@ export default function AddProductFromWarehouse(props: any) {
                                         )
                                     }
 
-                                    <Box display={"flex"} justifyContent={"center"}>
+                                    <Box display={"flex"}>
                                         {row.products.name}
                                     </Box>
                                 </TableCell>
@@ -302,7 +278,7 @@ export default function AddProductFromWarehouse(props: any) {
                                 </TableCell>
 
                                 <TableCell style={{ padding: 0 }} colSpan={5}>
-                                    <Tooltip title={"Details"}>
+                                    <Tooltip title={"Detalles"}>
                                         <IconButton
                                             size={"small"}
                                             sx={{ m: "3px" }}
@@ -317,7 +293,6 @@ export default function AddProductFromWarehouse(props: any) {
                                     </Tooltip>
                                 </TableCell>
                             </TableRow>
-
                             <TableRow>
                                 <TableCell style={{ padding: 0 }} colSpan={5}>
                                     {showDetails === row.id && (
@@ -413,7 +388,7 @@ export default function AddProductFromWarehouse(props: any) {
     const setValidationSchema = (
         Yup.object({
             units: Yup.number()
-                .max(data[selectedDepot ?? 0]?.product_total_remaining_units, "No existe esta cantidad")
+                .max(data[selectedDepot ?? 0]?.product_total_remaining_units, "Máximo excedido")
                 .required("Cantidad requerida")
         })
     )
@@ -445,15 +420,15 @@ export default function AddProductFromWarehouse(props: any) {
 
         if (data[ind].store_depots.length === 0) {
             dataRequest = {
-                store_id: dataStore.id,
+                store_id: dataStore?.id,
                 depot_id: data[ind].id,
                 product_units: units,
                 product_remaining_units: units,
-                seller_profit_percentage: dataStore.fixed_seller_profit_percentage,
-                seller_profit_quantity: dataStore.fixed_seller_profit_quantity,
+                seller_profit_percentage: dataStore?.fixed_seller_profit_percentage,
+                seller_profit_quantity: dataStore?.fixed_seller_profit_quantity,
             }
 
-            request = await requestWarehouse.addProductsStoreDepots(userId, dataRequest);
+            request = await requestWarehouse.addProductsStoreDepots(dataRequest);
         } else {
             const {
                 id,
@@ -481,7 +456,7 @@ export default function AddProductFromWarehouse(props: any) {
                 is_active: true,
             }
 
-            request = await requestWarehouse.updateStoreDepots(userId, dataRequest)
+            request = await requestWarehouse.updateStoreDepots(dataRequest)
         }
 
         // Se comprueba q se halla echo la operacion en storeDepots
@@ -503,12 +478,12 @@ export default function AddProductFromWarehouse(props: any) {
                 product_total_units,
                 product_total_remaining_units: (product_total_remaining_units - units)
             }
-            request = await requestWarehouse.updateDepots(userId, dataRequest)
+            request = await requestWarehouse.updateDepots(dataRequest)
 
             if (request === 200) {
                 hideDepotInWarehouse() // ocultar deposito
                 setSelectedDepot(undefined) // dejar de seleccionar el deposito
-                values.units = 0; // reiniciar valor de cantidad inicial
+                values.units = ''; // reiniciar valor de cantidad inicial
 
                 notifySuccess("Producto agregado a la tienda")
             } else {
@@ -538,13 +513,13 @@ export default function AddProductFromWarehouse(props: any) {
     return (
         <>
             <ImagesDisplayDialog
-                open={openImageDialog}
-                setOpen={setOpenImageDialog}
+                open={openImagesDialog}
+                setOpen={setOpenImagesDialog}
                 images={dialogImages}
             />
 
             <Formik
-                initialValues={{ units: 0 }}
+                initialValues={{ units: '' }}
                 validationSchema={setValidationSchema}
                 onSubmit={handleSubmit}
             >
@@ -663,3 +638,5 @@ export default function AddProductFromWarehouse(props: any) {
         </>
     )
 }
+
+export default AddProductFromWarehouse

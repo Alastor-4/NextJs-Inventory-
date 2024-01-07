@@ -27,6 +27,11 @@ export interface ManageQuantityProps {
     setActiveManageQuantity: (bool: boolean) => void;
 }
 
+export interface AddProductFromWarehouseProps {
+    dataStore?: stores;
+    warehouseId?: number;
+}
+
 export interface UpdateValueDialogProps {
     open: boolean;
     setOpen: (boolean: boolean) => void;
