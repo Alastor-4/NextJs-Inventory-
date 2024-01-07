@@ -24,7 +24,7 @@ import useImageUploadContext from "@/providers/ImageUploadProvider";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 
 export default function ProductsForm(props: any) {
-    const { userId, departments, productId, handleForceRender, setOpen } = props
+    const { userId, departments, productId, setOpen } = props
 
     const [updateItem, setUpdateItem] = React.useState()
 
@@ -117,8 +117,6 @@ export default function ProductsForm(props: any) {
                     startImagesUpload(response.data.id, newImages)
                 }
             }
-
-            handleForceRender();
 
             notifySuccess(
                 updateItem

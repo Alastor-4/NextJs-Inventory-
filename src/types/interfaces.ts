@@ -15,7 +15,7 @@ export interface ModalUpdateProductProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
     dialogTitle: string;
-    setForceRender: (bool: boolean) => void;
+    handleForceRender: () => void;
     children?: ReactNode;
 }
 export interface ManageQuantityProps {

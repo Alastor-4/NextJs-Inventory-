@@ -1,6 +1,5 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
 import {
     AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent,
     Checkbox, Collapse, Divider, Grid, IconButton, InputBase,
@@ -19,6 +18,7 @@ import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import warehouseDepots from "../requests/warehouseDepots";
 import { useStoreHook } from "@/app/store/useStoreHook";
+import React, { useEffect, useState } from "react";
 import { TableNoData } from "@/components/TableNoData";
 import { handleKeyDown } from "@/utils/handleKeyDown";
 import tableStyles from "@/assets/styles/tableStyles";
@@ -63,6 +63,11 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
 
     const [forceRender, setForceRender] = useState(true);
 
+    const handleForceRender = () => {
+        setForceRender(true);
+        setSelectedDepartments(null);
+    }
+
     const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
     const [dialogImages, setDialogImages] = useState<images[] | null>(null);
 
@@ -74,13 +79,15 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     //GET initial products data
     useEffect(() => {
         const getAllProductsByDepartment = async () => {
-            const newAllProductsByDepartment = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
-            setAllProductsByDepartment(newAllProductsByDepartment.map((department: allProductsByDepartmentProps) => ({
-                ...department,
-                selected: false
-            })))
-            setForceRender(false);
-            setSelectedProduct(null);
+            const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+            if (newAllProductsByDepartment) {
+                setAllProductsByDepartment(newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
+                    ...productsByDepartments,
+                    selected: false
+                })));
+                setForceRender(false);
+                setSelectedProduct(null);
+            }
         }
         getAllProductsByDepartment();
     }, [ownerId, warehouseDetails, forceRender]);
@@ -92,16 +99,16 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
             if (selectedDepartments) {
                 for (const department of selectedDepartments!) if (department.selected === true) bool = true;
             }
-            allProductsByDepartment?.forEach((departmentItem) => {
+            allProductsByDepartment?.forEach((productsByDepartments) => {
                 if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
-                    allProducts = [...allProducts, ...departmentItem.products!];
+                    allProducts = [...allProducts, ...productsByDepartments.products!];
                 }
                 if (selectedDepartments?.length! > 0 && bool) {
-                    if (departmentItem.selected) {
-                        allProducts = [...allProducts, ...departmentItem.products!];
+                    if (productsByDepartments.selected) {
+                        allProducts = [...allProducts, ...productsByDepartments.products!];
                     }
                 }
-            })
+            });
 
             allProducts.sort((a: productsProps, b: productsProps) => {
                 if (a?.name! < b?.name!) return -1;
@@ -157,13 +164,15 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     }
 
     const refreshAfterAction = async () => {
-        const newAllProductsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
-        setAllProductsByDepartment(newAllProductsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
-            {
-                ...departments,
+        const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+        setSelectedDepartments(null);
+        if (newAllProductsByDepartment) {
+            setAllProductsByDepartment(newAllProductsByDepartment?.map((productsByDepartments: allProductsByDepartmentProps) => ({
+                ...productsByDepartments,
                 selected: false
             })));
-        setSelectedProduct(null);
+            setSelectedProduct(null);
+        }
     }
 
     const handleRemove = async () => {
@@ -234,13 +243,13 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     const afterUpdateDepot = (updatedDepot: AxiosResponse) => {
         const newDepots = [...allProductsByDepartment!];
 
-        for (const departmentItem of allProductsByDepartment!) {
-            const departmentIndex = newDepots.indexOf(departmentItem);
+        for (const productsByDepartments of allProductsByDepartment!) {
+            const productsByDepartmentsIndex = newDepots.indexOf(productsByDepartments);
 
-            const updatedIndex = departmentItem.products?.findIndex(productItem => productItem.depots![0].id === updatedDepot.data.id)
+            const updatedIndex = productsByDepartments.products?.findIndex(productItem => productItem.depots![0].id === updatedDepot.data.id)
             if (updatedIndex! > -1) {
-                newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_units = updatedDepot.data.product_total_units;
-                newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units;
+                newDepots[productsByDepartmentsIndex].products![updatedIndex!].depots![0].product_total_units = updatedDepot.data.product_total_units;
+                newDepots[productsByDepartmentsIndex].products![updatedIndex!].depots![0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units;
 
                 setAllProductsByDepartment(newDepots);
                 break;
@@ -355,9 +364,9 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         function updateLocalData(updatedDepot: depots, updatedStoreDepot: store_depots) {
             const newDepots = [...allProductsByDepartment!];
 
-            for (const departmentItem of allProductsByDepartment!) {
-                const departmentProducts = departmentItem.products;
-                const departmentIndex = newDepots.indexOf(departmentItem);
+            for (const productsByDepartments of allProductsByDepartment!) {
+                const departmentProducts = productsByDepartments.products;
+                const productsByDepartmentsIndex = newDepots.indexOf(productsByDepartments);
 
                 //find updatedDepot
                 const updatedIndex = departmentProducts?.findIndex(productItem => productItem.depots![0].id === updatedDepot.id);
@@ -369,11 +378,9 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         findIndex(storeItem => storeItem.id === updatedStoreDepot.store_id);
 
                     if (updatedStoreDepotIndex! > - 1) {
-                        newDepots[departmentIndex].products![updatedIndex!].storesDistribution![updatedStoreDepotIndex!].store_depots![0] = updatedStoreDepot;
+                        newDepots[productsByDepartmentsIndex].products![updatedIndex!].storesDistribution![updatedStoreDepotIndex!].store_depots![0] = updatedStoreDepot;
                     }
-
                     setAllProductsByDepartment(newDepots);
-
                     break
                 }
             }
@@ -562,10 +569,10 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         const response = await warehouseDepots.depotStoreDistribution(ownerId!, warehouseDetails?.id!, depot.id!)
         if (response) {
             const newAllProductsByDepartment = [...allProductsByDepartment!];
-            allProductsByDepartment?.forEach((departmentItem, departmentIndex) => {
-                const productIndex = departmentItem.products?.findIndex(productItem => productItem.depots![0].id === depot.id)
+            allProductsByDepartment?.forEach((productsByDepartments, productsByDepartmentsIndex) => {
+                const productIndex = productsByDepartments.products?.findIndex(productItem => productItem.depots![0].id === depot.id)
                 if (productIndex! > -1) {
-                    newAllProductsByDepartment[departmentIndex].products![productIndex!].storesDistribution = response;
+                    newAllProductsByDepartment[productsByDepartmentsIndex].products![productIndex!].storesDistribution = response;
 
                     //ToDo: break loop
                 }
@@ -891,7 +898,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             open={activeModalAddProduct}
                             setOpen={setActiveModalAddProduct}
                             dialogTitle="Nuevo Depósito"
-                            setForceRender={setForceRender}
+                            handleForceRender={handleForceRender}
                         >
                             <UserWarehouseForm
                                 ownerId={ownerId}

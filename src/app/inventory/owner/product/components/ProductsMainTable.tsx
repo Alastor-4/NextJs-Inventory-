@@ -349,13 +349,13 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 open={isCreateModalOpen}
                 setOpen={setIsCreateModalOpen}
                 dialogTitle="Crear Producto"
-                setForceRender={setForceRender}
+                handleForceRender={handleForceRender}
             >
                 <ProductsForm
                     userId={userId}
                     departments={departments}
                     productId={null}
-                    handleForceRender={handleForceRender}
+
                     setOpen={setIsCreateModalOpen}
                 />
             </ModalUpdateProduct>
@@ -364,13 +364,12 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 open={isUpdateModalOpen}
                 setOpen={setIsUpdateModalOpen}
                 dialogTitle="Modificar Producto"
-                setForceRender={setForceRender}
+                handleForceRender={handleForceRender}
             >
                 <ProductsForm
                     userId={userId}
                     departments={departments}
                     productId={selectedProduct?.id}
-                    handleForceRender={handleForceRender}
                     setOpen={setIsUpdateModalOpen}
                 />
             </ModalUpdateProduct>
