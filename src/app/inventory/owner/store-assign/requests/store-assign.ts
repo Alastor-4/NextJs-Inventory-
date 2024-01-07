@@ -7,7 +7,7 @@ const transactionUrl = `/inventory/owner/store-assign/showProductApi/apiTransact
 
 const storeAssign = {
     //Peticiones del component ShowProductStore
-    allProductsByDepartmentStore: async function (userId: number, storeId: any) {
+    allProductsByDepartmentStore: async function (storeId: any) {
         try {
             const response = await apiRequest.get(showProductStoreUrl, { params: { storeId: storeId } })
             return response.data
@@ -18,7 +18,7 @@ const storeAssign = {
         return false
     },
 
-    updateProductStore: async function (userId: number, data: any) {
+    updateProductStore: async function (data: any) {
         try {
             return await apiRequest.put(showProductStoreUrl, data)
         } catch (e) {
@@ -28,7 +28,7 @@ const storeAssign = {
         return false
     },
 
-    updateProductWarehouse: async function (userId: number, data: any) {
+    updateProductWarehouse: async function (data: any) {
         try {
             return await apiRequest.put(showProductWarehouseUrl, data)
         } catch (e) {
@@ -39,7 +39,7 @@ const storeAssign = {
     },
 
     // Peticiones para el component ShowProductWarehouse
-    allProductByDepartmentWarehouse: async function (userId: number, storeId: any, warehouseId: any) {
+    allProductByDepartmentWarehouse: async function (storeId: any, warehouseId: any) {
         try {
             const response = await apiRequest.get(showProductWarehouseUrl, { params: { storeId: storeId, warehouseId: warehouseId } })
             return response.data
@@ -50,7 +50,7 @@ const storeAssign = {
         return false
     },
 
-    postProductToStoreDepot: async function (userId: number, data: any) {
+    postProductToStoreDepot: async function (data: any) {
         try {
             const response = await apiRequest.post(showProductWarehouseUrl, data)
             return response.status

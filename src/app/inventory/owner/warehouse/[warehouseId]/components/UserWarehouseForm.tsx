@@ -15,6 +15,7 @@ import InfoTooltip from "@/components/InfoTooltip";
 import { AxiosResponse } from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup"
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 
 export const UserWarehouseForm = ({ ownerId, warehouseId, depotsInWarehouses }: UserWarehouseFormProps) => {
 
@@ -272,6 +273,11 @@ export const UserWarehouseForm = ({ ownerId, warehouseId, depotsInWarehouses }: 
 
     return (
         <>
+            <ImagesDisplayDialog
+                open={openImageDialog}
+                setOpen={setOpenImagesDialog}
+                images={dialogImages}
+            />
             <FilterProductsByDepartmentsModal
                 allProductsByDepartment={allProductsByDepartment!}
                 setSelectedDepartments={setSelectedDepartments}

@@ -5,7 +5,7 @@ const urlSpecificComponent = `/inventory/owner/store-assign/addProductFromWareho
 
 const requestWarehouse = {
 
-    getAllWarehousesWithTheirDepots: async function (userId: any, storeId: any) {
+    getAllWarehousesWithTheirDepots: async function (storeId: number) {
         try {
             const request = await apiRequest.get(url, { params: { storeId: storeId } })
 
@@ -16,7 +16,7 @@ const requestWarehouse = {
         }
         return false
     },
-    getWarehouseWithTheirDepots: async function (userId: any, storeId: any, warehouseId: any) {
+    getWarehouseWithTheirDepots: async function (storeId: number, warehouseId: number) {
         try {
             const request = await apiRequest.get(urlSpecificComponent, { params: { storeId: storeId, warehouseId: warehouseId } })
 
@@ -28,7 +28,7 @@ const requestWarehouse = {
         return false
     },
 
-    addProductsStoreDepots: async function (userId: any, data: any) {
+    addProductsStoreDepots: async function (data: any) {
 
         try {
             const request = await apiRequest.post(url, data)
@@ -39,7 +39,7 @@ const requestWarehouse = {
         }
 
     },
-    updateDepots: async function (userId: any, data: any) {
+    updateDepots: async function (data: any) {
 
         try {
             const request = await apiRequest.put(url, data)
@@ -50,7 +50,7 @@ const requestWarehouse = {
         }
 
     },
-    updateStoreDepots: async function (userId: any, data: any) {
+    updateStoreDepots: async function (data: any) {
 
         try {
             const request = await apiRequest.put(urlSpecificComponent, data)

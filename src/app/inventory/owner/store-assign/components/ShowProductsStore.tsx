@@ -1,83 +1,91 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
-import { TableNoData } from "@/components/TableNoData";
 import {
-    Avatar,
-    AvatarGroup,
-    Button,
-    Card,
-    CardContent,
-    Collapse,
-    Grid,
-    IconButton,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Tooltip,
-    Typography
+    Avatar, AvatarGroup, Button, Card, CardContent, Collapse,
+    Grid, IconButton, InputBase, Table, TableBody, TableCell,
+    TableContainer, TableHead, TableRow, Tooltip, Typography
 } from '@mui/material';
-import {
-    EditOutlined,
-    ExpandLessOutlined,
-    ExpandMoreOutlined,
-    RemoveOutlined,
-} from '@mui/icons-material';
-import { characteristics, departments, depots, images } from '@prisma/client';
 import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse';
+import { EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, FilterAlt, HelpOutline, RemoveOutlined, } from '@mui/icons-material';
+import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
-import DepartmentCustomButton from '@/components/DepartmentCustomButton';
+import FilterProductsByDepartmentsModal from '@/components/modals/FilterProductsByDepartmentsModal';
+import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
+import { characteristics, depots, images } from '@prisma/client';
 import ModalStoreAssign from './Modal/ModalStoreAssign';
+import { TableNoData } from "@/components/TableNoData";
 import ManageQuantity from './Modal/ManageQuantity';
+import SearchIcon from '@mui/icons-material/Search';
+import InfoTooltip from '@/components/InfoTooltip';
 import storeAssign from '../requests/store-assign';
+import React, { useEffect, useState } from 'react'
 import { AxiosResponse } from 'axios';
 import { Formik } from 'formik';
-import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
-import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
 
-function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) {
+const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) => {
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
-
+    const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [depotsInStore, setDepotsInStore] = useState<number | null>(dataStore?.store_depots?.length!);
     const [activeManageQuantity, setActiveManageQuantity] = useState(false);
     const [showDetails, setShowDetails] = useState<number>(-1);
 
     const [activeAddProductFromWarehouse, setActiveAddProductFromWarehouse] = useState<boolean>(false);
 
-    const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
+    const [openImagesDialog, setOpenImagesDialog] = useState<boolean>(false);
     const [dialogImages, setDialogImages] = useState<images[] | null>(null);
 
+    const handleOpenImagesDialog = (images: images[]) => {
+        setDialogImages(images);
+        setOpenImagesDialog(true);
+    }
+
     const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
+
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
+    const toggleModalFilter = () => setIsFilterModalOpen(!isFilterModalOpen);
+
+
+    const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
+    const handleTooltipClose = () => setIsOpenTooltip(false);
+    const handleTooltipOpen = () => setIsOpenTooltip(true);
 
     useEffect(() => {
         setAllProductsByDepartment(null);
     }, [dataStore?.id]);
 
+    //GET initial products data
     useEffect(() => {
-        const getDepositsByDepartament = async () => {
-            const newProductsByDepartment: allProductsByDepartmentProps[] = await storeAssign.allProductsByDepartmentStore(userId!, dataStore?.id);
-
-            setAllProductsByDepartment(newProductsByDepartment?.map((productsByDepartments: allProductsByDepartmentProps) => (
-                {
+        const getAllProductsByDepartment = async () => {
+            const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await storeAssign.allProductsByDepartmentStore(dataStore?.id);
+            if (newAllProductsByDepartment) {
+                setAllProductsByDepartment(newAllProductsByDepartment?.map((productsByDepartments: allProductsByDepartmentProps) => ({
                     ...productsByDepartments,
                     selected: false
                 })));
+                setSelectedProduct(null);
+            }
         }
-        getDepositsByDepartament();
-    }, [dataStore?.id, userId]);
+
+        getAllProductsByDepartment();
+    }, [dataStore?.id, dataStore]);
 
     useEffect(() => {
         if (allProductsByDepartment?.length) {
             let allProducts: productsProps[] = [];
-
-            allProductsByDepartment.forEach((departmentItem) => {
-                if (departmentItem.selected) {
-                    allProducts = [...allProducts, ...departmentItem.products!]
+            let bool = false;
+            if (selectedDepartments) {
+                for (const department of selectedDepartments!) if (department.selected === true) bool = true;
+            }
+            allProductsByDepartment?.forEach((productsByDepartments) => {
+                if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
+                    allProducts = [...allProducts, ...productsByDepartments.products!];
+                }
+                if (selectedDepartments?.length! > 0 && bool) {
+                    if (productsByDepartments.selected) {
+                        allProducts = [...allProducts, ...productsByDepartments.products!];
+                    }
                 }
             });
 
@@ -86,95 +94,98 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                 if (a?.name! > a?.name!) return 1;
                 return 0
             });
-
             setDataProducts(allProducts);
         } else {
+            setDepotsInStore(null);
             setDataProducts(null);
         }
-    }, [allProductsByDepartment]);
+    }, [allProductsByDepartment, selectedDepartments]);
 
-    function handleSelectFilter(index: number) {
-        let filters = [...allProductsByDepartment!];
-        filters[index].selected = !filters[index].selected;
-
-        setAllProductsByDepartment(filters);
+    const loadData = async () => {
+        let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await storeAssign.allProductsByDepartmentStore(dataStore?.id);
+        setSelectedDepartments(null)
+        if (newAllProductsByDepartment) {
+            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
+                ...productsByDepartments,
+                selected: (selectedDepartments?.includes(productsByDepartments))
+            }))
+            setAllProductsByDepartment(newAllProductsByDepartment);
+        }
     }
 
-    const DepartmentsFilter = ({ formik }: any) => (
-        <Card variant={"outlined"} sx={{ padding: "10px" }}>
-            <Grid container item xs={12}>
-                <Grid item xs={12}>
-                    <Typography variant={"subtitle2"}>
-                        Seleccione departamentos para encontrar el producto que busca
-                    </Typography>
-                </Grid>
-                <Grid container item xs={12} flexWrap="nowrap" columnSpacing={2} sx={{ overflowX: "auto", p: "7px 0px" }}>
-                    {
-                        allProductsByDepartment?.map((deposits, index) => (
-                            <Grid key={deposits.id} item xs={"auto"}>
-                                <DepartmentCustomButton
-                                    title={deposits.name!}
-                                    subtitle={deposits.products?.length === 1 ? `${deposits.products.length!}` + " producto" : `${deposits.products?.length!}` + " productos"}
-                                    selected={deposits.selected!}
-                                    onClick={() => handleSelectFilter(index)}
-                                />
-                            </Grid>
-                        ))
-                    }
-                </Grid>
-                {
-                    dataProducts?.length! > 0 && (
-                        <Grid container item xs={12} mt={"5px"} rowSpacing={1}>
-                            <Grid item xs={12}>
-                                <Typography variant={"subtitle2"}>
-                                    Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    name={"handleChangeSearchBarValue"}
-                                    placeholder="Buscar producto..."
-                                    size={"small"}
-                                    fullWidth
-                                    {...formik.getFieldProps("searchBarValue")}
-                                />
-                            </Grid>
-                        </Grid>
-                    )
-                }
-            </Grid>
-        </Card>
-    )
+    //Objetivo: crea un registro en la bd de cada transaccion q se hace
+    // direction es true si las unidades transferidas se le suamn al almacen
+    //           es false en caso contrario  
+    const recordTransaction = async (direction: boolean, transferredUnits: number, product?: productsProps) => {
+        const data = {
+            store_depot_id: product ? product!.depots![0].store_depots![0].id : selectedProduct!.depots![0].store_depots![0].id,
+            units_transferred_quantity: transferredUnits,
+            transfer_direction: direction ? transactionToWarehouse : transactionToStore
+        }
+        const response = await storeAssign.createTransaction(data);
 
-    const initialValues = {
-        searchBarValue: "",
+        return response ? true : false;
     }
 
+    const updateDepot = async (addUnits: number, depot: depots, product?: productsProps) => {
+        depot.product_total_remaining_units! += addUnits;
+        const result: boolean | AxiosResponse = await storeAssign.updateProductWarehouse(depot);
+        if (!result) return;
+        if (result.status === 200) {
+
+            const correctTransaction = await recordTransaction(addUnits > 0 ? true : false, Math.abs(addUnits), product);
+
+            if (correctTransaction) loadData();
+        }
+    }
+    // No borra el elemento de la tabla sino q cambia el valor
+    // de product_units a -1 para q no c filtre y asi conservar los datos
+    const removeProduct = async (index: number) => {
+        if (!dataProducts) return;
+        const newProduct = dataProducts[index];
+        const newProductStoreDepots = newProduct.depots![0].store_depots![0];
+        const updateData = {
+            id: newProductStoreDepots.id,
+            storeId: newProductStoreDepots.store_id,
+            depotId: newProductStoreDepots.depot_id,
+            product_units: -1,
+            product_remaining_units: 0,
+            sell_price: newProductStoreDepots.sell_price,
+            sell_price_unit: newProductStoreDepots.sell_price_unit,
+            price_discount_percentage: newProductStoreDepots.price_discount_percentage,
+            price_discount_quantity: newProductStoreDepots.price_discount_quantity,
+            seller_profit_percentage: newProductStoreDepots.seller_profit_percentage,
+            seller_profit_quantity: newProductStoreDepots.seller_profit_quantity,
+            is_active: newProductStoreDepots.is_active,
+        }
+
+        const result: boolean | AxiosResponse = await storeAssign.updateProductStore(updateData);
+        if (!result) return;
+
+        if (result.status === 200) {
+            await updateDepot(dataProducts[index].depots![0].store_depots![0].product_remaining_units!, dataProducts[index].depots![0], newProduct);
+        }
+    }
 
     const TableHeader = () => {
         const headCells = [
             {
                 id: "name",
                 label: "Nombre",
-                align: "left"
             },
             {
                 id: "store_units",
                 label: "Unidades restantes",
-                align: "left"
             },
             {
                 id: "remove",
                 label: "Retirar al almacén",
-                align: "left"
             },
             {
                 id: "more_details",
                 label: "",
-                align: "left"
             },
-
-        ]
+        ];
 
         return (
             <TableHead>
@@ -191,76 +202,6 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                 </TableRow>
             </TableHead>
         )
-    }
-
-    const loadData = async () => {
-        let newProductsByDepartment = await storeAssign.allProductsByDepartmentStore(userId!, dataStore?.id);
-
-        let selectedDepartment = allProductsByDepartment?.filter((productsByDepartments: allProductsByDepartmentProps) => (productsByDepartments.selected)).map(department => department.id)
-
-        newProductsByDepartment = newProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
-            ...productsByDepartments,
-            selected: (selectedDepartment?.includes(productsByDepartments.id))
-        }))
-        setAllProductsByDepartment(newProductsByDepartment);
-    }
-
-    //Objetivo: crea un registro en la bd de cada transaccion q se hace
-    // direction es true si las unidades transferidas se le suamn al almacen
-    //           es false en caso contrario  
-    const recordTransaction = async (direction: boolean, transferredUnits: number) => {
-        const data = {
-            store_depot_id: selectedProduct!.depots![0].store_depots![0].id,
-            units_transferred_quantity: transferredUnits,
-            transfer_direction: direction ? transactionToWarehouse : transactionToStore
-        }
-        const response = await storeAssign.createTransaction(data)
-
-        return response ? true : false
-    }
-
-    const updateDepot = async (addUnits: number, depot: depots) => {
-        depot.product_total_remaining_units! += addUnits;
-        const result: boolean | AxiosResponse = await storeAssign.updateProductWarehouse(userId!, depot);
-        if (!result) return;
-        if (result.status === 200) {
-
-            const correctTransaction = await recordTransaction(addUnits > 0 ? true : false, Math.abs(addUnits));
-
-            if (correctTransaction) loadData();
-        }
-    }
-    // No borra el elemento de la tabla sino q cambia el valor
-    // de product_units a -1 para q no c filtre y asi conservar los datos
-    const removeProduct = async (index: number) => {
-        if (!dataProducts) return;
-        const newProductStoreDepots = dataProducts[index].depots![0].store_depots![0];
-        const updateData = {
-            id: newProductStoreDepots.id,
-            storeId: newProductStoreDepots.store_id,
-            depotId: newProductStoreDepots.depot_id,
-            product_units: -1,
-            product_remaining_units: 0,
-            sell_price: newProductStoreDepots.sell_price,
-            sell_price_unit: newProductStoreDepots.sell_price_unit,
-            price_discount_percentage: newProductStoreDepots.price_discount_percentage,
-            price_discount_quantity: newProductStoreDepots.price_discount_quantity,
-            seller_profit_percentage: newProductStoreDepots.seller_profit_percentage,
-            seller_profit_quantity: newProductStoreDepots.seller_profit_quantity,
-            is_active: newProductStoreDepots.is_active,
-        }
-
-        const result: boolean | AxiosResponse = await storeAssign.updateProductStore(userId!, updateData);
-        if (!result) return;
-
-        if (result.status === 200) {
-            await updateDepot(dataProducts[index].depots![0].store_depots![0].product_remaining_units!, dataProducts[index].depots![0]);
-        }
-    }
-
-    function handleOpenImagesDialog(images: images[]) {
-        setDialogImages(images);
-        setOpenImagesDialog(true);
     }
 
     const TableContent = ({ formik }: any) => {
@@ -321,9 +262,9 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         sx={{ padding: 0 }}
                                                         size='small'
                                                         onClick={(e) => {
-                                                            e.stopPropagation()
-                                                            setActiveManageQuantity(true)
-                                                            setSelectedProduct(product)
+                                                            e.stopPropagation();
+                                                            setActiveManageQuantity(true);
+                                                            setSelectedProduct(product);
                                                         }}
                                                     >
                                                         <EditOutlined fontSize="small" color='primary' />
@@ -334,15 +275,15 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
 
                                         <TableCell >
                                             <IconButton color={"primary"} onClick={(e) => {
-                                                e.stopPropagation()
-                                                return removeProduct(index)
+                                                e.stopPropagation();
+                                                removeProduct(index);
                                             }}>
                                                 <RemoveOutlined />
                                             </IconButton>
                                         </TableCell>
 
                                         <TableCell style={{ padding: 0 }} colSpan={5}>
-                                            <Tooltip title={"Details"}>
+                                            <Tooltip title={"Detalles"}>
                                                 <IconButton
                                                     size={"small"}
                                                     sx={{ m: "3px" }}
@@ -387,7 +328,6 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                                 {product.departments?.name}
                                                             </Grid>
                                                         </Grid>
-
 
                                                         <Grid container item spacing={1} xs={12}>
                                                             <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
@@ -457,14 +397,18 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
 
     return (
         <Formik
-            initialValues={initialValues}
-            onSubmit={() => {
-
-            }}
+            initialValues={{ searchBarValue: "" }}
+            onSubmit={() => { }}
         >
             {
                 (formik) => (
                     <Card variant={"outlined"}>
+                        <FilterProductsByDepartmentsModal
+                            allProductsByDepartment={allProductsByDepartment!}
+                            setSelectedDepartments={setSelectedDepartments}
+                            isFilterModalOpen={isFilterModalOpen}
+                            toggleModalFilter={toggleModalFilter}
+                        />
                         <ModalStoreAssign
                             dialogTitle={"Administrar cantidad del producto"}
                             open={activeManageQuantity}
@@ -490,48 +434,79 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                         </ModalAddProductFromWarehouse>
 
                         <ImagesDisplayDialog
-                            open={openImageDialog}
+                            open={openImagesDialog}
                             setOpen={setOpenImagesDialog}
                             images={dialogImages}
                         />
 
                         <CardContent>
-                            <Grid container rowSpacing={2}>
-                                <Grid container item xs={12} justifyContent={"space-between"}>
-                                    <Grid item xs={6} md={10}>
-                                        <Typography variant={"subtitle1"}>Productos en tienda</Typography>
+                            <Grid container item xs={12} justifyContent={"space-between"}>
+                                <Grid item xs={6} md={10}>
+                                    <Typography variant={"subtitle1"}>Productos en tienda</Typography>
+                                </Grid>
+                                <Grid item xs={6} md={2}>
+                                    <Button size={"small"} variant={"contained"} onClick={() => setActiveAddProductFromWarehouse(true)}>
+                                        Agregar nuevo
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            <Card variant={"outlined"} sx={{ padding: "10px", marginY: "10px" }}>
+                                <Grid item container alignItems="center" justifyContent="center" sx={{ marginTop: "-10px" }}>
+                                    <Grid container item xs={"auto"} alignItems={"center"} >
+                                        <Typography variant="subtitle1" sx={{ fontWeight: "400" }}>Búsqueda avanzada</Typography>
                                     </Grid>
-                                    <Grid item xs={6} md={2}>
-                                        <Button size={"small"} variant={"contained"} onClick={() => setActiveAddProductFromWarehouse(true)}>
-                                            Agregar nuevo
-                                        </Button>
+                                    <Grid container item xs={"auto"} alignItems={"center"}>
+                                        <InfoTooltip
+                                            isOpenTooltip={isOpenTooltip}
+                                            handleTooltipClose={handleTooltipClose}
+                                            message={"Puede buscar por nombre y descripción ó filtrar por departamentos"}
+                                        >
+                                            <IconButton onClick={handleTooltipOpen}>
+                                                <HelpOutline />
+                                            </IconButton>
+                                        </InfoTooltip>
                                     </Grid>
                                 </Grid>
-
-                                {
-                                    allProductsByDepartment?.length! > 0 && (
-                                        <Grid item xs={12}>
-                                            <DepartmentsFilter formik={formik} />
+                                <Grid container spacing={2} alignItems="center">
+                                    <Grid item xs={true} md={8}>
+                                        <Grid item container xs={12} border={"1px solid gray"} borderRadius={"5px"} margin="4px" position="relative" >
+                                            <Grid item position="absolute" height="100%" paddingLeft="4px" display="flex" alignItems="center" justifyContent="center" >
+                                                <SearchIcon color="action" />
+                                            </Grid>
+                                            <Grid item width="100%" paddingLeft="35px" >
+                                                <InputBase
+                                                    placeholder="Buscar depósito..."
+                                                    inputProps={{ 'aria-label': 'search' }}
+                                                    {...formik.getFieldProps("searchBarValue")}
+                                                />
+                                            </Grid>
                                         </Grid>
-                                    )
-                                }
-
-                                <Grid item xs={12}>
+                                    </Grid>
+                                    <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
+                                        <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                    </Grid>
+                                </Grid>
+                            </Card>
+                            <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
+                                <Grid container rowSpacing={2}>
                                     {
                                         dataProducts?.length! > 0
-                                            ? (
-                                                <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
+                                            ? (dataProducts?.filter(
+                                                (product: productsProps) =>
+                                                    product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                                                    product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
+                                                (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
                                                     <Table sx={{ width: "100%" }} size={"small"}>
                                                         <TableHeader />
                                                         <TableContent formik={formik} />
                                                     </Table>
-                                                </TableContainer>
+                                                </TableContainer>) : <TableNoData searchCoincidence />
                                             ) : (
-                                                <TableNoData />
+                                                <TableNoData hasData={depotsInStore!} />
                                             )
                                     }
                                 </Grid>
-                            </Grid>
+                            </Card>
                         </CardContent>
                     </Card>
                 )

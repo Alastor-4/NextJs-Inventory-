@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { prisma } from 'db'
+import { prisma } from 'db';
 
 export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
-    const storeId = parseInt(<string>searchParams.get("storeId"));
+    const storeId = +searchParams.get("storeId")!;
 
     const result = await prisma.departments.findMany({
         where: {

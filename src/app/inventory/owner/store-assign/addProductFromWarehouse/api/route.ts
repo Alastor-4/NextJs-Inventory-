@@ -3,7 +3,7 @@ import { prisma } from "db"
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
-    const storeId = await parseInt(<string>searchParams.get("storeId"));
+    const storeId = await +searchParams.get("storeId")!;
 
     const result = await prisma.warehouses.findMany({
         where: {

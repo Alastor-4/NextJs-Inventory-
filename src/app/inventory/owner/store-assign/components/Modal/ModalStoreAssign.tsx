@@ -1,4 +1,3 @@
-import { ModalStoreAssignProps } from "@/types/interfaces";
 import {
     Box,
     Button,
@@ -7,7 +6,8 @@ import {
     DialogContent,
     DialogTitle,
 } from "@mui/material";
-import React, { ReactNode } from "react";
+import { ModalStoreAssignProps } from "@/types/interfaces";
+import React from "react";
 
 export default function ModalStoreAssign({ dialogTitle, open, setOpen, children }: ModalStoreAssignProps) {
 

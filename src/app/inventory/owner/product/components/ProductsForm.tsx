@@ -13,7 +13,7 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup"
 import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-material";
@@ -21,10 +21,10 @@ import { handleKeyDownWithDot } from "@/utils/handleKeyDown";
 import { useDropzone } from "react-dropzone";
 import products from "../requests/products";
 import useImageUploadContext from "@/providers/ImageUploadProvider";
-import {notifyError, notifySuccess} from "@/utils/generalFunctions";
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 
 export default function ProductsForm(props: any) {
-    const { userId, departments, productId, setForceRender, setOpen } = props
+    const { userId, departments, productId, setOpen } = props
 
     const [updateItem, setUpdateItem] = React.useState()
 
@@ -33,7 +33,7 @@ export default function ProductsForm(props: any) {
     //initial values
     const [department, setDepartment] = React.useState("");
 
-    React.useEffect(() => {
+    useEffect(() => {
         async function fetchProduct(id: string) {
             const product = await products.productDetails(id)
             setUpdateItem(product)
@@ -117,8 +117,6 @@ export default function ProductsForm(props: any) {
                     startImagesUpload(response.data.id, newImages)
                 }
             }
-
-            setForceRender(true)
 
             notifySuccess(
                 updateItem
