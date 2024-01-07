@@ -49,7 +49,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     }), [warehouseState];
 
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
-    const [allDepositsByDepartment, setAllDepositsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
     const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
 
     const [activeModalAddProduct, setActiveModalAddProduct] = useState(false);
@@ -73,26 +73,26 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
 
     //GET initial products data
     useEffect(() => {
-        const getAllDepositsByDepartment = async () => {
-            const newAllDepositsByDepartment = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
-            setAllDepositsByDepartment(newAllDepositsByDepartment.map((department: allProductsByDepartmentProps) => ({
+        const getAllProductsByDepartment = async () => {
+            const newAllProductsByDepartment = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+            setAllProductsByDepartment(newAllProductsByDepartment.map((department: allProductsByDepartmentProps) => ({
                 ...department,
                 selected: false
             })))
             setForceRender(false);
             setSelectedProduct(null);
         }
-        getAllDepositsByDepartment();
+        getAllProductsByDepartment();
     }, [ownerId, warehouseDetails, forceRender]);
 
     useEffect(() => {
-        if (allDepositsByDepartment?.length) {
+        if (allProductsByDepartment?.length) {
             let allProducts: productsProps[] = [];
             let bool = false;
             if (selectedDepartments) {
                 for (const department of selectedDepartments!) if (department.selected === true) bool = true;
             }
-            allDepositsByDepartment?.forEach((departmentItem) => {
+            allProductsByDepartment?.forEach((departmentItem) => {
                 if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
                     allProducts = [...allProducts, ...departmentItem.products!];
                 }
@@ -112,7 +112,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         } else {
             setDataProducts(null);
         }
-    }, [allDepositsByDepartment, selectedDepartments]);
+    }, [allProductsByDepartment, selectedDepartments]);
 
     const initialValues = {
         searchBarValue: "",
@@ -157,8 +157,8 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     }
 
     const refreshAfterAction = async () => {
-        const newAllDepositsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
-        setAllDepositsByDepartment(newAllDepositsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
+        const newAllProductsByDepartment: (departments & { products?: productsProps[], selected?: boolean })[] = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+        setAllProductsByDepartment(newAllProductsByDepartment?.map((departments: (departments & { products?: productsProps[], selected?: boolean })) => (
             {
                 ...departments,
                 selected: false
@@ -232,9 +232,9 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     const [storeDepotUpdateName, setStoreDepotUpdateName] = useState<string>("");
 
     const afterUpdateDepot = (updatedDepot: AxiosResponse) => {
-        const newDepots = [...allDepositsByDepartment!];
+        const newDepots = [...allProductsByDepartment!];
 
-        for (const departmentItem of allDepositsByDepartment!) {
+        for (const departmentItem of allProductsByDepartment!) {
             const departmentIndex = newDepots.indexOf(departmentItem);
 
             const updatedIndex = departmentItem.products?.findIndex(productItem => productItem.depots![0].id === updatedDepot.data.id)
@@ -242,7 +242,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_units = updatedDepot.data.product_total_units;
                 newDepots[departmentIndex].products![updatedIndex!].depots![0].product_total_remaining_units = updatedDepot.data.product_total_remaining_units;
 
-                setAllDepositsByDepartment(newDepots);
+                setAllProductsByDepartment(newDepots);
                 break;
             }
         }
@@ -353,9 +353,9 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         const { warehouseQuantity, storeQuantity, moveQuantity } = formik.values.productStoreDepotDistribution;
 
         function updateLocalData(updatedDepot: depots, updatedStoreDepot: store_depots) {
-            const newDepots = [...allDepositsByDepartment!];
+            const newDepots = [...allProductsByDepartment!];
 
-            for (const departmentItem of allDepositsByDepartment!) {
+            for (const departmentItem of allProductsByDepartment!) {
                 const departmentProducts = departmentItem.products;
                 const departmentIndex = newDepots.indexOf(departmentItem);
 
@@ -372,7 +372,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         newDepots[departmentIndex].products![updatedIndex!].storesDistribution![updatedStoreDepotIndex!].store_depots![0] = updatedStoreDepot;
                     }
 
-                    setAllDepositsByDepartment(newDepots);
+                    setAllProductsByDepartment(newDepots);
 
                     break
                 }
@@ -561,17 +561,16 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     async function handleLoadStoresDistribution(depot: depots) {
         const response = await warehouseDepots.depotStoreDistribution(ownerId!, warehouseDetails?.id!, depot.id!)
         if (response) {
-            const newAllDepositsByDepartment = [...allDepositsByDepartment!];
-            allDepositsByDepartment?.forEach((departmentItem, departmentIndex) => {
+            const newAllProductsByDepartment = [...allProductsByDepartment!];
+            allProductsByDepartment?.forEach((departmentItem, departmentIndex) => {
                 const productIndex = departmentItem.products?.findIndex(productItem => productItem.depots![0].id === depot.id)
                 if (productIndex! > -1) {
-                    newAllDepositsByDepartment[departmentIndex].products![productIndex!].storesDistribution = response;
+                    newAllProductsByDepartment[departmentIndex].products![productIndex!].storesDistribution = response;
 
                     //ToDo: break loop
                 }
             })
-
-            setAllDepositsByDepartment(newAllDepositsByDepartment);
+            setAllProductsByDepartment(newAllProductsByDepartment);
         }
     }
 
@@ -883,7 +882,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 (formik) => (
                     <Card variant={"outlined"}>
                         <FilterProductsByDepartmentsModal
-                            allProductsByDepartment={allDepositsByDepartment!}
+                            allProductsByDepartment={allProductsByDepartment!}
                             setSelectedDepartments={setSelectedDepartments}
                             isFilterModalOpen={isFilterModalOpen}
                             toggleModalFilter={toggleModalFilter}
