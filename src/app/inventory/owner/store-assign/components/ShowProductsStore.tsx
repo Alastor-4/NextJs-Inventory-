@@ -27,7 +27,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
     const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
-
+    const [depotsInStore, setDepotsInStore] = useState<number | null>(dataStore?.store_depots?.length!);
     const [activeManageQuantity, setActiveManageQuantity] = useState(false);
     const [showDetails, setShowDetails] = useState<number>(-1);
 
@@ -67,8 +67,9 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                 setSelectedProduct(null);
             }
         }
+
         getAllProductsByDepartment();
-    }, [dataStore?.id]);
+    }, [dataStore?.id, dataStore]);
 
     useEffect(() => {
         if (allProductsByDepartment?.length) {
@@ -93,9 +94,9 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                 if (a?.name! > a?.name!) return 1;
                 return 0
             });
-
             setDataProducts(allProducts);
         } else {
+            setDepotsInStore(null);
             setDataProducts(null);
         }
     }, [allProductsByDepartment, selectedDepartments]);
@@ -115,9 +116,9 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
     //Objetivo: crea un registro en la bd de cada transaccion q se hace
     // direction es true si las unidades transferidas se le suamn al almacen
     //           es false en caso contrario  
-    const recordTransaction = async (direction: boolean, transferredUnits: number) => {
+    const recordTransaction = async (direction: boolean, transferredUnits: number, product?: productsProps) => {
         const data = {
-            store_depot_id: selectedProduct!.depots![0].store_depots![0].id,
+            store_depot_id: product ? product!.depots![0].store_depots![0].id : selectedProduct!.depots![0].store_depots![0].id,
             units_transferred_quantity: transferredUnits,
             transfer_direction: direction ? transactionToWarehouse : transactionToStore
         }
@@ -126,13 +127,13 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
         return response ? true : false;
     }
 
-    const updateDepot = async (addUnits: number, depot: depots) => {
+    const updateDepot = async (addUnits: number, depot: depots, product?: productsProps) => {
         depot.product_total_remaining_units! += addUnits;
         const result: boolean | AxiosResponse = await storeAssign.updateProductWarehouse(depot);
         if (!result) return;
         if (result.status === 200) {
 
-            const correctTransaction = await recordTransaction(addUnits > 0 ? true : false, Math.abs(addUnits));
+            const correctTransaction = await recordTransaction(addUnits > 0 ? true : false, Math.abs(addUnits), product);
 
             if (correctTransaction) loadData();
         }
@@ -142,7 +143,6 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
     const removeProduct = async (index: number) => {
         if (!dataProducts) return;
         const newProduct = dataProducts[index];
-        setSelectedProduct(newProduct);
         const newProductStoreDepots = newProduct.depots![0].store_depots![0];
         const updateData = {
             id: newProductStoreDepots.id,
@@ -163,7 +163,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
         if (!result) return;
 
         if (result.status === 200) {
-            await updateDepot(dataProducts[index].depots![0].store_depots![0].product_remaining_units!, dataProducts[index].depots![0]);
+            await updateDepot(dataProducts[index].depots![0].store_depots![0].product_remaining_units!, dataProducts[index].depots![0], newProduct);
         }
     }
 
@@ -502,8 +502,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                     </Table>
                                                 </TableContainer>) : <TableNoData searchCoincidence />
                                             ) : (
-                                                <TableNoData hasData={dataStore?.store_depots?.length!} />
-                                                // hasData={depotsInWarehouses}
+                                                <TableNoData hasData={depotsInStore!} />
                                             )
                                     }
                                 </Grid>

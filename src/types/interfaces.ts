@@ -46,7 +46,7 @@ export interface ManageQuantityProps {
 }
 
 export interface AddProductFromWarehouseProps {
-    dataStore?: stores;
+    dataStore?: storeWithStoreDepots;
     warehouseId?: number;
 }
 
