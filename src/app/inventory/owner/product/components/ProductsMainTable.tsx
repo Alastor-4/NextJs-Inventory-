@@ -1,30 +1,10 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
 import {
-    AppBar,
-    Avatar,
-    AvatarGroup,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Checkbox,
-    Divider,
-    Grid,
-    IconButton,
-    InputBase,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Toolbar,
-    Typography,
+    AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent,
+    Checkbox, Divider, Grid, IconButton, InputBase, Table, TableBody,
+    TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography,
 } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
-import { TableNoData } from "@/components/TableNoData";
 import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined, FilterAlt, HelpOutline } from "@mui/icons-material";
 import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
@@ -32,7 +12,10 @@ import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import { images, characteristics, departments } from '@prisma/client';
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { useStoreHook } from "@/app/store/useStoreHook";
+import { TableNoData } from "@/components/TableNoData";
 import ModalUpdateProduct from "./ModalUpdateProduct";
+import SearchIcon from '@mui/icons-material/Search';
+import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useStore } from "@/app/store/store";
 import products from "../requests/products";
@@ -54,16 +37,23 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
     const [forceRender, setForceRender] = useState<boolean>(false);
 
+    const handleForceRender = () => {
+        setForceRender(true);
+        setSelectedDepartments(null);
+    }
+
     //GET initial data
     useEffect(() => {
         const getAllProductsByDepartment = async () => {
-            const newAllProductsByDepartment = await products.allUserProductDepartments(userId);
-            setAllProductsByDepartment(newAllProductsByDepartment.map((department: allProductsByDepartmentProps) => ({
-                ...department,
-                selected: false
-            })))
-            setForceRender(false);
-            setSelectedProduct(null);
+            const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await products.allUserProductDepartments(userId);
+            if (newAllProductsByDepartment) {
+                setAllProductsByDepartment(newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
+                    ...productsByDepartments,
+                    selected: false
+                })))
+                setForceRender(false);
+                setSelectedProduct(null);
+            }
         }
         getAllProductsByDepartment();
     }, [userId, forceRender]);
@@ -95,16 +85,16 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
             if (selectedDepartments) {
                 for (const department of selectedDepartments!) if (department.selected === true) bool = true;
             }
-            allProductsByDepartment?.forEach((departmentItem) => {
+            allProductsByDepartment?.forEach((productsByDepartments) => {
                 if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
-                    allProducts = [...allProducts, ...departmentItem.products!];
+                    allProducts = [...allProducts, ...productsByDepartments.products!];
                 }
                 if (selectedDepartments?.length! > 0 && bool) {
-                    if (departmentItem.selected) {
-                        allProducts = [...allProducts, ...departmentItem.products!];
+                    if (productsByDepartments.selected) {
+                        allProducts = [...allProducts, ...productsByDepartments.products!];
                     }
                 }
-            })
+            });
 
             allProducts.sort((a: productsProps, b: productsProps) => {
                 if (a?.name! < b?.name!) return -1;
@@ -130,13 +120,16 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
     //Handle delete product
     const handleRemove = async () => {
-        const response = await products.delete(userId, selectedProduct?.id!)
+        const response = await products.delete(userId, selectedProduct?.id!);
         if (response) {
             setSelectedProduct(null);
-            const selectedFilters = allProductsByDepartment?.filter(department => department.selected).map(department => department.id);
-            const updatedProducts = await products.allUserProductDepartments(userId)
+            const updatedProducts = await products.allUserProductDepartments(userId);
+            setSelectedDepartments(null);
             if (updatedProducts) {
-                setAllProductsByDepartment(updatedProducts.map((department: allProductsByDepartmentProps) => ({ ...department, selected: selectedFilters?.includes(department.id) })))
+                setAllProductsByDepartment(updatedProducts.map((productsByDepartments: allProductsByDepartmentProps) => ({
+                    ...productsByDepartments,
+                    selected: false
+                })));
                 notifySuccess("Se ha eliminado el producto");
             } else notifyError("Error al eliminar el producto");
         }
@@ -362,7 +355,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                     userId={userId}
                     departments={departments}
                     productId={null}
-                    setForceRender={setForceRender}
+                    handleForceRender={handleForceRender}
                     setOpen={setIsCreateModalOpen}
                 />
             </ModalUpdateProduct>
@@ -377,7 +370,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                     userId={userId}
                     departments={departments}
                     productId={selectedProduct?.id}
-                    setForceRender={setForceRender}
+                    handleForceRender={handleForceRender}
                     setOpen={setIsUpdateModalOpen}
                 />
             </ModalUpdateProduct>
