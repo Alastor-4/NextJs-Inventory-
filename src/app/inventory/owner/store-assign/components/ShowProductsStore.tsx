@@ -144,20 +144,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
         if (!dataProducts) return;
         const newProduct = dataProducts[index];
         const newProductStoreDepots = newProduct.depots![0].store_depots![0];
-        const updateData = {
-            id: newProductStoreDepots.id,
-            storeId: newProductStoreDepots.store_id,
-            depotId: newProductStoreDepots.depot_id,
-            product_units: -1,
-            product_remaining_units: 0,
-            sell_price: newProductStoreDepots.sell_price,
-            sell_price_unit: newProductStoreDepots.sell_price_unit,
-            price_discount_percentage: newProductStoreDepots.price_discount_percentage,
-            price_discount_quantity: newProductStoreDepots.price_discount_quantity,
-            seller_profit_percentage: newProductStoreDepots.seller_profit_percentage,
-            seller_profit_quantity: newProductStoreDepots.seller_profit_quantity,
-            is_active: newProductStoreDepots.is_active,
-        }
+        const updateData = { ...newProductStoreDepots, product_units: -1 }
 
         const result: boolean | AxiosResponse = await storeAssign.updateProductStore(updateData);
         if (!result) return;
