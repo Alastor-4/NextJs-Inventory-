@@ -68,7 +68,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         setSelectedDepartments(null);
     }
 
-    const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
+    const [openImagesDialog, setOpenImagesDialog] = useState<boolean>(false);
     const [dialogImages, setDialogImages] = useState<images[] | null>(null);
 
     const handleOpenImagesDialog = (images: images[]) => {
@@ -935,7 +935,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         </UpdateValueDialog>
 
                         <ImagesDisplayDialog
-                            open={openImageDialog}
+                            open={openImagesDialog}
                             setOpen={setOpenImagesDialog}
                             images={dialogImages}
                         />
