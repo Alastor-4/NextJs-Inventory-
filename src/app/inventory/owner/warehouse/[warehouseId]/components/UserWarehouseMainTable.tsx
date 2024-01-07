@@ -63,6 +63,14 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
 
     const [forceRender, setForceRender] = useState(true);
 
+    const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
+    const [dialogImages, setDialogImages] = useState<images[] | null>(null);
+
+    const handleOpenImagesDialog = (images: images[]) => {
+        setDialogImages(images);
+        setOpenImagesDialog(true);
+    }
+
     //GET initial products data
     useEffect(() => {
         const getAllDepositsByDepartment = async () => {
@@ -548,14 +556,6 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 </TableRow>
             </TableHead>
         )
-    }
-
-    const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
-    const [dialogImages, setDialogImages] = useState<images[] | null>(null);
-
-    function handleOpenImagesDialog(images: images[]) {
-        setDialogImages(images);
-        setOpenImagesDialog(true);
     }
 
     async function handleLoadStoresDistribution(depot: depots) {

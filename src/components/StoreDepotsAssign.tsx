@@ -1,33 +1,17 @@
 "use client"
 
 import {
-    AppBar,
-    Box,
-    Card,
-    CardContent,
-    Grid,
-    IconButton,
-    MenuItem,
-    TextField,
-    Toolbar,
-    Typography,
+    AppBar, Box, Card, CardContent, Grid, IconButton,
+    MenuItem, TextField, Toolbar, Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { Formik } from "formik";
-import * as Yup from "yup";
-
 import ShowProductsStore from "@/app/inventory/owner/store-assign/components/ShowProductsStore";
+import { StoreDepotsAssignProps } from "@/types/interfaces";
 import { stores, warehouses } from "@prisma/client";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
-
-interface StoreDepotsAssignProps {
-    userId?: number;
-    selectedWarehouseId?: number;
-    selectedStoreId?: number;
-    storeList?: stores[];
-    warehouseList?: warehouses[];
-}
+import { Formik } from "formik";
+import * as Yup from "yup";
 
 export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, selectedStoreId, storeList, userId }: StoreDepotsAssignProps) {
 
@@ -65,9 +49,7 @@ export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, 
         selectedStore: Yup.string().required("Seleccione una tienda"),
     })
 
-    function handleNavigateBack() {
-        router.back();
-    }
+    const handleNavigateBack = () => router.back();
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>

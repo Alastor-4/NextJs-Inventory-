@@ -1,46 +1,26 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
-import { TableNoData } from "@/components/TableNoData";
 import {
-    Avatar,
-    AvatarGroup,
-    Button,
-    Card,
-    CardContent,
-    Collapse,
-    Grid,
-    IconButton,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Tooltip,
-    Typography
+    Avatar, AvatarGroup, Button, Card, CardContent, Collapse,
+    Grid, IconButton, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Tooltip, Typography
 } from '@mui/material';
-import {
-    EditOutlined,
-    ExpandLessOutlined,
-    ExpandMoreOutlined,
-    RemoveOutlined,
-} from '@mui/icons-material';
-import { characteristics, departments, depots, images } from '@prisma/client';
 import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse';
+import { EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, RemoveOutlined, } from '@mui/icons-material';
+import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
-import DepartmentCustomButton from '@/components/DepartmentCustomButton';
+import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
+import { characteristics, depots, images } from '@prisma/client';
 import ModalStoreAssign from './Modal/ModalStoreAssign';
+import { TableNoData } from "@/components/TableNoData";
 import ManageQuantity from './Modal/ManageQuantity';
 import storeAssign from '../requests/store-assign';
+import React, { useEffect, useState } from 'react'
 import { AxiosResponse } from 'axios';
 import { Formik } from 'formik';
-import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
-import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
 
-function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) {
+const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) => {
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
 
@@ -51,6 +31,11 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
 
     const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
     const [dialogImages, setDialogImages] = useState<images[] | null>(null);
+
+    const handleOpenImagesDialog = (images: images[]) => {
+        setDialogImages(images);
+        setOpenImagesDialog(true);
+    }
 
     const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
 
@@ -93,88 +78,25 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
         }
     }, [allProductsByDepartment]);
 
-    function handleSelectFilter(index: number) {
-        let filters = [...allProductsByDepartment!];
-        filters[index].selected = !filters[index].selected;
-
-        setAllProductsByDepartment(filters);
-    }
-
-    const DepartmentsFilter = ({ formik }: any) => (
-        <Card variant={"outlined"} sx={{ padding: "10px" }}>
-            <Grid container item xs={12}>
-                <Grid item xs={12}>
-                    <Typography variant={"subtitle2"}>
-                        Seleccione departamentos para encontrar el producto que busca
-                    </Typography>
-                </Grid>
-                <Grid container item xs={12} flexWrap="nowrap" columnSpacing={2} sx={{ overflowX: "auto", p: "7px 0px" }}>
-                    {
-                        allProductsByDepartment?.map((deposits, index) => (
-                            <Grid key={deposits.id} item xs={"auto"}>
-                                <DepartmentCustomButton
-                                    title={deposits.name!}
-                                    subtitle={deposits.products?.length === 1 ? `${deposits.products.length!}` + " producto" : `${deposits.products?.length!}` + " productos"}
-                                    selected={deposits.selected!}
-                                    onClick={() => handleSelectFilter(index)}
-                                />
-                            </Grid>
-                        ))
-                    }
-                </Grid>
-                {
-                    dataProducts?.length! > 0 && (
-                        <Grid container item xs={12} mt={"5px"} rowSpacing={1}>
-                            <Grid item xs={12}>
-                                <Typography variant={"subtitle2"}>
-                                    Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
-                                </Typography>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    name={"handleChangeSearchBarValue"}
-                                    placeholder="Buscar producto..."
-                                    size={"small"}
-                                    fullWidth
-                                    {...formik.getFieldProps("searchBarValue")}
-                                />
-                            </Grid>
-                        </Grid>
-                    )
-                }
-            </Grid>
-        </Card>
-    )
-
-    const initialValues = {
-        searchBarValue: "",
-    }
-
-
     const TableHeader = () => {
         const headCells = [
             {
                 id: "name",
                 label: "Nombre",
-                align: "left"
             },
             {
                 id: "store_units",
                 label: "Unidades restantes",
-                align: "left"
             },
             {
                 id: "remove",
                 label: "Retirar al almacén",
-                align: "left"
             },
             {
                 id: "more_details",
                 label: "",
-                align: "left"
             },
-
-        ]
+        ];
 
         return (
             <TableHead>
@@ -256,11 +178,6 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
         if (result.status === 200) {
             await updateDepot(dataProducts[index].depots![0].store_depots![0].product_remaining_units!, dataProducts[index].depots![0]);
         }
-    }
-
-    function handleOpenImagesDialog(images: images[]) {
-        setDialogImages(images);
-        setOpenImagesDialog(true);
     }
 
     const TableContent = ({ formik }: any) => {
@@ -388,7 +305,6 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                             </Grid>
                                                         </Grid>
 
-
                                                         <Grid container item spacing={1} xs={12}>
                                                             <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
                                                             <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
@@ -457,10 +373,8 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
 
     return (
         <Formik
-            initialValues={initialValues}
-            onSubmit={() => {
-
-            }}
+            initialValues={{ searchBarValue: "" }}
+            onSubmit={() => { }}
         >
             {
                 (formik) => (
@@ -508,13 +422,13 @@ function ShowProductsStore({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                     </Grid>
                                 </Grid>
 
-                                {
+                                {/* {
                                     allProductsByDepartment?.length! > 0 && (
                                         <Grid item xs={12}>
                                             <DepartmentsFilter formik={formik} />
                                         </Grid>
                                     )
-                                }
+                                } */}
 
                                 <Grid item xs={12}>
                                     {
