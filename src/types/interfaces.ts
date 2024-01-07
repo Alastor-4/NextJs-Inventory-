@@ -123,6 +123,14 @@ export interface departmentWithoutDepots {
     products?: products | null
 }
 
+export interface StoreDepotsAssignProps {
+    userId?: number;
+    selectedWarehouseId?: number;
+    selectedStoreId?: number;
+    storeList?: stores[];
+    warehouseList?: warehouses[];
+}
+
 export interface UserWarehouseFormProps {
     ownerId?: number;
     warehouseId?: number;
