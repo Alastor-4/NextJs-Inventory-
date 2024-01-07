@@ -44,7 +44,7 @@ function ManageQuantity({ userId, nameStore, nameWarehouse, productDetails, upda
 
     } else productStoreDepots.product_remaining_units! -= unitsValue;
 
-    const result: boolean | AxiosResponse = await storeAssign.updateProductStore(userId, productStoreDepots);
+    const result: boolean | AxiosResponse = await storeAssign.updateProductStore(productStoreDepots);
 
     if (!result) return;
 

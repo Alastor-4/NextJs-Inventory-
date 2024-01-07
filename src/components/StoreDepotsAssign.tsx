@@ -5,7 +5,7 @@ import {
     MenuItem, TextField, Toolbar, Typography,
 } from "@mui/material";
 import ShowProductsStore from "@/app/inventory/owner/store-assign/components/ShowProductsStore";
-import { StoreDepotsAssignProps } from "@/types/interfaces";
+import { StoreDepotsAssignProps, storeWithStoreDepots } from "@/types/interfaces";
 import { stores, warehouses } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { ArrowLeft } from "@mui/icons-material";
@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
-export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, selectedStoreId, storeList, userId }: StoreDepotsAssignProps) {
+export const StoreDepotsAssign = ({ warehouseList, selectedWarehouseId, selectedStoreId, storeList, userId }: StoreDepotsAssignProps) => {
 
     const router = useRouter();
 
@@ -119,7 +119,7 @@ export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, 
                                         helperText={(formik.errors.selectedStore && formik.touched.selectedStore) && formik.errors.selectedStore}
                                     >
                                         {
-                                            storeList?.map((store: stores) => (
+                                            storeList?.map((store: storeWithStoreDepots) => (
                                                 <MenuItem key={store.id} onClick={() => { setSelectedStore(store) }} value={store.name!}>{`${store.name} (${store.description?.slice(0, 20) ?? ''})`}</MenuItem>
                                             ))
                                         }
@@ -145,3 +145,5 @@ export default function StoreDepotsAssign({ warehouseList, selectedWarehouseId, 
         </Formik>
     )
 }
+
+export default StoreDepotsAssign

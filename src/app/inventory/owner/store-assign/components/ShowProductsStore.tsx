@@ -502,7 +502,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                     </Table>
                                                 </TableContainer>) : <TableNoData searchCoincidence />
                                             ) : (
-                                                <TableNoData />
+                                                <TableNoData hasData={dataStore?.store_depots?.length!} />
                                                 // hasData={depotsInWarehouses}
                                             )
                                     }

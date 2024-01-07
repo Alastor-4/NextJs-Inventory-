@@ -5,12 +5,30 @@ export interface ShowProductsStoreProps {
     userId?: number;
     storeId?: number;
     nameStore?: string | null;
-    dataStore?: stores;
+    dataStore?: storeWithStoreDepots;
     dataWarehouse?: warehouses;
     warehouseId?: number;
     nameWarehouse?: string | null;
 }
 
+export interface storeWithStoreDepots {
+    id: number;
+    owner_id: number | null;
+    name: string | null;
+    description: string | null;
+    slogan: string | null;
+    address: string | null;
+    seller_user_id: number | null;
+    created_at: Date;
+    online_reservation: boolean | null;
+    online_catalog: boolean | null;
+    auto_open_time: boolean | null;
+    auto_reservation_time: boolean | null;
+    fixed_seller_profit_percentage: number | null;
+    fixed_seller_profit_quantity: number | null;
+    fixed_seller_profit_unit: string | null;
+    store_depots?: store_depots[];
+}
 export interface ModalUpdateProductProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
@@ -132,7 +150,7 @@ export interface StoreDepotsAssignProps {
     userId?: number;
     selectedWarehouseId?: number;
     selectedStoreId?: number;
-    storeList?: stores[];
+    storeList?: storeWithStoreDepots[];
     warehouseList?: warehouses[];
 }
 
