@@ -95,7 +95,6 @@ export const StoreDepotsAssign = ({ warehouseList, selectedWarehouseId, selected
                                         select
                                         {...formik.getFieldProps("selectedWarehouse")}
                                         error={!!formik.errors.selectedWarehouse && !!formik.touched.selectedWarehouse}
-
                                         helperText={(formik.errors.selectedWarehouse && formik.touched.selectedWarehouse) && formik.errors.selectedWarehouse}
                                     >
                                         {

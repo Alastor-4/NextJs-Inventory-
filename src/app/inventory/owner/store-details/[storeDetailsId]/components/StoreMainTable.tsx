@@ -41,6 +41,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
     const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [depotsInStore, setDepotsInStore] = useState<number | null>(dataStoreDetails?.store_depots?.length!);
 
     const [dataStore, setDataStore] = useState<storeWithStoreDepots | null>(dataStoreDetails);
 
@@ -61,16 +62,9 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
         setIsFilterModalOpen(!isFilterModalOpen);
     }
 
-    const [forceRender, setForceRender] = useState<boolean>(true);
-
     const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
     const handleTooltipClose = () => setIsOpenTooltip(false);
     const handleTooltipOpen = () => setIsOpenTooltip(true);
-
-    const handleForceRender = () => {
-        setForceRender(true);
-        setSelectedDepartments(null);
-    }
 
     //GET initial data
     useEffect(() => {
@@ -552,7 +546,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                                         </Table>
                                                     </TableContainer>) : <TableNoData searchCoincidence />
                                                 ) : (
-                                                    <TableNoData hasData={dataStoreDetails?.store_depots?.length!} />
+                                                    <TableNoData hasData={depotsInStore} />
                                                 )
                                         }
                                     </Grid>
