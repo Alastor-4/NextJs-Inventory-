@@ -8,9 +8,9 @@ import * as Yup from 'yup';
 
 export const StoreEditPrice = ({ storeDepot, setActiveModalPrice, loadData }: StoreEditPriceProps) => {
 
-    const [activeDiscount, setActiveDiscount] = useState(false)
-    const [activePercentage, setActivePercentage] = useState(false)
-    const [newSellPrice, setNewSellPrice] = useState(storeDepot.sell_price);
+    const [activeDiscount, setActiveDiscount] = useState<boolean>(false);
+    const [activePercentage, setActivePercentage] = useState<boolean>(false);
+    const [newSellPrice, setNewSellPrice] = useState<number>(storeDepot.sell_price!);
 
     useEffect(() => {
         if (storeDepot.price_discount_quantity || storeDepot.price_discount_percentage) {

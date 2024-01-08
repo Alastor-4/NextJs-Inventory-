@@ -21,7 +21,7 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
                 .required("Campo requerido"),
             quantity: Yup.number()
                 .min(0, "El limite inferior es 0")
-                .max(storeDepot?.sell_price!, `El limite superior es ${storeDepot?.sell_price}`)
+                .max(parseFloat(`${storeDepot?.sell_price!}`), `El limite superior es ${storeDepot?.sell_price}`)
                 .required("Campo requerido")
         })
     )
@@ -35,7 +35,7 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
             product_remaining_units: storeDepot?.product_remaining_units,
             seller_profit_percentage: (!selectedButton) ? parseFloat(values.percentage) : null,
             is_active: storeDepot?.is_active,
-            sell_price: storeDepot?.sell_price,
+            sell_price: parseFloat(`${storeDepot?.sell_price!}`),
             sell_price_unit: storeDepot?.sell_price_unit,
             seller_profit_quantity: (selectedButton) ? parseFloat(values.quantity) : null,
             price_discount_percentage: storeDepot?.price_discount_percentage,
