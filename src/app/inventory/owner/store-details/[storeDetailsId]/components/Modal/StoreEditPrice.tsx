@@ -5,30 +5,31 @@ import { StoreEditPriceProps } from '@/types/interfaces';
 import React, { useEffect, useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { handleKeyDownWithDot } from '@/utils/handleKeyDown';
 
 export const StoreEditPrice = ({ storeDepot, setActiveModalPrice, loadData }: StoreEditPriceProps) => {
 
     const [activeDiscount, setActiveDiscount] = useState<boolean>(false);
     const [activePercentage, setActivePercentage] = useState<boolean>(false);
-    const [newSellPrice, setNewSellPrice] = useState<number>(storeDepot.sell_price!);
+    const [newSellPrice, setNewSellPrice] = useState<number>(parseFloat(`${storeDepot?.sell_price!}`));
 
     useEffect(() => {
-        if (storeDepot.price_discount_quantity || storeDepot.price_discount_percentage) {
+        if (storeDepot?.price_discount_quantity || storeDepot?.price_discount_percentage) {
             setActiveDiscount(true)
         }
-    }, [setActiveDiscount, storeDepot.price_discount_percentage, storeDepot.price_discount_quantity])
+    }, [setActiveDiscount, storeDepot?.price_discount_percentage, storeDepot?.price_discount_quantity])
 
     useEffect(() => {
-        setActivePercentage(storeDepot.price_discount_percentage ? true : false)
+        setActivePercentage(storeDepot?.price_discount_percentage ? true : false)
     }, [storeDepot?.price_discount_percentage])
 
     const initialValues = ({
         price: newSellPrice,
-        currency: storeDepot.sell_price_unit ?? "CUP",
+        currency: storeDepot?.sell_price_unit ?? "CUP",
 
         discount: !activePercentage
-            ? storeDepot.price_discount_quantity ?? newSellPrice
-            : storeDepot.price_discount_percentage ?? 100,
+            ? storeDepot?.price_discount_quantity ?? newSellPrice
+            : storeDepot?.price_discount_percentage ?? 100,
 
         option: !activePercentage
             ? "$" // es el simbolo para acceder a la moneda de la propiedad currency
@@ -68,20 +69,20 @@ export const StoreEditPrice = ({ storeDepot, setActiveModalPrice, loadData }: St
             else discount_percentage = values.discount
         }
         const data = {
-            id: storeDepot.id,
-            store_id: storeDepot.store_id,
-            depot_id: storeDepot.depot_id,
-            product_units: storeDepot.product_units,
-            product_remaining_units: storeDepot.product_remaining_units,
-            seller_profit_percentage: storeDepot.seller_profit_percentage,
-            is_active: storeDepot.is_active,
+            id: storeDepot?.id,
+            store_id: storeDepot?.store_id,
+            depot_id: storeDepot?.depot_id,
+            product_units: storeDepot?.product_units,
+            product_remaining_units: storeDepot?.product_remaining_units,
+            seller_profit_percentage: storeDepot?.seller_profit_percentage,
+            is_active: storeDepot?.is_active,
             sell_price: parseFloat(precioOriginal),
             sell_price_unit: values.currency,
-            seller_profit_quantity: storeDepot.seller_profit_quantity,
+            seller_profit_quantity: storeDepot?.seller_profit_quantity,
             price_discount_percentage: parseFloat(discount_percentage),
             price_discount_quantity: parseFloat(discount_quantity),
         }
-        const response = await storeDetails.update(storeDepot.store_id, data)
+        const response = await storeDetails.update(storeDepot?.store_id, data)
         if (response === 200) {
             setActiveModalPrice({ active: false, storeDepot: null })
             loadData();
@@ -96,6 +97,7 @@ export const StoreEditPrice = ({ storeDepot, setActiveModalPrice, loadData }: St
                     label="Precio"
                     {...formik.getFieldProps("price")}
                     value={formik.values.price || ""}
+                    onKeyDown={handleKeyDownWithDot}
                     error={formik.errors.price && formik.touched.price}
                     helperText={(formik.errors.price && formik.touched.price) && formik.errors.price}
                     onChange={(e) => {
@@ -111,7 +113,7 @@ export const StoreEditPrice = ({ storeDepot, setActiveModalPrice, loadData }: St
                     error={formik.errors.currency && formik.touched.currency}
                     helperText={(formik.errors.currency && formik.touched.currency) && formik.errors.currency}
                     onChange={(e) => {
-                        storeDepot.sell_price_unit = e.target.value
+                        storeDepot!.sell_price_unit = e.target.value;
                         formik.setFieldValue("currency", e.target.value);
                     }}
                 >
@@ -139,8 +141,8 @@ export const StoreEditPrice = ({ storeDepot, setActiveModalPrice, loadData }: St
                         }}
                         onChange={(e) => {
                             activeDiscount
-                                ? storeDepot.price_discount_quantity! = +e.target.value
-                                : storeDepot.price_discount_percentage! = +e.target.value
+                                ? storeDepot!.price_discount_quantity! = +e.target.value
+                                : storeDepot!.price_discount_percentage! = +e.target.value
                             formik.setFieldValue("discount", e.target.value)
                         }}
                     />

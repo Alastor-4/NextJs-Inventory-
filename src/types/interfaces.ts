@@ -198,7 +198,7 @@ export interface StoreEditSellerProfitProps {
 }
 export interface StoreEditPriceProps {
     loadData: () => Promise<void>;
-    storeDepot: store_depots;
+    storeDepot: store_depots | null;
     setActiveModalPrice: ({ active, storeDepot }: { active: boolean, storeDepot: store_depots | null }) => void;
 }
 
