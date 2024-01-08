@@ -47,7 +47,7 @@ export interface ManageQuantityProps {
 
 export interface AddProductFromWarehouseProps {
     dataStore?: storeWithStoreDepots;
-    warehouseId?: number;
+    warehouseId?: number | null;
 }
 
 export interface UpdateValueDialogProps {
