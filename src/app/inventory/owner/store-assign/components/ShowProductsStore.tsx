@@ -44,8 +44,10 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
     const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
 
     const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
-    const toggleModalFilter = () => setIsFilterModalOpen(!isFilterModalOpen);
-
+    const toggleModalFilter = () => {
+        if (!dataProducts) return;
+        setIsFilterModalOpen(!isFilterModalOpen);
+    }
 
     const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
     const handleTooltipClose = () => setIsOpenTooltip(false);

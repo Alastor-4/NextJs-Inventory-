@@ -75,7 +75,10 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
     const toggleModalCreate = () => setIsCreateModalOpen(!isCreateModalOpen);
     const toggleModalUpdate = () => setIsUpdateModalOpen(!isUpdateModalOpen);
-    const toggleModalFilter = () => setIsFilterModalOpen(!isFilterModalOpen);
+    const toggleModalFilter = () => {
+        if (!dataProducts) return;
+        setIsFilterModalOpen(!isFilterModalOpen);
+    }
 
     //Update allProducts at change
     useEffect(() => {

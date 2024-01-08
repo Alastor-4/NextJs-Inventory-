@@ -7,8 +7,9 @@ export default async function Page({ params }: { params: { warehouseId: string }
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
 
-    const warehouseId = params.warehouseId;
-    const warehouseDetails = await prisma.warehouses.findUnique({ where: { id: +warehouseId } });
+    const warehouseId = +params.warehouseId;
+
+    const warehouseDetails = await prisma.warehouses.findUnique({ where: { id: warehouseId } });
 
     return (
         <main>
