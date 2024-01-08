@@ -1,42 +1,42 @@
 import { Button, Grid, TextField, Typography } from '@mui/material';
+import { storeDetails } from '../../request/storeDetails';
+import { StoreEditUnitsProps } from '@/types/interfaces';
+import React, { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import React, { useState, useEffect } from 'react'
-import { storeDetails } from '../../request/storeDetails';
-import { useParams } from 'next/navigation';
 
-function StoreEditUnits(props: any) {
-    const { dataRow, setActiveModalEditUnits, loadDates } = props;
+export const StoreEditUnits = ({ dataRow, setActiveModalEditUnits, loadData, }: StoreEditUnitsProps) => {
 
     const params = useParams();
 
-    const [remainingUnits, setRemainingUnits] = useState(dataRow.product_remaining_units);
-    const [totalUnits, setTotalUnits] = useState(dataRow.product_units);
+    const [remainingUnits, setRemainingUnits] = useState<number | null>(dataRow?.product_remaining_units!);
+    const [totalUnits, setTotalUnits] = useState<number | null>(dataRow?.product_units!);
 
     useEffect(() => {
-        if (remainingUnits !== dataRow.product_remaining_units) {
-            setRemainingUnits(dataRow.product_remaining_units)
-            setTotalUnits(dataRow.product_units)
+        if (remainingUnits !== dataRow?.product_remaining_units!) {
+            setRemainingUnits(dataRow?.product_remaining_units!)
+            setTotalUnits(dataRow?.product_units!)
         }
     }, [dataRow, remainingUnits])
 
     const setValidationSchema = (
         Yup.object({
             units: Yup.number()
-                .min(remainingUnits, `valor mayor que las unidades restantes en la tienda (${remainingUnits})`)
+                .min(remainingUnits!, `valor mayor que las unidades restantes en la tienda (${remainingUnits})`)
                 .required("valor requerido")
         })
     )
 
     const handleSubmit = async (values: any) => {
-        const data = dataRow;
-        data.product_units = parseInt(values.units);
+        const data = dataRow!;
+        data.product_units = +values.units;
 
-        const result = await storeDetails.update(params.storeDetailsId, data);
+        const result = await storeDetails.update(params.storeDetailsId, data!);
 
         if (result === 200) {
             setActiveModalEditUnits(false);
-            loadDates();
+            loadData();
         }
     }
 
@@ -75,7 +75,7 @@ function StoreEditUnits(props: any) {
                             </Grid>
 
                             <Grid item xs={12}>
-                                <Button fullWidth type='submit' variant='contained' sx={{marginTop: "15px"}}>
+                                <Button fullWidth type='submit' variant='contained' sx={{ marginTop: "15px" }}>
                                     Aceptar
                                 </Button>
                             </Grid>

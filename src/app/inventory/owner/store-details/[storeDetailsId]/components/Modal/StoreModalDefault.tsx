@@ -1,30 +1,19 @@
-// @ts-nocheck
-import {
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-} from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { StoreModalDefaultProps } from "@/types/interfaces";
 import React from "react";
 
-export default function StoreModalDefault(props) {
-    const { open, setOpen, dialogTitle } = props
+export const StoreModalDefault = ({ children, dialogTitle, setOpen, open }: StoreModalDefaultProps) => {
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
         setOpen(false);
     };
-
-
-
 
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>{dialogTitle}</DialogTitle>
             <DialogContent>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {props.children}
+                    {children}
                 </Box>
             </DialogContent>
             <DialogActions>
@@ -34,4 +23,4 @@ export default function StoreModalDefault(props) {
     )
 }
 
-
+export default StoreModalDefault

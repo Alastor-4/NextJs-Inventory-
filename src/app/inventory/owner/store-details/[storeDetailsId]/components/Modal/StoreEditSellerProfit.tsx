@@ -1,12 +1,12 @@
-// @ts-nocheck
 "use client"
+import { Button, Card, Grid, MenuItem, TextField } from '@mui/material';
+import { StoreEditSellerProfitProps } from '@/types/interfaces';
+import { storeDetails } from '../../request/storeDetails';
+import React, { useState } from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import React, { useState } from 'react'
-import { Button, Card, Grid, MenuItem, TextField } from '@mui/material';
-import { storeDetails } from '../../request/storeDetails';
 
-function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit, loadDates }) {
+export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, loadData }: StoreEditSellerProfitProps) => {
     const [selectedButton, setSelectedButton] = useState(storeDepot.seller_profit_percentage !== null ? false : true)
 
     const initialValues = ({
@@ -19,17 +19,14 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
                 .min(0, "El limite inferior es 0")
                 .max(100, "El limite superior es 100")
                 .required("Campo requerido"),
-
             quantity: Yup.number()
                 .min(0, "El limite inferior es 0")
-                .max(storeDepot.sell_price, `El limite superior es ${storeDepot.sell_price}`)
+                .max(storeDepot.sell_price!, `El limite superior es ${storeDepot.sell_price}`)
                 .required("Campo requerido")
-
         })
     )
 
-    const handleSubmit = async (values) => {
-
+    const handleSubmit = async (values: any) => {
         const data = {
             id: storeDepot.id,
             store_id: storeDepot.store_id,
@@ -48,15 +45,13 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
         const request = await storeDetails.update(storeDepot.id, data);
         if (request === 200) {
             setActiveModalSellerProfit(false)
-            loadDates()
+            loadData()
         }
-
     }
 
-    const editPercentage = (formik) => (
+    const editPercentage = (formik: any) => (
         <>
             <Grid container gap={1}>
-
                 <TextField
                     name='percentage'
                     label="Porcentaje"
@@ -64,9 +59,7 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
                     value={formik.values.percentage ?? ""}
                     error={formik.errors.percentage && formik.touched.percentage}
                     helperText={(formik.errors.percentage && formik.touched.percentage) && formik.errors.percentage}
-
                 />
-
                 <TextField
                     name={"symbolPercentage"}
                     select
@@ -79,10 +72,9 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
     )
 
 
-    const editQuantity = (formik) => (
+    const editQuantity = (formik: any) => (
         <>
             <Grid container gap={1}>
-
                 <TextField
                     name='quantity'
                     label="Cantidad fija"
@@ -90,20 +82,17 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
                     value={formik.values.quantity ?? ""}
                     error={formik.errors.quantity && formik.touched.quantity}
                     helperText={(formik.errors.quantity && formik.touched.quantity) && formik.errors.quantity}
-
                 />
-
                 <TextField
                     name={"currency"}
                     select
                     value={storeDepot.sell_price_unit}
                 >
-                    <MenuItem value={storeDepot.sell_price_unit} >CUP</MenuItem>
+                    <MenuItem value={storeDepot.sell_price_unit!} >CUP</MenuItem>
                 </TextField>
             </Grid>
         </>
     )
-
 
     return (
         <>
@@ -114,47 +103,36 @@ function StoreEditSellerProfit({ userId, storeDepot, setActiveModalSellerProfit,
                 onSubmit={handleSubmit}
             >
                 {(formik) => (
-
                     <form onSubmit={formik.handleSubmit}>
                         <Card variant='outlined' sx={{ padding: '10px' }} >
                             <Grid container direction={'column'} rowSpacing={2} >
-
                                 <Grid item container columnSpacing={1}>
-
                                     <Grid item>
                                         <Button
                                             variant={!selectedButton ? "contained" : "outlined"}
                                             onClick={() => setSelectedButton(false)}
                                         >Porcentaje</Button>
                                     </Grid>
-
                                     <Grid item>
                                         <Button
                                             variant={selectedButton ? "contained" : "outlined"}
                                             onClick={() => setSelectedButton(true)}
                                         >Cantidad fija</Button>
                                     </Grid>
-
-
                                 </Grid>
                                 <Grid item container >
                                     <Card variant="outlined" sx={{ padding: "10px" }}>
-
                                         <Grid item container direction={'column'}>
-
                                             {!selectedButton
                                                 ? editPercentage(formik)
                                                 : editQuantity(formik)
                                             }
-
                                             <Grid item >
                                                 <Button type='submit'>Guardar cambios</Button>
                                             </Grid>
                                         </Grid>
-
                                     </Card>
                                 </Grid>
-
                             </Grid>
                         </Card>
                     </form>
