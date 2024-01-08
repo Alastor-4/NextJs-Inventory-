@@ -7,11 +7,11 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 
 export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, loadData }: StoreEditSellerProfitProps) => {
-    const [selectedButton, setSelectedButton] = useState(storeDepot.seller_profit_percentage !== null ? false : true)
+    const [selectedButton, setSelectedButton] = useState(storeDepot?.seller_profit_percentage !== null ? false : true)
 
     const initialValues = ({
-        percentage: !selectedButton ? storeDepot.seller_profit_percentage ?? "0" : "0",
-        quantity: selectedButton ? storeDepot.seller_profit_quantity ?? "0" : "0",
+        percentage: !selectedButton ? storeDepot?.seller_profit_percentage ?? "0" : "0",
+        quantity: selectedButton ? storeDepot?.seller_profit_quantity ?? "0" : "0",
     });
     const setValidationSchema = () => (
         Yup.object({
@@ -21,28 +21,28 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
                 .required("Campo requerido"),
             quantity: Yup.number()
                 .min(0, "El limite inferior es 0")
-                .max(storeDepot.sell_price!, `El limite superior es ${storeDepot.sell_price}`)
+                .max(storeDepot?.sell_price!, `El limite superior es ${storeDepot?.sell_price}`)
                 .required("Campo requerido")
         })
     )
 
     const handleSubmit = async (values: any) => {
         const data = {
-            id: storeDepot.id,
-            store_id: storeDepot.store_id,
-            depot_id: storeDepot.depot_id,
-            product_units: storeDepot.product_units,
-            product_remaining_units: storeDepot.product_remaining_units,
+            id: storeDepot?.id,
+            store_id: storeDepot?.store_id,
+            depot_id: storeDepot?.depot_id,
+            product_units: storeDepot?.product_units,
+            product_remaining_units: storeDepot?.product_remaining_units,
             seller_profit_percentage: (!selectedButton) ? parseFloat(values.percentage) : null,
-            is_active: storeDepot.is_active,
-            sell_price: storeDepot.sell_price,
-            sell_price_unit: storeDepot.sell_price_unit,
+            is_active: storeDepot?.is_active,
+            sell_price: storeDepot?.sell_price,
+            sell_price_unit: storeDepot?.sell_price_unit,
             seller_profit_quantity: (selectedButton) ? parseFloat(values.quantity) : null,
-            price_discount_percentage: storeDepot.price_discount_percentage,
-            price_discount_quantity: storeDepot.price_discount_quantity,
+            price_discount_percentage: storeDepot?.price_discount_percentage,
+            price_discount_quantity: storeDepot?.price_discount_quantity,
         }
 
-        const request = await storeDetails.update(storeDepot.id, data);
+        const request = await storeDetails.update(storeDepot?.id, data);
         if (request === 200) {
             setActiveModalSellerProfit(false)
             loadData()
@@ -86,9 +86,9 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
                 <TextField
                     name={"currency"}
                     select
-                    value={storeDepot.sell_price_unit}
+                    value={storeDepot?.sell_price_unit}
                 >
-                    <MenuItem value={storeDepot.sell_price_unit!} >CUP</MenuItem>
+                    <MenuItem value={storeDepot?.sell_price_unit!} >CUP</MenuItem>
                 </TextField>
             </Grid>
         </>
