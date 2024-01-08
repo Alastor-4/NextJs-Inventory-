@@ -3,11 +3,10 @@ import { AppBar, Box, Dialog, DialogContent, IconButton, Toolbar, Typography } f
 import { ModalUpdateProductProps } from "@/types/interfaces";
 import React from "react";
 
-export default function ModalUpdateProduct({ open, setOpen, dialogTitle, children, setForceRender }: ModalUpdateProductProps) {
+export default function ModalUpdateProduct({ open, setOpen, dialogTitle, children }: ModalUpdateProductProps) {
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
         setOpen(false);
-        setForceRender(true);
     };
 
     return (
@@ -32,7 +31,6 @@ export default function ModalUpdateProduct({ open, setOpen, dialogTitle, childre
                     {children}
                 </Box>
             </DialogContent>
-
         </Dialog>
     )
 }
