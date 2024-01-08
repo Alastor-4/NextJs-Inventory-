@@ -75,7 +75,10 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
     const toggleModalCreate = () => setIsCreateModalOpen(!isCreateModalOpen);
     const toggleModalUpdate = () => setIsUpdateModalOpen(!isUpdateModalOpen);
-    const toggleModalFilter = () => setIsFilterModalOpen(!isFilterModalOpen);
+    const toggleModalFilter = () => {
+        if (!dataProducts) return;
+        setIsFilterModalOpen(!isFilterModalOpen);
+    }
 
     //Update allProducts at change
     useEffect(() => {
@@ -349,14 +352,13 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 open={isCreateModalOpen}
                 setOpen={setIsCreateModalOpen}
                 dialogTitle="Crear Producto"
-                handleForceRender={handleForceRender}
             >
                 <ProductsForm
                     userId={userId}
                     departments={departments}
                     productId={null}
-
                     setOpen={setIsCreateModalOpen}
+                    handleForceRender={handleForceRender}
                 />
             </ModalUpdateProduct>
 
@@ -364,13 +366,13 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 open={isUpdateModalOpen}
                 setOpen={setIsUpdateModalOpen}
                 dialogTitle="Modificar Producto"
-                handleForceRender={handleForceRender}
             >
                 <ProductsForm
                     userId={userId}
                     departments={departments}
-                    productId={selectedProduct?.id}
+                    productId={selectedProduct?.id!}
                     setOpen={setIsUpdateModalOpen}
+                    handleForceRender={handleForceRender}
                 />
             </ModalUpdateProduct>
 
@@ -431,7 +433,6 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                                     (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
                                                         <Table sx={{ width: "100%" }} size={"small"}>
                                                             <TableHeader />
-
                                                             <TableContent formik={formik} />
                                                         </Table>
                                                     </TableContainer>) : <TableNoData searchCoincidence />

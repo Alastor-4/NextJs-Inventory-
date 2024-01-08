@@ -1,23 +1,15 @@
 
+import { Button, Grid, IconButton, MenuItem, Stack, TextField, Typography } from '@mui/material'
+import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions'
+import { storeDetails } from '../../request/storeDetails'
 import { SwapVerticalCircle } from '@mui/icons-material'
-import {
-    Button,
-    Grid,
-    IconButton,
-    MenuItem,
-    Stack,
-    TextField,
-    Typography,
-} from '@mui/material'
-import { Formik } from 'formik'
-import * as Yup from 'yup'
+import { TransferUnitsProps } from '@/types/interfaces'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { storeDetails } from '../../request/storeDetails'
-import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions'
+import { Formik } from 'formik'
+import * as Yup from 'yup'
 
-function TransferUnits(props: any) {
-    const { nameStore, storeDepot, productId, setActiveTransferUnits, loadDates } = props;
+const TransferUnits = ({ nameStore, storeDepot, productId, setActiveTransferUnits, loadData }: TransferUnitsProps) => {
 
     const params = useParams()
 
@@ -45,7 +37,7 @@ function TransferUnits(props: any) {
 
     const maxUnits = {
         cant: (swap)
-            ? storeDepot.product_remaining_units
+            ? storeDepot?.product_remaining_units
             : selectedWarehouseDepot?.product_total_remaining_units,
 
         text: `Cantidad insuficiente en ${swap
@@ -64,7 +56,7 @@ function TransferUnits(props: any) {
 
     const recordTransaction = async (direction: boolean, transferredUnits: number) => {
         const data = {
-            store_depot_id: storeDepot.id,
+            store_depot_id: storeDepot?.id,
             units_transferred_quantity: transferredUnits,
             transfer_direction: direction ? transactionToWarehouse : transactionToStore
         }
@@ -82,9 +74,9 @@ function TransferUnits(props: any) {
                 depotId: selectedWarehouseDepot.id,
                 product_total_remaining_units: selectedWarehouseDepot.product_total_remaining_units - valueUnits,
 
-                storeDepotId: storeDepot.id,
-                product_remaining_units: storeDepot.product_remaining_units + valueUnits,
-                product_units: storeDepot.product_units + valueUnits
+                storeDepotId: storeDepot?.id,
+                product_remaining_units: storeDepot?.product_remaining_units! + valueUnits,
+                product_units: storeDepot?.product_units! + valueUnits
             }
 
         } else {
@@ -92,9 +84,9 @@ function TransferUnits(props: any) {
                 depotId: selectedWarehouseDepot.id,
                 product_total_remaining_units: selectedWarehouseDepot.product_total_remaining_units + valueUnits,
 
-                storeDepotId: storeDepot.id,
-                product_remaining_units: storeDepot.product_remaining_units - valueUnits,
-                product_units: storeDepot.product_units
+                storeDepotId: storeDepot?.id,
+                product_remaining_units: storeDepot?.product_remaining_units! - valueUnits,
+                product_units: storeDepot?.product_units
             }
         }
 
@@ -102,7 +94,7 @@ function TransferUnits(props: any) {
 
         if (result === 200) {
             recordTransaction(swap, valueUnits)
-            loadDates()
+            loadData()
         }
         setActiveTransferUnits(false);
     }
@@ -144,7 +136,7 @@ function TransferUnits(props: any) {
                         </Grid>
 
                         <Grid item xs={12} order={swap ? 1 : 2}>
-                            <Typography variant='subtitle1'>Unidades en tienda: {storeDepot.product_remaining_units}</Typography>
+                            <Typography variant='subtitle1'>Unidades en tienda: {storeDepot?.product_remaining_units}</Typography>
                         </Grid>
                     </Grid>
 

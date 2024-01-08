@@ -6,7 +6,7 @@ import StoreModalDefault from './Modal/StoreModalDefault'
 import StoreEditSellerProfit from './Modal/StoreEditSellerProfit'
 
 function StoreMoreDetails(props: any) {
-    const { userId, details, show, loadDates, row } = props
+    const { userId, details, show, loadData, row } = props
 
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
 
@@ -31,7 +31,7 @@ function StoreMoreDetails(props: any) {
                     userId={userId}
                     storeDepot={details}
                     setActiveModalSellerProfit={setActiveModalSellerProfit}
-                    loadDates={loadDates}
+                    loadData={loadData}
                 />
             </StoreModalDefault>
 

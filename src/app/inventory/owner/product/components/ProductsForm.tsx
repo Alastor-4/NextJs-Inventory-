@@ -1,52 +1,42 @@
-//@ts-nocheck
 "use client"
 
-import {
-    Avatar,
-    Badge,
-    Box,
-    Button,
-    FormControlLabel,
-    Grid,
-    IconButton,
-    MenuItem,
-    TextField,
-    Typography
-} from "@mui/material";
-import React, { useEffect } from "react";
-import { Formik } from "formik";
-import * as Yup from "yup"
+import { Avatar, Badge, Box, Button, FormControlLabel, Grid, IconButton, MenuItem, TextField, Typography } from "@mui/material";
 import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-material";
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import { departments, characteristics, images } from '@prisma/client';
+import { ProductsFormProps, productsProps } from "@/types/interfaces";
+import useImageUploadContext from "@/providers/ImageUploadProvider";
 import { handleKeyDownWithDot } from "@/utils/handleKeyDown";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import products from "../requests/products";
-import useImageUploadContext from "@/providers/ImageUploadProvider";
-import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import { AxiosResponse } from 'axios';
+import { Formik } from "formik";
+import * as Yup from "yup"
 
-export default function ProductsForm(props: any) {
-    const { userId, departments, productId, setOpen } = props
+export const ProductsForm = ({ userId, departments, productId, setOpen, handleForceRender }: ProductsFormProps) => {
 
-    const [updateItem, setUpdateItem] = React.useState()
+    const [updateItem, setUpdateItem] = useState<productsProps | null>(null);
 
-    const { startImagesUpload } = useImageUploadContext()
+    const { startImagesUpload }: any = useImageUploadContext();
 
     //initial values
-    const [department, setDepartment] = React.useState("");
+    const [department, setDepartment] = useState<departments | null>();
 
     useEffect(() => {
-        async function fetchProduct(id: string) {
+        async function fetchProduct(id: number) {
             const product = await products.productDetails(id)
-            setUpdateItem(product)
+            setUpdateItem(product);
 
             if (product?.departments?.id) {
-                const index = departments.findIndex((item: { id: any; }) => item.id === product.departments.id)
-                if (index > -1) {
-                    setDepartment(departments[index])
+                const index = departments?.findIndex((item: { id: any; }) => item.id === product.departments.id);
+                if (index && index! > -1) {
+                    setDepartment(departments![index]!)
                 }
             }
         }
         if (productId !== null) {
-            fetchProduct(productId)
+            fetchProduct(productId!);
         }
     }, [productId, userId, setUpdateItem, departments])
 
@@ -55,7 +45,7 @@ export default function ProductsForm(props: any) {
         description: updateItem?.description ? updateItem.description : "",
         buyPrice: updateItem?.buy_price ? updateItem.buy_price : "",
         imagesMaxErrorField: "",
-        department: department,
+        department: '',
         characteristics: updateItem?.characteristics?.length ? updateItem.characteristics : [],
         deletedCharacteristics: [],
         images: updateItem?.images?.length ? updateItem.images : [],
@@ -71,19 +61,19 @@ export default function ProductsForm(props: any) {
         buyPrice: Yup.number().nullable(),
         images: Yup.array(),
         imagesMaxErrorField: Yup.string(),
-        department: Yup.object().required("Debes seleccionar un departamento"),
+        department: Yup.number().required("Debes seleccionar un departamento"),
         characteristics: Yup.array().of(Yup.object()),
         characteristicName: Yup.string().nullable(),
         characteristicValue: Yup.string().nullable(),
     })
 
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (values: any) => {
         let data = {
-            id: undefined,
+            id: -1,
             name: values.name,
             description: values.description,
             buyPrice: values.buyPrice,
-            departmentId: values.department.id,
+            departmentId: values.department,
             userId: userId,
             characteristics: null,
             deletedCharacteristics: values.deletedCharacteristics.length ? values.deletedCharacteristics : null,
@@ -92,50 +82,50 @@ export default function ProductsForm(props: any) {
         }
 
         if (values.characteristics.length) {
-            const newCharacteristics = values.characteristics.filter(item => !item.id)
+            const newCharacteristics = values.characteristics.filter((item: characteristics) => !item.id)
             data.characteristics = newCharacteristics.length ? newCharacteristics : null
         }
 
         if (values.deletedImages.length) {
-            data.deletedImages = values.deletedImages.map(item => ({ id: item.id, fileKey: item.fileKey }))
+            data.deletedImages = values.deletedImages.map((item: images) => ({ id: item.id, fileKey: item.fileKey }))
         }
 
-        let response
+        let response: AxiosResponse | boolean;
 
         if (updateItem) {
             data.id = updateItem.id
 
-            response = await products.update(data)
+            response = await products.update(data);
         } else {
-            response = await products.create(data)
+            response = await products.create(data);
         }
 
-        if (response.status === 200) {
-            if (values.images.length) {
-                const newImages = values.images.filter(item => !item.fileKey)
-                if (newImages.length) {
-                    startImagesUpload(response.data.id, newImages)
+        if (response)
+            if (response.status === 200) {
+                if (values.images.length) {
+                    const newImages = values.images.filter((item: images) => !item.fileKey)
+                    if (newImages.length) {
+                        startImagesUpload(response.data.id, newImages)
+                    }
                 }
+
+                notifySuccess(
+                    updateItem
+                        ? "Se ha modificado el producto"
+                        : "Se ha creado el producto"
+                )
+            } else {
+                notifyError(
+                    updateItem
+                        ? "Error al modificar el producto"
+                        : "Error al crear el producto"
+                )
             }
-
-            notifySuccess(
-                updateItem
-                    ? "Se ha modificado el producto"
-                    : "Se ha creado el producto"
-            )
-        } else {
-            notifyError(
-                updateItem
-                    ? "Error al modificar el producto"
-                    : "Error al crear el producto"
-            )
-
-        }
-
-        setOpen(false)
+        setOpen(false);
+        handleForceRender();
     }
 
-    function handleAddCharacteristic(formik) {
+    function handleAddCharacteristic(formik: any) {
         if (formik.values.characteristicName && formik.values.characteristicValue) {
             let characteristics = [...formik.values.characteristics, { name: formik.values.characteristicName, value: formik.values.characteristicValue }]
             formik.setFieldValue("characteristics", characteristics)
@@ -152,7 +142,7 @@ export default function ProductsForm(props: any) {
         }
     }
 
-    function handleRemoveCharacteristic(formik, index) {
+    function handleRemoveCharacteristic(formik: any, index: any) {
         let characteristics = [...formik.values.characteristics]
 
         if (characteristics[index].id) {
@@ -164,15 +154,15 @@ export default function ProductsForm(props: any) {
         formik.setFieldValue("characteristics", characteristics)
     }
 
-    function MyDropzone({ formik }) {
-        function onDrop(acceptedFiles) {
+    function MyDropzone({ formik }: any) {
+        function onDrop(acceptedFiles: any) {
             const newFiles = [...acceptedFiles]
             let addedFiles = [...formik.values.images]
 
             newFiles.forEach((newFile) => {
                 //only 1 image allowed
                 if (addedFiles.length < 1) {
-                    const index = formik.values.images.findIndex((item) => item.name === newFile.name)
+                    const index = formik.values.images.findIndex((item: any) => item.name === newFile.name)
                     if (index < 0) {
                         newFile.fileUrl = URL.createObjectURL(newFile)
                         addedFiles.push(newFile)
@@ -233,10 +223,9 @@ export default function ProductsForm(props: any) {
         )
     }
 
-    function handleRemoveImage(formik, deletedItem) {
+    function handleRemoveImage(formik: any, deletedItem: any) {
         let images = formik.values.images
-
-        let deleteIndex = formik.values.images.findIndex((item) => item.name === deletedItem.name)
+        let deleteIndex = formik.values.images.findIndex((item: any) => item.name === deletedItem.name)
         if (images[deleteIndex].id) {
             const deletedImage = formik.values.deletedImages
             deletedImage.push(images[deleteIndex])
@@ -244,13 +233,11 @@ export default function ProductsForm(props: any) {
         } else {
             URL.revokeObjectURL(images[deleteIndex].preview)
         }
-
         images.splice(deleteIndex, 1)
-
         formik.setFieldValue("images", [...images])
     }
 
-    const thumbs = (formik) => formik.values.images.map((file) => (
+    const thumbs = (formik: any) => formik.values.images.map((file: any) => (
         <Badge
             key={file.name ? file.name : file.fileKey}
             overlap={"circular"}
@@ -270,65 +257,55 @@ export default function ProductsForm(props: any) {
         >
             {
                 (formik) => (
-
                     <form onSubmit={formik.handleSubmit}>
                         <Grid container rowSpacing={2}>
-
                             <Grid container item rowSpacing={4} >
                                 <Grid item xs={12}>
                                     <TextField
-                                        name={"Nombre*"}
                                         label="Nombre"
                                         size={"small"}
                                         fullWidth
                                         {...formik.getFieldProps("name")}
-                                        error={formik.errors.name && formik.touched.name}
+                                        error={!!formik.errors.name && formik.touched.name}
                                         helperText={(formik.errors.name && formik.touched.name) && formik.errors.name}
                                     />
                                 </Grid>
-
                                 <Grid item xs={12}>
                                     <TextField
-                                        name={"description"}
                                         label="Descripción"
                                         size={"small"}
                                         fullWidth
                                         {...formik.getFieldProps("description")}
-                                        error={formik.errors.description && formik.touched.description}
+                                        error={!!formik.errors.description && formik.touched.description}
                                         helperText={(formik.errors.description && formik.touched.description) && formik.errors.description}
                                     />
                                 </Grid>
-
                                 <Grid item xs={12}>
                                     <TextField
-                                        name={"buyPrice"}
                                         label="Precio de compra"
                                         size={"small"}
                                         onKeyDown={handleKeyDownWithDot}
                                         fullWidth
                                         {...formik.getFieldProps("buyPrice")}
-                                        error={formik.errors.buyPrice && formik.touched.buyPrice}
+                                        error={!!formik.errors.buyPrice && formik.touched.buyPrice}
                                         helperText={(formik.errors.buyPrice && formik.touched.buyPrice) && formik.errors.buyPrice}
                                     />
                                 </Grid>
-
                                 <Grid item xs={12}>
                                     <TextField
-                                        name={"department"}
                                         label="Departamento"
                                         size={"small"}
                                         fullWidth
                                         select
                                         {...formik.getFieldProps("department")}
-                                        error={formik.errors.department && formik.touched.department}
+                                        error={!!formik.errors.department && formik.touched.department}
                                         helperText={(formik.errors.department && formik.touched.department) && formik.errors.department}
                                     >
                                         {
-                                            departments?.map(item => (<MenuItem key={item.id} value={item}>{item.name}</MenuItem>))
+                                            departments?.map((item: departments) => (<MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>))
                                         }
                                     </TextField>
                                 </Grid>
-
                                 <Grid item container xs={12} rowSpacing={2}>
                                     <Grid item xs={12} sx={{ paddingX: "15px" }}>
                                         <FormControlLabel
@@ -357,7 +334,7 @@ export default function ProductsForm(props: any) {
                                                 >
                                                     <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
                                                         <Typography variant={"caption"} sx={{ color: "white", fontWeight: "600" }}>
-                                                            {item.name.toUpperCase()}
+                                                            {item?.name!.toUpperCase()}
                                                         </Typography>
                                                     </Grid>
                                                     <Grid container item alignItems={"center"} sx={{ color: "rgba(16,27,44,0.8)" }}>
@@ -382,29 +359,26 @@ export default function ProductsForm(props: any) {
                                             )
                                         }
                                     </Grid>
-
                                     {
                                         formik?.values?.displayCharacteristicForm && (
                                             <Grid container item xs={12} spacing={2}>
                                                 <Grid item xs={12}>
                                                     <TextField
-                                                        name={"characteristicName"}
                                                         label="Característica"
                                                         size={"small"}
                                                         fullWidth
                                                         {...formik.getFieldProps("characteristicName")}
-                                                        error={formik.errors.characteristicName && formik.touched.characteristicName}
+                                                        error={!!formik.errors.characteristicName && formik.touched.characteristicName}
                                                         helperText={(formik.errors.characteristicName && formik.touched.characteristicName) && formik.errors.characteristicName}
                                                     />
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <TextField
-                                                        name={"characteristicValue"}
                                                         label="Valor"
                                                         size={"small"}
                                                         fullWidth
                                                         {...formik.getFieldProps("characteristicValue")}
-                                                        error={formik.errors.characteristicValue && formik.touched.characteristicValue}
+                                                        error={!!formik.errors.characteristicValue && formik.touched.characteristicValue}
                                                         helperText={(formik.errors.characteristicValue && formik.touched.characteristicValue) && formik.errors.characteristicValue}
                                                     />
                                                 </Grid>
@@ -412,7 +386,6 @@ export default function ProductsForm(props: any) {
                                                     <IconButton color={"primary"} onClick={() => handleAddCharacteristic(formik)}>
                                                         <Done color={"primary"} />
                                                     </IconButton>
-
                                                     <IconButton onClick={() => formik.setFieldValue("displayCharacteristicForm", false)}>
                                                         <Close />
                                                     </IconButton>
@@ -420,7 +393,6 @@ export default function ProductsForm(props: any) {
                                             </Grid>
                                         )
                                     }
-
                                     <Grid item xs={12} sx={{ mt: "15px" }}>
                                         <MyDropzone formik={formik} />
                                     </Grid>
@@ -429,9 +401,7 @@ export default function ProductsForm(props: any) {
                                     </Grid>
                                 </Grid>
                             </Grid>
-
                             <Grid item sx={{ paddingX: "1.5em" }} xs={12} >
-
                                 <Button
                                     type={"submit"}
                                     fullWidth
@@ -445,10 +415,10 @@ export default function ProductsForm(props: any) {
                             </Grid>
                         </Grid>
                     </form>
-
                 )
             }
         </Formik>
-
     )
 }
+
+export default ProductsForm

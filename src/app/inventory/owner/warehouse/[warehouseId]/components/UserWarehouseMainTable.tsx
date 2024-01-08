@@ -55,13 +55,16 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     const [activeModalAddProduct, setActiveModalAddProduct] = useState(false);
 
     const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
-    const toggleModalFilter = () => setIsFilterModalOpen(!isFilterModalOpen);
+    const toggleModalFilter = () => {
+        if (!dataProducts) return;
+        setIsFilterModalOpen(!isFilterModalOpen);
+    }
 
     const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
     const handleTooltipClose = () => setIsOpenTooltip(false);
     const handleTooltipOpen = () => setIsOpenTooltip(true);
 
-    const [forceRender, setForceRender] = useState(true);
+    const [forceRender, setForceRender] = useState<boolean>(true);
 
     const handleForceRender = () => {
         setForceRender(true);

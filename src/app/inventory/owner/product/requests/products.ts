@@ -17,7 +17,7 @@ const products = {
         return false
     },
 
-    productDetails: async function (productId) {
+    productDetails: async function (productId: number) {
         try {
             const response = await apiRequest.get(updateUrl, { params: { productId: productId } })
             return response.data
