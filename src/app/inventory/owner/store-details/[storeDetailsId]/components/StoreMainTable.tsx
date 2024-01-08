@@ -1,127 +1,127 @@
 "use client"
 
-import React, {useState} from "react";
 import {
-    AppBar,
-    Avatar,
-    AvatarGroup,
-    Box,
-    Card,
-    CardContent,
-    Grid,
-    IconButton,
-    Switch,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Toolbar,
-    Tooltip,
-    Typography
+    AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent, Grid,
+    IconButton, InputBase, Switch, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Toolbar, Tooltip, Typography
 } from "@mui/material";
-import { TableNoData } from "@/components/TableNoData";
 import {
-    AddOutlined,
-    ArrowLeft,
-    DescriptionOutlined,
-    EditOutlined,
-    ExpandLessOutlined,
-    ExpandMoreOutlined,
-    ShareOutlined,
-    SwapHoriz
+    AddOutlined, ArrowLeft, DescriptionOutlined, EditOutlined,
+    ExpandLessOutlined, ExpandMoreOutlined, FilterAlt, HelpOutline, ShareOutlined, SwapHoriz
 } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
-import { Formik } from "formik";
-import StoreMoreDetails from "./StoreMoreDetails";
+import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse";
+import { StoreMainTableProps, allProductsByDepartmentProps, productsProps, storeWithStoreDepots } from "@/types/interfaces";
+import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
+import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import StoreModalDefault from "./Modal/StoreModalDefault";
+import { numberFormat } from "@/utils/generalFunctions";
+import { TableNoData } from "@/components/TableNoData";
+import { storeDetails } from "../request/storeDetails";
+import { images, store_depots } from "@prisma/client";
 import StoreModalPrice from "./Modal/StoreModalPrice"
 import StoreEditPrice from "./Modal/StoreEditPrice";
-import { storeDetails } from "../request/storeDetails";
-import StoreModalDefault from "./Modal/StoreModalDefault";
-import TransferUnits from "./Modal/TransferUnits";
-import StoreEditUnits from "./Modal/StoreEditUnits";
-import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse";
-import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
-import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
-import { numberFormat } from "@/utils/generalFunctions";
 import stores from "../../../store/requests/stores";
-import DepartmentCustomButton from "@/components/DepartmentCustomButton";
-import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
+import StoreEditUnits from "./Modal/StoreEditUnits";
+import React, { useEffect, useState } from "react";
+import StoreMoreDetails from "./StoreMoreDetails";
+import TransferUnits from "./Modal/TransferUnits";
+import { useRouter } from "next/navigation";
+import { Formik } from "formik";
+import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
+import InfoTooltip from "@/components/InfoTooltip";
+import SearchIcon from '@mui/icons-material/Search';
 
-const fetcher = (url: any) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function StoreMainTable({ userId, storeDetailsId }: { userId?: number, storeDetailsId: number }) {
-    const router = useRouter()
+export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps) => {
+    const router = useRouter();
 
     // Guardan datos de bd
-    const [data, setData] = React.useState<any>([])
-    const [allProductsByDepartment, setAllProductsByDepartment] = React.useState([])
-    const [dataStore, setDataStore] = React.useState<any>('')
+    const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
+    const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
+
+    const [dataStore, setDataStore] = useState<storeWithStoreDepots | null>(dataStoreDetails);
 
     // Se usan habilitar modales o detalles
-    const [showDetails, setShowDetails] = React.useState<any>('')
-    const [activeModalPrice, setActiveModalPrice] = React.useState({ active: false, storeDepot: [] })
-    const [activeModalTransferUnits, setActiveModalTransferUnits] = React.useState(false);
-    const [activeModalEditUnits, setActiveModalEditUnits] = React.useState(false);
-    const [activeAddProductFromWarehouse, setActiveAddProductFromWarehouse] = React.useState(false)
+    const [showDetails, setShowDetails] = useState<number>(-1);
+    const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: store_depots | null }>({ active: false, storeDepot: null });
+    const [activeModalTransferUnits, setActiveModalTransferUnits] = useState<boolean>(false);
+    const [activeModalEditUnits, setActiveModalEditUnits] = useState<boolean>(false);
+    const [activeAddProductFromWarehouse, setActiveAddProductFromWarehouse] = useState<boolean>(false);
 
     // Almacena el ind de la row seleccionada
     // modal q la usan:  TransferUnits , StoreEditUnits
-    const [selectedRowInd, setSelectedRowInd] = React.useState<any>(null);
+    const [selectedRowInd, setSelectedRowInd] = useState<number>(-1);
 
-    //get initial data
-    React.useEffect(() => {
-        fetcher(`/inventory/owner/store-details/${storeDetailsId}/api`).then((data) =>
-            setAllProductsByDepartment(data.map((item: any) => ({
-                ...item,
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
+    const toggleModalFilter = () => {
+        if (!dataProducts) return;
+        setIsFilterModalOpen(!isFilterModalOpen);
+    }
+
+    const [forceRender, setForceRender] = useState<boolean>(true);
+
+    const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
+    const handleTooltipClose = () => setIsOpenTooltip(false);
+    const handleTooltipOpen = () => setIsOpenTooltip(true);
+
+    const handleForceRender = () => {
+        setForceRender(true);
+        setSelectedDepartments(null);
+    }
+
+    //GET initial data
+    useEffect(() => {
+        fetcher(`/inventory/owner/store-details/${dataStoreDetails?.id}/api`).then((data: allProductsByDepartmentProps[]) =>
+            setAllProductsByDepartment(data.map((productsByDepartments: allProductsByDepartmentProps) => ({
+                ...productsByDepartments,
                 selected: false
-            }))))
-    }, [storeDetailsId])
+            }))));
+    }, [dataStoreDetails]);
 
-    React.useEffect(() => {
-        if (allProductsByDepartment.length) {
-            let allProducts: any = []
-
-            allProductsByDepartment.forEach((departmentItem: any) => {
-                if (departmentItem.selected) {
-                    allProducts = [...allProducts, ...departmentItem.products]
+    //Update allProducts at change
+    useEffect(() => {
+        if (allProductsByDepartment?.length) {
+            let allProducts: productsProps[] = [];
+            let bool = false;
+            if (selectedDepartments) {
+                for (const department of selectedDepartments!) if (department.selected === true) bool = true;
+            }
+            allProductsByDepartment?.forEach((productsByDepartments) => {
+                if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
+                    allProducts = [...allProducts, ...productsByDepartments.products!];
                 }
-            })
+                if (selectedDepartments?.length! > 0 && bool) {
+                    if (productsByDepartments.selected) {
+                        allProducts = [...allProducts, ...productsByDepartments.products!];
+                    }
+                }
+            });
 
-            allProducts.sort((a: any, b: any) => {
-                if (a.name < b.name)
-                    return -1
-
-                if (a.name > a.name)
-                    return 1
-
-                return 0
-            })
-
-            setData(allProducts)
+            allProducts.sort((a: productsProps, b: productsProps) => {
+                if (a?.name! < b?.name!) return -1;
+                if (a?.name! > a?.name!) return 1;
+                return 0;
+            });
+            setDataProducts(allProducts);
         }
+    }, [allProductsByDepartment, selectedDepartments, isFilterModalOpen]);
 
-    }, [allProductsByDepartment])
-
-    //Get Store name
-    React.useEffect(() => {
+    //GET store name
+    useEffect(() => {
         const getDataStore = async () => {
-            const datastore = await stores.storeDetails(userId!, storeDetailsId);
+            const datastore = await stores.storeDetails(userId!, dataStoreDetails?.id!);
             setDataStore(datastore);
         }
-        if (dataStore === '') {
-            getDataStore()
-        }
+        if (!dataStore) getDataStore();
 
-    }, [dataStore, storeDetailsId, userId, setDataStore])
+    }, [dataStoreDetails?.id, userId, dataStore]);
 
-    function handleNavigateBack() {
-        router.back()
-    }
+    const handleNavigateBack = () => router.back();
     // active - noActive
-    const updateProductActive = async (product: any) => {
+    const updateProductActive = async (product: store_depots) => {
         const data = {
             id: product.id,
             store_id: product.store_id,
@@ -138,10 +138,9 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
         }
         const response = await storeDetails.update(product.id, data)
         if (response === 200) {
-            await loadDates();
+            await loadData();
         }
     }
-
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -159,12 +158,12 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                             color: "white",
                         }}
                     >
-                        Productos {dataStore.name}
+                        {dataStore ? dataStore.name : 'Productos'}
                     </Typography>
                 </Box>
 
                 <Box sx={{ display: "flex" }}>
-                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/owner/store-assign?storeId=${dataStore.id}`)} >
+                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/owner/store-assign?storeId=${dataStore?.id}`)} >
                         <ShareOutlined fontSize={"small"} />
                     </IconButton>
                     <IconButton color={"inherit"} onClick={() => setActiveAddProductFromWarehouse(true)} >
@@ -180,32 +179,26 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
             {
                 id: "name",
                 label: "Nombre",
-                align: "left"
             },
             {
                 id: "departaments",
                 label: "Departamento",
-                align: "left"
             },
             {
                 id: "buy_Price",
                 label: "Precio",
-                align: "left"
             },
             {
                 id: "units",
                 label: "Unidades",
-                align: "left"
             },
             {
                 id: "Active",
                 label: "Estado",
-                align: "left"
             },
             {
                 id: "details",
                 label: "",
-                align: "left"
             },
         ]
 
@@ -226,42 +219,41 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
         )
     }
 
-    const loadDates = async () => {
-        let newAllProductsByDepartment = await storeDetails.getAllProductsByDepartment(storeDetailsId);
-
-        let selectedDepartment = allProductsByDepartment.filter((element: any) => (element.selected)).map((element: any) => element.id)
-
-        newAllProductsByDepartment = newAllProductsByDepartment.map((element: any) => ({
-            ...element,
-            selected: (selectedDepartment.includes(element.id))
-        }))
-        setAllProductsByDepartment(newAllProductsByDepartment);
+    const loadData = async () => {
+        let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await storeDetails.getAllProductsByDepartment(dataStore?.id!);
+        if (newAllProductsByDepartment) {
+            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
+                ...productsByDepartments,
+                selected: false
+            }))
+            setAllProductsByDepartment(newAllProductsByDepartment);
+        }
     }
 
-    const [openImageDialog, setOpenImageDialog] = useState(false);
-    const [dialogImages, setDialogImages] = useState([])
+    const [openImagesDialog, setOpenImagesDialog] = useState(false);
+    const [dialogImages, setDialogImages] = useState<images[] | null>();
 
-    function handleOpenImagesDialog(images: any) {
+    const handleOpenImagesDialog = (images: images[]) => {
         setDialogImages(images)
-        setOpenImageDialog(true)
+        setOpenImagesDialog(true)
     }
 
     const TableContent = ({ formik }: { formik: any }) => {
         return (
             <TableBody>
-                {data.filter(
-                    (item: any) =>
-                        item.name.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                            (row: any, index: number) => {
+                {dataProducts?.filter(
+                    (product: productsProps) =>
+                        product?.name!.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
+                            (product: productsProps, index: number) => {
 
-                                const baseProductPrice = row.depots[0].store_depots[0].sell_price === "0"
+                                const baseProductPrice = +product?.depots![0].store_depots![0].sell_price! === 0
                                     ? null
-                                    : numberFormat(row.depots[0].store_depots[0].sell_price)
+                                    : numberFormat(`${product?.depots![0].store_depots![0].sell_price}`)
 
                                 const priceDiscountQuantity = baseProductPrice
-                                    ? row.depots[0].store_depots[0].price_discount_percentage
-                                        ? row.depots[0].store_depots[0].price_discount_percentage * parseFloat(String(baseProductPrice)) / 100
-                                        : row.depots[0].store_depots[0].price_discount_quantity
+                                    ? product?.depots![0].store_depots![0].price_discount_percentage
+                                        ? product?.depots![0].store_depots![0].price_discount_percentage * parseFloat(String(baseProductPrice)) / 100
+                                        : product?.depots![0].store_depots![0].price_discount_quantity
                                     : null
 
                                 const finalProductPrice = baseProductPrice && priceDiscountQuantity
@@ -269,66 +261,63 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                                     : baseProductPrice
 
                                 const displayProductPrice = finalProductPrice
-                                    ? `${numberFormat(String(finalProductPrice)) + " " + row.depots[0].store_depots[0].sell_price_unit}`
+                                    ? `${numberFormat(`${finalProductPrice}`) + " " + product?.depots![0].store_depots![0].sell_price_unit}`
                                     : "sin precio"
 
                                 const displayPriceDiscount = baseProductPrice
-                                    ? row.depots[0].store_depots[0].price_discount_percentage
-                                        ? numberFormat(row.depots[0].store_depots[0].price_discount_percentage) + " %"
-                                        : row.depots[0].store_depots[0].price_discount_quantity
-                                            ? numberFormat(row.depots[0].store_depots[0].price_discount_quantity) + " " + row.depots[0].store_depots[0].sell_price_unit
+                                    ? product?.depots![0].store_depots![0].price_discount_percentage
+                                        ? numberFormat(`${product?.depots![0].store_depots![0].price_discount_percentage}`) + " %"
+                                        : product?.depots![0].store_depots![0].price_discount_quantity
+                                            ? numberFormat(`${product?.depots![0].store_depots![0].price_discount_quantity}`) + " " + product.depots[0].store_depots[0].sell_price_unit
                                             : null
                                     : null
 
                                 return (
-                                    <React.Fragment key={row.id}>
+                                    <React.Fragment key={product.id}>
                                         <TableRow
                                             hover
                                             tabIndex={-1}
-                                            onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
+                                            onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
                                         >
                                             <TableCell>
                                                 {
-                                                    row.images?.length! > 0 && (
+                                                    product.images?.length! > 0 && (
                                                         <Box display={"flex"} justifyContent={"center"}>
                                                             <AvatarGroup
                                                                 max={2}
-                                                                sx={{flexDirection: "row", width: "fit-content"}}
+                                                                sx={{ flexDirection: "row", width: "fit-content" }}
                                                                 onClick={(e) => {
                                                                     e.stopPropagation()
-                                                                    handleOpenImagesDialog(row.images!)
+                                                                    handleOpenImagesDialog(product.images!)
                                                                 }}
                                                             >
-                                                                {row.images.map(
-                                                                    (imageItem: any) => <Avatar
+                                                                {product?.images?.map(
+                                                                    (imageItem: images) => <Avatar
                                                                         variant={"rounded"}
                                                                         key={`producto-${imageItem.id}`}
                                                                         alt={`producto-${imageItem.id}`}
                                                                         src={imageItem.fileUrl!}
-                                                                        sx={{cursor: "pointer", border: "1px solid lightblue"}}
+                                                                        sx={{ cursor: "pointer", border: "1px solid lightblue" }}
                                                                     />
                                                                 )}
                                                             </AvatarGroup>
                                                         </Box>
                                                     )
                                                 }
-
-                                                <Box display={"flex"} justifyContent={"center"}>
-                                                    {row.name}
+                                                <Box display={"flex"} >
+                                                    {product.name}
                                                 </Box>
                                             </TableCell>
-
                                             <TableCell>
-                                                {row.departments?.name}
+                                                {product.departments?.name}
                                             </TableCell>
-
                                             <TableCell>
                                                 <Grid container rowSpacing={1}>
                                                     <Grid item xs={12}>
                                                         <div
                                                             onClick={(e: any) => {
                                                                 e.stopPropagation()
-                                                                setActiveModalPrice({ active: true, storeDepot: { ...row.depots[0].store_depots[0] } })
+                                                                setActiveModalPrice({ active: true, storeDepot: { ...product?.depots![0].store_depots![0] } });
                                                             }}
                                                         >
                                                             <MoneyInfoTag
@@ -336,12 +325,10 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                                                                 errorColor={!baseProductPrice}
                                                             />
                                                         </div>
-
-                                                        {row.depots[0].store_depots[0]._count.product_offers > 0 && (
+                                                        {product?.depots![0].store_depots![0].product_offers?.length! && (
                                                             <DescriptionOutlined fontSize={"small"} />
                                                         )}
                                                     </Grid>
-
                                                     {
                                                         displayPriceDiscount && (
                                                             <Grid item xs={12}>
@@ -350,24 +337,22 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                                                                         e.stopPropagation()
                                                                         setActiveModalPrice({
                                                                             active: true,
-                                                                            storeDepot: {...row.depots[0].store_depots[0]}
+                                                                            storeDepot: { ...product?.depots![0].store_depots![0] }
                                                                         })
                                                                     }}
                                                                 >
-                                                                    <InfoTag value={`- ${displayPriceDiscount}`}/>
+                                                                    <InfoTag value={`- ${displayPriceDiscount}`} />
                                                                 </div>
                                                             </Grid>
                                                         )
                                                     }
                                                 </Grid>
                                             </TableCell>
-
                                             <TableCell>
                                                 <Grid container rowSpacing={1}>
                                                     <Grid container item xs={12} justifyContent={"center"}>
-                                                        {`${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units} `}
+                                                        {`${product?.depots![0].store_depots![0].product_remaining_units} de ${product?.depots![0].store_depots![0].product_units}`}
                                                     </Grid>
-
                                                     <Grid container item xs={12} justifyContent={"center"} flexWrap={"nowrap"}>
                                                         <IconButton
                                                             size={"small"}
@@ -378,7 +363,6 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                                                             }}>
                                                             <SwapHoriz />
                                                         </IconButton>
-
                                                         <IconButton
                                                             size={"small"}
                                                             onClick={(e) => {
@@ -386,17 +370,16 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                                                                 setActiveModalEditUnits(true);
                                                                 setSelectedRowInd(index)
                                                             }}>
-                                                            <EditOutlined/>
+                                                            <EditOutlined />
                                                         </IconButton>
                                                     </Grid>
                                                 </Grid>
                                             </TableCell>
-
                                             <TableCell>
                                                 <Grid container>
-                                                    <Grid container item xs={12} justifyContent={"center"} flexWrap={"nowrap"} sx={{whiteSpace: "nowrap"}}>
+                                                    <Grid container item xs={12} justifyContent={"center"} flexWrap={"nowrap"} sx={{ whiteSpace: "nowrap" }}>
                                                         <Typography variant={"button"}>
-                                                            {row.depots[0].store_depots[0].is_active
+                                                            {product?.depots![0].store_depots![0].is_active
                                                                 ? "en venta"
                                                                 : "inactivo"
                                                             }
@@ -405,46 +388,42 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
                                                     <Grid container item xs={12} justifyContent={"center"}>
                                                         <Switch
                                                             size='small'
-                                                            checked={row.depots[0].store_depots[0].is_active}
+                                                            checked={product?.depots![0].store_depots![0].is_active!}
                                                             color={'success'}
                                                             disabled={!baseProductPrice}
                                                             onClick={(e) => {
                                                                 e.stopPropagation()
-                                                                return updateProductActive(row.depots[0].store_depots[0])
+                                                                return updateProductActive(product?.depots![0].store_depots![0])
                                                             }}
                                                         />
                                                     </Grid>
                                                 </Grid>
                                             </TableCell>
-
                                             <TableCell style={{ padding: 0 }} colSpan={5}>
-                                                <Tooltip title={"Details"}>
+                                                <Tooltip title={"Detalles"}>
                                                     <IconButton
                                                         size={"small"}
                                                         sx={{ m: "3px" }}
-                                                        onClick={(e) => setShowDetails((showDetails !== row.id) ? row.id : '')}
+                                                        onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
                                                     >
                                                         {
-                                                            (showDetails !== row.id)
+                                                            (showDetails !== product.id)
                                                                 ? <ExpandMoreOutlined />
                                                                 : <ExpandLessOutlined />
                                                         }
                                                     </IconButton>
                                                 </Tooltip>
                                             </TableCell>
-
-
                                         </TableRow>
-
                                         <TableRow >
                                             <TableCell style={{ padding: 0 }} colSpan={6}>
-                                                {showDetails === row.id && (
+                                                {showDetails === product.id && (
                                                     <StoreMoreDetails
                                                         userId={userId}
-                                                        details={row.depots[0].store_depots[0]}
-                                                        show={(showDetails === row.id)}
-                                                        loadDates={loadDates}
-                                                        row={row}
+                                                        details={product?.depots![0].store_depots![0]}
+                                                        show={(showDetails === product.id)}
+                                                        loadData={loadData}
+                                                        row={product}
                                                     />
                                                 )}
                                             </TableCell>
@@ -456,171 +435,135 @@ export default function StoreMainTable({ userId, storeDetailsId }: { userId?: nu
         )
     }
 
-    async function handleSelectFilter(index: number) {
-        let filters: any = [...allProductsByDepartment]
-        filters[index].selected = !filters[index].selected
-
-        setAllProductsByDepartment(filters)
-    }
-
-    const DepartmentsFilter = ({ formik }: { formik: any }) => {
-        const [displaySearchBar, setDisplaySearchBar] = React.useState(false)
-
-        return (
-            <Card variant={"outlined"} sx={{ padding: "15px" }}>
-                <Grid container rowSpacing={2}>
-                    <Grid item>
-                        <Typography variant={"subtitle2"}>
-                            Seleccione departamentos para encontrar el producto que busca
-                        </Typography>
-                    </Grid>
-                    <Grid container item columnSpacing={2} flexWrap={"nowrap"} sx={{overflowX: "auto", py: "7px"}}>
-                        {
-                            allProductsByDepartment.map((item: any, index: number) => (
-                                <Grid key={item.id} item xs={"auto"}>
-                                    <DepartmentCustomButton
-                                        title={item.name}
-                                        subtitle={`${item.products.length} productos`}
-                                        selected={item.selected}
-                                        onClick={() => handleSelectFilter(index)}
-                                    />
-                                </Grid>
-                            ))
-                        }
-                    </Grid>
-
-                    {
-                        data?.length > 0 && (
-                            <Grid container item rowSpacing={1}>
-                                <Grid item xs={12}>
-                                    <Typography variant={"subtitle2"}>
-                                        Puede buscar productos por nombre o descripción en los departamentos seleccionados aquí
-                                        <IconButton
-                                            onClick={() => setDisplaySearchBar(!displaySearchBar)}
-                                            sx={{ ml: "5px" }}
-                                        >
-                                            {displaySearchBar
-                                                ? <ExpandMoreOutlined fontSize={"small"} />
-                                                : <ExpandLessOutlined fontSize={"small"} />
-                                            }
-                                        </IconButton>
-                                    </Typography>
-                                </Grid>
-
-                                {
-                                    displaySearchBar && (
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                name={"handleChangeSearchBarValue"}
-                                                placeholder="Buscar producto..."
-                                                size={"small"}
-                                                fullWidth
-                                                {...formik.getFieldProps("searchBarValue")}
-                                            />
-                                        </Grid>
-                                    )
-                                }
-                            </Grid>
-                        )
-                    }
-                </Grid>
-            </Card>
-        )
-    }
-
-    const initialValues = {
-        searchBarValue: ""
-    }
-
     return (
-        <Formik
-            initialValues={initialValues}
-            onSubmit={() => {
+        <>
+            <CustomToolbar />
+            <FilterProductsByDepartmentsModal
+                allProductsByDepartment={allProductsByDepartment!}
+                setSelectedDepartments={setSelectedDepartments}
+                isFilterModalOpen={isFilterModalOpen}
+                toggleModalFilter={toggleModalFilter}
+            />
+            <ImagesDisplayDialog
+                open={openImagesDialog}
+                setOpen={setOpenImagesDialog}
+                images={dialogImages!}
+            />
 
-            }}
-        >
-            {
-                (formik) => (
-                    <Card variant={"outlined"}>
-                        <CustomToolbar />
+            <StoreModalPrice
+                dialogTitle={"Editar Precio"}
+                open={activeModalPrice.active}
+                setOpen={setActiveModalPrice}
+            >
+                <StoreEditPrice storeDepot={activeModalPrice.storeDepot!} setActiveModalPrice={setActiveModalPrice} loadData={loadData} />
+            </StoreModalPrice>
 
-                        <ImagesDisplayDialog
-                            open={openImageDialog}
-                            setOpen={setOpenImageDialog}
-                            images={dialogImages}
-                        />
+            <StoreModalDefault
+                dialogTitle={"Modificar Total"}
+                open={activeModalEditUnits}
+                setOpen={setActiveModalEditUnits}
+            >
+                <StoreEditUnits
+                    dataRow={selectedRowInd > 0 ? dataProducts![selectedRowInd]?.depots![0].store_depots![0] : null}
+                    setActiveModalEditUnits={setActiveModalEditUnits}
+                    loadData={loadData}
+                />
+            </StoreModalDefault>
 
-                        <StoreModalPrice
-                            dialogTitle={"Editar Precio"}
-                            open={activeModalPrice.active}
-                            setOpen={setActiveModalPrice}
-                        >
-                            <StoreEditPrice userId={userId} storeDepot={activeModalPrice.storeDepot} setActiveModalPrice={setActiveModalPrice} loadDates={loadDates} />
-                        </StoreModalPrice>
+            <StoreModalDefault
+                dialogTitle={"Transferir unidades"}
+                open={activeModalTransferUnits}
+                setOpen={setActiveModalTransferUnits}
+            >
+                <TransferUnits
+                    nameStore={dataStore?.name!}
+                    storeDepot={selectedRowInd > 0 ? dataProducts![selectedRowInd].depots![0].store_depots![0] : null}
+                    productId={selectedRowInd > 0 ? dataProducts![selectedRowInd].depots![0].product_id : null}
+                    setActiveTransferUnits={setActiveModalTransferUnits}
+                    loadData={loadData}
+                />
+            </StoreModalDefault>
 
-                        <StoreModalDefault
-                            dialogTitle={"Modificar Total"}
-                            open={activeModalEditUnits}
-                            setOpen={setActiveModalEditUnits}
-                        >
-                            <StoreEditUnits
-                                dataRow={data[selectedRowInd]?.depots[0].store_depots[0]}
-                                setActiveModalEditUnits={setActiveModalEditUnits}
-                                loadDates={loadDates}
-                                userId={userId}
-                            />
-                        </StoreModalDefault>
-
-                        <StoreModalDefault
-                            dialogTitle={"Transferir unidades"}
-                            open={activeModalTransferUnits}
-                            setOpen={setActiveModalTransferUnits}
-                        >
-                            <TransferUnits
-                                nameStore={dataStore.name}
-                                storeDepot={data[selectedRowInd]?.depots[0].store_depots[0]}
-                                productId={data[selectedRowInd]?.depots[0].product_id}
-                                setActiveTransferUnits={setActiveModalTransferUnits}
-                                loadDates={loadDates}
-                                userId={userId}
-                            />
-                        </StoreModalDefault>
-
-                        <ModalAddProductFromWarehouse
-                            dialogTitle={"Agregar productos"}
-                            open={activeAddProductFromWarehouse}
-                            setOpen={setActiveAddProductFromWarehouse}
-                            loadData={loadDates}
-                        >
-                            <AddProductFromWarehouse userId={userId} dataStore={dataStore} warehouseId={null} />
-                        </ModalAddProductFromWarehouse>
-
-                        <CardContent>
-                            {
-                                allProductsByDepartment.length > 0 && (
-                                    <DepartmentsFilter formik={formik} />
-                                )
-                            }
-
-                            {
-                                data?.length > 0
-                                    ? (
-                                        <TableContainer sx={{width: "100%", overflowX: "auto"}}>
-                                            <Table sx={{ width: "100%" }} size={"small"}>
-                                                <TableHeader />
-
-                                                <TableContent formik={formik} />
-                                            </Table>
-                                        </TableContainer>
-                                    ) : (
-                                        <TableNoData />
-                                    )
-                            }
-                        </CardContent>
-                    </Card>
-
-                )
-            }
-        </Formik>
+            <ModalAddProductFromWarehouse
+                dialogTitle={"Agregar productos"}
+                open={activeAddProductFromWarehouse}
+                setOpen={setActiveAddProductFromWarehouse}
+                loadData={loadData}
+            >
+                <AddProductFromWarehouse dataStore={dataStore!} warehouseId={null} />
+            </ModalAddProductFromWarehouse>
+            <Formik
+                initialValues={{ searchBarValue: "" }}
+                onSubmit={() => { }}
+            >
+                {
+                    (formik) => (
+                        <Card variant={"outlined"}>
+                            <CardContent>
+                                <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>
+                                    <Grid item container alignItems="center" justifyContent="center" sx={{ marginTop: "-10px" }}>
+                                        <Grid container item xs={"auto"} alignItems={"center"} >
+                                            <Typography variant="subtitle1" sx={{ fontWeight: "400" }}>Búsqueda avanzada</Typography>
+                                        </Grid>
+                                        <Grid container item xs={"auto"} alignItems={"center"}>
+                                            <InfoTooltip
+                                                isOpenTooltip={isOpenTooltip}
+                                                handleTooltipClose={handleTooltipClose}
+                                                message={"Puede buscar por nombre y descripción ó filtrar por departamentos"}
+                                            >
+                                                <IconButton onClick={handleTooltipOpen}>
+                                                    <HelpOutline />
+                                                </IconButton>
+                                            </InfoTooltip>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container spacing={2} alignItems="center">
+                                        <Grid item xs={true} md={8}>
+                                            <Grid item container xs={12} border={"1px solid gray"} borderRadius={"5px"} margin="4px" position="relative" >
+                                                <Grid item position="absolute" height="100%" paddingLeft="4px" display="flex" alignItems="center" justifyContent="center" >
+                                                    <SearchIcon color="action" />
+                                                </Grid>
+                                                <Grid item width="100%" paddingLeft="35px" >
+                                                    <InputBase
+                                                        placeholder="Buscar producto..."
+                                                        inputProps={{ 'aria-label': 'search' }}
+                                                        {...formik.getFieldProps("searchBarValue")}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                        <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
+                                            <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                        </Grid>
+                                    </Grid>
+                                </Card>
+                                <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
+                                    <Grid container rowSpacing={2}>
+                                        {
+                                            dataProducts?.length! > 0
+                                                ? (dataProducts?.filter(
+                                                    (product: productsProps) =>
+                                                        product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                                                        product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
+                                                    (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
+                                                        <Table sx={{ width: "100%" }} size={"small"}>
+                                                            <TableHeader />
+                                                            <TableContent formik={formik} />
+                                                        </Table>
+                                                    </TableContainer>) : <TableNoData searchCoincidence />
+                                                ) : (
+                                                    <TableNoData hasData={dataStoreDetails?.store_depots?.length!} />
+                                                )
+                                        }
+                                    </Grid>
+                                </Card>
+                            </CardContent>
+                        </Card>
+                    )
+                }
+            </Formik>
+        </>
     )
 }
+
+export default StoreMainTable
