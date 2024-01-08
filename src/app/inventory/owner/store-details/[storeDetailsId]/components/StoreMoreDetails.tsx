@@ -28,7 +28,6 @@ function StoreMoreDetails(props: any) {
                 setOpen={setActiveModalSellerProfit}
             >
                 <StoreEditSellerProfit
-                    userId={userId}
                     storeDepot={details}
                     setActiveModalSellerProfit={setActiveModalSellerProfit}
                     loadData={loadData}
