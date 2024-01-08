@@ -29,7 +29,6 @@ const ModalAddProduct = ({ open, setOpen, dialogTitle, children }: ModalUpdatePr
             <DialogContent>
                 {children}
             </DialogContent>
-
         </Dialog>
     )
 }

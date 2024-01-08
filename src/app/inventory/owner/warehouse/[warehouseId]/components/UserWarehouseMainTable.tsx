@@ -897,11 +897,11 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             isFilterModalOpen={isFilterModalOpen}
                             toggleModalFilter={toggleModalFilter}
                         />
+
                         <ModalAddProduct
                             open={activeModalAddProduct}
                             setOpen={setActiveModalAddProduct}
                             dialogTitle="Nuevo Depósito"
-                            handleForceRender={handleForceRender}
                         >
                             <UserWarehouseForm
                                 ownerId={ownerId}
