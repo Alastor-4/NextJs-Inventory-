@@ -1,15 +1,18 @@
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
 import StoreMainTable from "./components/StoreMainTable";
 import { getServerSession } from "next-auth";
+import { prisma } from "@/db";
+import { storeWithStoreDepots } from "@/types/interfaces";
 
-export default async function page({params}: {params: { storeDetailsId: number }}) {
+export default async function page({ params }: { params: { storeDetailsId: string } }) {
   const session = await getServerSession(nextAuthOptions);
   const userId = session?.user.id;
-  const storeDetailsId = params.storeDetailsId;
+  const storeDetailsId = +params.storeDetailsId!;
+  const dataStore: storeWithStoreDepots | null = await prisma.stores.findUnique({ where: { id: storeDetailsId }, include: { store_depots: true } });
 
   return (
     <main>
-      <StoreMainTable userId={userId} storeDetailsId={storeDetailsId} />
+      <StoreMainTable userId={userId} dataStoreDetails={dataStore!} />
     </ main>
   )
 }

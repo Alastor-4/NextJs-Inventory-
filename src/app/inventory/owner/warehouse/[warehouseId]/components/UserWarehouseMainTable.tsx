@@ -64,7 +64,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     const handleTooltipClose = () => setIsOpenTooltip(false);
     const handleTooltipOpen = () => setIsOpenTooltip(true);
 
-    const [forceRender, setForceRender] = useState(true);
+    const [forceRender, setForceRender] = useState<boolean>(true);
 
     const handleForceRender = () => {
         setForceRender(true);
