@@ -1,4 +1,4 @@
-import { characteristics, departments, depots, images, products, store_depots, stores, users, warehouses } from "@prisma/client";
+import { characteristics, departments, depots, images, product_offers, products, store_depots, stores, users, warehouses } from "@prisma/client";
 import { ReactNode } from "react";
 
 export interface ShowProductsStoreProps {
@@ -33,8 +33,14 @@ export interface ModalUpdateProductProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
     dialogTitle: string;
-    handleForceRender: () => void;
     children?: ReactNode;
+}
+export interface ProductsFormProps {
+    userId: number;
+    departments: departments[] | null;
+    productId: number | null;
+    handleForceRender: () => void;
+    setOpen: (bool: boolean) => void;
 }
 export interface ManageQuantityProps {
     userId: number;
@@ -56,6 +62,12 @@ export interface UpdateValueDialogProps {
     dialogTitle: string;
     children: ReactNode;
     formik?: any;
+}
+
+export interface StoreMainTableProps {
+    userId?: number;
+    // storeDetailsId: number;
+    dataStoreDetails: storeWithStoreDepots | null;
 }
 
 export interface ProductsMainTableProps {
@@ -103,7 +115,23 @@ export interface productsProps {
         product_total_units: number | null;
         product_total_remaining_units: number | null;
         created_at: Date;
-        store_depots?: store_depots[];
+        store_depots?: {
+            id: number;
+            store_id: number | null;
+            depot_id: number | null;
+            product_units: number | null;
+            product_remaining_units: number | null;
+            seller_profit_percentage: number | null;
+            created_at: Date;
+            is_active: boolean | null;
+            sell_price: number | null;
+            sell_price_unit: string | null;
+            seller_profit_quantity: number | null;
+            price_discount_percentage: number | null;
+            price_discount_quantity: number | null;
+            seller_profit_unit: string | null;
+            product_offers?: product_offers[] | null;
+        }[];
     }[];
     departments?: departments;
     images?: images[];
@@ -124,10 +152,62 @@ export interface productsProps {
         fixed_seller_profit_percentage: number | null;
         fixed_seller_profit_quantity: number | null;
         fixed_seller_profit_unit: string | null;
-        store_depots?: store_depots[];
+        store_depots?: {
+            id: number;
+            store_id: number | null;
+            depot_id: number | null;
+            product_units: number | null;
+            product_remaining_units: number | null;
+            seller_profit_percentage: number | null;
+            created_at: Date;
+            is_active: boolean | null;
+            sell_price: number | null;
+            sell_price_unit: string | null;
+            seller_profit_quantity: number | null;
+            price_discount_percentage: number | null;
+            price_discount_quantity: number | null;
+            seller_profit_unit: string | null;
+            product_offers?: product_offers[] | null;
+        }[];
     }[];
 }
 
+export interface StoreModalDefaultProps {
+    open: boolean;
+    setOpen: (bool: boolean) => void;
+    children?: ReactNode;
+    dialogTitle?: string;
+}
+
+export interface TransferUnitsProps {
+    nameStore: string | null;
+    storeDepot: store_depots | null;
+    productId: number | null
+    setActiveTransferUnits: (bool: boolean) => void;
+    loadData: () => Promise<void>;
+}
+export interface StoreEditUnitsProps {
+    loadData: () => Promise<void>;
+    setActiveModalEditUnits: (bool: boolean) => void;
+    dataRow: store_depots | null;
+}
+export interface StoreEditSellerProfitProps {
+    loadData: () => Promise<void>;
+    storeDepot: store_depots | null;
+    setActiveModalSellerProfit: (bool: boolean) => void;
+}
+export interface StoreEditPriceProps {
+    loadData: () => Promise<void>;
+    storeDepot: store_depots;
+    setActiveModalPrice: ({ active, storeDepot }: { active: boolean, storeDepot: store_depots | null }) => void;
+}
+
+export interface StoreModalPriceProps {
+    open: boolean;
+    setOpen: ({ active, storeDepot }: { active: boolean, storeDepot: store_depots | null }) => void;
+    children?: ReactNode;
+    dialogTitle?: string;
+}
 export interface allProductsByDepartmentProps {
     id: number;
     name: string | null;
