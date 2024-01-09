@@ -13,9 +13,9 @@ import {
 } from "@mui/icons-material";
 import { UserWarehouseMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
-import { departments, depots, images, store_depots } from "@prisma/client";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
+import { depots, images, store_depots } from "@prisma/client";
 import warehouseDepots from "../requests/warehouseDepots";
 import { useStoreHook } from "@/app/store/useStoreHook";
 import React, { useEffect, useState } from "react";
@@ -364,7 +364,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     const UpdateStoreDepotQuantityForm = ({ formik }: any) => {
         const { warehouseQuantity, storeQuantity, moveQuantity } = formik.values.productStoreDepotDistribution;
 
-        function updateLocalData(updatedDepot: depots, updatedStoreDepot: store_depots) {
+        function updateLocalData(updatedDepot: depots, updatedStoreDepot: any) {
             const newDepots = [...allProductsByDepartment!];
 
             for (const productsByDepartments of allProductsByDepartment!) {

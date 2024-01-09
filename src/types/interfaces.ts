@@ -124,7 +124,7 @@ export interface productsProps {
             seller_profit_percentage: number | null;
             created_at: Date;
             is_active: boolean | null;
-            sell_price: number | null;
+            sell_price: any | null;
             sell_price_unit: string | null;
             seller_profit_quantity: number | null;
             price_discount_percentage: number | null;
@@ -161,7 +161,7 @@ export interface productsProps {
             seller_profit_percentage: number | null;
             created_at: Date;
             is_active: boolean | null;
-            sell_price: number | null;
+            sell_price: any | null;
             sell_price_unit: string | null;
             seller_profit_quantity: number | null;
             price_discount_percentage: number | null;
