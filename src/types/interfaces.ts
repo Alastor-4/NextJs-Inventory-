@@ -1,4 +1,4 @@
-import { characteristics, departments, depots, images, product_offers, products, store_depots, stores, users, warehouses } from "@prisma/client";
+import { characteristics, departments, depots, images, product_offers, products, users, warehouses } from "@prisma/client";
 import { ReactNode } from "react";
 
 export interface ShowProductsStoreProps {
@@ -27,7 +27,7 @@ export interface storeWithStoreDepots {
     fixed_seller_profit_percentage: number | null;
     fixed_seller_profit_quantity: number | null;
     fixed_seller_profit_unit: string | null;
-    store_depots?: store_depots[];
+    store_depots?: any[];
 }
 export interface ModalUpdateProductProps {
     open: boolean;
@@ -181,7 +181,7 @@ export interface StoreModalDefaultProps {
 
 export interface TransferUnitsProps {
     nameStore: string | null;
-    storeDepot: store_depots | null;
+    storeDepot: any | null;
     productId: number | null
     setActiveTransferUnits: (bool: boolean) => void;
     loadData: () => Promise<void>;
@@ -189,22 +189,22 @@ export interface TransferUnitsProps {
 export interface StoreEditUnitsProps {
     loadData: () => Promise<void>;
     setActiveModalEditUnits: (bool: boolean) => void;
-    dataRow: store_depots | null;
+    dataRow: any | null;
 }
 export interface StoreEditSellerProfitProps {
     loadData: () => Promise<void>;
-    storeDepot: store_depots | null;
+    storeDepot: any | null;
     setActiveModalSellerProfit: (bool: boolean) => void;
 }
 export interface StoreEditPriceProps {
     loadData: () => Promise<void>;
-    storeDepot: store_depots | null;
-    setActiveModalPrice: ({ active, storeDepot }: { active: boolean, storeDepot: store_depots | null }) => void;
+    storeDepot: any | null;
+    setActiveModalPrice: ({ active, storeDepot }: { active: boolean, storeDepot: any | null }) => void;
 }
 
 export interface StoreModalPriceProps {
     open: boolean;
-    setOpen: ({ active, storeDepot }: { active: boolean, storeDepot: store_depots | null }) => void;
+    setOpen: ({ active, storeDepot }: { active: boolean, storeDepot: any | null }) => void;
     children?: ReactNode;
     dialogTitle?: string;
 }
