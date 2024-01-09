@@ -12,6 +12,7 @@ import {
 import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse";
 import { StoreMainTableProps, allProductsByDepartmentProps, productsProps, storeWithStoreDepots } from "@/types/interfaces";
 import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
+import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import StoreModalDefault from "./Modal/StoreModalDefault";
@@ -23,14 +24,13 @@ import StoreModalPrice from "./Modal/StoreModalPrice"
 import StoreEditPrice from "./Modal/StoreEditPrice";
 import stores from "../../../store/requests/stores";
 import StoreEditUnits from "./Modal/StoreEditUnits";
+import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
+import InfoTooltip from "@/components/InfoTooltip";
 import StoreMoreDetails from "./StoreMoreDetails";
 import TransferUnits from "./Modal/TransferUnits";
 import { useRouter } from "next/navigation";
 import { Formik } from "formik";
-import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
-import InfoTooltip from "@/components/InfoTooltip";
-import SearchIcon from '@mui/icons-material/Search';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -124,7 +124,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
             product_remaining_units: product.product_remaining_units,
             seller_profit_percentage: product.seller_profit_percentage,
             is_active: !product.is_active,
-            sell_price: product.sell_price,
+            sell_price: parseFloat(`${product.sell_price}`),
             sell_price_unit: product.sell_price_unit,
             seller_profit_quantity: product.seller_profit_quantity,
             price_discount_percentage: product.price_discount_percentage,
@@ -240,7 +240,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                         product?.name!.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
                             (product: productsProps, index: number) => {
 
-                                const baseProductPrice = +product?.depots![0].store_depots![0].sell_price! === 0
+                                const baseProductPrice = product?.depots![0].store_depots![0].sell_price! === 0
                                     ? null
                                     : numberFormat(`${product?.depots![0].store_depots![0].sell_price}`)
 
