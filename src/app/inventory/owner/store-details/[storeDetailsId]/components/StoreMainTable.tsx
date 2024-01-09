@@ -115,7 +115,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
 
     const handleNavigateBack = () => router.back();
     // active - noActive
-    const updateProductActive = async (product: store_depots) => {
+    const updateProductActive = async (product: any) => {
         const data = {
             id: product.id,
             store_id: product.store_id,
