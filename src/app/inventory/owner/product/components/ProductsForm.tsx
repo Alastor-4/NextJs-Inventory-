@@ -56,7 +56,7 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
     }
 
     const validationSchema = Yup.object({
-        name: Yup.string().required("campo requerido"),
+        name: Yup.string().required("Este campo es requerido"),
         description: Yup.string(),
         buyPrice: Yup.number().nullable(),
         images: Yup.array(),
@@ -65,7 +65,7 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
         characteristics: Yup.array().of(Yup.object()),
         characteristicName: Yup.string().nullable(),
         characteristicValue: Yup.string().nullable(),
-    })
+    });
 
     const handleSubmit = async (values: any) => {
         let data = {

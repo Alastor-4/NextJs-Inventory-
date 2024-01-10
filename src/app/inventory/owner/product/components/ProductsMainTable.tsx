@@ -63,6 +63,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     useEffect(() => {
         const getAllDepartments = async () => {
             const departments = await products.getDepartments()
+            //TODO Cargar departamentos por usuario
             setDepartments(departments);
         }
         if (departments === null) getAllDepartments();
