@@ -70,7 +70,27 @@ export interface StoreMainTableProps {
     dataStoreDetails: storeWithStoreDepots | null;
 }
 
+export interface departmentsWithProductsCount {
+    id: number;
+    name: string | null;
+    description: string | null;
+    created_at: Date | null;
+    usersId: number | null;
+    products: number;
+}
+
+export interface ModalCreateUpdateDepartmentProps {
+    userId: number;
+    isOpen: boolean;
+    setIsOpen: (bool: boolean) => void;
+    dialogTitle: string;
+    handleForceRender: () => void;
+    department?: departmentsWithProductsCount | null;
+}
 export interface ProductsMainTableProps {
+    userId: number;
+}
+export interface DepartmentsMainTableProps {
     userId: number;
 }
 
