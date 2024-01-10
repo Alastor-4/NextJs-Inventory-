@@ -26,7 +26,6 @@ import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { depots, images } from "@prisma/client";
 import ModalAddProduct from "./ModalAddProduct";
-import { depots, images } from "@prisma/client";
 import { useStore } from "@/app/store/store";
 import { useRouter } from "next/navigation";
 import { AxiosResponse } from "axios";
