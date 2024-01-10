@@ -1,7 +1,6 @@
-//@ts-nocheck
 "use client"
 
-import React, { useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import {
     AppBar,
     Box,
@@ -25,14 +24,39 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import { signOut } from "next-auth/react";
 import { setProductsCount, setOwnerwarehouses } from "@/app/store/store";
+import {userStatsRequest} from "@/app/inventory/request/userStats";
 
-export default function UserProfileMain(props) {
-    const { userDetails, userRole, ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount, sellerStores } = props;
+export default function UserProfileMain({ userId }: {userId: number}) {
+    const [userDetails, setUserDetails] = useState<null | any>(null)
+    const [userRole, setUserRole] = useState<null | any>(null)
+
+    const [ownerWarehouses, setOwnerWarehouses] = useState<null | any[]>(null)
+    const [ownerStores, setOwnerStores] = useState<null | any[]>(null)
+    const [ownerProductsCount, setOwnerProductsCount] = useState<null | number>(null)
+    const [ownerWorkersCount, setOwnerWorkersCount] = useState<null | number>(null)
+
+    const [sellerStores, setSellerStores] = useState<null | any[]>(null)
 
     useEffect(() => {
-        setProductsCount(ownerProductsCount);
-        setOwnerwarehouses(ownerWarehouses);
-    }, [ownerProductsCount, ownerWarehouses]);
+        async function fetchData() {
+            const response = await userStatsRequest.defaultStats(userId)
+
+            if (response) {
+                setProductsCount(response.ownerProductsCount)
+                setOwnerwarehouses(response.ownerWarehouses)
+
+                setUserDetails(response.userDetails)
+                setUserRole(response.userRole)
+                setOwnerWarehouses(response.ownerWarehouses)
+                setOwnerStores(response.ownerStores)
+                setOwnerProductsCount(response.ownerProductsCount)
+                setOwnerWorkersCount(response.ownerWorkersCount)
+                setSellerStores(response.sellerStores)
+            }
+        }
+
+        fetchData()
+    }, [userId]);
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -65,7 +89,7 @@ export default function UserProfileMain(props) {
         </AppBar>
     )
 
-    function getColorByRole(roleName) {
+    function getColorByRole(roleName: string) {
         switch (roleName) {
             case "admin":
                 return "primary"
@@ -131,7 +155,11 @@ export default function UserProfileMain(props) {
         )
     }
 
-    const OwnerModule = ({ ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount }) => {
+    const OwnerModule = (
+        { ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount }: {
+            ownerWarehouses: any[], ownerStores: any[], ownerProductsCount: number, ownerWorkersCount: number
+        }
+    ) => {
         const WarehouseButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <CardHeader title={"Almacenes"} />
@@ -281,7 +309,7 @@ export default function UserProfileMain(props) {
         )
     }
 
-    const SellerModule = ({ sellerStores }) => {
+    const SellerModule = ({ sellerStores }: {sellerStores: any[]}) => {
         const StoreButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <CardHeader title={"Tiendas"} />
@@ -337,7 +365,7 @@ export default function UserProfileMain(props) {
                             <Grid container item xs={12} spacing={1}>
                                 <Grid item sx={userProfileStyles.leftFlex}>Nombre:</Grid>
                                 <Grid item sx={userProfileStyles.rightFlex}>
-                                    {userDetails.name}
+                                    {userDetails?.name ?? "-"}
                                     {
                                         userDetails?.roles?.name && (
                                             <Chip
@@ -354,28 +382,28 @@ export default function UserProfileMain(props) {
                             <Grid container item xs={12} spacing={1}>
                                 <Grid item sx={userProfileStyles.leftFlex}>Usuario:</Grid>
                                 <Grid item sx={userProfileStyles.rightFlex}>
-                                    {userDetails.username}
+                                    {userDetails?.username ?? "-"}
                                 </Grid>
                             </Grid>
 
                             <Grid container item xs={12} spacing={1}>
                                 <Grid item sx={userProfileStyles.leftFlex}>Correo:</Grid>
                                 <Grid item sx={userProfileStyles.rightFlex}>
-                                    {userDetails.mail}
+                                    {userDetails?.mail ?? "-"}
                                 </Grid>
                             </Grid>
 
                             <Grid container item xs={12} spacing={1}>
                                 <Grid item sx={userProfileStyles.leftFlex}>Teléfono:</Grid>
                                 <Grid item sx={userProfileStyles.rightFlex}>
-                                    {userDetails.phone}
+                                    {userDetails?.phone ?? "-"}
                                 </Grid>
                             </Grid>
 
                             <Grid container item xs={12} spacing={1}>
                                 <Grid item sx={userProfileStyles.leftFlex}>Unido en:</Grid>
                                 <Grid item sx={userProfileStyles.rightFlex}>
-                                    {dayjs(userDetails.created_at).format("DD/MM/YYYY")}
+                                    {userDetails?.created_at ? dayjs(userDetails.created_at).format("DD/MM/YYYY") : "-"}
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -388,7 +416,11 @@ export default function UserProfileMain(props) {
                         }
 
                         {
-                            userRole === "store_owner" && (
+                            userRole === "store_owner" &&
+                            ownerWarehouses &&
+                            ownerStores &&
+                            ownerProductsCount !== null &&
+                            ownerWorkersCount !== null && (
                                 <Grid item xs={12}>
                                     <OwnerModule
                                         ownerWarehouses={ownerWarehouses}
@@ -401,7 +433,7 @@ export default function UserProfileMain(props) {
                         }
 
                         {
-                            (userRole === "store_owner" || userRole === "store_seller") && (
+                            (userRole === "store_owner" || userRole === "store_seller") && sellerStores && (
                                 <Grid item xs={12}>
                                     <SellerModule sellerStores={sellerStores} />
                                 </Grid>
