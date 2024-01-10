@@ -3,10 +3,11 @@ import { AppBar, Dialog, DialogContent, IconButton, Toolbar, Typography } from "
 import { ModalUpdateProductProps } from "@/types/interfaces";
 import React from "react";
 
-const ModalAddProduct = ({ open, setOpen, dialogTitle, children }: ModalUpdateProductProps) => {
+const ModalAddProduct = ({ open, setOpen, dialogTitle, children, handleForceRender }: ModalUpdateProductProps) => {
 
     const handleClose = (event: React.SyntheticEvent<unknown>, reason?: string) => {
         setOpen(false);
+        if (handleForceRender) handleForceRender();
     };
 
     return (

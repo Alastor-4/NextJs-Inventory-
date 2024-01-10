@@ -11,20 +11,20 @@ import {
     Done, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined,
     FilterAlt, HelpOutline, ShareOutlined,
 } from "@mui/icons-material";
-import { UserWarehouseMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
+import { UserWarehouseMainTableProps, allProductsByDepartmentProps, productsProps, storeDepotsWithAny } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
-import { depots, images, store_depots } from "@prisma/client";
 import warehouseDepots from "../requests/warehouseDepots";
 import { useStoreHook } from "@/app/store/useStoreHook";
-import React, { useEffect, useState } from "react";
 import { TableNoData } from "@/components/TableNoData";
 import { handleKeyDown } from "@/utils/handleKeyDown";
 import tableStyles from "@/assets/styles/tableStyles";
 import UserWarehouseForm from "./UserWarehouseForm";
 import SearchIcon from '@mui/icons-material/Search';
+import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
+import { depots, images } from "@prisma/client";
 import ModalAddProduct from "./ModalAddProduct";
 import { useStore } from "@/app/store/store";
 import { useRouter } from "next/navigation";
@@ -364,7 +364,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     const UpdateStoreDepotQuantityForm = ({ formik }: any) => {
         const { warehouseQuantity, storeQuantity, moveQuantity } = formik.values.productStoreDepotDistribution;
 
-        function updateLocalData(updatedDepot: depots, updatedStoreDepot: any) {
+        function updateLocalData(updatedDepot: depots, updatedStoreDepot: storeDepotsWithAny) {
             const newDepots = [...allProductsByDepartment!];
 
             for (const productsByDepartments of allProductsByDepartment!) {
@@ -902,6 +902,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             open={activeModalAddProduct}
                             setOpen={setActiveModalAddProduct}
                             dialogTitle="Nuevo Depósito"
+                            handleForceRender={handleForceRender}
                         >
                             <UserWarehouseForm
                                 ownerId={ownerId}

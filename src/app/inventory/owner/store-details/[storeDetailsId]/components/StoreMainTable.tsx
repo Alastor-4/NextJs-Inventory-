@@ -9,8 +9,8 @@ import {
     AddOutlined, ArrowLeft, DescriptionOutlined, EditOutlined,
     ExpandLessOutlined, ExpandMoreOutlined, FilterAlt, HelpOutline, ShareOutlined, SwapHoriz
 } from "@mui/icons-material";
+import { StoreMainTableProps, allProductsByDepartmentProps, productsProps, storeDepotsWithAny, storeWithStoreDepots } from "@/types/interfaces";
 import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse";
-import { StoreMainTableProps, allProductsByDepartmentProps, productsProps, storeWithStoreDepots } from "@/types/interfaces";
 import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
@@ -19,7 +19,6 @@ import StoreModalDefault from "./Modal/StoreModalDefault";
 import { numberFormat } from "@/utils/generalFunctions";
 import { TableNoData } from "@/components/TableNoData";
 import { storeDetails } from "../request/storeDetails";
-import { images, store_depots } from "@prisma/client";
 import StoreModalPrice from "./Modal/StoreModalPrice"
 import StoreEditPrice from "./Modal/StoreEditPrice";
 import stores from "../../../store/requests/stores";
@@ -30,6 +29,7 @@ import InfoTooltip from "@/components/InfoTooltip";
 import StoreMoreDetails from "./StoreMoreDetails";
 import TransferUnits from "./Modal/TransferUnits";
 import { useRouter } from "next/navigation";
+import { images } from "@prisma/client";
 import { Formik } from "formik";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -47,7 +47,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
 
     // Se usan habilitar modales o detalles
     const [showDetails, setShowDetails] = useState<number>(-1);
-    const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: any | null }>({ active: false, storeDepot: null });
+    const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: storeDepotsWithAny | null }>({ active: false, storeDepot: null });
     const [activeModalTransferUnits, setActiveModalTransferUnits] = useState<boolean>(false);
     const [activeModalEditUnits, setActiveModalEditUnits] = useState<boolean>(false);
     const [activeAddProductFromWarehouse, setActiveAddProductFromWarehouse] = useState<boolean>(false);
@@ -115,7 +115,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
 
     const handleNavigateBack = () => router.back();
     // active - noActive
-    const updateProductActive = async (product: any) => {
+    const updateProductActive = async (product: storeDepotsWithAny) => {
         const data = {
             id: product.id,
             store_id: product.store_id,

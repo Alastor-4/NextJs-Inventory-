@@ -34,6 +34,7 @@ export interface ModalUpdateProductProps {
     setOpen: (bool: boolean) => void;
     dialogTitle: string;
     children?: ReactNode;
+    handleForceRender?: () => void;
 }
 export interface ProductsFormProps {
     userId: number;
@@ -66,7 +67,6 @@ export interface UpdateValueDialogProps {
 
 export interface StoreMainTableProps {
     userId?: number;
-    // storeDetailsId: number;
     dataStoreDetails: storeWithStoreDepots | null;
 }
 
@@ -172,6 +172,24 @@ export interface productsProps {
     }[];
 }
 
+export interface storeDepotsWithAny {
+    id: number;
+    store_id: number | null;
+    depot_id: number | null;
+    product_units: number | null;
+    product_remaining_units: number | null;
+    seller_profit_percentage: number | null;
+    created_at: Date;
+    is_active: boolean | null;
+    sell_price: any | null;
+    sell_price_unit: string | null;
+    seller_profit_quantity: number | null;
+    price_discount_percentage: number | null;
+    price_discount_quantity: number | null;
+    seller_profit_unit: string | null;
+    product_offers?: product_offers[] | null;
+}
+
 export interface StoreModalDefaultProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
@@ -181,7 +199,7 @@ export interface StoreModalDefaultProps {
 
 export interface TransferUnitsProps {
     nameStore: string | null;
-    storeDepot: any | null;
+    storeDepot: storeDepotsWithAny | null;
     productId: number | null
     setActiveTransferUnits: (bool: boolean) => void;
     loadData: () => Promise<void>;
@@ -193,18 +211,18 @@ export interface StoreEditUnitsProps {
 }
 export interface StoreEditSellerProfitProps {
     loadData: () => Promise<void>;
-    storeDepot: any | null;
+    storeDepot: storeDepotsWithAny | null;
     setActiveModalSellerProfit: (bool: boolean) => void;
 }
 export interface StoreEditPriceProps {
     loadData: () => Promise<void>;
-    storeDepot: any | null;
-    setActiveModalPrice: ({ active, storeDepot }: { active: boolean, storeDepot: any | null }) => void;
+    storeDepot: storeDepotsWithAny | null;
+    setActiveModalPrice: ({ active, storeDepot }: { active: boolean, storeDepot: storeDepotsWithAny | null }) => void;
 }
 
 export interface StoreModalPriceProps {
     open: boolean;
-    setOpen: ({ active, storeDepot }: { active: boolean, storeDepot: any | null }) => void;
+    setOpen: ({ active, storeDepot }: { active: boolean, storeDepot: storeDepotsWithAny | null }) => void;
     children?: ReactNode;
     dialogTitle?: string;
 }
