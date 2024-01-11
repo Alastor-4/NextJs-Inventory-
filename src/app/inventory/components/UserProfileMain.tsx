@@ -190,7 +190,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                                     </Grid>
                                     <Grid item xs={"auto"}>
                                         {globalAndOwnerDepartments.filter(item => !!item.usersId).length}
-                                        {`${globalAndOwnerDepartments.filter(item => !!item.usersId).length === 1 ? " propio" : " propios"}`}
+                                        {`${globalAndOwnerDepartments.filter(item => !!item.usersId).length === 1 ? " personalizado" : " personalizados"}`}
                                     </Grid>
                                 </Grid>
                             </Link>

@@ -6,9 +6,9 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const usersId = +searchParams.get("usersId")!;
 
-        const departmentsByUserId = await prisma.departments.findMany({
-            where: { usersId }
-        });
+        const departmentsByUserId = await prisma.departments.findMany(
+            { where: { OR: [{usersId: null}, {usersId: usersId}] } }
+        );
 
         return NextResponse.json(departmentsByUserId);
     } catch (error) {
