@@ -27,7 +27,7 @@ export default function RootLayout({
         <body className={`p-4 ${roboto.className}`}>
         {/* <SessionAuthProvider> */}
         {/* <SnackBarContextProvider> */}
-        <NextTopLoader color="#000" height={4}/>
+        <NextTopLoader color="#fff" height={4}/>
         <ClientLayout>
             {children}
         </ClientLayout>

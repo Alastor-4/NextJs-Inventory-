@@ -58,14 +58,11 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const [departments, setDepartments] = useState<departments[] | null>(null);
     useEffect(() => {
         const getAllDepartments = async () => {
-            const departments = await products.getDepartmentsByUser(1)
-            setDepartments(departments);
-            if (userId !== 2) {
-                const departmentsByUserId = await products.getDepartmentsByUser(userId);
-                setDepartments([...departments, ...departmentsByUserId]);
-            }
+            const departments = await products.getDepartmentsByUserAndGlobal(userId)
+            setDepartments(departments)
         }
-        if (departments === null) getAllDepartments();
+        
+        if (!departments) getAllDepartments()
     }, [departments, userId]);
 
     //Modals handlers

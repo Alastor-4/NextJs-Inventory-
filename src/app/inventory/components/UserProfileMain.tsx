@@ -32,7 +32,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
     const [ownerWarehouses, setOwnerWarehouses] = useState<null | any[]>(null)
     const [ownerStores, setOwnerStores] = useState<null | any[]>(null)
     const [ownerProductsCount, setOwnerProductsCount] = useState<null | number>(null)
-    const [ownerDepartmentsCount, setOwnerDepartmentsCount] = useState<null | number>(null)
+    const [globalAndOwnerDepartments, setGlobalAndOwnerDepartments] = useState<null | any[]>(null)
     const [ownerWorkersCount, setOwnerWorkersCount] = useState<null | number>(null)
 
     const [sellerStores, setSellerStores] = useState<null | any[]>(null)
@@ -43,7 +43,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
             if (response) {
                 setOwnerWarehouses(response.ownerWarehouses)
-                setOwnerDepartmentsCount(response.ownerDepartmentsCount)
+                setGlobalAndOwnerDepartments(response.globalAndOwnerDepartments)
                 setUserDetails(response.userDetails)
                 setUserRole(response.userRole)
                 setOwnerWarehouses(response.ownerWarehouses)
@@ -161,8 +161,8 @@ export default function UserProfileMain({ userId }: { userId: number }) {
     }
 
     const OwnerModule = (
-        { ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount }: {
-            ownerWarehouses: any[], ownerStores: any[], ownerProductsCount: number, ownerWorkersCount: number
+        { globalAndOwnerDepartments, ownerWarehouses, ownerStores, ownerProductsCount, ownerWorkersCount }: {
+            globalAndOwnerDepartments: any[], ownerWarehouses: any[], ownerStores: any[], ownerProductsCount: number, ownerWorkersCount: number
         }
     ) => {
         const DepartmentsButton = () => (
@@ -170,17 +170,31 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                 <CardHeader title={"Departamentos"} />
 
                 <CardContent>
-                    <Grid container>
-                        <Link href={`/inventory/owner/departments`}>
+                    <Grid container spacing={1}>
+                        <Grid container item xs={12}>
                             <Grid container item rowSpacing={2}>
                                 <Grid container item xs={"auto"} alignItems={"center"}>
                                     <ChevronRightOutlined fontSize={"small"} />
                                 </Grid>
                                 <Grid item xs={"auto"}>
-                                    {`${ownerDepartmentsCount} ${ownerDepartmentsCount === 1 ? "departamento" : "departamentos"}`}
+                                    {globalAndOwnerDepartments.filter(item => !item.usersId).length} globales
                                 </Grid>
                             </Grid>
-                        </Link>
+                        </Grid>
+
+                        <Grid container item xs={12}>
+                            <Link href={`/inventory/owner/departments`}>
+                                <Grid container item rowSpacing={2}>
+                                    <Grid container item xs={"auto"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                    </Grid>
+                                    <Grid item xs={"auto"}>
+                                        {globalAndOwnerDepartments.filter(item => !!item.usersId).length}
+                                        {`${globalAndOwnerDepartments.filter(item => !!item.usersId).length === 1 ? " personalizado" : " personalizados"}`}
+                                    </Grid>
+                                </Grid>
+                            </Link>
+                        </Grid>
                     </Grid>
                 </CardContent>
             </Card>
@@ -447,12 +461,14 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
                         {
                             userRole === "store_owner" &&
+                            globalAndOwnerDepartments &&
                             ownerWarehouses &&
                             ownerStores &&
                             ownerProductsCount !== null &&
                             ownerWorkersCount !== null && (
                                 <Grid item xs={12}>
                                     <OwnerModule
+                                        globalAndOwnerDepartments={globalAndOwnerDepartments}
                                         ownerWarehouses={ownerWarehouses}
                                         ownerStores={ownerStores}
                                         ownerProductsCount={ownerProductsCount}

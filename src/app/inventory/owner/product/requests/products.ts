@@ -68,7 +68,8 @@ const products = {
 
         return false
     },
-    getDepartmentsByUser: async function (usersId: number) {
+
+    getDepartmentsByUserAndGlobal: async function (usersId: number) {
         try {
             const response = await apiRequest.get(urlApiDepartments, { params: { usersId } });
             return response.data
