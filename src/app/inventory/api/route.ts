@@ -14,7 +14,7 @@ export async function GET(req: Request) {
         let ownerStores = null
         let ownerProductsCount = null
         let ownerWorkersCount = null
-        let ownerDepartmentsCount = null
+        let globalAndOwnerDepartments = null
 
         let sellerStores = null
 
@@ -23,15 +23,15 @@ export async function GET(req: Request) {
             const ownerStoresPromise = prisma.stores.findMany({ where: { owner_id: +userId! } })
             const productsCountPromise = prisma.products.count({ where: { owner_id: +userId! } })
             const workersCountPromise = prisma.users.count({ where: { work_for_user_id: +userId! } })
-            const departmentsCountPromise = prisma.departments.count({ where: { usersId: +userId! } })
+            const departmentsPromise = prisma.departments.findMany({ where: { OR: [{usersId: null}, {usersId: +userId!}] } }) //global or user's department
 
-            const ownerQueries = await Promise.all([ownerWarehousesPromise, ownerStoresPromise, productsCountPromise, workersCountPromise, departmentsCountPromise])
+            const ownerQueries = await Promise.all([ownerWarehousesPromise, ownerStoresPromise, productsCountPromise, workersCountPromise, departmentsPromise])
             ownerWarehouses = ownerQueries[0]
             ownerStores = ownerQueries[1]
             ownerProductsCount = ownerQueries[2]
             ownerWorkersCount = ownerQueries[3]
             sellerStores = ownerQueries[1]
-            ownerDepartmentsCount = ownerQueries[4]
+            globalAndOwnerDepartments = ownerQueries[4]
         }
 
         if (userRole === "store_seller") {
@@ -46,7 +46,7 @@ export async function GET(req: Request) {
                 ownerStores,
                 ownerProductsCount,
                 ownerWorkersCount,
-                ownerDepartmentsCount,
+                globalAndOwnerDepartments,
                 sellerStores
             }
         )
