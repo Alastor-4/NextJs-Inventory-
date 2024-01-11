@@ -80,12 +80,12 @@ export interface departmentsWithProductsCount {
 }
 
 export interface ModalCreateUpdateDepartmentProps {
-    userId: number;
+    userId?: number;
     isOpen: boolean;
     setIsOpen: (bool: boolean) => void;
     dialogTitle: string;
     handleForceRender: () => void;
-    department?: departmentsWithProductsCount | null;
+    department?: allProductsByDepartmentProps | null;
 }
 export interface ProductsMainTableProps {
     userId: number;
@@ -250,7 +250,8 @@ export interface allProductsByDepartmentProps {
     id: number;
     name: string | null;
     description: string | null;
-    created_at: Date;
+    created_at: Date | null;
+    usersId: number | null;
     products?: productsProps[];
     selected?: boolean
 }
@@ -276,7 +277,6 @@ export interface UserWarehouseFormProps {
     ownerId?: number;
     warehouseId?: number;
     dataAllProducts?: productsProps[] | null;
-    depotsInWarehouses?: number | null;
 }
 
 export interface UserWarehouseMainTableProps {

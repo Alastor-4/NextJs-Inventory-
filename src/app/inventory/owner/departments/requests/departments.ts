@@ -1,17 +1,17 @@
-import apiRequest from "@/api"
 import { notifyError } from "@/utils/generalFunctions";
 import { departments } from "@prisma/client";
+import apiRequest from "@/api";
 
-const url = `/inventory/owner/departments/api`
-const updateUrl = `/inventory/owner/departments/update/api`
+const url = `/inventory/owner/departments/api`;
+const updateUrl = `/inventory/owner/departments/update/api`;
 
 const departmentsRequests = {
-    getAllUserDepartments: async function (userId: number) {
+    getAllUserDepartments: async function (usersId: number) {
         try {
-            const response = await apiRequest.get(url, { params: { userId } })
+            const response = await apiRequest.get(url, { params: { usersId } })
             return response.data;
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Error al cargar los departamentos");
         }
         return false
     },
@@ -21,7 +21,7 @@ const departmentsRequests = {
             const response = await apiRequest.get(updateUrl, { params: { departmentId } })
             return response.data;
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Error al obtener la información del departamento");
         }
         return false
     },
@@ -31,7 +31,7 @@ const departmentsRequests = {
             await apiRequest.post(url, data);
             return true;
         } catch (e) {
-            notifyError("Ha ocurrido un error creando el departamento")
+            notifyError("Ha ocurrido un error creando el departamento");
         }
         return false
     },
@@ -41,17 +41,17 @@ const departmentsRequests = {
             await apiRequest.put(url, data);
             return true;
         } catch (e) {
-            notifyError("Ha ocurrido un error modificando el departamento")
+            notifyError("Ha ocurrido un error modificando el departamento");
         }
         return false
     },
 
     deleteDepartment: async function (departmentId: number) {
         try {
-            const response = await apiRequest.delete(url, { params: { departmentId } })
-            if (response.status === 200) return true
+            await apiRequest.delete(url, { params: { departmentId } })
+            return true
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Ha ocurrido un error eliminando el departamento");
         }
         return false
     },
