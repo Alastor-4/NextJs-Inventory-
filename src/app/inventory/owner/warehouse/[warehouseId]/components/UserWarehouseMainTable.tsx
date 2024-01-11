@@ -16,7 +16,6 @@ import FilterProductsByDepartmentsModal from "@/components/modals/FilterProducts
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import warehouseDepots from "../requests/warehouseDepots";
-import { useStoreHook } from "@/app/store/useStoreHook";
 import { TableNoData } from "@/components/TableNoData";
 import { handleKeyDown } from "@/utils/handleKeyDown";
 import tableStyles from "@/assets/styles/tableStyles";
@@ -26,7 +25,6 @@ import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { depots, images } from "@prisma/client";
 import ModalAddProduct from "./ModalAddProduct";
-import { useStore } from "@/app/store/store";
 import { useRouter } from "next/navigation";
 import { AxiosResponse } from "axios";
 import { Formik } from "formik";
@@ -35,18 +33,6 @@ import dayjs from "dayjs";
 
 const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMainTableProps) => {
     const router = useRouter();
-
-    const warehouseState = useStoreHook(useStore, (state) => state.ownerWarehouses);
-    const [depotsInWarehouses, setDepotsInWarehouses] = useState<number>(0);
-
-    useEffect(() => {
-        let depotsCount = 0;
-        const productsInWarehousesQuantity = () => {
-            for (const warehouse of warehouseState!) depotsCount += warehouse.depots?.length!;
-            setDepotsInWarehouses(depotsCount);
-        }
-        if (warehouseState) productsInWarehousesQuantity();
-    }), [warehouseState];
 
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
@@ -908,7 +894,6 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                 ownerId={ownerId}
                                 warehouseId={warehouseDetails?.id}
                                 dataAllProducts={dataProducts!}
-                                depotsInWarehouses={depotsInWarehouses}
                             />
                         </ModalAddProduct>
 
@@ -999,7 +984,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                                     </Table>
                                                 </TableContainer>) : <TableNoData searchCoincidence />
                                             ) : (
-                                                <TableNoData hasData={depotsInWarehouses} />
+                                                <TableNoData hasData={dataProducts?.length!} />
                                             )
                                     }
                                 </Grid>

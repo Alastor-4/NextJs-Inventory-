@@ -58,7 +58,7 @@ const products = {
         return false
     },
 
-    delete: async function (userId, productId) {
+    delete: async function (productId) {
         try {
             const response = await apiRequest.delete(url, { params: { productId: productId } })
             if (response.status === 200) return true
@@ -68,12 +68,10 @@ const products = {
 
         return false
     },
-    getDepartments: async function () {
+    getDepartmentsByUser: async function (usersId: number) {
         try {
-            const response = await apiRequest.get(urlApiDepartments)
-
+            const response = await apiRequest.get(urlApiDepartments, { params: { usersId } });
             return response.data
-
         } catch (e) {
             notifyError("Error al obtener los departamentos")
         }

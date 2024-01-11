@@ -4,6 +4,7 @@ import { Avatar, AvatarGroup, Box, Button, Card, CardContent, Checkbox, Grid, Ic
 import { UserWarehouseFormProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { FilterAlt, HelpOutline } from "@mui/icons-material";
 import warehouseDepots from "../requests/warehouseDepots";
 import { characteristics, images } from "@prisma/client";
@@ -15,9 +16,8 @@ import InfoTooltip from "@/components/InfoTooltip";
 import { AxiosResponse } from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup"
-import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 
-export const UserWarehouseForm = ({ ownerId, warehouseId, depotsInWarehouses }: UserWarehouseFormProps) => {
+export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormProps) => {
 
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
@@ -365,7 +365,7 @@ export const UserWarehouseForm = ({ ownerId, warehouseId, depotsInWarehouses }: 
                                             </Table>
                                         </TableContainer>) : <TableNoData searchCoincidence />
                                     ) : (
-                                        <TableNoData hasData={depotsInWarehouses} />
+                                        <TableNoData hasData={dataProducts?.length!} />
                                     )
                             }
                         </Grid>

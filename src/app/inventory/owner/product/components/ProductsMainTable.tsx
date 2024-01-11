@@ -11,13 +11,11 @@ import FilterProductsByDepartmentsModal from "@/components/modals/FilterProducts
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import { images, characteristics, departments } from '@prisma/client';
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import { useStoreHook } from "@/app/store/useStoreHook";
 import { TableNoData } from "@/components/TableNoData";
 import ModalUpdateProduct from "./ModalUpdateProduct";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
-import { useStore } from "@/app/store/store";
 import products from "../requests/products";
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
@@ -25,8 +23,6 @@ import { Formik } from "formik";
 
 export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const router = useRouter();
-
-    const store = useStoreHook(useStore, (state) => state.ownerProductsCount);
 
     //Products data
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
@@ -62,12 +58,15 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const [departments, setDepartments] = useState<departments[] | null>(null);
     useEffect(() => {
         const getAllDepartments = async () => {
-            const departments = await products.getDepartments()
-            //TODO Cargar departamentos por usuario
+            const departments = await products.getDepartmentsByUser(1)
             setDepartments(departments);
+            if (userId !== 2) {
+                const departmentsByUserId = await products.getDepartmentsByUser(userId);
+                setDepartments([...departments, ...departmentsByUserId]);
+            }
         }
         if (departments === null) getAllDepartments();
-    }, [departments]);
+    }, [departments, userId]);
 
     //Modals handlers
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
@@ -124,7 +123,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
     //Handle delete product
     const handleRemove = async () => {
-        const response = await products.delete(userId, selectedProduct?.id!);
+        const response = await products.delete(selectedProduct?.id!);
         if (response) {
             setSelectedProduct(null);
             const updatedProducts = await products.allUserProductDepartments(userId);
@@ -438,7 +437,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                                         </Table>
                                                     </TableContainer>) : <TableNoData searchCoincidence />
                                                 ) : (
-                                                    <TableNoData hasData={store} />
+                                                    <TableNoData hasData={dataProducts?.length!} />
                                                 )
                                         }
                                     </Grid>
