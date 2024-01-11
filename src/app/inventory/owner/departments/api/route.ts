@@ -5,117 +5,48 @@ import { prisma } from "db";
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
-        const userId = searchParams.get("userId");
+        const usersId = +searchParams.get("usersId")!;
 
-        const departments = await prisma.departments.findMany(
-            {
-                where: {
-                    products: { some: { owner_id: +userId! } }
-                },
-                include: {
-                    products: { include: { departments: true, characteristics: true, images: true } }
-                }
-            }
-        )
+        const departments = await prisma.departments.findMany({
+            where: { usersId },
+            include: { products: true }
+        });
 
-        return NextResponse.json(departments)
+        return NextResponse.json(departments);
     } catch (error) {
-        console.log('[PRODUCT_GET_ALL]', error);
+        console.log('[DEPARTMENT_GET_ALL]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
 
-// CREATE new user product
+// CREATE new user department
 export async function POST(req: Request) {
     try {
-        const { userId, name, description, departmentId, buyPrice, characteristics } = await req.json();
+        const { usersId, name, description } = await req.json();
 
-        let createObj = {
-            data: {
-                owner_id: +userId!,
-                name,
-                description,
-                department_id: +departmentId!,
-                buy_price: +buyPrice!,
-            },
-        }
+        const newDepartment = await prisma.departments.create({
+            data: { name, description, usersId }
+        });
 
-        if (characteristics) {
-            // @ts-ignore
-            createObj.data.characteristics = { createMany: { data: characteristics } }
-            // @ts-ignore
-            createObj.include = { characteristics: true }
-        }
-
-        const newProduct = await prisma.products.create(createObj)
-
-        return NextResponse.json(newProduct)
+        return NextResponse.json(newDepartment);
     } catch (error) {
-        console.log('[PRODUCT_CREATE]', error);
+        console.log('[DEPARTMENT_CREATE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
 
-// UPDATE user product
+// UPDATE user department
 export async function PUT(req: Request) {
     try {
-        const {
-            id,
-            name,
-            description,
-            departmentId,
-            buyPrice,
-            characteristics,
-            deletedCharacteristics,
-            deletedImages
-        } = await req.json()
+        const { id, usersId, name, description } = await req.json();
 
-        let updateObj: { name: string; description: string; department_id: number; buy_price: number } = {
-            name,
-            description,
-            department_id: +departmentId!,
-            buy_price: +buyPrice!,
-        }
+        const updatedDepartment = await prisma.departments.update({
+            where: { id }, data: { name, description, usersId }
+        });
 
-        if (deletedCharacteristics) {
-            await prisma.characteristics.deleteMany({ where: { id: { in: deletedCharacteristics } } })
-        }
-
-        if (deletedImages) {
-            await utapi.deleteFiles(deletedImages.map((item: { fileKey: string }) => item.fileKey))
-            await prisma.images.deleteMany({ where: { id: { in: deletedImages.map((item: { id: number }) => item.id) } } })
-        }
-
-        if (characteristics) {
-            await prisma.characteristics.createMany({ data: characteristics.map((item: any) => ({ ...item, product_id: id })) })
-        }
-
-        const updatedProduct = await prisma.products.update(
-            {
-                data: updateObj, where: { id: parseInt(id) }
-            }
-        )
-
-        return NextResponse.json(updatedProduct)
+        return NextResponse.json(updatedDepartment)
     } catch (error) {
-        console.log('[PRODUCT_UPDATE]', error);
-        return new NextResponse("Internal Error", { status: 500 });
-    }
-}
-
-// INSERT images metadata from already uploaded product images
-export async function PATCH(req: Request) {
-    try {
-        const { productId, productImages } = await req.json()
-
-        const data = productImages.map((item: any) => ({ product_id: +productId, fileKey: item.key, fileUrl: item.url }))
-
-        //insert new images for an existing product
-        const updatedProduct = await prisma.images.createMany({ data: data })
-
-        return NextResponse.json(updatedProduct);
-    } catch (error) {
-        console.log('[PRODUCT_UPDATE_METADATA_IMAGE]', error);
+        console.log('[DEPARTMENT_UPDATE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -124,13 +55,15 @@ export async function PATCH(req: Request) {
 export async function DELETE(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
-        const productId = searchParams.get("productId");
+        const departmentId = +searchParams.get("departmentId")!;
 
-        const deletedProduct = await prisma.products.delete({ where: { id: +productId! } })
+        const deletedDepartment = await prisma.departments.delete({
+            where: { id: departmentId }
+        });
 
-        return NextResponse.json(deletedProduct)
+        return NextResponse.json(deletedDepartment);
     } catch (error) {
-        console.log('[PRODUCT_DELETE]', error);
+        console.log('[DEPARTMENT_DELETE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
