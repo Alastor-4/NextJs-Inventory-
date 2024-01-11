@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
-import { ModalCreateUpdateDepartmentProps, allProductsByDepartmentProps } from '@/types/interfaces';
+import { ModalCreateUpdateDepartmentProps } from '@/types/interfaces';
 import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
 import departmentsRequests from '../../requests/departments';
 import { notifySuccess } from '@/utils/generalFunctions';
@@ -20,7 +20,7 @@ const ModalCreateUpdateDepartment = ({ isOpen, setIsOpen, dialogTitle, departmen
         name: department ? department.name : '',
         description: department?.description ? department.description : '',
         created_at: department ? department.created_at : new Date(),
-        usersId: 1
+        usersId: null
     }
 
     const validationSchema = Yup.object({
@@ -33,7 +33,7 @@ const ModalCreateUpdateDepartment = ({ isOpen, setIsOpen, dialogTitle, departmen
             id: department ? department.id : -1,
             name: values.name,
             description: values.description,
-            usersId: 1,
+            usersId: null,
             created_at: new Date()
         }
         if (department) {
@@ -103,7 +103,9 @@ const ModalCreateUpdateDepartment = ({ isOpen, setIsOpen, dialogTitle, departmen
                             </Grid>
                             <DialogActions sx={{ marginRight: "15px", marginTop: "20px" }}>
                                 <Button color="error" variant="outlined" onClick={handleCloseModal}>Cerrar</Button>
-                                <Button color="primary" disabled={!formik.values.name} variant="outlined" type='submit'>Agregar</Button>
+                                <Button color="primary" disabled={!formik.values.name} variant="outlined" type='submit'>
+                                    {department ? "Modificar" : "Agregar"}
+                                </Button>
                             </DialogActions>
                         </Form>
                     )}

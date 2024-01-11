@@ -13,7 +13,6 @@ export async function GET(req: Request) {
 
         return NextResponse.json(department);
     } catch (error) {
-        console.log('[DEPARTMENT_GET_ONE_BY_ID]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

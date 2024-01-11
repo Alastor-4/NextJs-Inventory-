@@ -6,9 +6,9 @@ const url = `/inventory/admin/departments/api`;
 const updateUrl = `/inventory/admin/departments/update/api`;
 
 const departmentsRequests = {
-    getAllUserDepartments: async function (usersId: number) {
+    getAllGlobalDepartments: async function () {
         try {
-            const response = await apiRequest.get(url, { params: { usersId } })
+            const response = await apiRequest.get(url)
             return response.data;
         } catch (e) {
             notifyError("Error al cargar los departamentos");

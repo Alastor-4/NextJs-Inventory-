@@ -34,7 +34,7 @@ export const AdminDepartmentsMainTable = () => {
     //GET initial data
     useEffect(() => {
         const getAllDepartments = async () => {
-            const newAllDepartments: allProductsByDepartmentProps[] | null = await departmentsRequests.getAllUserDepartments(1);
+            const newAllDepartments: allProductsByDepartmentProps[] | null = await departmentsRequests.getAllGlobalDepartments();
             if (newAllDepartments) {
                 setAllDepartmentsData(newAllDepartments);
                 setForceRender(false);

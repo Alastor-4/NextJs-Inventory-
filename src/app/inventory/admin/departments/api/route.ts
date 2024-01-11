@@ -4,17 +4,12 @@ import { prisma } from "db";
 // GET all user departments
 export async function GET(req: Request) {
     try {
-        const { searchParams } = new URL(req.url);
-        const usersId = +searchParams.get("usersId")!;
-
         const departments = await prisma.departments.findMany({
-            where: { usersId },
-            include: { products: true }
+            where: { usersId: null },
         });
 
         return NextResponse.json(departments);
     } catch (error) {
-        console.log('[DEPARTMENT_GET_ALL]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -22,15 +17,14 @@ export async function GET(req: Request) {
 // CREATE new user department
 export async function POST(req: Request) {
     try {
-        const { usersId, name, description } = await req.json();
+        const { name, description } = await req.json();
 
         const newDepartment = await prisma.departments.create({
-            data: { name, description, usersId }
+            data: { name, description }
         });
 
         return NextResponse.json(newDepartment);
     } catch (error) {
-        console.log('[DEPARTMENT_CREATE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -46,7 +40,6 @@ export async function PUT(req: Request) {
 
         return NextResponse.json(updatedDepartment)
     } catch (error) {
-        console.log('[DEPARTMENT_UPDATE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -63,7 +56,6 @@ export async function DELETE(req: Request) {
 
         return NextResponse.json(deletedDepartment);
     } catch (error) {
-        console.log('[DEPARTMENT_DELETE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
