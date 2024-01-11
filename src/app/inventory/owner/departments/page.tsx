@@ -1,5 +1,5 @@
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
-import ProductsMainTable from "./components/ProductsMainTable";
+import DepartmentsMainTable from "./components/DepartmentsMainTable";
 import { getServerSession } from "next-auth";
 
 const Page = async () => {
@@ -8,7 +8,7 @@ const Page = async () => {
 
     return (
         <main>
-            <ProductsMainTable userId={userId} />
+            <DepartmentsMainTable userId={userId} />
         </main>
     )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     AppBar,
     Box,
@@ -23,16 +23,16 @@ import userProfileStyles from "@/assets/styles/userProfileStyles"
 import Link from "next/link";
 import dayjs from "dayjs";
 import { signOut } from "next-auth/react";
-import { setProductsCount, setOwnerwarehouses } from "@/app/store/store";
-import {userStatsRequest} from "@/app/inventory/request/userStats";
+import { userStatsRequest } from "@/app/inventory/request/userStats";
 
-export default function UserProfileMain({ userId }: {userId: number}) {
+export default function UserProfileMain({ userId }: { userId: number }) {
     const [userDetails, setUserDetails] = useState<null | any>(null)
     const [userRole, setUserRole] = useState<null | any>(null)
 
     const [ownerWarehouses, setOwnerWarehouses] = useState<null | any[]>(null)
     const [ownerStores, setOwnerStores] = useState<null | any[]>(null)
     const [ownerProductsCount, setOwnerProductsCount] = useState<null | number>(null)
+    const [ownerDepartmentsCount, setOwnerDepartmentsCount] = useState<null | number>(null)
     const [ownerWorkersCount, setOwnerWorkersCount] = useState<null | number>(null)
 
     const [sellerStores, setSellerStores] = useState<null | any[]>(null)
@@ -42,9 +42,8 @@ export default function UserProfileMain({ userId }: {userId: number}) {
             const response = await userStatsRequest.defaultStats(userId)
 
             if (response) {
-                setProductsCount(response.ownerProductsCount)
-                setOwnerwarehouses(response.ownerWarehouses)
-
+                setOwnerWarehouses(response.ownerWarehouses)
+                setOwnerDepartmentsCount(response.ownerDepartmentsCount)
                 setUserDetails(response.userDetails)
                 setUserRole(response.userRole)
                 setOwnerWarehouses(response.ownerWarehouses)
@@ -149,6 +148,12 @@ export default function UserProfileMain({ userId }: {userId: number}) {
                                 title={"Almacenes"}
                             />
                         </Grid>
+                        <Grid item>
+                            <LinksTemplate
+                                pageAddress={`/inventory/admin/departments`}
+                                title={"Departamentos"}
+                            />
+                        </Grid>
                     </Grid>
                 </CardContent>
             </Card>
@@ -160,6 +165,27 @@ export default function UserProfileMain({ userId }: {userId: number}) {
             ownerWarehouses: any[], ownerStores: any[], ownerProductsCount: number, ownerWorkersCount: number
         }
     ) => {
+        const DepartmentsButton = () => (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <CardHeader title={"Departamentos"} />
+
+                <CardContent>
+                    <Grid container>
+                        <Link href={`/inventory/owner/departments`}>
+                            <Grid container item rowSpacing={2}>
+                                <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                </Grid>
+                                <Grid item xs={"auto"}>
+                                    {`${ownerDepartmentsCount} ${ownerDepartmentsCount === 1 ? "departamento" : "departamentos"}`}
+                                </Grid>
+                            </Grid>
+                        </Link>
+                    </Grid>
+                </CardContent>
+            </Card>
+        )
+
         const WarehouseButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <CardHeader title={"Almacenes"} />
@@ -290,6 +316,10 @@ export default function UserProfileMain({ userId }: {userId: number}) {
 
                 <Grid container item spacing={2}>
                     <Grid container item xs={6} justifyContent={"center"}>
+                        <DepartmentsButton />
+                    </Grid>
+
+                    <Grid container item xs={6} justifyContent={"center"}>
                         <ProductButton />
                     </Grid>
 
@@ -309,7 +339,7 @@ export default function UserProfileMain({ userId }: {userId: number}) {
         )
     }
 
-    const SellerModule = ({ sellerStores }: {sellerStores: any[]}) => {
+    const SellerModule = ({ sellerStores }: { sellerStores: any[] }) => {
         const StoreButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <CardHeader title={"Tiendas"} />

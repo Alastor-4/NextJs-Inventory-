@@ -70,7 +70,27 @@ export interface StoreMainTableProps {
     dataStoreDetails: storeWithStoreDepots | null;
 }
 
+export interface departmentsWithProductsCount {
+    id: number;
+    name: string | null;
+    description: string | null;
+    created_at: Date | null;
+    usersId: number | null;
+    products: number;
+}
+
+export interface ModalCreateUpdateDepartmentProps {
+    userId?: number;
+    isOpen: boolean;
+    setIsOpen: (bool: boolean) => void;
+    dialogTitle: string;
+    handleForceRender: () => void;
+    department?: allProductsByDepartmentProps | null;
+}
 export interface ProductsMainTableProps {
+    userId: number;
+}
+export interface DepartmentsMainTableProps {
     userId: number;
 }
 
@@ -230,7 +250,8 @@ export interface allProductsByDepartmentProps {
     id: number;
     name: string | null;
     description: string | null;
-    created_at: Date;
+    created_at: Date | null;
+    usersId: number | null;
     products?: productsProps[];
     selected?: boolean
 }
@@ -256,7 +277,6 @@ export interface UserWarehouseFormProps {
     ownerId?: number;
     warehouseId?: number;
     dataAllProducts?: productsProps[] | null;
-    depotsInWarehouses?: number | null;
 }
 
 export interface UserWarehouseMainTableProps {

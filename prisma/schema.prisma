@@ -34,8 +34,10 @@ model departments {
   id          Int        @id @default(autoincrement())
   name        String?    @db.VarChar(255)
   description String?    @db.VarChar(255)
-  created_at  DateTime   @default(now()) @db.Timestamp(0)
+  created_at  DateTime?  @default(now()) @db.Timestamp(0)
   products    products[]
+  users       users?     @relation("departments_user", fields: [usersId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "department_user_FK")
+  usersId     Int?
 }
 
 model depots {
@@ -182,6 +184,7 @@ model users {
   user_owner_stores  stores[]       @relation("owner_user")
   roles              roles?         @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
   warehouses         warehouses[]
+  departments        departments[]  @relation("departments_user")
 
   @@index([role_id], map: "role_id")
 }

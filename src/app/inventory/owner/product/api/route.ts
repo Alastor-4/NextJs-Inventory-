@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
+import { utapi } from "@/server/uploadthing";
+import { NextResponse } from 'next/server';
 import { prisma } from "db";
-import {utapi} from "@/server/uploadthing";
 
 // GET all user products
 export async function GET(req: Request) {
@@ -109,10 +109,10 @@ export async function PATCH(req: Request) {
     try {
         const { productId, productImages } = await req.json()
 
-        const data = productImages.map((item: any) => ({product_id: +productId, fileKey: item.key, fileUrl: item.url }))
+        const data = productImages.map((item: any) => ({ product_id: +productId, fileKey: item.key, fileUrl: item.url }))
 
         //insert new images for an existing product
-        const updatedProduct = await prisma.images.createMany({ data: data})
+        const updatedProduct = await prisma.images.createMany({ data: data })
 
         return NextResponse.json(updatedProduct);
     } catch (error) {
