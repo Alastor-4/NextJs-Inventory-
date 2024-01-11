@@ -15,12 +15,11 @@ const ModalCreateUpdateDepartment = ({ isOpen, setIsOpen, dialogTitle, departmen
         setIsOpen(false);
     }
 
-    const initialValues: allProductsByDepartmentProps = {
+    const initialValues: departments = {
         id: department ? department.id : -1,
         name: department ? department.name : '',
         description: department?.description ? department.description : '',
         created_at: department ? department.created_at : new Date(),
-        products: department ? department.products : [],
         usersId: 1
     }
 

@@ -15,13 +15,12 @@ const ModalCreateUpdateDepartment = ({ userId, isOpen, setIsOpen, dialogTitle, d
         setIsOpen(false);
     }
 
-    const initialValues: allProductsByDepartmentProps = {
+    const initialValues: departments = {
         id: department ? department.id : -1,
         name: department ? department.name : '',
         description: department?.description ? department.description : '',
         created_at: department ? department.created_at : new Date(),
-        products: department ? department.products : [],
-        usersId: userId
+        usersId: userId!
     }
 
     const validationSchema = Yup.object({
@@ -34,7 +33,7 @@ const ModalCreateUpdateDepartment = ({ userId, isOpen, setIsOpen, dialogTitle, d
             id: department ? department.id : -1,
             name: values.name,
             description: values.description,
-            usersId: userId,
+            usersId: userId!,
             created_at: new Date()
         }
         if (department) {

@@ -251,7 +251,7 @@ export interface allProductsByDepartmentProps {
     name: string | null;
     description: string | null;
     created_at: Date | null;
-    usersId: number | null;
+    usersId?: number | null;
     products?: productsProps[];
     selected?: boolean
 }
