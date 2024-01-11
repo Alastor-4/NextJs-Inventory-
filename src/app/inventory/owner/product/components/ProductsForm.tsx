@@ -21,17 +21,17 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
     const { startImagesUpload }: any = useImageUploadContext();
 
     //initial values
-    const [department, setDepartment] = useState<departments | null>();
+    const [department, setDepartment] = useState<number | string>("");
 
     useEffect(() => {
         async function fetchProduct(id: number) {
             const product = await products.productDetails(id)
             setUpdateItem(product);
 
-            if (product?.departments?.id) {
+            if (product?.departments?.id && departments?.length) {
                 const index = departments?.findIndex((item: { id: any; }) => item.id === product.departments.id);
-                if (index && index! > -1) {
-                    setDepartment(departments![index]!)
+                if (index > -1) {
+                    setDepartment(departments[index].id)
                 }
             }
         }
@@ -45,7 +45,7 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
         description: updateItem?.description ? updateItem.description : "",
         buyPrice: updateItem?.buy_price ? updateItem.buy_price : "",
         imagesMaxErrorField: "",
-        department: '',
+        department: department,
         characteristics: updateItem?.characteristics?.length ? updateItem.characteristics : [],
         deletedCharacteristics: [],
         images: updateItem?.images?.length ? updateItem.images : [],
