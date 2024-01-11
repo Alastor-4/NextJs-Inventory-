@@ -1,32 +1,28 @@
 "use client"
 
 import {
-    AppBar, Box, Card, CardContent, Checkbox, Divider, Grid, IconButton, InputBase, Table, TableBody, TableCell,
-    TableContainer,
-    TableHead, TableRow, Toolbar, Typography
+    AppBar, Box, Card, CardContent, Checkbox, Divider, Grid,
+    IconButton, InputBase, Table, TableBody, TableCell,
+    TableContainer, TableHead, TableRow, Toolbar, Typography
 } from "@mui/material";
-import { DepartmentsMainTableProps, departmentsWithProductsCount, allProductsByDepartmentProps } from "@/types/interfaces";
 import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined, HelpOutline } from "@mui/icons-material";
+import { DepartmentsMainTableProps, allProductsByDepartmentProps } from "@/types/interfaces";
 import ModalCreateUpdateDepartment from "./Modal/ModalCreateUpdateDepartment";
-import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import departmentsRequests from "../requests/departments";
-import { useStoreHook } from "@/app/store/useStoreHook";
+import { notifySuccess } from "@/utils/generalFunctions";
 import { TableNoData } from "@/components/TableNoData";
+import SearchIcon from '@mui/icons-material/Search';
+import InfoTooltip from "@/components/InfoTooltip";
 import React, { useEffect, useState } from "react";
-import { useStore } from "@/app/store/store";
 import { useRouter } from "next/navigation";
 import { Formik } from "formik";
-import InfoTooltip from "@/components/InfoTooltip";
-import SearchIcon from '@mui/icons-material/Search';
 
 export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
     const router = useRouter();
 
-    const store = useStoreHook(useStore, (state) => state.ownerDepartmentsCount);
-
     //Departments data
-    const [allDepartmentsData, setAllDepartmentsData] = useState<departmentsWithProductsCount[] | null>(null);
-    const [selectedDepartment, setSelectedDepartment] = useState<departmentsWithProductsCount | null>(null);
+    const [allDepartmentsData, setAllDepartmentsData] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [selectedDepartment, setSelectedDepartment] = useState<allProductsByDepartmentProps | null>(null);
 
     const [forceRender, setForceRender] = useState<boolean>(false);
 
@@ -38,7 +34,7 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
     //GET initial data
     useEffect(() => {
         const getAllDepartments = async () => {
-            const newAllDepartments: departmentsWithProductsCount[] | null = await departmentsRequests.getAllUserDepartments(+userId);
+            const newAllDepartments: allProductsByDepartmentProps[] | null = await departmentsRequests.getAllUserDepartments(+userId);
             if (newAllDepartments) {
                 setAllDepartmentsData(newAllDepartments);
                 setForceRender(false);
@@ -46,7 +42,7 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
             }
         }
         getAllDepartments();
-    }, [userId, forceRender, allDepartmentsData]);
+    }, [userId, forceRender]);
 
     //Modals handlers
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
@@ -55,36 +51,8 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
     const toggleModalCreate = () => setIsCreateModalOpen(!isCreateModalOpen);
     const toggleModalUpdate = () => setIsUpdateModalOpen(!isUpdateModalOpen);
 
-    //Update allDepartments at change
-    // useEffect(() => {
-    //     if (allProductsByDepartment?.length) {
-    //         let allProducts: productsProps[] = [];
-    //         let bool = false;
-    //         if (selectedDepartments) {
-    //             for (const department of selectedDepartments!) if (department.selected === true) bool = true;
-    //         }
-    //         allProductsByDepartment?.forEach((productsByDepartments) => {
-    //             if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
-    //                 allProducts = [...allProducts, ...productsByDepartments.products!];
-    //             }
-    //             if (selectedDepartments?.length! > 0 && bool) {
-    //                 if (productsByDepartments.selected) {
-    //                     allProducts = [...allProducts, ...productsByDepartments.products!];
-    //                 }
-    //             }
-    //         });
-
-    //         allProducts.sort((a: productsProps, b: productsProps) => {
-    //             if (a?.name! < b?.name!) return -1;
-    //             if (a?.name! > a?.name!) return 1;
-    //             return 0;
-    //         });
-    //         setDataProducts(allProducts);
-    //     }
-    // }, [allProductsByDepartment, selectedDepartments, isFilterModalOpen]);
-
     //Handle selected department
-    const handleSelectDepartment = (department: departmentsWithProductsCount) => {
+    const handleSelectDepartment = (department: allProductsByDepartmentProps) => {
         if (selectedDepartment && (selectedDepartment.id === department.id)) {
             setSelectedDepartment(null);
         } else {
@@ -103,8 +71,6 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
             setSelectedDepartment(null);
             handleForceRender();
             notifySuccess("Se ha eliminado el departamento");
-        } else {
-            notifyError("Error al eliminar el departamento");
         }
     }
 
@@ -189,13 +155,13 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
 
     const TableContent = ({ formik }: any) => {
         const filteredDepartments = allDepartmentsData?.filter(
-            (department: departmentsWithProductsCount) =>
+            (department: allProductsByDepartmentProps) =>
                 department?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                 department?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()));
         return (
             <TableBody >
                 {filteredDepartments?.map(
-                    (department: departmentsWithProductsCount) => (
+                    (department: allProductsByDepartmentProps) => (
                         <TableRow
                             key={department.id}
                             hover
@@ -210,9 +176,9 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
                                     sx={{ width: "5px" }}
                                 />
                             </TableCell>
-                            <TableCell>{department.name ?? "-"}</TableCell>
-                            <TableCell>{department.description ?? "-"}</TableCell>
-                            <TableCell>{department.products}</TableCell>
+                            <TableCell>{department.name}</TableCell>
+                            <TableCell align={department.description?.length === 0 ? "center" : "left"}>{department.description?.length === 0 ? "-" : department.description}</TableCell>
+                            <TableCell>{department.products?.length!}</TableCell>
                         </TableRow>
                     ))}
             </TableBody>
@@ -284,7 +250,7 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
                                         {
                                             allDepartmentsData?.length! > 0
                                                 ? (allDepartmentsData?.filter(
-                                                    (department: departmentsWithProductsCount) =>
+                                                    (department: allProductsByDepartmentProps) =>
                                                         department?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                                                         department?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
                                                     (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
@@ -293,9 +259,8 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
                                                             <TableContent formik={formik} />
                                                         </Table>
                                                     </TableContainer>) : <TableNoData searchCoincidence />
-                                                ) : (
-                                                    <TableNoData hasData={store} />
-                                                )
+                                                ) :
+                                                <TableNoData hasData={allDepartmentsData?.length!} />
                                         }
                                     </Grid>
                                 </Card>

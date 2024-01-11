@@ -1,13 +1,13 @@
-import { ModalCreateUpdateDepartmentProps, departmentsWithProductsCount } from '@/types/interfaces';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
+import { ModalCreateUpdateDepartmentProps, allProductsByDepartmentProps } from '@/types/interfaces';
+import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
 import departmentsRequests from '../../requests/departments';
 import { notifySuccess } from '@/utils/generalFunctions';
 import { departments } from '@prisma/client';
 import { AxiosResponse } from 'axios';
+import { Form, Formik } from 'formik';
 import * as Yup from "yup";
 import React from 'react';
-import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
-import { Form, Formik } from 'formik';
 
 const ModalCreateUpdateDepartment = ({ userId, isOpen, setIsOpen, dialogTitle, department, handleForceRender }: ModalCreateUpdateDepartmentProps) => {
 
@@ -15,12 +15,12 @@ const ModalCreateUpdateDepartment = ({ userId, isOpen, setIsOpen, dialogTitle, d
         setIsOpen(false);
     }
 
-    const initialValues: departmentsWithProductsCount = {
+    const initialValues: allProductsByDepartmentProps = {
         id: department ? department.id : -1,
-        name: department ? department.name : "",
-        description: department?.description ? department.description : "",
+        name: department ? department.name : '',
+        description: department?.description ? department.description : '',
         created_at: department ? department.created_at : new Date(),
-        products: department ? department.products : 0,
+        products: department ? department.products : [],
         usersId: userId
     }
 
@@ -39,10 +39,10 @@ const ModalCreateUpdateDepartment = ({ userId, isOpen, setIsOpen, dialogTitle, d
         }
         if (department) {
             const response: AxiosResponse | boolean = await departmentsRequests.updateDepartment(data);
-            if (response) notifySuccess("El departamento se ha creado correctamente");
+            if (response) notifySuccess("El departamento se ha modificado correctamente");
         } else {
             const response: AxiosResponse | boolean = await departmentsRequests.createDepartment(data);
-            if (response) notifySuccess("El departamento se ha modificado correctamente");
+            if (response) notifySuccess("El departamento se ha creado correctamente");
         }
         handleForceRender();
     }
@@ -53,7 +53,6 @@ const ModalCreateUpdateDepartment = ({ userId, isOpen, setIsOpen, dialogTitle, d
                 display={"flex"}
                 justifyContent={"space-between"}
                 alignItems={"center"}
-
                 color={"white"}
                 fontWeight={"400"}
                 sx={{ bgcolor: '#1976d3' }}
