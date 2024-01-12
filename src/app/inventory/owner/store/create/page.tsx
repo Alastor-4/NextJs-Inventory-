@@ -3,10 +3,16 @@ import StoresForm from "../components/StoresForm";
 import { getServerSession } from "next-auth";
 import { prisma } from "db";
 
+export const dynamic = "force-dynamic";
+
+async function fetchSellers(userId: number) {
+    return prisma.users.findMany({where: {work_for_user_id: userId, roles: {name: "store_seller"}}});
+}
+
 export default async function Page() {
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
-    const sellerUsers: any = await prisma.users.findMany({ where: { work_for_user_id: userId, roles: { name: "store_seller" } } })
+    const sellerUsers: any = await fetchSellers(userId!)
 
     return (
         <main>

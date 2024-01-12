@@ -1,9 +1,8 @@
-
 import apiRequest from "@/api";
-import { notifySuccess } from "@/utils/generalFunctions";
+import {notifyError} from "@/utils/generalFunctions";
 
-const url = `/inventory/owner/store/api`;
-const updateUrl = `/inventory/owner/store/update/api`;
+const url = "/inventory/owner/store/api";
+const updateUrl = "/inventory/owner/store/update/api";
 
 const stores = {
     allUserStores: async function (userId: number) {
@@ -11,7 +10,7 @@ const stores = {
             const response = await apiRequest.get(url, { params: { userId: userId } })
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Algo ha fallado mientras se obtenían los datos de las tiendas")
         }
 
         return false
@@ -22,7 +21,7 @@ const stores = {
             const response = await apiRequest.get(updateUrl, { params: { id: userId, storeId: storeId } })
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Algo ha fallado mientras se obtenían los datos de la tienda")
         }
 
         return false
@@ -32,9 +31,8 @@ const stores = {
         try {
             return await apiRequest.post(url, data)
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Algo ha fallado en la creación de la tienda")
         }
-
 
         return false
     },
@@ -43,7 +41,7 @@ const stores = {
         try {
             return await apiRequest.put(url, data)
         } catch (e) {
-            //ToDo: notify error here
+            notifyError("Algo ha fallado mientras se modificaba la tienda")
         }
 
         return false
