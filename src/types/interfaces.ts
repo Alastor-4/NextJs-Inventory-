@@ -35,7 +35,7 @@ export interface storeWithStoreDepots {
         product_remaining_units: number | null;
         seller_profit_percentage: number | null;
         created_at: Date;
-        description: string | null;
+        discount_description: string | null;
         is_active: boolean | null;
         sell_price: any | null;
         sell_price_unit: string | null;
@@ -172,7 +172,7 @@ export interface productsProps {
             product_remaining_units: number | null;
             seller_profit_percentage: number | null;
             created_at: Date;
-            description: string | null;
+            discount_description: string | null;
             is_active: boolean | null;
             sell_price: any | null;
             sell_price_unit: string | null;
@@ -211,7 +211,7 @@ export interface productsProps {
             seller_profit_percentage: number | null;
             created_at: Date;
             is_active: boolean | null;
-            description: string | null;
+            discount_description: string | null;
             sell_price: any | null;
             sell_price_unit: string | null;
             seller_profit_quantity: number | null;
@@ -231,7 +231,7 @@ export interface storeDepotsWithAny {
     product_remaining_units: number | null;
     seller_profit_percentage: number | null;
     created_at: Date;
-    description: string | null;
+    discount_description: string | null;
     is_active: boolean | null;
     sell_price: any | null;
     sell_price_unit: string | null;

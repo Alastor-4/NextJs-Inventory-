@@ -1,6 +1,6 @@
 'use client'
 import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle,
+    Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel,
     Grid, IconButton, InputAdornment, MenuItem, Switch, TextField
 } from '@mui/material';
 import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
@@ -12,10 +12,9 @@ import { Form, Formik } from 'formik';
 import * as Yup from "yup";
 
 const ModalProductPrice = ({ activeModalPrice, setActiveModalPrice, dialogTitle, storeDepot, loadData }: ModalProductPriceProps) => {
-
     const [activeDiscount, setActiveDiscount] = useState<boolean>(false);
     const [activePercentage, setActivePercentage] = useState<boolean>(false);
-    const [newSellPrice, setNewSellPrice] = useState<number>(parseFloat(`${storeDepot?.sell_price!}`));
+    const [newSellPrice, setNewSellPrice] = useState<number>(storeDepot?.sell_price ?? "");
 
     useEffect(() => {
         if (storeDepot?.price_discount_quantity || storeDepot?.price_discount_percentage) {
@@ -36,34 +35,33 @@ const ModalProductPrice = ({ activeModalPrice, setActiveModalPrice, dialogTitle,
         currency: storeDepot?.sell_price_unit ?? "CUP",
 
         discount: !activePercentage
-            ? storeDepot?.price_discount_quantity ?? newSellPrice
-            : storeDepot?.price_discount_percentage ?? 100,
+            ? storeDepot?.price_discount_quantity ?? 0
+            : storeDepot?.price_discount_percentage ?? 0,
 
         option: !activePercentage
             ? "$" // es el simbolo para acceder a la moneda de la propiedad currency
             : '%',
-        description: storeDepot?.description ? storeDepot?.description : ''
+        discount_description: storeDepot?.discount_description ? storeDepot?.discount_description : ''
     })
 
     const validationSchema = Yup.object({
-        price: Yup.number()
-            .required("Debe definir un precio"),
-        currency: Yup.string().required("Debes poner alguna moneda"),
-        discount: !activePercentage
+        price: Yup.number().required("Defina un precio"),
+        currency: Yup.string().required("Seleccione moneda"),
+        discount: activePercentage
             ? (
                 Yup.number()
-                    .max(newSellPrice!, `La rebaja no puede ser mayor al precio original (${newSellPrice})`)
-                    .min(0, "No se admiten precios negativos")
-                    .required("Defina una rebaja")
+                    .min(0, 'Mayor que 0')
+                    .max(100, 'Menor que 100')
+                    .required("Defina un valor")
             )
             : (
                 Yup.number()
-                    .min(0, 'El limite inferior es 0')
-                    .max(100, 'El limite superior es 100')
-                    .required("Defina un porcentaje")
+                    .max(newSellPrice!, `Menor que precio (${newSellPrice})`)
+                    .min(0, "Mayor que 0")
+                    .required("Defina una valor")
             ),
         option: Yup.string(),
-        description: Yup.string()
+        discount_description: Yup.string()
     });
 
     const handleSubmit = async (values: any) => {
@@ -83,7 +81,7 @@ const ModalProductPrice = ({ activeModalPrice, setActiveModalPrice, dialogTitle,
             product_remaining_units: storeDepot?.product_remaining_units,
             seller_profit_percentage: storeDepot?.seller_profit_percentage,
             is_active: storeDepot?.is_active,
-            description: values.description,
+            discount_description: values.discount_description,
             sell_price: parseFloat(precioOriginal),
             sell_price_unit: values.currency,
             seller_profit_quantity: storeDepot?.seller_profit_quantity,
@@ -165,10 +163,16 @@ const ModalProductPrice = ({ activeModalPrice, setActiveModalPrice, dialogTitle,
                                     </Grid>
                                 </Grid>
                                 <Grid item >
-                                    <Switch
-                                        checked={activeDiscount}
-                                        onChange={() => setActiveDiscount((e) => !e)}
-                                    /> Activar rebaja
+                                    <FormControlLabel
+                                        control={
+                                            <Switch
+                                                checked={activeDiscount}
+                                                disabled={!formik.values.price}
+                                                onChange={() => setActiveDiscount((e) => !e)}
+                                            />
+                                        }
+                                        label={"Usar rebaja"}
+                                    />
                                 </Grid>
                                 {activeDiscount &&
                                     <Grid container item rowSpacing={3} >
@@ -211,13 +215,14 @@ const ModalProductPrice = ({ activeModalPrice, setActiveModalPrice, dialogTitle,
                                         </Grid>
                                         <Grid item xs={12}>
                                             <TextField
-                                                label="Descripción"
+                                                placeholder={"Razón de la rebaja"}
                                                 size={"small"}
                                                 autoComplete='off'
                                                 fullWidth
-                                                {...formik.getFieldProps("description")}
-                                                error={!!formik.errors.description && formik.touched.description}
-                                                helperText={(formik.errors.description && formik.touched.description) && formik.errors.description}
+                                                {...formik.getFieldProps("discount_description")}
+                                                error={!!formik.errors.discount_description && !!formik.touched.discount_description}
+                                                // @ts-ignore
+                                                helperText={(formik.errors.discount_description && formik.touched.discount_description) && formik.errors.discount_description}
                                             />
                                         </Grid>
                                     </Grid>
