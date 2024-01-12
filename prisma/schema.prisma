@@ -123,6 +123,7 @@ model store_depots {
   seller_profit_quantity    Float?                    @db.Real
   price_discount_percentage Float?                    @db.Real
   price_discount_quantity   Float?                    @db.Real
+  description               String?
   seller_profit_unit        String?                   @db.VarChar(255)
   product_offers            product_offers[]
   product_store_transfers   product_store_transfers[]

@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
-import { ModalCreateUpdateDepartmentProps, allProductsByDepartmentProps } from '@/types/interfaces';
 import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
+import { ModalCreateUpdateDepartmentProps } from '@/types/interfaces';
 import departmentsRequests from '../../requests/departments';
 import { notifySuccess } from '@/utils/generalFunctions';
 import { departments } from '@prisma/client';
