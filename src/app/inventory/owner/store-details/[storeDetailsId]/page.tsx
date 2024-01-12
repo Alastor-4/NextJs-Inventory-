@@ -1,8 +1,8 @@
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
 import StoreMainTable from "./components/StoreMainTable";
+import { storeWithStoreDepots } from "@/types/interfaces";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/db";
-import { storeWithStoreDepots } from "@/types/interfaces";
 
 export default async function page({ params }: { params: { storeDetailsId: string } }) {
   const session = await getServerSession(nextAuthOptions);

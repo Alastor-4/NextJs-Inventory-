@@ -101,6 +101,7 @@ export async function PUT(req: Request) {
         seller_profit_quantity,
         price_discount_percentage,
         price_discount_quantity,
+        description
     } = await req.json();
 
 
@@ -119,6 +120,7 @@ export async function PUT(req: Request) {
             seller_profit_quantity,
             price_discount_percentage,
             price_discount_quantity,
+            description
         }, where: { id: id }
     })
 
