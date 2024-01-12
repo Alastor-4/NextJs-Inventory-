@@ -312,7 +312,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                                         <div
                                                             onClick={(e: any) => {
                                                                 e.stopPropagation()
-                                                                setActiveModalPrice({ active: true, storeDepot: { ...product?.depots![0].store_depots![0] } });
+                                                                setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true });
                                                             }}
                                                         >
                                                             <MoneyInfoTag
@@ -331,8 +331,8 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                                                     onClick={(e: any) => {
                                                                         e.stopPropagation()
                                                                         setActiveModalPrice({
+                                                                            storeDepot: { ...product?.depots![0].store_depots![0] },
                                                                             active: true,
-                                                                            storeDepot: { ...product?.depots![0].store_depots![0] }
                                                                         })
                                                                     }}
                                                                 >
@@ -433,24 +433,32 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     return (
         <>
             <CustomToolbar />
+
             <FilterProductsByDepartmentsModal
                 allProductsByDepartment={allProductsByDepartment!}
                 setSelectedDepartments={setSelectedDepartments}
                 isFilterModalOpen={isFilterModalOpen}
                 toggleModalFilter={toggleModalFilter}
             />
+
             <ImagesDisplayDialog
                 open={openImagesDialog}
                 setOpen={setOpenImagesDialog}
                 images={dialogImages!}
             />
-            <ModalProductPrice
-                dialogTitle="Editar Precio"
-                activeModalPrice={activeModalPrice.active}
-                storeDepot={activeModalPrice.storeDepot}
-                setActiveModalPrice={setActiveModalPrice}
-                loadData={loadData}
-            />
+
+            {
+                activeModalPrice.active && (
+                    <ModalProductPrice
+                        dialogTitle="Editar Precio"
+                        activeModalPrice={activeModalPrice.active}
+                        storeDepot={activeModalPrice.storeDepot}
+                        setActiveModalPrice={setActiveModalPrice}
+                        loadData={loadData}
+                    />
+                )
+            }
+
             {/* 
             <StoreModalPrice
                 dialogTitle={"Editar Precio"}

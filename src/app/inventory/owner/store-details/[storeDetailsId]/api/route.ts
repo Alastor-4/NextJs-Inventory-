@@ -7,7 +7,7 @@ interface Params {
 }
 
 //Pido todos los departamentos, productos de estos departamentos
-// y sus caracteristicas( todo esto de la tienda seleccionada )
+// y sus caracteristicas de la tienda seleccionada
 export async function GET(req: Request, { params }: Params) {
     const storeId = parseInt(params.storeDetailsId)
     const result = await prisma.departments.findMany({
@@ -101,10 +101,8 @@ export async function PUT(req: Request) {
         seller_profit_quantity,
         price_discount_percentage,
         price_discount_quantity,
-        description
+        discount_description
     } = await req.json();
-
-
 
     const result = await prisma.store_depots.update({
         data: {
@@ -120,7 +118,7 @@ export async function PUT(req: Request) {
             seller_profit_quantity,
             price_discount_percentage,
             price_discount_quantity,
-            description
+            discount_description
         }, where: { id: id }
     })
 
