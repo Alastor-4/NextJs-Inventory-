@@ -4,9 +4,22 @@ import React, { useState } from 'react'
 import StoreListOffers from './offers/components/StoreListOffers'
 import StoreModalDefault from './Modal/StoreModalDefault'
 import StoreEditSellerProfit from './Modal/StoreEditSellerProfit'
+import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
+import {numberFormat} from "@/utils/generalFunctions";
 
 function StoreMoreDetails(props: any) {
-    const { userId, details, show, loadData, row } = props
+    const {
+        details,
+        show,
+        loadData,
+        row,
+        baseProductPrice,
+        displayProductPrice,
+        priceDiscountQuantity,
+        displayPriceDiscount,
+        sellerProfitQuantity,
+        finalProductPrice,
+    } = props
 
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
 
@@ -16,7 +29,7 @@ function StoreMoreDetails(props: any) {
         let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
 
         const valuePercentage = (details.seller_profit_percentage !== null) ? (details.seller_profit_percentage * price / 100).toFixed(2) : null;
-        if (valuePercentage !== null) return `${details.seller_profit_percentage}%  (${valuePercentage} ${details.sell_price_unit})`
+        if (valuePercentage !== null) return `${details.seller_profit_percentage}%`
         return `${details.seller_profit_quantity} CUP`
     }
 
@@ -95,14 +108,52 @@ function StoreMoreDetails(props: any) {
                     </Grid>
 
                     <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ganancia del vendedor por producto:</Grid>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio
+                            base:</Grid>
+                        <Grid item xs={true}>
+                            {
+                                baseProductPrice
+                                    ? baseProductPrice + " " + row.depots[0].store_depots[0].sell_price_unit
+                                    : "sin precio"
+                            }
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio:</Grid>
+                        <Grid item xs={true}>
+                            <MoneyInfoTag
+                                value={displayProductPrice}
+                                errorColor={!baseProductPrice}
+                            />
+                            {
+                                priceDiscountQuantity && (
+                                    <InfoTag value={`- ${displayPriceDiscount} descuento`} />
+                                )
+                            }
+                        </Grid>
+                    </Grid>
+
+                    {
+                        row?.depots![0].store_depots![0].discount_description && (
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Razón de la rebaja:</Grid>
+                                <Grid item xs={true}>
+                                    {row?.depots![0].store_depots![0].discount_description}
+                                </Grid>
+                            </Grid>
+                        )
+                    }
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Salario vendedor:</Grid>
                         <Grid item container xs={true}>
                             <Grid item>
-                                {showSellerProfit(
-                                    row.depots[0].store_depots[0].sell_price,
-                                    row.depots[0].store_depots[0].price_discount_quantity,
-                                    row.depots[0].store_depots[0].price_discount_percentage
-                                )}
+                                {
+                                    row?.depots![0].store_depots![0].seller_profit_percentage
+                                        ? `${row?.depots![0].store_depots![0].seller_profit_percentage} %`
+                                        : `${row?.depots![0].store_depots![0].seller_profit_quantity} CUP`
+                                }
                             </Grid>
 
                             <Grid item>
@@ -114,10 +165,22 @@ function StoreMoreDetails(props: any) {
                     </Grid>
 
                     <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades restantes de total:</Grid>
+                        <Grid item xs={"auto"}
+                              sx={{ fontWeight: 600 }}>Distribución:</Grid>
+                        <Grid item xs={true}>
+                            {
+                                (baseProductPrice && sellerProfitQuantity && finalProductPrice)
+                                    ? `Dueño: ${numberFormat(String(finalProductPrice - sellerProfitQuantity))} | Vendedor: ${numberFormat(sellerProfitQuantity)}`
+                                    : "-"
+                            }
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades:</Grid>
                         <Grid item container xs={true}>
                             {
-                                `${row.depots[0].store_depots[0].product_remaining_units} de ${row.depots[0].store_depots[0].product_units}`
+                                `Qudan: ${row.depots[0].store_depots[0].product_remaining_units} | ${row.depots[0].store_depots[0].product_units} :Total ingresado`
                             }
                         </Grid>
                     </Grid>

@@ -255,6 +255,12 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                     ? (parseFloat(String(baseProductPrice)) - priceDiscountQuantity)
                                     : baseProductPrice
 
+                                const sellerProfitQuantity = finalProductPrice
+                                    ? product?.depots![0].store_depots![0].seller_profit_percentage
+                                        ? product?.depots![0].store_depots![0].seller_profit_percentage * finalProductPrice / 100
+                                        : product?.depots![0].store_depots![0].seller_profit_quantity
+                                    : null
+
                                 const displayProductPrice = finalProductPrice
                                     ? `${numberFormat(`${finalProductPrice}`) + " " + product?.depots![0].store_depots![0].sell_price_unit}`
                                     : "sin precio"
@@ -414,11 +420,16 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                             <TableCell style={{ padding: 0 }} colSpan={6}>
                                                 {showDetails === product.id && (
                                                     <StoreMoreDetails
-                                                        userId={userId}
                                                         details={product?.depots![0].store_depots![0]}
                                                         show={(showDetails === product.id)}
                                                         loadData={loadData}
                                                         row={product}
+                                                        baseProductPrice={baseProductPrice}
+                                                        displayProductPrice={displayProductPrice}
+                                                        priceDiscountQuantity={priceDiscountQuantity}
+                                                        displayPriceDiscount={displayPriceDiscount}
+                                                        sellerProfitQuantity={sellerProfitQuantity}
+                                                        finalProductPrice={finalProductPrice}
                                                     />
                                                 )}
                                             </TableCell>
