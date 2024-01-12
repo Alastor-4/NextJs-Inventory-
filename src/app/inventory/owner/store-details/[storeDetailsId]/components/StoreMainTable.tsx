@@ -31,6 +31,7 @@ import TransferUnits from "./Modal/TransferUnits";
 import { useRouter } from "next/navigation";
 import { images } from "@prisma/client";
 import { Formik } from "formik";
+import ModalProductPrice from "./Modal/ModalProductPrice";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -443,14 +444,21 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                 setOpen={setOpenImagesDialog}
                 images={dialogImages!}
             />
-
+            <ModalProductPrice
+                dialogTitle="Editar Precio"
+                activeModalPrice={activeModalPrice.active}
+                storeDepot={activeModalPrice.storeDepot}
+                setActiveModalPrice={setActiveModalPrice}
+                loadData={loadData}
+            />
+            {/* 
             <StoreModalPrice
                 dialogTitle={"Editar Precio"}
                 open={activeModalPrice.active}
                 setOpen={setActiveModalPrice}
             >
                 <StoreEditPrice storeDepot={activeModalPrice.storeDepot!} setActiveModalPrice={setActiveModalPrice} loadData={loadData} />
-            </StoreModalPrice>
+            </StoreModalPrice> */}
 
             <StoreModalDefault
                 dialogTitle={"Modificar Total"}

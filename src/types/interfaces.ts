@@ -27,7 +27,24 @@ export interface storeWithStoreDepots {
     fixed_seller_profit_percentage: number | null;
     fixed_seller_profit_quantity: number | null;
     fixed_seller_profit_unit: string | null;
-    store_depots?: any[];
+    store_depots?: {
+        id: number;
+        store_id: number | null;
+        depot_id: number | null;
+        product_units: number | null;
+        product_remaining_units: number | null;
+        seller_profit_percentage: number | null;
+        created_at: Date;
+        description: string | null;
+        is_active: boolean | null;
+        sell_price: any | null;
+        sell_price_unit: string | null;
+        seller_profit_quantity: number | null;
+        price_discount_percentage: number | null;
+        price_discount_quantity: number | null;
+        seller_profit_unit: string | null;
+        product_offers?: product_offers[] | null;
+    }[];
 }
 export interface ModalUpdateProductProps {
     open: boolean;
@@ -94,6 +111,18 @@ export interface DepartmentsMainTableProps {
     userId: number;
 }
 
+export interface ModalProductPriceProps {
+    activeModalPrice: boolean;
+    dialogTitle: string;
+    setActiveModalPrice: React.Dispatch<React.SetStateAction<{
+        active: boolean;
+        storeDepot: storeDepotsWithAny | null;
+    }>>
+    storeDepot: storeDepotsWithAny | null
+    loadData: () => Promise<void>;
+
+}
+
 export interface ModalAddProductFromWarehouseProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
@@ -143,6 +172,7 @@ export interface productsProps {
             product_remaining_units: number | null;
             seller_profit_percentage: number | null;
             created_at: Date;
+            description: string | null;
             is_active: boolean | null;
             sell_price: any | null;
             sell_price_unit: string | null;
@@ -181,6 +211,7 @@ export interface productsProps {
             seller_profit_percentage: number | null;
             created_at: Date;
             is_active: boolean | null;
+            description: string | null;
             sell_price: any | null;
             sell_price_unit: string | null;
             seller_profit_quantity: number | null;
@@ -200,6 +231,7 @@ export interface storeDepotsWithAny {
     product_remaining_units: number | null;
     seller_profit_percentage: number | null;
     created_at: Date;
+    description: string | null;
     is_active: boolean | null;
     sell_price: any | null;
     sell_price_unit: string | null;
