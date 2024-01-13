@@ -315,17 +315,11 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                             <TableCell>
                                                 <Grid container rowSpacing={1}>
                                                     <Grid item xs={12}>
-                                                        <div
-                                                            onClick={(e: any) => {
-                                                                e.stopPropagation()
-                                                                setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true });
-                                                            }}
-                                                        >
-                                                            <MoneyInfoTag
-                                                                value={displayProductPrice}
-                                                                errorColor={!baseProductPrice}
-                                                            />
-                                                        </div>
+                                                        <MoneyInfoTag
+                                                            value={displayProductPrice}
+                                                            errorColor={!baseProductPrice}
+                                                            action={() => setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true })}
+                                                        />
                                                         {product?.depots![0].store_depots![0].product_offers?.length! && (
                                                             <DescriptionOutlined fontSize={"small"} />
                                                         )}
@@ -333,17 +327,11 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                                     {
                                                         displayPriceDiscount && (
                                                             <Grid item xs={12}>
-                                                                <div
-                                                                    onClick={(e: any) => {
-                                                                        e.stopPropagation()
-                                                                        setActiveModalPrice({
-                                                                            storeDepot: { ...product?.depots![0].store_depots![0] },
-                                                                            active: true,
-                                                                        })
-                                                                    }}
-                                                                >
-                                                                    <InfoTag value={`- ${displayPriceDiscount}`} />
-                                                                </div>
+                                                                <InfoTag
+                                                                    value={`- ${displayPriceDiscount}`}
+                                                                    action={() => setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true })}
+                                                                    tooltipText={product?.depots![0].store_depots![0].discount_description}
+                                                                />
                                                             </Grid>
                                                         )
                                                     }

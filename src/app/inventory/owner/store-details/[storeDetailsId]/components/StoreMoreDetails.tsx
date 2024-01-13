@@ -23,16 +23,6 @@ function StoreMoreDetails(props: any) {
 
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
 
-    const showSellerProfit = (priceProductStore: any, discountQuantity: any, discountPorcentage: any) => {
-        let pricePorcentage = (discountPorcentage !== null) ? (discountPorcentage * priceProductStore / 100).toFixed(2) : null;
-
-        let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
-
-        const valuePercentage = (details.seller_profit_percentage !== null) ? (details.seller_profit_percentage * price / 100).toFixed(2) : null;
-        if (valuePercentage !== null) return `${details.seller_profit_percentage}%`
-        return `${details.seller_profit_quantity} CUP`
-    }
-
     return (
         <>
             <StoreModalDefault
