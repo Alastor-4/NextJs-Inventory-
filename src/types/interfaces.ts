@@ -242,6 +242,11 @@ export interface storeDepotsWithAny {
     product_offers?: product_offers[] | null;
 }
 
+export interface ModalSellsTodayProps {
+    isOpen: boolean;
+    setIsOpen: () => void;
+    dialogTitle: string;
+}
 export interface StoreModalDefaultProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
