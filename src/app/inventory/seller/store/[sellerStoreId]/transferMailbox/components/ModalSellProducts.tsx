@@ -1,7 +1,6 @@
 //@ts-nocheck
 import {
     AppBar,
-    Box,
     Button,
     Dialog,
     DialogContent,
