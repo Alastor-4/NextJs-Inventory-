@@ -1,4 +1,3 @@
-//@ts-nocheck
 "use client"
 
 import {
@@ -11,12 +10,13 @@ import {
 } from "@mui/icons-material"
 import { daysMap, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
+import { productSellsStatsProps, storeSellsDetailsProps } from "@/types/interfaces";
 import { useParams, useRouter } from "next/navigation";
+import ModalSellsToday from "./Modal/ModalSellsToday";
 import React, { useEffect, useState } from "react";
 import isBetween from "dayjs/plugin/isBetween";
 import Link from "next/link";
 import dayjs from "dayjs";
-import ModalSellsToday from "./Modal/ModalSellsToday";
 
 dayjs.extend(isBetween);
 
@@ -24,37 +24,47 @@ export default function StoreMain({ userId }) {
     const [storeDetails, setStoreDetails] = useState(null)
     const [storeDepotsStats, setStoreDepotsStats] = useState(null)
     const [productSells, setProductSells] = useState(null)
-    const [productSellsStats, setProductSellsStats] = useState(null)
+    const [todaySellsStats, setTodaySellsStats] = useState<productSellsStatsProps | null>(null);
+    const [allSells, setAllSells] = useState<storeSellsDetailsProps[] | null>(null);
+    const [todaySells, setTodaySells] = useState<storeSellsDetailsProps[] | null>(null);
 
     const params = useParams();
     const router = useRouter();
 
-    const sellerStoreId = params.sellerStoreId;
+    const sellerStoreId = +params.sellerStoreId!;
 
     //Modal Handlers
     const [isModalSellsOpen, setIsModalSellsOpen] = useState<boolean>(false);
     const toggleModalSellsOpen = () => setIsModalSellsOpen(!isModalSellsOpen);
 
-    //get initial store and sells details and compute stats
+    //GET initial store and sellsStats details
     useEffect(() => {
         async function loadStatsData() {
-            const p1 = await stores.storeDetails(userId, sellerStoreId)
-            const p2 = await stores.storeSellsDetails(sellerStoreId)
+            const storeDetails = await stores.storeDetails(userId, sellerStoreId)
+            const storeTodaySellsDetails: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId);
+            const storeAllSellsDetails: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId, true);
 
-            const [storeDetailsResponse, storeSellsResponse] = [p1, p2]
+            console.log("Solo hoy");
+            console.log(storeTodaySellsDetails);
+
+            console.log("Todas");
+            console.log(storeAllSellsDetails);
+
+
+            // const [storeDetailsResponse, storeSellsDetailsResponse] = [storeDetails, storeSellsDetails]
             // const [storeDetailsResponse, storeSellsResponse] = await Promise.all([p1, p2])
 
-            if (storeDetailsResponse) {
-                setStoreDetails(storeDetailsResponse)
+            if (storeDetails) {
+                setStoreDetails(storeDetails);
 
-                const depotsTotal = storeDetailsResponse.store_depots.length
+                const depotsTotal = storeDetails.store_depots.length
                 let depotsRemainingUnitsTotal = 0
                 let depotsNotRemainingUnitsTotal = 0
                 let depotsNotActiveTotal = 0
                 let depotsWithoutPriceTotal = 0
                 let depotsWithDiscountTotal = 0
 
-                storeDetailsResponse.store_depots.forEach(item => {
+                storeDetails.store_depots.forEach(item => {
                     depotsRemainingUnitsTotal += item.product_remaining_units
                     if (!item.product_remaining_units) depotsNotRemainingUnitsTotal++
                     if (!item.is_active) depotsNotActiveTotal++
@@ -72,72 +82,71 @@ export default function StoreMain({ userId }) {
                 })
             }
 
-            if (storeSellsResponse) {
-                setProductSells(storeSellsResponse)
-                const sellsTotal = storeSellsResponse.length
-                let sellsDifferentProductsTotal = 0
-                let sellsUnitsTotal = 0
-                let sellsAmountTotal = 0
-                let sellsUnitsReturnedTotal = 0
-                let sellerProfitTotal = 0
+            if (storeTodaySellsDetails) {
+                // setProductSells(storeSellsDetailsResponse)
+                const sellsTotal: number = storeTodaySellsDetails.length!
+                let sellsDifferentProductsTotal: number = 0;
+                let sellsUnitsTotal: number = 0;
+                let sellsAmountTotal: number = 0;
+                let sellsUnitsReturnedTotal: number = 0;
+                let sellerProfitTotal: number = 0;
 
-                let seeDepotsId = {}
+                let sellsDepotsIdAndSellState: { [key: number]: boolean; } = {};
 
-                storeSellsResponse.forEach(item => {
-                    let sellProfitQuantity = 0
+                storeTodaySellsDetails.forEach((sells: storeSellsDetailsProps) => {
+                    let sellProfitQuantity: number = 0;
 
-                    //sell from a reservation
-                    if (item.reservations) {
-                        //loop trough reservation products
-                        item.reservations.reservation_products.forEach(reservationProductItem => {
-                            if (!seeDepotsId[reservationProductItem.store_depots.depot_id]) {
-                                sellsDifferentProductsTotal++
-                                seeDepotsId[reservationProductItem.store_depots.depot_id] = true
+                    //venta a través de reservación
+                    if (sells.reservations) {
+                        sells.reservations.reservation_products.forEach(reservationProductItem => {
+                            if (!sellsDepotsIdAndSellState[reservationProductItem.store_depots.depot_id!]) {
+                                sellsDifferentProductsTotal++;
+                                sellsDepotsIdAndSellState[reservationProductItem.store_depots.depot_id!] = true
                             }
 
-                            sellsUnitsTotal += reservationProductItem.units_quantity
+                            sellsUnitsTotal += reservationProductItem.units_quantity;
 
                             sellProfitQuantity += reservationProductItem.store_depots.seller_profit_quantity
                                 ? reservationProductItem.store_depots.seller_profit_quantity * reservationProductItem.units_quantity
-                                : reservationProductItem.store_depots.seller_profit_percentage * reservationProductItem.price / 100
+                                : reservationProductItem.store_depots.seller_profit_percentage! * reservationProductItem.price / 100;
                         })
                     } else {
-                        //loop trough sell products
-                        item.sell_products.forEach(sellProductItem => {
-                            if (!seeDepotsId[sellProductItem.store_depots.depot_id]) {
-                                sellsDifferentProductsTotal++
-                                seeDepotsId[sellProductItem.store_depots.depot_id] = true
+                        sells.sell_products.forEach(sellProductItem => {
+                            if (!sellsDepotsIdAndSellState[sellProductItem.store_depots.depot_id!]) {
+                                sellsDifferentProductsTotal++;
+                                sellsDepotsIdAndSellState[sellProductItem.store_depots.depot_id!] = true;
                             }
 
-                            sellsUnitsTotal += sellProductItem.units_quantity
+                            sellsUnitsTotal += sellProductItem.units_quantity;
 
                             sellProfitQuantity += sellProductItem.store_depots.seller_profit_quantity
                                 ? sellProductItem.store_depots.seller_profit_quantity * sellProductItem.units_quantity
-                                : sellProductItem.store_depots.seller_profit_percentage * sellProductItem.price / 100
+                                : sellProductItem.store_depots.seller_profit_percentage! * sellProductItem.price / 100;
                         })
                     }
 
-                    sellsAmountTotal += item.total_price
-                    sellsUnitsReturnedTotal += item.units_returned_quantity
+                    sellsAmountTotal += sells.total_price!;
+                    sellsUnitsReturnedTotal += sells.units_returned_quantity!;
 
-                    sellerProfitTotal += sellProfitQuantity
+                    sellerProfitTotal += sellProfitQuantity;
                 })
-
-                setProductSellsStats({
+                setTodaySells(storeTodaySellsDetails);
+                setAllSells(storeAllSellsDetails);
+                setTodaySellsStats({
                     sellsTotal,
                     sellsDifferentProductsTotal,
                     sellsUnitsTotal,
                     sellsAmountTotal,
                     sellsUnitsReturnedTotal,
                     sellerProfitTotal,
-                })
+                });
             }
         }
 
         if (sellerStoreId && userId) {
-            loadStatsData()
+            loadStatsData();
         }
-    }, [sellerStoreId, userId])
+    }, [sellerStoreId, userId]);
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -162,7 +171,7 @@ export default function StoreMain({ userId }) {
         </AppBar>
     )
 
-    const [autoOpenTime, setAutoOpenTime] = useState(true)
+    const [autoOpenTime, setAutoOpenTime] = useState<boolean>(true);
     useEffect(() => {
         if (storeDetails) {
             setAutoOpenTime(storeDetails?.auto_open_time ?? false)
@@ -254,8 +263,8 @@ export default function StoreMain({ userId }) {
         return false
     }
 
-    const [displayAutoOpenSection, setDisplayAutoOpenSection] = useState(false)
-    const [displayAutoReservationSection, setDisplayAutoReservationSection] = useState(false)
+    const [displayAutoOpenSection, setDisplayAutoOpenSection] = useState<boolean>(false);
+    const [displayAutoReservationSection, setDisplayAutoReservationSection] = useState<boolean>(false);
 
     const StoreProducts = () => {
 
@@ -390,63 +399,63 @@ export default function StoreMain({ userId }) {
         return (
             <Card variant={"outlined"} sx={{ overflow: "visible" }}>
                 <CardHeader sx={{ marginBottom: "-20px", marginTop: "-30px" }} title={
-                    <Typography display={"flex"} variant="h5" sx={{ bgcolor: "white", px: "3px", width: "73px" }}>
-                        Ventas
+                    <Typography display={"flex"} variant="h5" sx={{ bgcolor: "white", px: "4px", width: "155px" }}>
+                        Ventas de hoy
                     </Typography>
                 } />
                 <CardContent>
                     <Grid item container justifyContent={"space-between"} marginBottom={"15px"}>
                         <Grid item xs={8}>
-                            <Button size="small" variant="outlined" color="primary" onClick={toggleModalSellsOpen}>Detalles de hoy</Button>
+                            <Button size="small" variant="outlined" color="primary" onClick={toggleModalSellsOpen}>Ver detalles</Button>
                         </Grid>
                         <Grid item xs={4}>
                             <Button size="small" variant="outlined" color="secondary">Historial</Button>
                         </Grid>
                     </Grid>
                     {
-                        productSellsStats && (
+                        todaySellsStats && (
                             <Grid container rowSpacing={2}>
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Ventas:
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                        Total de ventas:
                                     </Grid>
-                                    <Grid item xs={true}>
-                                        {productSellsStats.sellsTotal} ({productSellsStats.sellsUnitsTotal} unidades total) ({productSellsStats.sellsDifferentProductsTotal} productos diferentes)
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        {todaySellsStats.sellsTotal} ({todaySellsStats.sellsUnitsTotal} unidades totales) ({todaySellsStats.sellsDifferentProductsTotal} productos diferentes)
                                     </Grid>
                                 </Grid>
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
                                         Productos devueltos:
                                     </Grid>
-                                    <Grid item xs={true}>
-                                        {productSellsStats.sellsUnitsReturnedTotal}
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        {todaySellsStats.sellsUnitsReturnedTotal}
                                     </Grid>
                                 </Grid>
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Total vendido:
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                        Total recaudado:
                                     </Grid>
-                                    <Grid item xs={true}>
-                                        $ {numberFormat(productSellsStats.sellsAmountTotal)}
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        $ {numberFormat(`${todaySellsStats.sellsAmountTotal}`)}
                                     </Grid>
                                 </Grid>
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
                                         Desglose:
                                     </Grid>
-                                    <Grid item xs={true}>
-                                        $ {numberFormat(productSellsStats.sellsAmountTotal - productSellsStats.sellerProfitTotal)} del dueño | $ {numberFormat(productSellsStats.sellerProfitTotal)} del vendedor
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        $ {numberFormat(`${todaySellsStats.sellsAmountTotal - todaySellsStats.sellerProfitTotal}`)} del dueño | $ {numberFormat(`${todaySellsStats.sellerProfitTotal}`)} del vendedor
                                     </Grid>
                                 </Grid>
                             </Grid>
                         )
                     }
                 </CardContent>
-            </Card>
+            </Card >
         )
     }
 

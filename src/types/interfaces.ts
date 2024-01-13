@@ -1,4 +1,4 @@
-import { characteristics, departments, depots, images, product_offers, products, users, warehouses } from "@prisma/client";
+import { characteristics, departments, depots, images, product_offers, products, sell_products, sells, users, warehouses, store_depots, reservations, reservation_products, Prisma } from '@prisma/client';
 import { ReactNode } from "react";
 
 export interface ShowProductsStoreProps {
@@ -244,7 +244,7 @@ export interface storeDepotsWithAny {
 
 export interface ModalSellsTodayProps {
     isOpen: boolean;
-    setIsOpen: () => void;
+    setIsOpen: (bool: boolean) => void;
     dialogTitle: string;
 }
 export interface StoreModalDefaultProps {
@@ -254,12 +254,64 @@ export interface StoreModalDefaultProps {
     dialogTitle?: string;
 }
 
+export interface storeSellsDetailsProps {
+    id: number;
+    total_price: number | null;
+    payment_method: string | null;
+    units_returned_quantity: number | null;
+    created_at: Date;
+    returned_at: Date | null;
+    returned_reason: string | null;
+    from_reservation_id: number | null;
+    requesting_user_id: number | null;
+    reservations?: {
+        id: number;
+        payment_method: string | null;
+        created_at: Date;
+        requesting_user_id: number;
+        request_delivery: boolean;
+        delivery_notes: string | null;
+        status_description: string | null;
+        status_id: number;
+        total_price: number;
+        reservation_products: {
+            id: number;
+            reservation_id: number;
+            store_depot_id: number;
+            units_quantity: number;
+            price: number;
+            applied_offer: Prisma.JsonValue;
+            applied_discount: Prisma.JsonValue;
+            created_at: Date;
+            store_depots: storeDepotsWithAny;
+        }[];
+    } | null;
+    sell_products: {
+        id: number;
+        sell_id: number;
+        store_depot_id: number;
+        units_quantity: number;
+        price: number;
+        created_at: Date;
+        store_depots: storeDepotsWithAny;
+    }[];
+}
+
 export interface TransferUnitsProps {
     nameStore: string | null;
     storeDepot: storeDepotsWithAny | null;
     productId: number | null
     setActiveTransferUnits: (bool: boolean) => void;
     loadData: () => Promise<void>;
+}
+
+export interface productSellsStatsProps {
+    sellsTotal: number;
+    sellsDifferentProductsTotal: number;
+    sellsUnitsTotal: number;
+    sellsAmountTotal: number;
+    sellsUnitsReturnedTotal: number;
+    sellerProfitTotal: number;
 }
 export interface StoreEditUnitsProps {
     loadData: () => Promise<void>;
