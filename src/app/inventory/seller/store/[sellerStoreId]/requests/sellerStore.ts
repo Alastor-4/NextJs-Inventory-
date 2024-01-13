@@ -3,7 +3,7 @@ import apiRequest from "@/api"
 import { notifyError } from "@/utils/generalFunctions";
 
 const url = (sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/api`
-const sellsUrl = (sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/sellsApi`
+const sellsUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/sellsApi`
 
 const sellerStore = {
     storeDetails: async function (userId, sellerStoreId) {
@@ -17,14 +17,13 @@ const sellerStore = {
         return false
     },
 
-    storeSellsDetails: async function (sellerStoreId) {
+    storeSellsDetails: async function (sellerStoreId: number, allSells?: boolean) {
         try {
-            const response = await apiRequest.get(sellsUrl(sellerStoreId))
-            return response.data
+            const response = await apiRequest.get(sellsUrl(sellerStoreId), { params: { sellerStoreId, allSells } });
+            return response.data;
         } catch (e) {
             notifyError(`Ha ocurrido un error obteniendo los datos de las ventas de la tienda. Inténtelo nuevamente`)
         }
-
         return false
     },
 
