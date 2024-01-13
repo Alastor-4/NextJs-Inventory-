@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import transfer from '../request/transfer'
 import dayjs from 'dayjs'
-import { characteristics, departments, images, products, stores } from '@prisma/client'
+import { images } from '@prisma/client'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import { DataTransferReceived, TransferStoreDepots } from './TypeTransfers'
 import ModalSellProducts from './ModalSellProducts'
@@ -13,6 +13,7 @@ import ModalSellProducts from './ModalSellProducts'
 interface SellerTransferMailboxProps {
     userId?: number
     storeId?: number
+    sent: boolean
 }
 
 interface DataStatus {
@@ -22,7 +23,7 @@ interface DataStatus {
 }
 
 
-function SellerTransferMailBox({ userId, storeId }: SellerTransferMailboxProps) {
+function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxProps) {
 
     const router = useRouter()
 
@@ -32,15 +33,14 @@ function SellerTransferMailBox({ userId, storeId }: SellerTransferMailboxProps) 
     const [forceRender, setForceRender] = useState(true)
     //get initial data
     useEffect(() => {
+        const checkStatus = (item: DataTransferReceived) => {
+            if (item.from_store_accepted) return 1
+            if (item.to_store_accepted) return 2
+            else return 3
+
+        }
+
         const getAllTransfersReceived = async () => {
-
-            const checkStatus = (item: DataTransferReceived) => {
-                if (item.from_store_accepted) return 1
-                if (item.to_store_accepted) return 2
-                else return 3
-
-            }
-
             const newDataTransfer = await transfer.getAllTransfersReceived(storeId!)
             if (newDataTransfer) {
                 setDataTransfer(
@@ -52,14 +52,34 @@ function SellerTransferMailBox({ userId, storeId }: SellerTransferMailboxProps) 
                             { ...item, transferStatus: checkStatus(item) }
                         ))
                 )
-                setForceRender(false)
             }
         }
 
-        if (storeId && userId && forceRender) {
-            getAllTransfersReceived()
+        const getAllTransferSent = async () => {
+            let newDataTransfer = await transfer.getAllTransfersSent(storeId!)
+            for (let item of newDataTransfer) {
+                item.store_depots.stores = item.stores
+            }
+
+            setDataTransfer(
+                newDataTransfer
+                    .sort((dateA: DataTransferReceived, dateB: DataTransferReceived) =>
+                        -(dayjs(dateA.created_at).diff(dayjs(dateB.created_at))
+                        ))
+                    .map((item: DataTransferReceived) => (
+                        { ...item, transferStatus: checkStatus(item) }
+                    ))
+            )
         }
-    }, [storeId, userId, forceRender])
+
+        if ((storeId && userId) || forceRender) {
+            sent
+                ? getAllTransferSent()
+                : getAllTransfersReceived()
+
+            setForceRender(false)
+        }
+    }, [storeId, userId, sent, forceRender])
 
     useEffect(() => {
         if (dataTransfer.length) {
@@ -324,7 +344,7 @@ function SellerTransferMailBox({ userId, storeId }: SellerTransferMailboxProps) 
                             </Grid>
 
 
-                            <Grid item container spacing={1} alignItems={'center'}>
+                            <Grid item container columnGap={1} alignItems={'center'}>
                                 <Grid item sx={{ fontWeight: 600 }}>Mensaje: </Grid>
                                 {
                                     dataItem.transfer_notes
@@ -516,7 +536,7 @@ function SellerTransferMailBox({ userId, storeId }: SellerTransferMailboxProps) 
                             <ProductDetails />
                         </Grid>
                         {
-                            dataItem.transferStatus === 1 && (
+                            dataItem.transferStatus === 1 && !sent && (
                                 <Grid item xs={12}>
                                     <TransferOptions />
                                 </Grid>
@@ -536,7 +556,11 @@ function SellerTransferMailBox({ userId, storeId }: SellerTransferMailboxProps) 
 
                         <Grid item container justifyContent={'space-between'}>
                             <Grid item>
-                                {dataItem.store_depots.stores.name}
+
+                                {`
+                                    ${sent ? 'Para:' : 'De:'}
+                                        ${dataItem.store_depots.stores.name}
+                                `}
                             </Grid>
                             <Grid item>
                                 {

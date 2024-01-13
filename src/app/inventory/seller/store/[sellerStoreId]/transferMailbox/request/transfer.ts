@@ -1,14 +1,6 @@
 import apiRequest from "@/api";
 import { notifyError } from "@/utils/generalFunctions";
-import { store_depots } from "@prisma/client";
 
-const urlTransfer = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiProductTransfer`
-
-const urlStoreDepot = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiStoreDepots`
-
-const urlOfferTransfer = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiOffersTransfer`
-
-const urlSells = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiSell`
 
 interface TransferStoreDepots {
     id?: number
@@ -43,6 +35,20 @@ interface SellsAndSellProductProps {
     units_quantity: number,
     price: number
 }
+
+
+const urlTransfer = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiProductTransfer`
+
+const urlStoreDepot = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiStoreDepots`
+
+const urlOfferTransfer = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiOffersTransfer`
+
+const urlSells = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiSell`
+
+const urlSent = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiSent`
+
+
+
 
 export const transfer = {
 
@@ -117,6 +123,17 @@ export const transfer = {
         return false
     },
 
+    //Sent
+    getAllTransfersSent: async function (storeId: number) {
+        try {
+            const result = await apiRequest.get(urlSent(storeId))
+
+            return result.data
+        } catch (e) {
+            notifyError("Error al cargar las transferencias")
+        }
+        return false
+    },
 }
 
 export default transfer;
