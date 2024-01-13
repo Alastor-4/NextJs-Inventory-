@@ -1,12 +1,12 @@
 import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Button } from '@mui/material';
-import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
 import { ModalSellsTodayProps } from '@/types/interfaces';
+import { Close } from '@mui/icons-material';
 import React from 'react';
 
 const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle }: ModalSellsTodayProps) => {
 
     const handleCloseModal = () => {
-        setIsOpen();
+        setIsOpen(false);
     }
 
     return (
@@ -26,7 +26,7 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle }: ModalSellsTodayProp
                     onClick={handleCloseModal}
                     aria-label="close"
                 >
-                    <CloseIcon />
+                    <Close />
                 </IconButton>
             </DialogTitle>
             <DialogContent dividers >
