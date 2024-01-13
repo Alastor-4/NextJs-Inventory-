@@ -1,51 +1,42 @@
-// @ts-nocheck
+//@ts-nocheck
 "use client"
 
-import React from "react";
 import {
-    AppBar,
-    Box,
-    Card,
-    CardContent,
-    CardHeader,
-    Chip,
-    Grid,
-    IconButton,
-    Switch,
-    Toolbar,
-    Typography
+    AppBar, Box, Button, Card, CardContent, CardHeader,
+    Chip, Grid, IconButton, Switch, Toolbar, Typography
 } from "@mui/material";
 import {
-    ArrowLeft,
-    ChevronRightOutlined,
-    ExpandLessOutlined,
-    ExpandMoreOutlined,
-    ForwardToInbox,
-    InfoOutlined,
-    Mail
+    ArrowLeft, ChevronRightOutlined, ExpandLessOutlined, ExpandMoreOutlined,
+    ForwardToInbox, InfoOutlined, Mail
 } from "@mui/icons-material"
-import { useParams, useRouter } from "next/navigation";
-import dayjs from "dayjs";
-import isBetween from "dayjs/plugin/isBetween";
-import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
-import Link from "next/link";
 import { daysMap, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
+import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
+import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import isBetween from "dayjs/plugin/isBetween";
+import Link from "next/link";
+import dayjs from "dayjs";
+import ModalSellsToday from "./Modal/ModalSellsToday";
 
-dayjs.extend(isBetween)
+dayjs.extend(isBetween);
 
 export default function StoreMain({ userId }) {
-    const [storeDetails, setStoreDetails] = React.useState(null)
-    const [storeDepotsStats, setStoreDepotsStats] = React.useState(null)
-    const [productSells, setProductSells] = React.useState(null)
-    const [productSellsStats, setProductSellsStats] = React.useState(null)
+    const [storeDetails, setStoreDetails] = useState(null)
+    const [storeDepotsStats, setStoreDepotsStats] = useState(null)
+    const [productSells, setProductSells] = useState(null)
+    const [productSellsStats, setProductSellsStats] = useState(null)
 
-    const params = useParams()
-    const router = useRouter()
+    const params = useParams();
+    const router = useRouter();
 
-    const sellerStoreId = params.sellerStoreId
+    const sellerStoreId = params.sellerStoreId;
+
+    //Modal Handlers
+    const [isModalSellsOpen, setIsModalSellsOpen] = useState<boolean>(false);
+    const toggleModalSellsOpen = () => setIsModalSellsOpen(!isModalSellsOpen);
 
     //get initial store and sells details and compute stats
-    React.useEffect(() => {
+    useEffect(() => {
         async function loadStatsData() {
             const p1 = await stores.storeDetails(userId, sellerStoreId)
             const p2 = await stores.storeSellsDetails(sellerStoreId)
@@ -171,8 +162,8 @@ export default function StoreMain({ userId }) {
         </AppBar>
     )
 
-    const [autoOpenTime, setAutoOpenTime] = React.useState(true)
-    React.useEffect(() => {
+    const [autoOpenTime, setAutoOpenTime] = useState(true)
+    useEffect(() => {
         if (storeDetails) {
             setAutoOpenTime(storeDetails?.auto_open_time ?? false)
         }
@@ -194,8 +185,8 @@ export default function StoreMain({ userId }) {
         }
     }
 
-    const [autoReservationTime, setAutoReservationTime] = React.useState(true)
-    React.useEffect(() => {
+    const [autoReservationTime, setAutoReservationTime] = useState(true)
+    useEffect(() => {
         if (storeDetails) {
             setAutoReservationTime(storeDetails?.auto_reservation_time ?? false)
         }
@@ -263,8 +254,8 @@ export default function StoreMain({ userId }) {
         return false
     }
 
-    const [displayAutoOpenSection, setDisplayAutoOpenSection] = React.useState(false)
-    const [displayAutoReservationSection, setDisplayAutoReservationSection] = React.useState(false)
+    const [displayAutoOpenSection, setDisplayAutoOpenSection] = useState(false)
+    const [displayAutoReservationSection, setDisplayAutoReservationSection] = useState(false)
 
     const StoreProducts = () => {
 
@@ -395,13 +386,23 @@ export default function StoreMain({ userId }) {
     }
 
 
-    const TodaySells = () => {
-
+    const SellsModule = () => {
         return (
-            <Card variant={"outlined"}>
-                <CardHeader title={"Ventas de hoy"} />
-
+            <Card variant={"outlined"} sx={{ overflow: "visible" }}>
+                <CardHeader sx={{ marginBottom: "-20px", marginTop: "-30px" }} title={
+                    <Typography display={"flex"} variant="h5" sx={{ bgcolor: "white", px: "3px", width: "73px" }}>
+                        Ventas
+                    </Typography>
+                } />
                 <CardContent>
+                    <Grid item container justifyContent={"space-between"} marginBottom={"15px"}>
+                        <Grid item xs={8}>
+                            <Button size="small" variant="outlined" color="primary" onClick={toggleModalSellsOpen}>Detalles de hoy</Button>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Button size="small" variant="outlined" color="secondary">Historial</Button>
+                        </Grid>
+                    </Grid>
                     {
                         productSellsStats && (
                             <Grid container rowSpacing={2}>
@@ -414,7 +415,6 @@ export default function StoreMain({ userId }) {
                                         {productSellsStats.sellsTotal} ({productSellsStats.sellsUnitsTotal} unidades total) ({productSellsStats.sellsDifferentProductsTotal} productos diferentes)
                                     </Grid>
                                 </Grid>
-
                                 <Grid container item spacing={1} xs={12}>
                                     <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                         <ChevronRightOutlined fontSize={"small"} />
@@ -424,7 +424,6 @@ export default function StoreMain({ userId }) {
                                         {productSellsStats.sellsUnitsReturnedTotal}
                                     </Grid>
                                 </Grid>
-
                                 <Grid container item spacing={1} xs={12}>
                                     <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                         <ChevronRightOutlined fontSize={"small"} />
@@ -434,7 +433,6 @@ export default function StoreMain({ userId }) {
                                         $ {numberFormat(productSellsStats.sellsAmountTotal)}
                                     </Grid>
                                 </Grid>
-
                                 <Grid container item spacing={1} xs={12}>
                                     <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                         <ChevronRightOutlined fontSize={"small"} />
@@ -664,7 +662,11 @@ export default function StoreMain({ userId }) {
     return (
         <Card variant={"outlined"}>
             <CustomToolbar />
-
+            <ModalSellsToday
+                dialogTitle="Ventas de hoy"
+                isOpen={isModalSellsOpen}
+                setIsOpen={setIsModalSellsOpen}
+            />
             {
                 storeDetails && (
                     <CardContent>
@@ -738,7 +740,7 @@ export default function StoreMain({ userId }) {
                                 </Grid>
 
                                 <Grid item xs={12} md={6}>
-                                    <TodaySells />
+                                    <SellsModule />
                                 </Grid>
 
                                 {
