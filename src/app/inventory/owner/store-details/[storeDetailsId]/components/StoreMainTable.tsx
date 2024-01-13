@@ -44,8 +44,6 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     // Se usan habilitar modales o detalles
     const [showDetails, setShowDetails] = useState<number>(-1);
     const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: storeDepotsWithAny | null }>({ active: false, storeDepot: null });
-    const [activeModalTransferUnits, setActiveModalTransferUnits] = useState<boolean>(false);
-    const [activeModalEditUnits, setActiveModalEditUnits] = useState<boolean>(false);
     const [activeAddProductFromWarehouse, setActiveAddProductFromWarehouse] = useState<boolean>(false);
 
     // Almacena el ind de la row seleccionada

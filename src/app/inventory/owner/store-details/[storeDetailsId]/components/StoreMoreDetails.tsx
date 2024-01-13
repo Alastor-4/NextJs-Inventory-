@@ -8,6 +8,8 @@ import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import {numberFormat} from "@/utils/generalFunctions";
 import TransferUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/TransferUnits";
 import StoreEditUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/StoreEditUnits";
+import {storeDepotsWithAny} from "@/types/interfaces";
+import ModalProductPrice from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/ModalProductPrice";
 
 function StoreMoreDetails(props: any) {
     const {
@@ -23,12 +25,21 @@ function StoreMoreDetails(props: any) {
         finalProductPrice,
     } = props
 
+    const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: storeDepotsWithAny | null }>({ active: false, storeDepot: null });
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
     const [activeModalTransferUnits, setActiveModalTransferUnits] = useState<boolean>(false);
     const [activeModalEditUnits, setActiveModalEditUnits] = useState<boolean>(false);
 
     return (
         <>
+            <ModalProductPrice
+                dialogTitle="Modificar Precio"
+                activeModalPrice={activeModalPrice.active}
+                storeDepot={row.depots[0].store_depots[0]}
+                setActiveModalPrice={setActiveModalPrice}
+                loadData={loadData}
+            />
+
             <StoreModalDefault
                 dialogTitle={"Transferir almacén - tienda"}
                 open={activeModalTransferUnits}
@@ -145,6 +156,7 @@ function StoreMoreDetails(props: any) {
                             <MoneyInfoTag
                                 value={displayProductPrice}
                                 errorColor={!baseProductPrice}
+                                action={() => setActiveModalPrice({ storeDepot: null, active: true })}
                             />
                             {
                                 priceDiscountQuantity && (
