@@ -104,37 +104,35 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
             >
                 {(formik) => (
                     <form onSubmit={formik.handleSubmit}>
-                        <Card variant='outlined' sx={{ padding: '10px' }} >
-                            <Grid container direction={'column'} rowSpacing={2} >
-                                <Grid item container columnSpacing={1}>
-                                    <Grid item>
-                                        <Button
-                                            variant={!selectedButton ? "contained" : "outlined"}
-                                            onClick={() => setSelectedButton(false)}
-                                        >Porcentaje</Button>
-                                    </Grid>
-                                    <Grid item>
-                                        <Button
-                                            variant={selectedButton ? "contained" : "outlined"}
-                                            onClick={() => setSelectedButton(true)}
-                                        >Cantidad fija</Button>
-                                    </Grid>
+                        <Grid container direction={'column'} rowSpacing={2} >
+                            <Grid item container columnSpacing={1}>
+                                <Grid item>
+                                    <Button
+                                        variant={!selectedButton ? "contained" : "outlined"}
+                                        onClick={() => setSelectedButton(false)}
+                                    >Porcentaje</Button>
                                 </Grid>
-                                <Grid item container >
-                                    <Card variant="outlined" sx={{ padding: "10px" }}>
-                                        <Grid item container direction={'column'}>
-                                            {!selectedButton
-                                                ? editPercentage(formik)
-                                                : editQuantity(formik)
-                                            }
-                                            <Grid item >
-                                                <Button type='submit'>Guardar cambios</Button>
-                                            </Grid>
-                                        </Grid>
-                                    </Card>
+                                <Grid item>
+                                    <Button
+                                        variant={selectedButton ? "contained" : "outlined"}
+                                        onClick={() => setSelectedButton(true)}
+                                    >Cantidad fija</Button>
                                 </Grid>
                             </Grid>
-                        </Card>
+                            <Grid item container >
+                                <Card variant="outlined" sx={{ padding: "10px" }}>
+                                    <Grid item container direction={'column'}>
+                                        {!selectedButton
+                                            ? editPercentage(formik)
+                                            : editQuantity(formik)
+                                        }
+                                        <Grid item >
+                                            <Button type='submit'>Guardar cambios</Button>
+                                        </Grid>
+                                    </Grid>
+                                </Card>
+                            </Grid>
+                        </Grid>
                     </form>
                 )}
             </Formik>
