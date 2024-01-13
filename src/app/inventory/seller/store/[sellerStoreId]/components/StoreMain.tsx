@@ -20,7 +20,9 @@ import {
     ChevronRightOutlined,
     ExpandLessOutlined,
     ExpandMoreOutlined,
-    InfoOutlined
+    ForwardToInbox,
+    InfoOutlined,
+    Mail
 } from "@mui/icons-material"
 import { useParams, useRouter } from "next/navigation";
 import dayjs from "dayjs";
@@ -452,9 +454,37 @@ export default function StoreMain({ userId }) {
 
     const TodayTransfers = () => {
 
+        const handleTransfer = (sent: boolean) => {
+            router.push(`/inventory/seller/store/${params.sellerStoreId}/transferMailbox?sent=${sent}`)
+
+        }
+
         return (
             <Card variant={"outlined"}>
-                <CardHeader title={"Transferencias de hoy"} />
+                <CardHeader title={
+                    <Grid container spacing={2}>
+
+                        <Grid item>
+                            Transferencias de hoy
+                        </Grid>
+
+                        <Grid item container xs={'auto'}>
+
+                            <Grid item>
+                                <IconButton size="small" onClick={() => handleTransfer(false)} >
+                                    <Mail color="primary" />
+                                </IconButton>
+                            </Grid>
+
+                            <Grid item >
+                                <IconButton size="small" onClick={() => handleTransfer(true)} >
+                                    <ForwardToInbox color="primary" />
+                                </IconButton>
+                            </Grid>
+
+                        </Grid>
+                    </Grid>
+                } />
 
                 <CardContent>
                     contenido aqui
