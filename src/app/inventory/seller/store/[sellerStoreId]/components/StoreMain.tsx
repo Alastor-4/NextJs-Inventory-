@@ -10,7 +10,7 @@ import {
 } from "@mui/icons-material"
 import { daysMap, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
-import { productSellsStatsProps, storeSellsDetailsProps } from "@/types/interfaces";
+import { productSellsStatsProps, storeDepotsStatsProps, storeDepotsWithAny, storeSellsDetailsProps, storeWithStoreDepots } from "@/types/interfaces";
 import { useParams, useRouter } from "next/navigation";
 import ModalSellsToday from "./Modal/ModalSellsToday";
 import React, { useEffect, useState } from "react";
@@ -20,10 +20,11 @@ import dayjs from "dayjs";
 
 dayjs.extend(isBetween);
 
-export default function StoreMain({ userId }) {
-    const [storeDetails, setStoreDetails] = useState(null)
-    const [storeDepotsStats, setStoreDepotsStats] = useState(null)
+export default function StoreMain({ userId }: { userId?: number }) {
     const [productSells, setProductSells] = useState(null)
+
+    const [storeDepotsStats, setStoreDepotsStats] = useState<storeDepotsStatsProps | null>(null);
+    const [storeDetails, setStoreDetails] = useState<storeWithStoreDepots | null>(null);
     const [todaySellsStats, setTodaySellsStats] = useState<productSellsStatsProps | null>(null);
     const [allSells, setAllSells] = useState<storeSellsDetailsProps[] | null>(null);
     const [todaySells, setTodaySells] = useState<storeSellsDetailsProps[] | null>(null);
@@ -35,41 +36,38 @@ export default function StoreMain({ userId }) {
 
     //Modal Handlers
     const [isModalSellsOpen, setIsModalSellsOpen] = useState<boolean>(false);
-    const toggleModalSellsOpen = () => setIsModalSellsOpen(!isModalSellsOpen);
+    const toggleModalSellsOpen = () => {
+        if (todaySells) {
+            setIsModalSellsOpen(!isModalSellsOpen);
+        }
+    };
 
     //GET initial store and sellsStats details
     useEffect(() => {
         async function loadStatsData() {
-            const storeDetails = await stores.storeDetails(userId, sellerStoreId)
-            const storeTodaySellsDetails: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId);
-            const storeAllSellsDetails: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId, true);
+            const storeDetailsPromise: storeWithStoreDepots = await stores.storeDetails(userId, sellerStoreId);
+            const storeTodaySellsDetailsPromise: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId);
+            const storeAllSellsDetailsPromise: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId, true);
 
-            console.log("Solo hoy");
-            console.log(storeTodaySellsDetails);
-
-            console.log("Todas");
-            console.log(storeAllSellsDetails);
-
-
-            // const [storeDetailsResponse, storeSellsDetailsResponse] = [storeDetails, storeSellsDetails]
-            // const [storeDetailsResponse, storeSellsResponse] = await Promise.all([p1, p2])
+            const [storeDetails, storeTodaySellsDetails, storeAllSellsDetails] =
+                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeAllSellsDetailsPromise]);
 
             if (storeDetails) {
                 setStoreDetails(storeDetails);
 
-                const depotsTotal = storeDetails.store_depots.length
-                let depotsRemainingUnitsTotal = 0
-                let depotsNotRemainingUnitsTotal = 0
-                let depotsNotActiveTotal = 0
-                let depotsWithoutPriceTotal = 0
-                let depotsWithDiscountTotal = 0
+                const depotsTotal: number = storeDetails.store_depots?.length!;
+                let depotsRemainingUnitsTotal: number = 0;
+                let depotsNotRemainingUnitsTotal: number = 0;
+                let depotsNotActiveTotal: number = 0;
+                let depotsWithoutPriceTotal: number = 0;
+                let depotsWithDiscountTotal: number = 0;
 
-                storeDetails.store_depots.forEach(item => {
-                    depotsRemainingUnitsTotal += item.product_remaining_units
-                    if (!item.product_remaining_units) depotsNotRemainingUnitsTotal++
-                    if (!item.is_active) depotsNotActiveTotal++
-                    if (item.sell_price.toString() === "0") depotsWithoutPriceTotal++
-                    if (item.price_discount_percentage || item.price_discount_quantity) depotsWithDiscountTotal++
+                storeDetails.store_depots?.forEach((storeDepot: storeDepotsWithAny) => {
+                    depotsRemainingUnitsTotal += storeDepot.product_remaining_units!
+                    if (!storeDepot.product_remaining_units) depotsNotRemainingUnitsTotal++
+                    if (!storeDepot.is_active) depotsNotActiveTotal++
+                    if (storeDepot.sell_price.toString() === "0") depotsWithoutPriceTotal++
+                    if (storeDepot.price_discount_percentage || storeDepot.price_discount_quantity) depotsWithDiscountTotal++
                 })
 
                 setStoreDepotsStats({
@@ -675,6 +673,7 @@ export default function StoreMain({ userId }) {
                 dialogTitle="Ventas de hoy"
                 isOpen={isModalSellsOpen}
                 setIsOpen={setIsModalSellsOpen}
+                todaySellsData={todaySells!}
             />
             {
                 storeDetails && (
