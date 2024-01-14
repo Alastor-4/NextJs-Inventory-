@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from "db";
 import logger from '@/utils/logger';
+import { storeWithStoreDepots } from '@/types/interfaces';
 
 interface Params {
     params: { sellerStoreId: string }
@@ -18,7 +19,7 @@ export async function GET(req: Request, { params }: Params) {
         const userId = parseInt(userIdParam)
         const storeId = parseInt(storeIdParam)
 
-        const store = await prisma.stores.findFirst(
+        const store: storeWithStoreDepots | null = await prisma.stores.findFirst(
             {
                 where: { OR: [{ id: storeId, owner_id: userId }, { id: storeId, seller_user_id: userId }] },
                 include: {
