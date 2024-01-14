@@ -1,36 +1,59 @@
 'use client'
 import { allProductsByDepartmentProps } from '@/types/interfaces';
-import { FilterAltOff } from '@mui/icons-material';
+import {FilterAlt, FilterAltOff} from '@mui/icons-material';
 import {Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
 interface FilterProductsByDepartmentsModalProps {
-    allProductsByDepartment: allProductsByDepartmentProps[] | null;
-    setSelectedDepartments: (allProductsByDepartmentProps: allProductsByDepartmentProps[] | null) => void;
+    allProductsByDepartment: allProductsByDepartmentProps[];
+    setAllProductsByDepartment: (allProductsByDepartmentProps: allProductsByDepartmentProps[] | null) => void;
+    setFiltersApplied: (val: boolean) => void;
     toggleModalFilter: () => void;
     isFilterModalOpen: boolean;
 }
 
 const FilterProductsByDepartmentsModal = (
-    { allProductsByDepartment, setSelectedDepartments, toggleModalFilter, isFilterModalOpen }
+    { allProductsByDepartment, setAllProductsByDepartment, setFiltersApplied, toggleModalFilter, isFilterModalOpen }
         : FilterProductsByDepartmentsModalProps) => {
-    const [filteredDepartments, setFilteredDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
+
+    const [filteredDepartments, setFilteredDepartments] = useState<any[] | null>(null);
 
     useEffect(() => {
-        if (allProductsByDepartment) setFilteredDepartments([...allProductsByDepartment!]);
+        if (allProductsByDepartment) {
+            const departmentsCopy = allProductsByDepartment.map(item => (
+                {id: item.id, name: item.name, selected: item.selected}
+            ))
+
+            setFilteredDepartments(departmentsCopy);
+        }
     }, [allProductsByDepartment]);
 
     const handleRemoveFilter = () => handleDepartmentClick(null, true);
 
     const handleCloseModal = () => {
-        setSelectedDepartments([...filteredDepartments!]);
+        toggleModalFilter();
+    }
+
+    const applyFilters = () => {
+        let existFilterApplied = false
+
+        const newAllProductsByDepartment = allProductsByDepartment.map((item: any, index: number) => {
+            const currentFilterApplied = filteredDepartments![index].selected
+
+            if (currentFilterApplied) existFilterApplied = true
+
+            return {...item, selected: currentFilterApplied}
+        })
+
+        setAllProductsByDepartment(newAllProductsByDepartment);
+        setFiltersApplied(existFilterApplied)
         toggleModalFilter();
     }
 
     const handleDepartmentClick = (departmentSelected: allProductsByDepartmentProps | null, remove?: boolean) => {
         if (!filteredDepartments) return;
-        let departments = Array.from([...filteredDepartments!]);
+        let departments = [...filteredDepartments]
         if (remove) {
             departments?.forEach((department: allProductsByDepartmentProps) => department.selected = false);
             setFilteredDepartments(departments);
@@ -83,7 +106,8 @@ const FilterProductsByDepartmentsModal = (
                 </Stack>
             </DialogContent>
             <DialogActions sx={{ marginRight: "15px" }}>
-                <Button startIcon={<FilterAltOff />} color="error" variant="outlined" onClick={handleRemoveFilter}>Limpiar filtros</Button>
+                <Button startIcon={<FilterAltOff />} color="error" variant="outlined" onClick={handleRemoveFilter}>Limpiar</Button>
+                <Button startIcon={<FilterAlt />} color="primary" variant="outlined" onClick={applyFilters}>Aplicar</Button>
             </DialogActions>
         </Dialog>
     );
