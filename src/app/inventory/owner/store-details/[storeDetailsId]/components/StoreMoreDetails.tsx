@@ -55,7 +55,7 @@ function StoreMoreDetails(props: any) {
             </StoreModalDefault>
 
             <StoreModalDefault
-                dialogTitle={"Modificar total recibido"}
+                dialogTitle={"Total recibido"}
                 open={activeModalEditUnits}
                 setOpen={setActiveModalEditUnits}
             >
@@ -67,7 +67,7 @@ function StoreMoreDetails(props: any) {
             </StoreModalDefault>
 
             <StoreModalDefault
-                dialogTitle={"Modificar salario del vendedor"}
+                dialogTitle={"Salario del vendedor"}
                 open={activeModalSellerProfit}
                 setOpen={setActiveModalSellerProfit}
             >

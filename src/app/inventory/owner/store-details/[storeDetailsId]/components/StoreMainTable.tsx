@@ -331,7 +331,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                                 </Grid>
                                             </TableCell>
                                             <TableCell>
-                                                {`${product?.depots![0].store_depots![0].product_remaining_units} de ${product?.depots![0].store_depots![0].product_units}`}
+                                                {product?.depots![0].store_depots![0].product_remaining_units}
                                             </TableCell>
                                             <TableCell>
                                                 <Grid container>

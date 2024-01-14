@@ -1,5 +1,6 @@
 import { AddOutlined, DeleteOutline, EditOutlined, WarningOutlined } from '@mui/icons-material';
 import {
+    Box,
     Button,
     Card,
     Checkbox,
@@ -57,7 +58,6 @@ function StoreListOffers(props: any) {
 
         const setValidationSchema = (
             Yup.object({
-
                 quantity: Yup.number()
                     .typeError("Solo cantidades numéricas")
                     .min(2, "La cantidad mínima es 2")
@@ -104,16 +104,19 @@ function StoreListOffers(props: any) {
             >
                 {
                     (formik: any) => (
-                        <Card variant='outlined' sx={{ padding: '20px', width: "100%" }}>
-                            <form onSubmit={formik.handleSubmit}>
-                                <Grid container direction={'column'} rowGap={2}>
-                                    <Grid item container
+                        <form onSubmit={formik.handleSubmit}>
+                            <Grid container rowSpacing={2}>
+                                <Grid container item xs={12} rowGap={2}>
+                                    <Grid
+                                        item
+                                        container
+                                        xs={12}
                                         justifyContent={"center"}
                                         alignItems={"center"}
                                         columnGap={1.3}
                                     >
                                         <Grid item>
-                                            Operacion:
+                                            Operación:
                                         </Grid>
 
                                         <Grid item>
@@ -131,7 +134,7 @@ function StoreListOffers(props: any) {
                                         </Grid>
                                     </Grid>
 
-                                    <Grid item>
+                                    <Grid item xs={12}>
                                         <TextField
                                             fullWidth
                                             name='quantity'
@@ -144,11 +147,11 @@ function StoreListOffers(props: any) {
                                         />
                                     </Grid>
 
-                                    <Grid item>
+                                    <Grid item xs={12}>
                                         <TextField
                                             fullWidth
                                             name='newPrice'
-                                            label={"Nuevo Precio del producto"}
+                                            label={"Precio por unidades"}
                                             size='small'
                                             InputProps={{
                                                 endAdornment: <InputAdornment
@@ -161,13 +164,19 @@ function StoreListOffers(props: any) {
                                     </Grid>
                                 </Grid>
 
-                                <Grid container marginTop={2} justifyContent={'flex-end'}>
-                                    <Grid item>
-                                        <Button type='submit' variant='outlined' size='small'>Aceptar</Button>
-                                    </Grid>
+                                <Grid item xs={12}>
+                                    {
+                                        formik.values.selectedOperation === '='
+                                            ? `Cuando compren ${formik.values.quantity} unidades de este producto, cada unidad tendrá un precio de ${formik.values.newPrice} ${currency}`
+                                            : `Cuando compren más de ${formik.values.quantity} unidades de este producto, cada unidad tendrá un precio de ${formik.values.newPrice} ${currency}`
+                                    }
                                 </Grid>
-                            </form>
-                        </Card>
+
+                                <Grid container item xs={12} justifyContent={'flex-end'}>
+                                    <Button type='submit' variant='outlined' size='small'>Aceptar</Button>
+                                </Grid>
+                            </Grid>
+                        </form>
                     )
                 }
             </Formik>
@@ -205,7 +214,7 @@ function StoreListOffers(props: any) {
                 open={activeModalCreateOffer}
                 setOpen={setActiveModalCreateOffer}
             >
-                <EditOffer offers={null} />
+                <EditOffer offers={null}/>
             </StoreModalOffers>
 
             <StoreModalDefault
@@ -213,22 +222,22 @@ function StoreListOffers(props: any) {
                 open={activeModalEditOffer}
                 setOpen={setActiveModalEditOffer}
             >
-                <EditOffer offer={selectedOffer} />
+                <EditOffer offer={selectedOffer}/>
             </StoreModalDefault>
 
 
             <Grid item container xs={12}>
                 <Grid item container>
-                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }} alignSelf={'center'}>Ofertas:</Grid>
+                    <Grid item xs={"auto"} sx={{fontWeight: 600}} alignSelf={'center'}>Ofertas:</Grid>
 
                     <Grid item>
                         <IconButton
                             size='small'
                             color='primary'
                             onClick={() => setActiveModalCreateOffer(true)}
-                            sx={{ ml: "10px" }}
+                            sx={{ml: "10px"}}
                         >
-                            <AddOutlined fontSize='small' />
+                            <AddOutlined fontSize='small'/>
                         </IconButton>
                     </Grid>
                 </Grid>
@@ -245,6 +254,7 @@ function StoreListOffers(props: any) {
                                             container
                                             item
                                             columnSpacing={1}
+                                            maxWidth={"80vw"}
                                             sx={{
                                                 width: 'fit-content',
                                                 backgroundColor: "lightgray",
@@ -256,52 +266,44 @@ function StoreListOffers(props: any) {
                                                 cursor: "pointer",
                                                 textDecorationLine: item.is_active ? "none" : "line-through",
                                             }}
+                                            onClick={async () => {
+                                                setActiveModalEditOffer(true)
+                                                setSelectedOffer(item)
+                                            }}
                                         >
-                                            <Grid container item xs={"auto"} alignItems={"center"}>
-                                                <Typography variant={"caption"}
-                                                    sx={{ color: "white", fontWeight: "600" }}>
-                                                    {`${index + 1} . `}
-                                                </Typography>
-                                            </Grid>
-
-                                            <Grid container item xs={"auto"} alignItems={"center"}
-                                                sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                {
-                                                    item.compare_function === '='
-                                                        ? `Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
-                                                        : `Cuando compren más de ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
-                                                }
-                                            </Grid>
-
-                                            <Grid container item xs={"auto"} alignItems={"center"}>
+                                            <Grid container item xs={12} justifyContent={"space-between"}>
                                                 <Checkbox
                                                     size={"small"}
                                                     color={item.is_active ? "success" : "default"}
                                                     checked={item.is_active}
-                                                    onClick={async () => {
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation()
                                                         return await handleToggleOffer(item.id)
                                                     }}
                                                 />
 
-                                                <Divider orientation={"vertical"} />
-
-                                                <EditOutlined
-                                                    fontSize={"small"}
-                                                    sx={{ cursor: "pointer", ml: "10px" }}
-                                                    onClick={async () => {
-                                                        setActiveModalEditOffer(true)
-                                                        setSelectedOffer(item)
-                                                    }}
-                                                />
-
-                                                <DeleteOutline
-                                                    fontSize={"small"}
-                                                    color='error'
-                                                    sx={{ cursor: "pointer", ml: "15px" }}
-                                                    onClick={async () => {
+                                                <IconButton
+                                                    size={"small"}
+                                                    onClick={async (e) => {
+                                                        e.stopPropagation()
                                                         return await removeOffer(item.id)
                                                     }}
-                                                />
+                                                >
+                                                    <DeleteOutline fontSize={"small"} color='error'/>
+                                                </IconButton>
+                                            </Grid>
+
+                                            <Grid
+                                                container
+                                                item
+                                                xs={12}
+                                                alignItems={"center"}
+                                                sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                {
+                                                    item.compare_function === '='
+                                                        ? `${index + 1}. Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
+                                                        : `${index + 1}. Cuando compren más de ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
+                                                }
                                             </Grid>
                                         </Grid>
                                     </Grid>
