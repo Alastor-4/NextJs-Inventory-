@@ -26,7 +26,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const [storeDepotsStats, setStoreDepotsStats] = useState<storeDepotsStatsProps | null>(null);
     const [storeDetails, setStoreDetails] = useState<storeWithStoreDepots | null>(null);
     const [todaySellsStats, setTodaySellsStats] = useState<productSellsStatsProps | null>(null);
-    const [allSells, setAllSells] = useState<storeSellsDetailsProps[] | null>(null);
     const [todaySells, setTodaySells] = useState<storeSellsDetailsProps[] | null>(null);
 
     const params = useParams();
@@ -47,10 +46,9 @@ export default function StoreMain({ userId }: { userId?: number }) {
         async function loadStatsData() {
             const storeDetailsPromise: storeWithStoreDepots = await stores.storeDetails(userId, sellerStoreId);
             const storeTodaySellsDetailsPromise: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId);
-            const storeAllSellsDetailsPromise: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId, true);
 
-            const [storeDetails, storeTodaySellsDetails, storeAllSellsDetails] =
-                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeAllSellsDetailsPromise]);
+            const [storeDetails, storeTodaySellsDetails] =
+                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise]);
 
             if (storeDetails) {
                 setStoreDetails(storeDetails);
@@ -81,7 +79,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
             }
 
             if (storeTodaySellsDetails) {
-                // setProductSells(storeSellsDetailsResponse)
                 const sellsTotal: number = storeTodaySellsDetails.length!
                 let sellsDifferentProductsTotal: number = 0;
                 let sellsUnitsTotal: number = 0;
@@ -129,7 +126,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                     sellerProfitTotal += sellProfitQuantity;
                 })
                 setTodaySells(storeTodaySellsDetails);
-                setAllSells(storeAllSellsDetails);
                 setTodaySellsStats({
                     sellsTotal,
                     sellsDifferentProductsTotal,
@@ -407,7 +403,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             <Button size="small" variant="outlined" color="primary" onClick={toggleModalSellsOpen}>Ver detalles</Button>
                         </Grid>
                         <Grid item xs={4}>
-                            <Button size="small" variant="outlined" color="secondary">Historial</Button>
+                            <Button size="small" variant="outlined" color="secondary" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`,) }}>Historial</Button>
                         </Grid>
                     </Grid>
                     {
