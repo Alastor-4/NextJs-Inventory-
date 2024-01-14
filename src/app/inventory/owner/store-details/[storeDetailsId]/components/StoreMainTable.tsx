@@ -199,10 +199,23 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     const loadData = async () => {
         let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await storeDetails.getAllProductsByDepartment(dataStore?.id!);
         if (newAllProductsByDepartment) {
-            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
-                ...productsByDepartments,
-                selected: false
-            }))
+            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => {
+                //search if current department was selected in previous data to keep selection
+
+                let oldDepartmentSelected = false
+
+                const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
+                if (oldDepartmentIndex && oldDepartmentIndex > -1 && allProductsByDepartment![oldDepartmentIndex].selected) {
+                    oldDepartmentSelected = true
+                }
+
+                return (
+                    {
+                        ...productsByDepartments,
+                        selected: oldDepartmentSelected
+                    }
+                )
+            })
             setAllProductsByDepartment(newAllProductsByDepartment);
         }
     }
