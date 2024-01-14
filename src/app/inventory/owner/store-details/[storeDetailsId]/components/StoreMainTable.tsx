@@ -36,7 +36,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     // Guardan datos de bd
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
-    const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [filtersApplied, setFiltersApplied] = useState<boolean>(false);
     const [depotsInStore, setDepotsInStore] = useState<number | null>(dataStoreDetails?.store_depots?.length!);
 
     const [dataStore, setDataStore] = useState<storeWithStoreDepots | null>(dataStoreDetails);
@@ -45,10 +45,6 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     const [showDetails, setShowDetails] = useState<number>(-1);
     const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: storeDepotsWithAny | null }>({ active: false, storeDepot: null });
     const [activeAddProductFromWarehouse, setActiveAddProductFromWarehouse] = useState<boolean>(false);
-
-    // Almacena el ind de la row seleccionada
-    // modal q la usan:  TransferUnits , StoreEditUnits
-    const [selectedRowInd, setSelectedRowInd] = useState<number>(-1);
 
     const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
     const toggleModalFilter = () => {
@@ -73,18 +69,11 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     useEffect(() => {
         if (allProductsByDepartment?.length) {
             let allProducts: productsProps[] = [];
-            let bool = false;
-            if (selectedDepartments) {
-                for (const department of selectedDepartments!) if (department.selected === true) bool = true;
-            }
-            allProductsByDepartment?.forEach((productsByDepartments) => {
-                if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
+
+            allProductsByDepartment.forEach((productsByDepartments) => {
+                //when there are no filters applied all departments are returned
+                if (!filtersApplied || productsByDepartments.selected) {
                     allProducts = [...allProducts, ...productsByDepartments.products!];
-                }
-                if (selectedDepartments?.length! > 0 && bool) {
-                    if (productsByDepartments.selected) {
-                        allProducts = [...allProducts, ...productsByDepartments.products!];
-                    }
                 }
             });
 
@@ -95,7 +84,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
             });
             setDataProducts(allProducts);
         }
-    }, [allProductsByDepartment, selectedDepartments, isFilterModalOpen]);
+    }, [allProductsByDepartment, filtersApplied]);
 
     //GET store name
     useEffect(() => {
@@ -210,10 +199,23 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     const loadData = async () => {
         let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await storeDetails.getAllProductsByDepartment(dataStore?.id!);
         if (newAllProductsByDepartment) {
-            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
-                ...productsByDepartments,
-                selected: false
-            }))
+            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => {
+                //search if current department was selected in previous data to keep selection
+
+                let oldDepartmentSelected = false
+
+                const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
+                if (oldDepartmentIndex && oldDepartmentIndex > -1 && allProductsByDepartment![oldDepartmentIndex].selected) {
+                    oldDepartmentSelected = true
+                }
+
+                return (
+                    {
+                        ...productsByDepartments,
+                        selected: oldDepartmentSelected
+                    }
+                )
+            })
             setAllProductsByDepartment(newAllProductsByDepartment);
         }
     }
@@ -402,12 +404,15 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
         <>
             <CustomToolbar />
 
-            <FilterProductsByDepartmentsModal
-                allProductsByDepartment={allProductsByDepartment!}
-                setSelectedDepartments={setSelectedDepartments}
-                isFilterModalOpen={isFilterModalOpen}
-                toggleModalFilter={toggleModalFilter}
-            />
+            {isFilterModalOpen && allProductsByDepartment?.length && (
+                <FilterProductsByDepartmentsModal
+                    allProductsByDepartment={allProductsByDepartment}
+                    setAllProductsByDepartment={setAllProductsByDepartment}
+                    setFiltersApplied={setFiltersApplied}
+                    isFilterModalOpen={isFilterModalOpen}
+                    toggleModalFilter={toggleModalFilter}
+                />
+            )}
 
             <ImagesDisplayDialog
                 open={openImagesDialog}
