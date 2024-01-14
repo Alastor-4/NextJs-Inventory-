@@ -15,19 +15,14 @@ import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehou
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
-import StoreModalDefault from "./Modal/StoreModalDefault";
 import { numberFormat } from "@/utils/generalFunctions";
 import { TableNoData } from "@/components/TableNoData";
 import { storeDetails } from "../request/storeDetails";
-import StoreModalPrice from "./Modal/StoreModalPrice"
-import StoreEditPrice from "./Modal/StoreEditPrice";
 import stores from "../../../store/requests/stores";
-import StoreEditUnits from "./Modal/StoreEditUnits";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import StoreMoreDetails from "./StoreMoreDetails";
-import TransferUnits from "./Modal/TransferUnits";
 import { useRouter } from "next/navigation";
 import { images } from "@prisma/client";
 import { Formik } from "formik";
@@ -49,8 +44,6 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     // Se usan habilitar modales o detalles
     const [showDetails, setShowDetails] = useState<number>(-1);
     const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: storeDepotsWithAny | null }>({ active: false, storeDepot: null });
-    const [activeModalTransferUnits, setActiveModalTransferUnits] = useState<boolean>(false);
-    const [activeModalEditUnits, setActiveModalEditUnits] = useState<boolean>(false);
     const [activeAddProductFromWarehouse, setActiveAddProductFromWarehouse] = useState<boolean>(false);
 
     // Almacena el ind de la row seleccionada
@@ -315,17 +308,11 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                             <TableCell>
                                                 <Grid container rowSpacing={1}>
                                                     <Grid item xs={12}>
-                                                        <div
-                                                            onClick={(e: any) => {
-                                                                e.stopPropagation()
-                                                                setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true });
-                                                            }}
-                                                        >
-                                                            <MoneyInfoTag
-                                                                value={displayProductPrice}
-                                                                errorColor={!baseProductPrice}
-                                                            />
-                                                        </div>
+                                                        <MoneyInfoTag
+                                                            value={displayProductPrice}
+                                                            errorColor={!baseProductPrice}
+                                                            action={() => setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true })}
+                                                        />
                                                         {product?.depots![0].store_depots![0].product_offers?.length! && (
                                                             <DescriptionOutlined fontSize={"small"} />
                                                         )}
@@ -333,48 +320,18 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                                     {
                                                         displayPriceDiscount && (
                                                             <Grid item xs={12}>
-                                                                <div
-                                                                    onClick={(e: any) => {
-                                                                        e.stopPropagation()
-                                                                        setActiveModalPrice({
-                                                                            storeDepot: { ...product?.depots![0].store_depots![0] },
-                                                                            active: true,
-                                                                        })
-                                                                    }}
-                                                                >
-                                                                    <InfoTag value={`- ${displayPriceDiscount}`} />
-                                                                </div>
+                                                                <InfoTag
+                                                                    value={`- ${displayPriceDiscount}`}
+                                                                    action={() => setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true })}
+                                                                    tooltipText={product?.depots![0].store_depots![0].discount_description}
+                                                                />
                                                             </Grid>
                                                         )
                                                     }
                                                 </Grid>
                                             </TableCell>
                                             <TableCell>
-                                                <Grid container rowSpacing={1}>
-                                                    <Grid container item xs={12} justifyContent={"center"}>
-                                                        {`${product?.depots![0].store_depots![0].product_remaining_units} de ${product?.depots![0].store_depots![0].product_units}`}
-                                                    </Grid>
-                                                    <Grid container item xs={12} justifyContent={"center"} flexWrap={"nowrap"}>
-                                                        <IconButton
-                                                            size={"small"}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                setActiveModalTransferUnits(true);
-                                                                setSelectedRowInd(index)
-                                                            }}>
-                                                            <SwapHoriz />
-                                                        </IconButton>
-                                                        <IconButton
-                                                            size={"small"}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                setActiveModalEditUnits(true);
-                                                                setSelectedRowInd(index)
-                                                            }}>
-                                                            <EditOutlined />
-                                                        </IconButton>
-                                                    </Grid>
-                                                </Grid>
+                                                {product?.depots![0].store_depots![0].product_remaining_units}
                                             </TableCell>
                                             <TableCell>
                                                 <Grid container>
@@ -420,10 +377,10 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                             <TableCell style={{ padding: 0 }} colSpan={6}>
                                                 {showDetails === product.id && (
                                                     <StoreMoreDetails
-                                                        details={product?.depots![0].store_depots![0]}
                                                         show={(showDetails === product.id)}
                                                         loadData={loadData}
                                                         row={product}
+                                                        dataStore={dataStore}
                                                         baseProductPrice={baseProductPrice}
                                                         displayProductPrice={displayProductPrice}
                                                         priceDiscountQuantity={priceDiscountQuantity}
@@ -469,41 +426,6 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                     />
                 )
             }
-
-            {/* 
-            <StoreModalPrice
-                dialogTitle={"Editar Precio"}
-                open={activeModalPrice.active}
-                setOpen={setActiveModalPrice}
-            >
-                <StoreEditPrice storeDepot={activeModalPrice.storeDepot!} setActiveModalPrice={setActiveModalPrice} loadData={loadData} />
-            </StoreModalPrice> */}
-
-            <StoreModalDefault
-                dialogTitle={"Modificar Total"}
-                open={activeModalEditUnits}
-                setOpen={setActiveModalEditUnits}
-            >
-                <StoreEditUnits
-                    dataRow={selectedRowInd > 0 ? dataProducts![selectedRowInd]?.depots![0].store_depots![0] : null}
-                    setActiveModalEditUnits={setActiveModalEditUnits}
-                    loadData={loadData}
-                />
-            </StoreModalDefault>
-
-            <StoreModalDefault
-                dialogTitle={"Transferir unidades"}
-                open={activeModalTransferUnits}
-                setOpen={setActiveModalTransferUnits}
-            >
-                <TransferUnits
-                    nameStore={dataStore?.name!}
-                    storeDepot={selectedRowInd > 0 ? dataProducts![selectedRowInd].depots![0].store_depots![0] : null}
-                    productId={selectedRowInd > 0 ? dataProducts![selectedRowInd].depots![0].product_id : null}
-                    setActiveTransferUnits={setActiveModalTransferUnits}
-                    loadData={loadData}
-                />
-            </StoreModalDefault>
 
             <ModalAddProductFromWarehouse
                 dialogTitle={"Agregar productos"}
