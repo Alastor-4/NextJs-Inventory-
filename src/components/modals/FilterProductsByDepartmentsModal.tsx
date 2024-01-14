@@ -1,8 +1,9 @@
 'use client'
 import { allProductsByDepartmentProps } from '@/types/interfaces';
-import { CheckBoxOutlineBlank, CheckBoxOutlined, FilterAltOff } from '@mui/icons-material';
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from '@mui/material';
+import { FilterAltOff } from '@mui/icons-material';
+import {Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack} from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
 interface FilterProductsByDepartmentsModalProps {
     allProductsByDepartment: allProductsByDepartmentProps[] | null;
@@ -46,7 +47,25 @@ const FilterProductsByDepartmentsModal = (
 
     return (
         <Dialog open={isFilterModalOpen} fullWidth onClose={handleCloseModal}>
-            <DialogTitle m="auto">Filtrar por departamentos</DialogTitle>
+            <DialogTitle
+                display={"flex"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+                color={"white"}
+                fontWeight={"400"}
+                sx={{ bgcolor: '#1976d3' }}
+            >
+                Filtrar por departamentos
+
+                <IconButton
+                    edge="start"
+                    color="inherit"
+                    onClick={handleCloseModal}
+                    aria-label="close"
+                >
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
             <DialogContent dividers >
                 <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap" >
                     {filteredDepartments?.map((department: allProductsByDepartmentProps) => (
@@ -58,7 +77,6 @@ const FilterProductsByDepartmentsModal = (
                             onClick={() => handleDepartmentClick(department)}
                             variant={department.selected ? "filled" : "outlined"}
                             sx={{ display: "flex" }}
-                            icon={department.selected ? <CheckBoxOutlined fontSize={"small"} /> : <CheckBoxOutlineBlank fontSize={"small"} />}
                             color="primary"
                         />
                     ))}
