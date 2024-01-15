@@ -205,7 +205,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                 let oldDepartmentSelected = false
 
                 const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
-                if (oldDepartmentIndex && oldDepartmentIndex > -1 && allProductsByDepartment![oldDepartmentIndex].selected) {
+                if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
                     oldDepartmentSelected = true
                 }
 
