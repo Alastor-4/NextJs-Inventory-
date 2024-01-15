@@ -400,7 +400,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
                 <CardContent>
                     <Grid item container justifyContent={"space-between"} marginBottom={"15px"}>
                         <Grid item xs={8}>
-                            <Button size="small" variant="outlined" color="primary" onClick={toggleModalSellsOpen}>Ver detalles</Button>
+                            <Button size="small" variant="outlined" disabled={todaySells?.length! > 0 ? false : true} color="primary" onClick={toggleModalSellsOpen}>Ver detalles</Button>
                         </Grid>
                         <Grid item xs={4}>
                             <Button size="small" variant="outlined" color="secondary" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`,) }}>Historial</Button>
