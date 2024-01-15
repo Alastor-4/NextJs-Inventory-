@@ -15,10 +15,18 @@ export default function ModalStoreAssign({ dialogTitle, open, setOpen, children 
         setOpen(false);
     };
 
-
     return (
         <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{dialogTitle}</DialogTitle>
+            <DialogTitle
+                display={"flex"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+                color={"white"}
+                fontWeight={"400"}
+                sx={{ bgcolor: '#1976d3' }}
+            >
+                {dialogTitle}
+            </DialogTitle>
             <DialogContent>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                     {children}

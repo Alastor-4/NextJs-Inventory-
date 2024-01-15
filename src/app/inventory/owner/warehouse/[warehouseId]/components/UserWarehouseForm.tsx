@@ -20,8 +20,8 @@ import * as Yup from "yup"
 export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormProps) => {
 
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
-    const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [filtersApplied, setFiltersApplied] = useState<boolean>(false);
     const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
 
     //Handle selected product
@@ -55,20 +55,13 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
     useEffect(() => {
         if (allProductsByDepartment?.length) {
             let allProducts: productsProps[] = [];
-            let bool = false;
-            if (selectedDepartments) {
-                for (const department of selectedDepartments!) if (department.selected === true) bool = true;
-            }
-            allProductsByDepartment?.forEach((departmentItem) => {
-                if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
-                    allProducts = [...allProducts, ...departmentItem.products!];
+
+            allProductsByDepartment.forEach((productsByDepartments) => {
+                //when there are no filters applied all departments are returned
+                if (!filtersApplied || productsByDepartments.selected) {
+                    allProducts = [...allProducts, ...productsByDepartments.products!];
                 }
-                if (selectedDepartments?.length! > 0 && bool) {
-                    if (departmentItem.selected) {
-                        allProducts = [...allProducts, ...departmentItem.products!];
-                    }
-                }
-            })
+            });
 
             allProducts.sort((a: productsProps, b: productsProps) => {
                 if (a?.name! < b?.name!) return -1;
@@ -76,10 +69,8 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                 return 0;
             });
             setDataProducts(allProducts);
-        } else {
-            setDataProducts(null);
         }
-    }, [allProductsByDepartment, selectedDepartments]);
+    }, [allProductsByDepartment, filtersApplied]);
 
     const initialValues = {
         product: null,
@@ -113,12 +104,30 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
         if (!response) return;
 
         if (response?.status === 200) {
-            setSelectedDepartments(null);
             let allProductsByDepartmentWithoutDepots: allProductsByDepartmentProps[] | null = await warehouseDepots.allProductsWithoutDepots(ownerId!, warehouseId!)
 
             if (allProductsByDepartmentWithoutDepots) {
-                formik.resetForm();
+                allProductsByDepartmentWithoutDepots = allProductsByDepartmentWithoutDepots.map((productsByDepartments: allProductsByDepartmentProps) => {
+                    //search if current department was selected in previous data to keep selection
+
+                    let oldDepartmentSelected = false
+
+                    const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
+                    if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
+                        oldDepartmentSelected = true
+                    }
+
+                    return (
+                        {
+                            ...productsByDepartments,
+                            selected: oldDepartmentSelected
+                        }
+                    )
+                })
                 setAllProductsByDepartment(allProductsByDepartmentWithoutDepots);
+
+                formik.resetForm();
+
                 notifySuccess("Se ha creado un nuevo depósito")
             } else {
                 notifyError("Error al cargar los datos")
@@ -126,7 +135,6 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
 
         } else {
             //ToDo: catch validation errors
-            notifyError("Hay un error en la creación de depósitos")
         }
     }
 
@@ -278,12 +286,19 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                 setOpen={setOpenImagesDialog}
                 images={dialogImages}
             />
-            <FilterProductsByDepartmentsModal
-                allProductsByDepartment={allProductsByDepartment!}
-                setSelectedDepartments={setSelectedDepartments}
-                isFilterModalOpen={isFilterModalOpen}
-                toggleModalFilter={toggleModalFilter}
-            />
+
+            {
+                isFilterModalOpen && allProductsByDepartment?.length && (
+                    <FilterProductsByDepartmentsModal
+                        allProductsByDepartment={allProductsByDepartment}
+                        setAllProductsByDepartment={setAllProductsByDepartment}
+                        setFiltersApplied={setFiltersApplied}
+                        isFilterModalOpen={isFilterModalOpen}
+                        toggleModalFilter={toggleModalFilter}
+                    />
+                )
+            }
+
             <form onSubmit={formik.handleSubmit} >
                 <CardContent sx={{ width: "100%", marginLeft: "-15px", marginTop: "-15px" }}>
                     <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>

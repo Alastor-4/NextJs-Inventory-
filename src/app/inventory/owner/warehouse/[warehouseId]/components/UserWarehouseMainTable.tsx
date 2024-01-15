@@ -36,6 +36,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
 
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [filtersApplied, setFiltersApplied] = useState<boolean>(false);
     const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
 
     const [activeModalAddProduct, setActiveModalAddProduct] = useState(false);
@@ -49,13 +50,6 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
     const handleTooltipClose = () => setIsOpenTooltip(false);
     const handleTooltipOpen = () => setIsOpenTooltip(true);
-
-    const [forceRender, setForceRender] = useState<boolean>(true);
-
-    const handleForceRender = () => {
-        setForceRender(true);
-        setSelectedDepartments(null);
-    }
 
     const [openImagesDialog, setOpenImagesDialog] = useState<boolean>(false);
     const [dialogImages, setDialogImages] = useState<images[] | null>(null);
@@ -74,28 +68,45 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                     ...productsByDepartments,
                     selected: false
                 })));
-                setForceRender(false);
-                setSelectedProduct(null);
             }
         }
         getAllProductsByDepartment();
-    }, [ownerId, warehouseDetails, forceRender]);
+    }, [ownerId, warehouseDetails]);
+
+    const reloadData = async () => {
+        let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+        if (newAllProductsByDepartment) {
+            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => {
+                //search if current department was selected in previous data to keep selection
+
+                let oldDepartmentSelected = false
+
+                const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id)
+                if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
+                    oldDepartmentSelected = true
+                }
+
+                return (
+                    {
+                        ...productsByDepartments,
+                        selected: oldDepartmentSelected
+                    }
+                )
+            })
+
+            setAllProductsByDepartment(newAllProductsByDepartment);
+        }
+    }
+
 
     useEffect(() => {
         if (allProductsByDepartment?.length) {
             let allProducts: productsProps[] = [];
-            let bool = false;
-            if (selectedDepartments) {
-                for (const department of selectedDepartments!) if (department.selected === true) bool = true;
-            }
-            allProductsByDepartment?.forEach((productsByDepartments) => {
-                if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
+
+            allProductsByDepartment.forEach((productsByDepartments) => {
+                //when there are no filters applied all departments are returned
+                if (!filtersApplied || productsByDepartments.selected) {
                     allProducts = [...allProducts, ...productsByDepartments.products!];
-                }
-                if (selectedDepartments?.length! > 0 && bool) {
-                    if (productsByDepartments.selected) {
-                        allProducts = [...allProducts, ...productsByDepartments.products!];
-                    }
                 }
             });
 
@@ -108,7 +119,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         } else {
             setDataProducts(null);
         }
-    }, [allProductsByDepartment, selectedDepartments]);
+    }, [allProductsByDepartment, filtersApplied]);
 
     const initialValues = {
         searchBarValue: "",
@@ -164,11 +175,6 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         }
     }
 
-    const handleRemove = async () => {
-        const response = await warehouseDepots.deleteDepot(ownerId, warehouseDetails?.id, selectedProduct?.depots![0].id);
-        if (response) await refreshAfterAction();
-    };
-
     const handleNavigateBack = () => router.push('/inventory');
 
     const handleStoreAssign = () => {
@@ -204,19 +210,6 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         <IconButton color={"inherit"} sx={{ color: 'white' }} onClick={() => setActiveModalAddProduct(true)} >
                             <AddOutlined />
                         </IconButton>
-
-                        {
-                            selectedProduct && (
-                                <Box sx={{ display: "flex" }}>
-                                    <Divider orientation="vertical" variant="middle" flexItem
-                                        sx={{ borderRight: "2px solid white", mx: "5px" }} />
-
-                                    <IconButton color={"inherit"} onClick={handleRemove}>
-                                        <DeleteOutline fontSize={"small"} />
-                                    </IconButton>
-                                </Box>
-                            )
-                        }
                     </>
                 </Box>
             </Toolbar>
@@ -418,93 +411,91 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         }
 
         return (
-            <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
-                <Grid container item direction="column" spacing={2}>
-                    <Grid item xs={12}>
-                        Mover de almacén hacia tienda: {warehouseQuantity} disponibles
-                    </Grid>
-                    <Grid item container alignItems="center" xs={12} md={8}>
-                        <Grid item xs={10} md={6}>
-                            <TextField
-                                name={"productStoreDepotDistribution"}
-                                label={"Enviar a tienda"}
-                                color={"primary"}
-                                type={"number"}
-                                size={"small"}
-                                onKeyDown={handleKeyDown}
-                                {...formik.getFieldProps("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity")}
-                                error={
+            <Grid container item spacing={2}>
+                <Grid item xs={12}>
+                    Mover de almacén hacia tienda: {warehouseQuantity} disponibles
+                </Grid>
+                <Grid item container alignItems="center" xs={12} md={8}>
+                    <Grid item xs={10} md={6}>
+                        <TextField
+                            name={"productStoreDepotDistribution"}
+                            label={"Enviar a tienda"}
+                            color={"primary"}
+                            type={"number"}
+                            size={"small"}
+                            onKeyDown={handleKeyDown}
+                            {...formik.getFieldProps("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity")}
+                            error={
+                                formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity &&
+                                formik.touched.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
+                            }
+                            helperText={
+                                (
                                     formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity &&
                                     formik.touched.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
-                                }
-                                helperText={
-                                    (
-                                        formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity &&
-                                        formik.touched.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
-                                    ) && formik.errors.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity
-                                }
-                            />
-                        </Grid>
-                        <Grid item xs={2} md={6}>
-                            <IconButton
-                                color={"primary"}
-                                onClick={handleMoveToStore}
-                                sx={{ ml: "10px" }}
-                                disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity}
-                            >
-                                <Done />
-                            </IconButton>
-                        </Grid>
+                                ) && formik.errors.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity
+                            }
+                        />
                     </Grid>
-                    {
-                        !!storeQuantity && (
-                            <>
-                                <Grid item xs={12}>
-                                    <Divider flexItem sx={{ width: 1 }} />
-                                </Grid>
+                    <Grid item xs={2} md={6}>
+                        <IconButton
+                            color={"primary"}
+                            onClick={handleMoveToStore}
+                            sx={{ ml: "10px" }}
+                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity}
+                        >
+                            <Done />
+                        </IconButton>
+                    </Grid>
+                </Grid>
+                {
+                    !!storeQuantity && (
+                        <>
+                            <Grid item xs={12}>
+                                <Divider flexItem sx={{ width: 1 }} />
+                            </Grid>
 
-                                <Grid item xs={12}>
-                                    Retirar de tienda hacia el almacén: {storeQuantity} disponibles
-                                </Grid>
+                            <Grid item xs={12}>
+                                Retirar de tienda hacia el almacén: {storeQuantity} disponibles
+                            </Grid>
 
-                                <Grid item container alignItems="center" xs={12} md={8}>
-                                    <Grid item xs={10} md={6}>
-                                        <TextField
-                                            name={"productStoreDepotDistribution"}
-                                            label={"Retirar de tienda"}
-                                            color={"secondary"}
-                                            type={"number"}
-                                            size={"small"}
-                                            onKeyDown={handleKeyDown}
-                                            {...formik.getFieldProps("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity")}
-                                            error={
+                            <Grid item container alignItems="center" xs={12} md={8}>
+                                <Grid item xs={10} md={6}>
+                                    <TextField
+                                        name={"productStoreDepotDistribution"}
+                                        label={"Retirar de tienda"}
+                                        color={"secondary"}
+                                        type={"number"}
+                                        size={"small"}
+                                        onKeyDown={handleKeyDown}
+                                        {...formik.getFieldProps("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity")}
+                                        error={
+                                            formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity &&
+                                            formik.touched.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
+                                        }
+                                        helperText={
+                                            (
                                                 formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity &&
                                                 formik.touched.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
-                                            }
-                                            helperText={
-                                                (
-                                                    formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity &&
-                                                    formik.touched.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
-                                                ) && formik.errors.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity
-                                            }
-                                        />
-                                    </Grid>
-                                    <Grid item xs={2} md={6}>
-                                        <IconButton
-                                            color={"secondary"}
-                                            onClick={handleMoveToWarehouse}
-                                            sx={{ ml: "10px" }}
-                                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity}
-                                        >
-                                            <Done />
-                                        </IconButton>
-                                    </Grid>
+                                            ) && formik.errors.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity
+                                        }
+                                    />
                                 </Grid>
-                            </>
-                        )
-                    }
-                </Grid>
-            </Card>
+                                <Grid item xs={2} md={6}>
+                                    <IconButton
+                                        color={"secondary"}
+                                        onClick={handleMoveToWarehouse}
+                                        sx={{ ml: "10px" }}
+                                        disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity}
+                                    >
+                                        <Done />
+                                    </IconButton>
+                                </Grid>
+                            </Grid>
+                        </>
+                    )
+                }
+            </Grid>
         )
     }
 
@@ -877,18 +868,23 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
             {
                 (formik) => (
                     <Card variant={"outlined"}>
-                        <FilterProductsByDepartmentsModal
-                            allProductsByDepartment={allProductsByDepartment!}
-                            setSelectedDepartments={setSelectedDepartments}
-                            isFilterModalOpen={isFilterModalOpen}
-                            toggleModalFilter={toggleModalFilter}
-                        />
+                        {
+                            isFilterModalOpen && allProductsByDepartment?.length && (
+                                <FilterProductsByDepartmentsModal
+                                    allProductsByDepartment={allProductsByDepartment!}
+                                    setAllProductsByDepartment={setAllProductsByDepartment}
+                                    setFiltersApplied={setFiltersApplied}
+                                    isFilterModalOpen={isFilterModalOpen}
+                                    toggleModalFilter={toggleModalFilter}
+                                />
+                            )
+                        }
 
                         <ModalAddProduct
                             open={activeModalAddProduct}
                             setOpen={setActiveModalAddProduct}
                             dialogTitle="Nuevo Depósito"
-                            handleForceRender={handleForceRender}
+                            handleForceRender={reloadData}
                         >
                             <UserWarehouseForm
                                 ownerId={ownerId}
@@ -898,7 +894,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         </ModalAddProduct>
 
                         <UpdateValueDialog
-                            dialogTitle={"Agregar nuevos productos a este depósito"}
+                            dialogTitle={"Agregar unidades"}
                             open={displayNewUnitsForm}
                             setOpen={setDisplayNewUnitsForm}
                             formik={formik}
@@ -907,7 +903,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         </UpdateValueDialog>
 
                         <UpdateValueDialog
-                            dialogTitle={"Establezca las nuevas cantidades"}
+                            dialogTitle={"Establecer cantidades"}
                             open={displayUpdateUnitsForm}
                             setOpen={setDisplayUpdateUnitsForm}
                         >
@@ -915,7 +911,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         </UpdateValueDialog>
 
                         <UpdateValueDialog
-                            dialogTitle={"Redistribuir productos en " + storeDepotUpdateName}
+                            dialogTitle={"Enviar productos a " + storeDepotUpdateName}
                             open={displayUpdateDepotQuantityForm}
                             setOpen={setDisplayUpdateDepotQuantityForm}
                             formik={formik}
