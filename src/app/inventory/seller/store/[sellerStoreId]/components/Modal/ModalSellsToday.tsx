@@ -26,6 +26,9 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
             { id: "total_price", label: "Precio total", },
             { id: "payment_method", label: "Método de pago", },
             { id: "sell_products_quantity", label: "Productos vendidos", },
+            // { id: "units_returned_quantity", label: "Cantidad de unidades devueltas", },
+            // { id: "returned_reason", label: "Razón de la devolución", },
+            // { id: "reservations", label: "Reservaciones", },
         ];
 
         return (

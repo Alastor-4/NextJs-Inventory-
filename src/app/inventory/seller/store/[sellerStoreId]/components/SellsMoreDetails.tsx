@@ -34,7 +34,7 @@ const SellsMoreDetails = ({ show, sell_products }: SellsMoreDetailsProps) => {
                         </Grid>
                         <Grid container item spacing={1} xs={3} >
                             <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                                Cantidad vendida:
+                                Cantidad:
                             </Grid>
                             <Grid item xs={12} display={"flex"} justifyContent={"center"} >
                                 {sell_product.units_quantity}

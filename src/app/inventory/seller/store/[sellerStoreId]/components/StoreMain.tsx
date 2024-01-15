@@ -1,3 +1,4 @@
+//@ts-nocheck
 "use client"
 
 import {
@@ -6,7 +7,7 @@ import {
 } from "@mui/material";
 import {
     ArrowLeft, ChevronRightOutlined, ExpandLessOutlined, ExpandMoreOutlined,
-    ForwardToInbox, InfoOutlined, Mail
+    ForwardToInbox, InfoOutlined, Mail, Schedule
 } from "@mui/icons-material"
 import { daysMap, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
@@ -36,9 +37,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
     //Modal Handlers
     const [isModalSellsOpen, setIsModalSellsOpen] = useState<boolean>(false);
     const toggleModalSellsOpen = () => {
-        if (todaySells) {
-            setIsModalSellsOpen(!isModalSellsOpen);
-        }
+        if (todaySells) setIsModalSellsOpen(!isModalSellsOpen);
     };
 
     //GET initial store and sellsStats details
@@ -176,7 +175,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
         //change auto open time
         const updatedStore = await stores.changeAutoOpenTime(sellerStoreId)
 
-        let storeData = { ...storeDetails }
+        let storeData = { ...storeDetails! }
         storeData.auto_open_time = updatedStore.auto_open_time
 
         setStoreDetails(storeData)
@@ -392,20 +391,23 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const SellsModule = () => {
         return (
             <Card variant={"outlined"} sx={{ overflow: "visible" }}>
-                <CardHeader sx={{ marginBottom: "-20px", marginTop: "-30px" }} title={
-                    <Typography display={"flex"} variant="h5" sx={{ bgcolor: "white", px: "4px", width: "155px" }}>
-                        Ventas de hoy
-                    </Typography>
-                } />
-                <CardContent>
-                    <Grid item container justifyContent={"space-between"} marginBottom={"15px"}>
-                        <Grid item xs={8}>
-                            <Button size="small" variant="outlined" disabled={todaySells?.length! > 0 ? false : true} color="primary" onClick={toggleModalSellsOpen}>Ver detalles</Button>
+                <CardHeader title={
+                    <Grid container spacing={2} justifyContent={"space-between"}>
+                        <Grid item>
+                            <Typography display={"flex"} onClick={toggleModalSellsOpen} variant="h5" sx={{ color: "#0067ca", textDecoration: "underline", cursor: "pointer" }}>
+                                Ventas de hoy
+                            </Typography>
                         </Grid>
-                        <Grid item xs={4}>
-                            <Button size="small" variant="outlined" color="secondary" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`,) }}>Historial</Button>
+                        <Grid item container xs={'auto'} mr={"20px"}>
+                            <Grid item>
+                                <IconButton size="small" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`) }} >
+                                    <Schedule color="primary" />
+                                </IconButton>
+                            </Grid>
                         </Grid>
                     </Grid>
+                } />
+                <CardContent>
                     {
                         todaySellsStats && (
                             <Grid container rowSpacing={2}>
