@@ -27,16 +27,8 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     //Products data
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [filtersApplied, setFiltersApplied] = useState<boolean>(false);
     const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
-
-    const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
-
-    const [forceRender, setForceRender] = useState<boolean>(false);
-
-    const handleForceRender = () => {
-        setForceRender(true);
-        setSelectedDepartments(null);
-    }
 
     //GET initial data
     useEffect(() => {
@@ -47,12 +39,36 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                     ...productsByDepartments,
                     selected: false
                 })))
-                setForceRender(false);
+
                 setSelectedProduct(null);
             }
         }
         getAllProductsByDepartment();
-    }, [userId, forceRender]);
+    }, [userId]);
+
+    const reloadData = async () => {
+        let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await products.allUserProductDepartments(userId);
+        if (newAllProductsByDepartment) {
+            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => {
+                //search if current department was selected in previous data to keep selection
+
+                let oldDepartmentSelected = false
+
+                const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
+                if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
+                    oldDepartmentSelected = true
+                }
+
+                return (
+                    {
+                        ...productsByDepartments,
+                        selected: oldDepartmentSelected
+                    }
+                )
+            })
+            setAllProductsByDepartment(newAllProductsByDepartment);
+        }
+    }
 
     //GET all departments
     const [departments, setDepartments] = useState<departments[] | null>(null);
@@ -81,18 +97,11 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     useEffect(() => {
         if (allProductsByDepartment?.length) {
             let allProducts: productsProps[] = [];
-            let bool = false;
-            if (selectedDepartments) {
-                for (const department of selectedDepartments!) if (department.selected === true) bool = true;
-            }
-            allProductsByDepartment?.forEach((productsByDepartments) => {
-                if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
+
+            allProductsByDepartment.forEach((productsByDepartments) => {
+                //when there are no filters applied all departments are returned
+                if (!filtersApplied || productsByDepartments.selected) {
                     allProducts = [...allProducts, ...productsByDepartments.products!];
-                }
-                if (selectedDepartments?.length! > 0 && bool) {
-                    if (productsByDepartments.selected) {
-                        allProducts = [...allProducts, ...productsByDepartments.products!];
-                    }
                 }
             });
 
@@ -103,7 +112,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
             });
             setDataProducts(allProducts);
         }
-    }, [allProductsByDepartment, selectedDepartments, isFilterModalOpen]);
+    }, [allProductsByDepartment, filtersApplied]);
 
     //Handle selected product
     const handleSelectProduct = (product: productsProps) => {
@@ -123,16 +132,33 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
         const response = await products.delete(selectedProduct?.id!);
         if (response) {
             setSelectedProduct(null);
-            const updatedProducts = await products.allUserProductDepartments(userId);
-            setSelectedDepartments(null);
+
+            let updatedProducts = await products.allUserProductDepartments(userId);
+
             if (updatedProducts) {
-                setAllProductsByDepartment(updatedProducts.map((productsByDepartments: allProductsByDepartmentProps) => ({
-                    ...productsByDepartments,
-                    selected: false
-                })));
+                updatedProducts = updatedProducts.map((productsByDepartments: allProductsByDepartmentProps) => {
+                    //search if current department was selected in previous data to keep selection
+
+                    let oldDepartmentSelected = false
+
+                    const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
+                    if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
+                        oldDepartmentSelected = true
+                    }
+
+                    return (
+                        {
+                            ...productsByDepartments,
+                            selected: oldDepartmentSelected
+                        }
+                    )
+                })
+
+                setAllProductsByDepartment(updatedProducts);
+
                 notifySuccess("Se ha eliminado el producto");
-            } else notifyError("Error al eliminar el producto");
-        }
+            }
+        } else notifyError("Error al eliminar el producto. Solo es posibe eliminar productos que no están siendo usados en el sistema");
     }
 
     const handleNavigateBack = () => { router.push(`/inventory`); }
@@ -332,12 +358,15 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
     return (
         <>
-            <FilterProductsByDepartmentsModal
-                allProductsByDepartment={allProductsByDepartment!}
-                setSelectedDepartments={setSelectedDepartments}
-                isFilterModalOpen={isFilterModalOpen}
-                toggleModalFilter={toggleModalFilter}
-            />
+            {isFilterModalOpen && allProductsByDepartment?.length && (
+                <FilterProductsByDepartmentsModal
+                    allProductsByDepartment={allProductsByDepartment}
+                    setAllProductsByDepartment={setAllProductsByDepartment}
+                    setFiltersApplied={setFiltersApplied}
+                    isFilterModalOpen={isFilterModalOpen}
+                    toggleModalFilter={toggleModalFilter}
+                />
+            )}
 
             <ImagesDisplayDialog
                 open={openImageDialog}
@@ -355,7 +384,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                     departments={departments}
                     productId={null}
                     setOpen={setIsCreateModalOpen}
-                    handleForceRender={handleForceRender}
+                    handleForceRender={reloadData}
                 />
             </ModalUpdateProduct>
 
@@ -369,7 +398,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                     departments={departments}
                     productId={selectedProduct?.id!}
                     setOpen={setIsUpdateModalOpen}
-                    handleForceRender={handleForceRender}
+                    handleForceRender={reloadData}
                 />
             </ModalUpdateProduct>
 
