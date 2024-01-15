@@ -26,7 +26,7 @@ import { Formik } from 'formik';
 const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) => {
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
-    const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [filtersApplied, setFiltersApplied] = useState<boolean>(false);
     const [depotsInStore, setDepotsInStore] = useState<number | null>(dataStore?.store_depots?.length!);
     const [activeManageQuantity, setActiveManageQuantity] = useState(false);
     const [showDetails, setShowDetails] = useState<number>(-1);
@@ -76,41 +76,47 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
     useEffect(() => {
         if (allProductsByDepartment?.length) {
             let allProducts: productsProps[] = [];
-            let bool = false;
-            if (selectedDepartments) {
-                for (const department of selectedDepartments!) if (department.selected === true) bool = true;
-            }
-            allProductsByDepartment?.forEach((productsByDepartments) => {
-                if (!selectedDepartments || selectedDepartments?.length! === 0 || !bool) {
+
+            allProductsByDepartment.forEach((productsByDepartments) => {
+                //when there are no filters applied all departments are returned
+                if (!filtersApplied || productsByDepartments.selected) {
                     allProducts = [...allProducts, ...productsByDepartments.products!];
-                }
-                if (selectedDepartments?.length! > 0 && bool) {
-                    if (productsByDepartments.selected) {
-                        allProducts = [...allProducts, ...productsByDepartments.products!];
-                    }
                 }
             });
 
             allProducts.sort((a: productsProps, b: productsProps) => {
                 if (a?.name! < b?.name!) return -1;
                 if (a?.name! > a?.name!) return 1;
-                return 0
+                return 0;
             });
             setDataProducts(allProducts);
         } else {
             setDepotsInStore(null);
             setDataProducts(null);
         }
-    }, [allProductsByDepartment, selectedDepartments]);
+    }, [allProductsByDepartment, filtersApplied]);
 
     const loadData = async () => {
         let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await storeAssign.allProductsByDepartmentStore(dataStore?.id);
-        setSelectedDepartments(null)
         if (newAllProductsByDepartment) {
-            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
-                ...productsByDepartments,
-                selected: (selectedDepartments?.includes(productsByDepartments))
-            }))
+            newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => {
+                //search if current department was selected in previous data to keep selection
+
+                let oldDepartmentSelected = false
+
+                const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id)
+                if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
+                    oldDepartmentSelected = true
+                }
+
+                return (
+                    {
+                        ...productsByDepartments,
+                        selected: oldDepartmentSelected
+                    }
+                )
+            })
+
             setAllProductsByDepartment(newAllProductsByDepartment);
         }
     }
@@ -392,14 +398,20 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
             {
                 (formik) => (
                     <Card variant={"outlined"}>
-                        <FilterProductsByDepartmentsModal
-                            allProductsByDepartment={allProductsByDepartment!}
-                            setSelectedDepartments={setSelectedDepartments}
-                            isFilterModalOpen={isFilterModalOpen}
-                            toggleModalFilter={toggleModalFilter}
-                        />
+                        {
+                            isFilterModalOpen && allProductsByDepartment?.length && (
+                                <FilterProductsByDepartmentsModal
+                                    allProductsByDepartment={allProductsByDepartment!}
+                                    setAllProductsByDepartment={setAllProductsByDepartment}
+                                    setFiltersApplied={setFiltersApplied}
+                                    isFilterModalOpen={isFilterModalOpen}
+                                    toggleModalFilter={toggleModalFilter}
+                                />
+                            )
+                        }
+
                         <ModalStoreAssign
-                            dialogTitle={"Administrar cantidad del producto"}
+                            dialogTitle={"Trasladar productos"}
                             open={activeManageQuantity}
                             setOpen={setActiveManageQuantity}
                         >
