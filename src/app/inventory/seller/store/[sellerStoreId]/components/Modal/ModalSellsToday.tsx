@@ -14,8 +14,6 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
     const handleCloseModal = () => {
         setIsOpen(false);
     }
-    console.log(todaySellsData);
-
 
     if (!todaySellsData) {
         setIsOpen(false);
@@ -28,7 +26,8 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
             { id: "total_price", label: "Precio total", },
             { id: "payment_method", label: "Método de pago", },
             { id: "sell_products_quantity", label: "Productos vendidos", },
-        ]
+        ];
+
         return (
             <TableHead>
                 <TableRow>
@@ -50,7 +49,7 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
             <TableBody>
                 {todaySellsData?.map(
                     (sell: storeSellsDetailsProps) => (
-                        <>
+                        <React.Fragment key={sell.id}>
                             <TableRow
                                 key={sell.id}
                                 hover
@@ -84,7 +83,7 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
                                     )}
                                 </TableCell>
                             </TableRow>
-                        </>
+                        </React.Fragment>
                     ))}
             </TableBody>
         )
