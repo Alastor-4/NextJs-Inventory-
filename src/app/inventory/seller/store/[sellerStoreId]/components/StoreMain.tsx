@@ -1,74 +1,70 @@
-// @ts-nocheck
+//@ts-nocheck
 "use client"
 
-import React from "react";
 import {
-    AppBar,
-    Box,
-    Card,
-    CardContent,
-    CardHeader,
-    Chip,
-    Grid,
-    IconButton,
-    Switch,
-    Toolbar,
-    Typography
+    AppBar, Box, Button, Card, CardContent, CardHeader,
+    Chip, Grid, IconButton, Switch, Toolbar, Typography
 } from "@mui/material";
 import {
-    ArrowLeft,
-    ChevronRightOutlined,
-    ExpandLessOutlined,
-    ExpandMoreOutlined,
-    ForwardToInbox,
-    InfoOutlined,
-    Mail
+    ArrowLeft, ChevronRightOutlined, ExpandLessOutlined, ExpandMoreOutlined,
+    ForwardToInbox, InfoOutlined, Mail, Schedule
 } from "@mui/icons-material"
-import { useParams, useRouter } from "next/navigation";
-import dayjs from "dayjs";
-import isBetween from "dayjs/plugin/isBetween";
-import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
-import Link from "next/link";
 import { daysMap, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
+import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
+import { productSellsStatsProps, storeDepotsStatsProps, storeDepotsWithAny, storeSellsDetailsProps, storeWithStoreDepots } from "@/types/interfaces";
+import { useParams, useRouter } from "next/navigation";
+import ModalSellsToday from "./Modal/ModalSellsToday";
+import React, { useEffect, useState } from "react";
+import isBetween from "dayjs/plugin/isBetween";
+import Link from "next/link";
+import dayjs from "dayjs";
 
-dayjs.extend(isBetween)
+dayjs.extend(isBetween);
 
-export default function StoreMain({ userId }) {
-    const [storeDetails, setStoreDetails] = React.useState(null)
-    const [storeDepotsStats, setStoreDepotsStats] = React.useState(null)
-    const [productSells, setProductSells] = React.useState(null)
-    const [productSellsStats, setProductSellsStats] = React.useState(null)
+export default function StoreMain({ userId }: { userId?: number }) {
+    const [productSells, setProductSells] = useState(null)
 
-    const params = useParams()
-    const router = useRouter()
+    const [storeDepotsStats, setStoreDepotsStats] = useState<storeDepotsStatsProps | null>(null);
+    const [storeDetails, setStoreDetails] = useState<storeWithStoreDepots | null>(null);
+    const [todaySellsStats, setTodaySellsStats] = useState<productSellsStatsProps | null>(null);
+    const [todaySells, setTodaySells] = useState<storeSellsDetailsProps[] | null>(null);
 
-    const sellerStoreId = params.sellerStoreId
+    const params = useParams();
+    const router = useRouter();
 
-    //get initial store and sells details and compute stats
-    React.useEffect(() => {
+    const sellerStoreId = +params.sellerStoreId!;
+
+    //Modal Handlers
+    const [isModalSellsOpen, setIsModalSellsOpen] = useState<boolean>(false);
+    const toggleModalSellsOpen = () => {
+        if (todaySells) setIsModalSellsOpen(!isModalSellsOpen);
+    };
+
+    //GET initial store and sellsStats details
+    useEffect(() => {
         async function loadStatsData() {
-            const p1 = await stores.storeDetails(userId, sellerStoreId)
-            const p2 = await stores.storeSellsDetails(sellerStoreId)
+            const storeDetailsPromise: storeWithStoreDepots = await stores.storeDetails(userId, sellerStoreId);
+            const storeTodaySellsDetailsPromise: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId);
 
-            const [storeDetailsResponse, storeSellsResponse] = [p1, p2]
-            // const [storeDetailsResponse, storeSellsResponse] = await Promise.all([p1, p2])
+            const [storeDetails, storeTodaySellsDetails] =
+                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise]);
 
-            if (storeDetailsResponse) {
-                setStoreDetails(storeDetailsResponse)
+            if (storeDetails) {
+                setStoreDetails(storeDetails);
 
-                const depotsTotal = storeDetailsResponse.store_depots.length
-                let depotsRemainingUnitsTotal = 0
-                let depotsNotRemainingUnitsTotal = 0
-                let depotsNotActiveTotal = 0
-                let depotsWithoutPriceTotal = 0
-                let depotsWithDiscountTotal = 0
+                const depotsTotal: number = storeDetails.store_depots?.length!;
+                let depotsRemainingUnitsTotal: number = 0;
+                let depotsNotRemainingUnitsTotal: number = 0;
+                let depotsNotActiveTotal: number = 0;
+                let depotsWithoutPriceTotal: number = 0;
+                let depotsWithDiscountTotal: number = 0;
 
-                storeDetailsResponse.store_depots.forEach(item => {
-                    depotsRemainingUnitsTotal += item.product_remaining_units
-                    if (!item.product_remaining_units) depotsNotRemainingUnitsTotal++
-                    if (!item.is_active) depotsNotActiveTotal++
-                    if (item.sell_price.toString() === "0") depotsWithoutPriceTotal++
-                    if (item.price_discount_percentage || item.price_discount_quantity) depotsWithDiscountTotal++
+                storeDetails.store_depots?.forEach((storeDepot: storeDepotsWithAny) => {
+                    depotsRemainingUnitsTotal += storeDepot.product_remaining_units!
+                    if (!storeDepot.product_remaining_units) depotsNotRemainingUnitsTotal++
+                    if (!storeDepot.is_active) depotsNotActiveTotal++
+                    if (storeDepot.sell_price.toString() === "0") depotsWithoutPriceTotal++
+                    if (storeDepot.price_discount_percentage || storeDepot.price_discount_quantity) depotsWithDiscountTotal++
                 })
 
                 setStoreDepotsStats({
@@ -81,72 +77,69 @@ export default function StoreMain({ userId }) {
                 })
             }
 
-            if (storeSellsResponse) {
-                setProductSells(storeSellsResponse)
-                const sellsTotal = storeSellsResponse.length
-                let sellsDifferentProductsTotal = 0
-                let sellsUnitsTotal = 0
-                let sellsAmountTotal = 0
-                let sellsUnitsReturnedTotal = 0
-                let sellerProfitTotal = 0
+            if (storeTodaySellsDetails) {
+                const sellsTotal: number = storeTodaySellsDetails.length!
+                let sellsDifferentProductsTotal: number = 0;
+                let sellsUnitsTotal: number = 0;
+                let sellsAmountTotal: number = 0;
+                let sellsUnitsReturnedTotal: number = 0;
+                let sellerProfitTotal: number = 0;
 
-                let seeDepotsId = {}
+                let sellsDepotsIdAndSellState: { [key: number]: boolean; } = {};
 
-                storeSellsResponse.forEach(item => {
-                    let sellProfitQuantity = 0
+                storeTodaySellsDetails.forEach((sells: storeSellsDetailsProps) => {
+                    let sellProfitQuantity: number = 0;
 
-                    //sell from a reservation
-                    if (item.reservations) {
-                        //loop trough reservation products
-                        item.reservations.reservation_products.forEach(reservationProductItem => {
-                            if (!seeDepotsId[reservationProductItem.store_depots.depot_id]) {
-                                sellsDifferentProductsTotal++
-                                seeDepotsId[reservationProductItem.store_depots.depot_id] = true
+                    //venta a través de reservación
+                    if (sells.reservations) {
+                        sells.reservations.reservation_products.forEach(reservationProductItem => {
+                            if (!sellsDepotsIdAndSellState[reservationProductItem.store_depots.depot_id!]) {
+                                sellsDifferentProductsTotal++;
+                                sellsDepotsIdAndSellState[reservationProductItem.store_depots.depot_id!] = true
                             }
 
-                            sellsUnitsTotal += reservationProductItem.units_quantity
+                            sellsUnitsTotal += reservationProductItem.units_quantity;
 
                             sellProfitQuantity += reservationProductItem.store_depots.seller_profit_quantity
                                 ? reservationProductItem.store_depots.seller_profit_quantity * reservationProductItem.units_quantity
-                                : reservationProductItem.store_depots.seller_profit_percentage * reservationProductItem.price / 100
+                                : reservationProductItem.store_depots.seller_profit_percentage! * reservationProductItem.price / 100;
                         })
                     } else {
-                        //loop trough sell products
-                        item.sell_products.forEach(sellProductItem => {
-                            if (!seeDepotsId[sellProductItem.store_depots.depot_id]) {
-                                sellsDifferentProductsTotal++
-                                seeDepotsId[sellProductItem.store_depots.depot_id] = true
+                        sells.sell_products.forEach(sellProductItem => {
+                            if (!sellsDepotsIdAndSellState[sellProductItem.store_depots.depot_id!]) {
+                                sellsDifferentProductsTotal++;
+                                sellsDepotsIdAndSellState[sellProductItem.store_depots.depot_id!] = true;
                             }
 
-                            sellsUnitsTotal += sellProductItem.units_quantity
+                            sellsUnitsTotal += sellProductItem.units_quantity;
 
                             sellProfitQuantity += sellProductItem.store_depots.seller_profit_quantity
                                 ? sellProductItem.store_depots.seller_profit_quantity * sellProductItem.units_quantity
-                                : sellProductItem.store_depots.seller_profit_percentage * sellProductItem.price / 100
+                                : sellProductItem.store_depots.seller_profit_percentage! * sellProductItem.price / 100;
                         })
                     }
 
-                    sellsAmountTotal += item.total_price
-                    sellsUnitsReturnedTotal += item.units_returned_quantity
+                    sellsAmountTotal += sells.total_price!;
+                    sellsUnitsReturnedTotal += sells.units_returned_quantity!;
 
-                    sellerProfitTotal += sellProfitQuantity
+                    sellerProfitTotal += sellProfitQuantity;
                 })
-
-                setProductSellsStats({
+                setTodaySells(storeTodaySellsDetails);
+                setTodaySellsStats({
                     sellsTotal,
                     sellsDifferentProductsTotal,
                     sellsUnitsTotal,
                     sellsAmountTotal,
                     sellsUnitsReturnedTotal,
                     sellerProfitTotal,
-                })
+                });
             }
         }
 
         if (sellerStoreId && userId) {
-            loadStatsData()
+            loadStatsData();
         }
-    }, [sellerStoreId, userId])
+    }, [sellerStoreId, userId]);
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -171,8 +164,8 @@ export default function StoreMain({ userId }) {
         </AppBar>
     )
 
-    const [autoOpenTime, setAutoOpenTime] = React.useState(true)
-    React.useEffect(() => {
+    const [autoOpenTime, setAutoOpenTime] = useState<boolean>(true);
+    useEffect(() => {
         if (storeDetails) {
             setAutoOpenTime(storeDetails?.auto_open_time ?? false)
         }
@@ -182,7 +175,7 @@ export default function StoreMain({ userId }) {
         //change auto open time
         const updatedStore = await stores.changeAutoOpenTime(sellerStoreId)
 
-        let storeData = { ...storeDetails }
+        let storeData = { ...storeDetails! }
         storeData.auto_open_time = updatedStore.auto_open_time
 
         setStoreDetails(storeData)
@@ -194,8 +187,8 @@ export default function StoreMain({ userId }) {
         }
     }
 
-    const [autoReservationTime, setAutoReservationTime] = React.useState(true)
-    React.useEffect(() => {
+    const [autoReservationTime, setAutoReservationTime] = useState(true)
+    useEffect(() => {
         if (storeDetails) {
             setAutoReservationTime(storeDetails?.auto_reservation_time ?? false)
         }
@@ -263,8 +256,8 @@ export default function StoreMain({ userId }) {
         return false
     }
 
-    const [displayAutoOpenSection, setDisplayAutoOpenSection] = React.useState(false)
-    const [displayAutoReservationSection, setDisplayAutoReservationSection] = React.useState(false)
+    const [displayAutoOpenSection, setDisplayAutoOpenSection] = useState<boolean>(false);
+    const [displayAutoReservationSection, setDisplayAutoReservationSection] = useState<boolean>(false);
 
     const StoreProducts = () => {
 
@@ -395,60 +388,70 @@ export default function StoreMain({ userId }) {
     }
 
 
-    const TodaySells = () => {
-
+    const SellsModule = () => {
         return (
-            <Card variant={"outlined"}>
-                <CardHeader title={"Ventas de hoy"} />
-
+            <Card variant={"outlined"} sx={{ overflow: "visible" }}>
+                <CardHeader title={
+                    <Grid container spacing={2} justifyContent={"space-between"}>
+                        <Grid item>
+                            <Typography display={"flex"} onClick={toggleModalSellsOpen} variant="h5" sx={{ color: "#0067ca", textDecoration: "underline", cursor: "pointer" }}>
+                                Ventas de hoy
+                            </Typography>
+                        </Grid>
+                        <Grid item container xs={'auto'} mr={"20px"}>
+                            <Grid item>
+                                <IconButton size="small" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`) }} >
+                                    <Schedule color="primary" />
+                                </IconButton>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                } />
                 <CardContent>
                     {
-                        productSellsStats && (
+                        todaySellsStats && (
                             <Grid container rowSpacing={2}>
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Ventas:
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                        Total de ventas:
                                     </Grid>
-                                    <Grid item xs={true}>
-                                        {productSellsStats.sellsTotal} ({productSellsStats.sellsUnitsTotal} unidades total) ({productSellsStats.sellsDifferentProductsTotal} productos diferentes)
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        {todaySellsStats.sellsTotal} ({todaySellsStats.sellsUnitsTotal} unidades totales) ({todaySellsStats.sellsDifferentProductsTotal} productos diferentes)
                                     </Grid>
                                 </Grid>
-
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
                                         Productos devueltos:
                                     </Grid>
-                                    <Grid item xs={true}>
-                                        {productSellsStats.sellsUnitsReturnedTotal}
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        {todaySellsStats.sellsUnitsReturnedTotal}
                                     </Grid>
                                 </Grid>
-
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Total vendido:
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                        Total recaudado:
                                     </Grid>
-                                    <Grid item xs={true}>
-                                        $ {numberFormat(productSellsStats.sellsAmountTotal)}
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        $ {numberFormat(`${todaySellsStats.sellsAmountTotal}`)}
                                     </Grid>
                                 </Grid>
-
                                 <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
                                         Desglose:
                                     </Grid>
-                                    <Grid item xs={true}>
-                                        $ {numberFormat(productSellsStats.sellsAmountTotal - productSellsStats.sellerProfitTotal)} del dueño | $ {numberFormat(productSellsStats.sellerProfitTotal)} del vendedor
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        $ {numberFormat(`${todaySellsStats.sellsAmountTotal - todaySellsStats.sellerProfitTotal}`)} del dueño | $ {numberFormat(`${todaySellsStats.sellerProfitTotal}`)} del vendedor
                                     </Grid>
                                 </Grid>
                             </Grid>
                         )
                     }
                 </CardContent>
-            </Card>
+            </Card >
         )
     }
 
@@ -664,7 +667,12 @@ export default function StoreMain({ userId }) {
     return (
         <Card variant={"outlined"}>
             <CustomToolbar />
-
+            <ModalSellsToday
+                dialogTitle="Ventas de hoy"
+                isOpen={isModalSellsOpen}
+                setIsOpen={setIsModalSellsOpen}
+                todaySellsData={todaySells!}
+            />
             {
                 storeDetails && (
                     <CardContent>
@@ -738,7 +746,7 @@ export default function StoreMain({ userId }) {
                                 </Grid>
 
                                 <Grid item xs={12} md={6}>
-                                    <TodaySells />
+                                    <SellsModule />
                                 </Grid>
 
                                 {

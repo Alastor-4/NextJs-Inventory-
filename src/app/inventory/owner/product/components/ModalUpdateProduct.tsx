@@ -1,6 +1,6 @@
-import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import { AppBar, Box, Dialog, DialogContent, IconButton, Toolbar, Typography } from "@mui/material";
 import { ModalUpdateProductProps } from "@/types/interfaces";
+import { Close } from "@mui/icons-material";
 import React from "react";
 
 export default function ModalUpdateProduct({ open, setOpen, dialogTitle, children }: ModalUpdateProductProps) {
@@ -22,7 +22,7 @@ export default function ModalUpdateProduct({ open, setOpen, dialogTitle, childre
                         onClick={handleClose}
                         aria-label="close"
                     >
-                        <CloseIcon />
+                        <Close />
                     </IconButton>
                 </Toolbar>
             </AppBar>

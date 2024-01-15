@@ -1,9 +1,9 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
-import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
 import { ModalCreateUpdateDepartmentProps } from '@/types/interfaces';
 import departmentsRequests from '../../requests/departments';
 import { notifySuccess } from '@/utils/generalFunctions';
 import { departments } from '@prisma/client';
+import { Close } from '@mui/icons-material';
 import { AxiosResponse } from 'axios';
 import { Form, Formik } from 'formik';
 import * as Yup from "yup";
@@ -63,7 +63,7 @@ const ModalCreateUpdateDepartment = ({ userId, isOpen, setIsOpen, dialogTitle, d
                     onClick={handleCloseModal}
                     aria-label="close"
                 >
-                    <CloseIcon />
+                    <Close />
                 </IconButton>
             </DialogTitle>
             <DialogContent dividers >
