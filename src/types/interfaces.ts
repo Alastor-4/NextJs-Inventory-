@@ -1,4 +1,4 @@
-import { characteristics, departments, depots, images, product_offers, products, sell_products, sells, users, warehouses, store_depots, reservations, reservation_products, Prisma } from '@prisma/client';
+import { characteristics, departments, depots, images, product_offers, products, sell_products, sells, users, warehouses, store_depots, reservations, reservation_products, Prisma, stores, store_open_days, store_reservation_days } from '@prisma/client';
 import { ReactNode } from "react";
 
 export interface ShowProductsStoreProps {
@@ -27,6 +27,20 @@ export interface storeWithStoreDepots {
     fixed_seller_profit_percentage: number | null;
     fixed_seller_profit_quantity: number | null;
     fixed_seller_profit_unit: string | null;
+    store_open_days?: {
+        id: number;
+        week_day_number: number;
+        day_start_time: Date;
+        day_end_time: Date;
+        store_id: number;
+    }[];
+    store_reservation_days?: {
+        id: number;
+        week_day_number: number;
+        day_start_time: Date;
+        day_end_time: Date;
+        store_id: number;
+    }[];
     store_depots?: {
         id: number;
         store_id: number | null;
@@ -82,6 +96,14 @@ export interface UpdateValueDialogProps {
     formik?: any;
 }
 
+export interface storeDepotsStatsProps {
+    depotsTotal: number;
+    depotsRemainingUnitsTotal: number;
+    depotsNotRemainingUnitsTotal: number;
+    depotsNotActiveTotal: number;
+    depotsWithoutPriceTotal: number;
+    depotsWithDiscountTotal: number;
+}
 export interface StoreMainTableProps {
     userId?: number;
     dataStoreDetails: storeWithStoreDepots | null;
@@ -240,12 +262,35 @@ export interface storeDepotsWithAny {
     price_discount_quantity: number | null;
     seller_profit_unit: string | null;
     product_offers?: product_offers[] | null;
+    depots?: {
+        id: number;
+        product_id: number | null;
+        warehouse_id: number | null;
+        inserted_by_id: number | null;
+        product_total_units: number | null;
+        product_total_remaining_units: number | null;
+        created_at: Date;
+        products?: products | null;
+    } | null
 }
 
+export interface SellsMoreDetailsProps {
+    sell_products: {
+        id: number;
+        sell_id: number;
+        store_depot_id: number;
+        units_quantity: number;
+        price: number;
+        created_at: Date;
+        store_depots: storeDepotsWithAny;
+    }[];
+    show: boolean;
+}
 export interface ModalSellsTodayProps {
     isOpen: boolean;
     setIsOpen: (bool: boolean) => void;
     dialogTitle: string;
+    todaySellsData: storeSellsDetailsProps[];
 }
 export interface StoreModalDefaultProps {
     open: boolean;
@@ -304,7 +349,6 @@ export interface TransferUnitsProps {
     setActiveTransferUnits: (bool: boolean) => void;
     loadData: () => Promise<void>;
 }
-
 export interface productSellsStatsProps {
     sellsTotal: number;
     sellsDifferentProductsTotal: number;

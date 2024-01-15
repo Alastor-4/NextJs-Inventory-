@@ -1,3 +1,4 @@
+//@ts-nocheck
 "use client"
 
 import {
@@ -6,11 +7,11 @@ import {
 } from "@mui/material";
 import {
     ArrowLeft, ChevronRightOutlined, ExpandLessOutlined, ExpandMoreOutlined,
-    ForwardToInbox, InfoOutlined, Mail
+    ForwardToInbox, InfoOutlined, Mail, Schedule
 } from "@mui/icons-material"
 import { daysMap, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
-import { productSellsStatsProps, storeSellsDetailsProps } from "@/types/interfaces";
+import { productSellsStatsProps, storeDepotsStatsProps, storeDepotsWithAny, storeSellsDetailsProps, storeWithStoreDepots } from "@/types/interfaces";
 import { useParams, useRouter } from "next/navigation";
 import ModalSellsToday from "./Modal/ModalSellsToday";
 import React, { useEffect, useState } from "react";
@@ -20,12 +21,12 @@ import dayjs from "dayjs";
 
 dayjs.extend(isBetween);
 
-export default function StoreMain({ userId }) {
-    const [storeDetails, setStoreDetails] = useState(null)
-    const [storeDepotsStats, setStoreDepotsStats] = useState(null)
+export default function StoreMain({ userId }: { userId?: number }) {
     const [productSells, setProductSells] = useState(null)
+
+    const [storeDepotsStats, setStoreDepotsStats] = useState<storeDepotsStatsProps | null>(null);
+    const [storeDetails, setStoreDetails] = useState<storeWithStoreDepots | null>(null);
     const [todaySellsStats, setTodaySellsStats] = useState<productSellsStatsProps | null>(null);
-    const [allSells, setAllSells] = useState<storeSellsDetailsProps[] | null>(null);
     const [todaySells, setTodaySells] = useState<storeSellsDetailsProps[] | null>(null);
 
     const params = useParams();
@@ -35,41 +36,35 @@ export default function StoreMain({ userId }) {
 
     //Modal Handlers
     const [isModalSellsOpen, setIsModalSellsOpen] = useState<boolean>(false);
-    const toggleModalSellsOpen = () => setIsModalSellsOpen(!isModalSellsOpen);
+    const toggleModalSellsOpen = () => {
+        if (todaySells) setIsModalSellsOpen(!isModalSellsOpen);
+    };
 
     //GET initial store and sellsStats details
     useEffect(() => {
         async function loadStatsData() {
-            const storeDetails = await stores.storeDetails(userId, sellerStoreId)
-            const storeTodaySellsDetails: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId);
-            const storeAllSellsDetails: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId, true);
+            const storeDetailsPromise: storeWithStoreDepots = await stores.storeDetails(userId, sellerStoreId);
+            const storeTodaySellsDetailsPromise: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId);
 
-            console.log("Solo hoy");
-            console.log(storeTodaySellsDetails);
-
-            console.log("Todas");
-            console.log(storeAllSellsDetails);
-
-
-            // const [storeDetailsResponse, storeSellsDetailsResponse] = [storeDetails, storeSellsDetails]
-            // const [storeDetailsResponse, storeSellsResponse] = await Promise.all([p1, p2])
+            const [storeDetails, storeTodaySellsDetails] =
+                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise]);
 
             if (storeDetails) {
                 setStoreDetails(storeDetails);
 
-                const depotsTotal = storeDetails.store_depots.length
-                let depotsRemainingUnitsTotal = 0
-                let depotsNotRemainingUnitsTotal = 0
-                let depotsNotActiveTotal = 0
-                let depotsWithoutPriceTotal = 0
-                let depotsWithDiscountTotal = 0
+                const depotsTotal: number = storeDetails.store_depots?.length!;
+                let depotsRemainingUnitsTotal: number = 0;
+                let depotsNotRemainingUnitsTotal: number = 0;
+                let depotsNotActiveTotal: number = 0;
+                let depotsWithoutPriceTotal: number = 0;
+                let depotsWithDiscountTotal: number = 0;
 
-                storeDetails.store_depots.forEach(item => {
-                    depotsRemainingUnitsTotal += item.product_remaining_units
-                    if (!item.product_remaining_units) depotsNotRemainingUnitsTotal++
-                    if (!item.is_active) depotsNotActiveTotal++
-                    if (item.sell_price.toString() === "0") depotsWithoutPriceTotal++
-                    if (item.price_discount_percentage || item.price_discount_quantity) depotsWithDiscountTotal++
+                storeDetails.store_depots?.forEach((storeDepot: storeDepotsWithAny) => {
+                    depotsRemainingUnitsTotal += storeDepot.product_remaining_units!
+                    if (!storeDepot.product_remaining_units) depotsNotRemainingUnitsTotal++
+                    if (!storeDepot.is_active) depotsNotActiveTotal++
+                    if (storeDepot.sell_price.toString() === "0") depotsWithoutPriceTotal++
+                    if (storeDepot.price_discount_percentage || storeDepot.price_discount_quantity) depotsWithDiscountTotal++
                 })
 
                 setStoreDepotsStats({
@@ -83,7 +78,6 @@ export default function StoreMain({ userId }) {
             }
 
             if (storeTodaySellsDetails) {
-                // setProductSells(storeSellsDetailsResponse)
                 const sellsTotal: number = storeTodaySellsDetails.length!
                 let sellsDifferentProductsTotal: number = 0;
                 let sellsUnitsTotal: number = 0;
@@ -131,7 +125,6 @@ export default function StoreMain({ userId }) {
                     sellerProfitTotal += sellProfitQuantity;
                 })
                 setTodaySells(storeTodaySellsDetails);
-                setAllSells(storeAllSellsDetails);
                 setTodaySellsStats({
                     sellsTotal,
                     sellsDifferentProductsTotal,
@@ -182,7 +175,7 @@ export default function StoreMain({ userId }) {
         //change auto open time
         const updatedStore = await stores.changeAutoOpenTime(sellerStoreId)
 
-        let storeData = { ...storeDetails }
+        let storeData = { ...storeDetails! }
         storeData.auto_open_time = updatedStore.auto_open_time
 
         setStoreDetails(storeData)
@@ -398,20 +391,23 @@ export default function StoreMain({ userId }) {
     const SellsModule = () => {
         return (
             <Card variant={"outlined"} sx={{ overflow: "visible" }}>
-                <CardHeader sx={{ marginBottom: "-20px", marginTop: "-30px" }} title={
-                    <Typography display={"flex"} variant="h5" sx={{ bgcolor: "white", px: "4px", width: "155px" }}>
-                        Ventas de hoy
-                    </Typography>
-                } />
-                <CardContent>
-                    <Grid item container justifyContent={"space-between"} marginBottom={"15px"}>
-                        <Grid item xs={8}>
-                            <Button size="small" variant="outlined" color="primary" onClick={toggleModalSellsOpen}>Ver detalles</Button>
+                <CardHeader title={
+                    <Grid container spacing={2} justifyContent={"space-between"}>
+                        <Grid item>
+                            <Typography display={"flex"} onClick={toggleModalSellsOpen} variant="h5" sx={{ color: "#0067ca", textDecoration: "underline", cursor: "pointer" }}>
+                                Ventas de hoy
+                            </Typography>
                         </Grid>
-                        <Grid item xs={4}>
-                            <Button size="small" variant="outlined" color="secondary">Historial</Button>
+                        <Grid item container xs={'auto'} mr={"20px"}>
+                            <Grid item>
+                                <IconButton size="small" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`) }} >
+                                    <Schedule color="primary" />
+                                </IconButton>
+                            </Grid>
                         </Grid>
                     </Grid>
+                } />
+                <CardContent>
                     {
                         todaySellsStats && (
                             <Grid container rowSpacing={2}>
@@ -675,6 +671,7 @@ export default function StoreMain({ userId }) {
                 dialogTitle="Ventas de hoy"
                 isOpen={isModalSellsOpen}
                 setIsOpen={setIsModalSellsOpen}
+                todaySellsData={todaySells!}
             />
             {
                 storeDetails && (

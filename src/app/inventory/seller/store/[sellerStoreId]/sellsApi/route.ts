@@ -23,10 +23,10 @@ export async function GET(req: Request) {
                     ]
                 },
                 include: {
-                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: true } },
+                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: true } } } } } },
                     reservations: {
                         where: { reservation_products: { some: { store_depots: { store_id: storeId } } } },
-                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: true }, }, },
+                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: true } } } } }, }, },
                     }
                 }
             }
@@ -49,10 +49,10 @@ export async function GET(req: Request) {
                     ]
                 },
                 include: {
-                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: true } },
+                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: true } } } } } },
                     reservations: {
                         where: { reservation_products: { some: { store_depots: { store_id: storeId } } } },
-                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: true }, }, },
+                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: true } } } } }, }, },
                     }
                 }
             }
