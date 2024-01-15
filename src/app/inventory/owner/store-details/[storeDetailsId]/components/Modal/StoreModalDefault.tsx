@@ -1,6 +1,7 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton} from "@mui/material";
 import { StoreModalDefaultProps } from "@/types/interfaces";
 import React from "react";
+import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
 export const StoreModalDefault = ({ children, dialogTitle, setOpen, open }: StoreModalDefaultProps) => {
 
@@ -10,8 +11,25 @@ export const StoreModalDefault = ({ children, dialogTitle, setOpen, open }: Stor
 
     return (
         <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{dialogTitle}</DialogTitle>
-            <DialogContent>
+            <DialogTitle
+                display={"flex"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+                color={"white"}
+                fontWeight={"400"}
+                sx={{ bgcolor: '#1976d3' }}
+            >
+                {dialogTitle}
+                <IconButton
+                    edge="start"
+                    color="inherit"
+                    onClick={handleClose}
+                    aria-label="close"
+                >
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
+            <DialogContent dividers>
                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                     {children}
                 </Box>

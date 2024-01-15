@@ -27,7 +27,7 @@ const ModalProductPrice = ({ activeModalPrice, setActiveModalPrice, dialogTitle,
     }, [storeDepot?.price_discount_percentage]);
 
     const handleCloseModal = () => {
-        setActiveModalPrice({ active: false, storeDepot: storeDepot });
+        setActiveModalPrice({ active: false, storeDepot: null });
     }
 
     const initialValues = ({

@@ -1,18 +1,22 @@
-import { EditOutlined } from '@mui/icons-material'
-import { Collapse, Grid, IconButton, Typography } from '@mui/material'
+import {EditOutlined, SwapVert} from '@mui/icons-material'
+import {Collapse, Grid, IconButton, Typography} from '@mui/material'
 import React, { useState } from 'react'
 import StoreListOffers from './offers/components/StoreListOffers'
 import StoreModalDefault from './Modal/StoreModalDefault'
 import StoreEditSellerProfit from './Modal/StoreEditSellerProfit'
 import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import {numberFormat} from "@/utils/generalFunctions";
+import TransferUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/TransferUnits";
+import StoreEditUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/StoreEditUnits";
+import {storeDepotsWithAny} from "@/types/interfaces";
+import ModalProductPrice from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/ModalProductPrice";
 
 function StoreMoreDetails(props: any) {
     const {
-        details,
         show,
         loadData,
         row,
+        dataStore,
         baseProductPrice,
         displayProductPrice,
         priceDiscountQuantity,
@@ -21,27 +25,54 @@ function StoreMoreDetails(props: any) {
         finalProductPrice,
     } = props
 
+    const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: storeDepotsWithAny | null }>({ active: false, storeDepot: null });
     const [activeModalSellerProfit, setActiveModalSellerProfit] = useState(false);
-
-    const showSellerProfit = (priceProductStore: any, discountQuantity: any, discountPorcentage: any) => {
-        let pricePorcentage = (discountPorcentage !== null) ? (discountPorcentage * priceProductStore / 100).toFixed(2) : null;
-
-        let price = discountQuantity ?? pricePorcentage ?? priceProductStore;
-
-        const valuePercentage = (details.seller_profit_percentage !== null) ? (details.seller_profit_percentage * price / 100).toFixed(2) : null;
-        if (valuePercentage !== null) return `${details.seller_profit_percentage}%`
-        return `${details.seller_profit_quantity} CUP`
-    }
+    const [activeModalTransferUnits, setActiveModalTransferUnits] = useState<boolean>(false);
+    const [activeModalEditUnits, setActiveModalEditUnits] = useState<boolean>(false);
 
     return (
         <>
+            <ModalProductPrice
+                dialogTitle="Modificar Precio"
+                activeModalPrice={activeModalPrice.active}
+                storeDepot={row.depots[0].store_depots[0]}
+                setActiveModalPrice={setActiveModalPrice}
+                loadData={loadData}
+            />
+
             <StoreModalDefault
-                dialogTitle={"Editar ganacia del vendedor"}
+                dialogTitle={"Transferir almacén - tienda"}
+                open={activeModalTransferUnits}
+                setOpen={setActiveModalTransferUnits}
+            >
+                <TransferUnits
+                    nameStore={dataStore?.name!}
+                    storeDepot={row.depots[0].store_depots[0]}
+                    productId={row.id}
+                    setActiveTransferUnits={setActiveModalTransferUnits}
+                    loadData={loadData}
+                />
+            </StoreModalDefault>
+
+            <StoreModalDefault
+                dialogTitle={"Total recibido"}
+                open={activeModalEditUnits}
+                setOpen={setActiveModalEditUnits}
+            >
+                <StoreEditUnits
+                    dataRow={row.depots[0].store_depots[0]}
+                    setActiveModalEditUnits={setActiveModalEditUnits}
+                    loadData={loadData}
+                />
+            </StoreModalDefault>
+
+            <StoreModalDefault
+                dialogTitle={"Salario del vendedor"}
                 open={activeModalSellerProfit}
                 setOpen={setActiveModalSellerProfit}
             >
                 <StoreEditSellerProfit
-                    storeDepot={details}
+                    storeDepot={row.depots[0].store_depots[0]}
                     setActiveModalSellerProfit={setActiveModalSellerProfit}
                     loadData={loadData}
                 />
@@ -125,6 +156,7 @@ function StoreMoreDetails(props: any) {
                             <MoneyInfoTag
                                 value={displayProductPrice}
                                 errorColor={!baseProductPrice}
+                                action={() => setActiveModalPrice({ storeDepot: null, active: true })}
                             />
                             {
                                 priceDiscountQuantity && (
@@ -145,8 +177,8 @@ function StoreMoreDetails(props: any) {
                         )
                     }
 
-                    <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Salario vendedor:</Grid>
+                    <Grid container item columnSpacing={1} xs={12}>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Salario del vendedor:</Grid>
                         <Grid item container xs={true}>
                             <Grid item>
                                 {
@@ -177,11 +209,30 @@ function StoreMoreDetails(props: any) {
                     </Grid>
 
                     <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades:</Grid>
-                        <Grid item container xs={true}>
-                            {
-                                `Qudan: ${row.depots[0].store_depots[0].product_remaining_units} | ${row.depots[0].store_depots[0].product_units} :Total ingresado`
-                            }
+                        <Grid item container xs={"auto"} sx={{ fontWeight: 600 }} alignItems={"center"}>Unidades restantes:</Grid>
+                        <Grid item container xs={true} alignItems={"center"}>
+                            {row.depots[0].store_depots[0].product_remaining_units}
+
+                            <IconButton
+                                size={"small"}
+                                onClick={() => setActiveModalTransferUnits(true)}
+                            >
+                                <SwapVert />
+                            </IconButton>
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                        <Grid item container xs={"auto"} sx={{ fontWeight: 600 }} alignItems={"center"}>Unidades recibidas:</Grid>
+                        <Grid item container xs={true} alignItems={"center"}>
+                            {row.depots[0].store_depots[0].product_units}
+
+                            <IconButton
+                                size={"small"}
+                                onClick={() => setActiveModalEditUnits(true)}
+                            >
+                                <EditOutlined />
+                            </IconButton>
                         </Grid>
                     </Grid>
 

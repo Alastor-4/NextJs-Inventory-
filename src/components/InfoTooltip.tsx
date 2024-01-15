@@ -15,10 +15,7 @@ export default function InfoTooltip({isOpenTooltip, handleTooltipClose, message,
             <Tooltip
                 onClose={handleTooltipClose}
                 open={isOpenTooltip}
-                disableFocusListener
-                disableHoverListener
                 placement="bottom-start"
-                disableTouchListener
                 arrow
                 title={message}
                 PopperProps={{
