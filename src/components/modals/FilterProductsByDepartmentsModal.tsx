@@ -1,7 +1,7 @@
 'use client'
 import { allProductsByDepartmentProps } from '@/types/interfaces';
 import {FilterAlt, FilterAltOff} from '@mui/icons-material';
-import {Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack} from '@mui/material';
+import {Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Stack} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
@@ -75,7 +75,7 @@ const FilterProductsByDepartmentsModal = (
                 justifyContent={"space-between"}
                 alignItems={"center"}
                 color={"white"}
-                fontWeight={"400"}
+                padding={{xs: "10px"}}
                 sx={{ bgcolor: '#1976d3' }}
             >
                 Filtrar por departamentos
@@ -89,14 +89,14 @@ const FilterProductsByDepartmentsModal = (
                     <CloseIcon />
                 </IconButton>
             </DialogTitle>
-            <DialogContent dividers >
-                <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap" >
+
+            <Grid container padding={"10px"} borderBottom={"1px solid gray"}>
+                <Stack spacing={"8px"} direction="row" useFlexGap flexWrap="wrap" >
                     {filteredDepartments?.map((department: allProductsByDepartmentProps) => (
                         <Chip
                             key={department.id!}
                             label={department.name}
                             clickable={true}
-                            size="medium"
                             onClick={() => handleDepartmentClick(department)}
                             variant={department.selected ? "filled" : "outlined"}
                             sx={{ display: "flex" }}
@@ -104,8 +104,9 @@ const FilterProductsByDepartmentsModal = (
                         />
                     ))}
                 </Stack>
-            </DialogContent>
-            <DialogActions sx={{ marginRight: "15px" }}>
+            </Grid>
+
+            <DialogActions sx={{ display: "flex", justifyContent: "flex-end" }}>
                 <Button startIcon={<FilterAltOff />} color="error" variant="outlined" onClick={handleRemoveFilter}>Limpiar</Button>
                 <Button startIcon={<FilterAlt />} color="primary" variant="outlined" onClick={applyFilters}>Aplicar</Button>
             </DialogActions>

@@ -32,7 +32,7 @@ import {
     ChevronRightOutlined,
     DescriptionOutlined,
     Done,
-    FilterAlt,
+    FilterAlt, FilterAltOff,
     FilterAltOutlined,
     HelpOutline,
     KeyboardArrowDown,
@@ -1004,13 +1004,12 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
 
         return (
             <Card variant={"outlined"} sx={{ padding: "5px" }}>
-
                 {
                     data && data.length > 0 && (
                         <Grid container item rowSpacing={2} >
                             <Grid item xs={12}>
                                 <Typography variant={"subtitle2"} sx={{ display: "flex", alignItems: "center" }}>
-                                    Para los productos en los departamentos seleccionados
+                                    Filtrar sobre los departamentos seleccionados.
 
                                     <IconButton onClick={() => setDisplayFilterSection(!displayFilterSection)}>
                                         {displayFilterSection ? <KeyboardArrowDown fontSize={"small"} /> :
@@ -1024,123 +1023,112 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
 
                             {
                                 displayFilterSection && (
-                                    <>
-                                        <Grid container item rowSpacing={1}>
-                                            <Grid item xs={12}>
-                                                <Typography variant={"subtitle2"}
-                                                    sx={{ display: "flex", alignItems: "center" }}>
-                                                    <ChevronRightOutlined /> Puede filtrar aquellos con una característica
-                                                    común
-                                                </Typography>
+                                    <Grid item container rowSpacing={1}>
+                                        <Grid container item xs={12} md={"auto"} columnSpacing={1} flexWrap={"nowrap"} overflow={"auto"}>
+                                            <Grid item>
+                                                <Chip
+                                                    variant={"outlined"}
+                                                    label={"en venta"}
+                                                    sx={enVentaFilter ? selectedChip : chipNotSelected}
+                                                    size={"small"}
+                                                    color={enVentaFilter ? "primary" : "default"}
+                                                    onClick={() => formik.setFieldValue("enVentaFilter", !enVentaFilter)}
+                                                />
                                             </Grid>
 
-                                            <Grid item container spacing={1}>
-                                                <Grid item>
-                                                    <Chip
-                                                        variant={"outlined"}
-                                                        label={"en venta"}
-                                                        sx={enVentaFilter ? selectedChip : chipNotSelected}
-                                                        size={"small"}
-                                                        color={enVentaFilter ? "primary" : "default"}
-                                                        onClick={() => formik.setFieldValue("enVentaFilter", !enVentaFilter)}
-                                                    />
-                                                </Grid>
+                                            <Grid item>
+                                                <Chip
+                                                    variant={"outlined"}
+                                                    label={"con descuento"}
+                                                    sx={conDescuentoFilter ? selectedChip : chipNotSelected}
+                                                    size={"small"}
+                                                    color={conDescuentoFilter ? "primary" : "default"}
+                                                    onClick={() => formik.setFieldValue("conDescuentoFilter", !conDescuentoFilter)}
+                                                />
+                                            </Grid>
 
-                                                <Grid item>
-                                                    <Chip
-                                                        variant={"outlined"}
-                                                        label={"inactivo"}
-                                                        sx={inactivoFilter ? selectedChip : chipNotSelected}
-                                                        size={"small"}
-                                                        color={inactivoFilter ? "primary" : "default"}
-                                                        onClick={() => formik.setFieldValue("inactivoFilter", !inactivoFilter)}
-                                                    />
-                                                </Grid>
-
-                                                <Grid item>
-                                                    <Chip
-                                                        variant={"outlined"}
-                                                        label={"retirado"}
-                                                        sx={retiradoFilter ? selectedChip : chipNotSelected}
-                                                        size={"small"}
-                                                        color={retiradoFilter ? "primary" : "default"}
-                                                        onClick={() => formik.setFieldValue("retiradoFilter", !retiradoFilter)}
-                                                    />
-                                                </Grid>
-
-                                                <Grid item>
-                                                    <Chip
-                                                        variant={"outlined"}
-                                                        label={"sin precio"}
-                                                        sx={sinPrecioFilter ? selectedChip : chipNotSelected}
-                                                        size={"small"}
-                                                        color={sinPrecioFilter ? "primary" : "default"}
-                                                        onClick={() => formik.setFieldValue("sinPrecioFilter", !sinPrecioFilter)}
-                                                    />
-
-                                                </Grid>
-
-                                                <Grid item>
-                                                    <Chip
-                                                        variant={"outlined"}
-                                                        label={"con descuento"}
-                                                        sx={conDescuentoFilter ? selectedChip : chipNotSelected}
-                                                        size={"small"}
-                                                        color={conDescuentoFilter ? "primary" : "default"}
-                                                        onClick={() => formik.setFieldValue("conDescuentoFilter", !conDescuentoFilter)}
-                                                    />
-                                                </Grid>
-
-                                                <Grid item>
-                                                    <Chip
-                                                        variant={"outlined"}
-                                                        label={"con ofertas"}
-                                                        sx={conOfertasFilter ? selectedChip : chipNotSelected}
-                                                        size={"small"}
-                                                        color={conOfertasFilter ? "primary" : "default"}
-                                                        onClick={() => formik.setFieldValue("conOfertasFilter", !conOfertasFilter)}
-                                                    />
-                                                </Grid>
-
-                                                <Grid item>
-                                                    <Chip
-                                                        variant={"outlined"}
-                                                        label={"sin disponibilidad"}
-                                                        sx={sinDisponibilidadFilter ? selectedChip : chipNotSelected}
-                                                        size={"small"}
-                                                        color={sinDisponibilidadFilter ? "primary" : "default"}
-                                                        onClick={() => formik.setFieldValue("sinDisponibilidadFilter", !sinDisponibilidadFilter)}
-                                                    />
-
-                                                </Grid>
-
-                                                <Grid item>
-                                                    <Chip
-                                                        variant={"outlined"}
-                                                        label={"disponibilidad < 10"}
-                                                        sx={disponibilidad10Filter ? selectedChip : chipNotSelected}
-                                                        size={"small"}
-                                                        color={disponibilidad10Filter ? "primary" : "default"}
-                                                        onClick={() => formik.setFieldValue("disponibilidad10Filter", !disponibilidad10Filter)}
-                                                    />
-
-                                                </Grid>
-
-                                                <Grid item>
-                                                    <Chip
-                                                        variant={"outlined"}
-                                                        label={"disponibilidad < 20"}
-                                                        sx={disponibilidad20Filter ? selectedChip : chipNotSelected}
-                                                        size={"small"}
-                                                        color={disponibilidad20Filter ? "primary" : "default"}
-                                                        onClick={() => formik.setFieldValue("disponibilidad20Filter", !disponibilidad20Filter)}
-                                                    />
-                                                </Grid>
-
+                                            <Grid item>
+                                                <Chip
+                                                    variant={"outlined"}
+                                                    label={"disponibilidad < 20"}
+                                                    sx={disponibilidad20Filter ? selectedChip : chipNotSelected}
+                                                    size={"small"}
+                                                    color={disponibilidad20Filter ? "primary" : "default"}
+                                                    onClick={() => formik.setFieldValue("disponibilidad20Filter", !disponibilidad20Filter)}
+                                                />
                                             </Grid>
                                         </Grid>
 
-                                    </>
+                                        <Grid container item xs={12} md={"auto"} columnSpacing={1} flexWrap={"nowrap"} overflow={"auto"}>
+                                            <Grid item>
+                                                <Chip
+                                                    variant={"outlined"}
+                                                    label={"con ofertas"}
+                                                    sx={conOfertasFilter ? selectedChip : chipNotSelected}
+                                                    size={"small"}
+                                                    color={conOfertasFilter ? "primary" : "default"}
+                                                    onClick={() => formik.setFieldValue("conOfertasFilter", !conOfertasFilter)}
+                                                />
+                                            </Grid>
+
+                                            <Grid item>
+                                                <Chip
+                                                    variant={"outlined"}
+                                                    label={"sin precio"}
+                                                    sx={sinPrecioFilter ? selectedChip : chipNotSelected}
+                                                    size={"small"}
+                                                    color={sinPrecioFilter ? "primary" : "default"}
+                                                    onClick={() => formik.setFieldValue("sinPrecioFilter", !sinPrecioFilter)}
+                                                />
+                                            </Grid>
+
+                                            <Grid item>
+                                                <Chip
+                                                    variant={"outlined"}
+                                                    label={"disponibilidad < 10"}
+                                                    sx={disponibilidad10Filter ? selectedChip : chipNotSelected}
+                                                    size={"small"}
+                                                    color={disponibilidad10Filter ? "primary" : "default"}
+                                                    onClick={() => formik.setFieldValue("disponibilidad10Filter", !disponibilidad10Filter)}
+                                                />
+                                            </Grid>
+                                        </Grid>
+
+                                        <Grid container item xs={12} md={"auto"} columnSpacing={1} flexWrap={"nowrap"} overflow={"auto"}>
+                                            <Grid item>
+                                                <Chip
+                                                    variant={"outlined"}
+                                                    label={"sin disponibilidad"}
+                                                    sx={sinDisponibilidadFilter ? selectedChip : chipNotSelected}
+                                                    size={"small"}
+                                                    color={sinDisponibilidadFilter ? "primary" : "default"}
+                                                    onClick={() => formik.setFieldValue("sinDisponibilidadFilter", !sinDisponibilidadFilter)}
+                                                />
+                                            </Grid>
+
+                                            <Grid item>
+                                                <Chip
+                                                    variant={"outlined"}
+                                                    label={"inactivo"}
+                                                    sx={inactivoFilter ? selectedChip : chipNotSelected}
+                                                    size={"small"}
+                                                    color={inactivoFilter ? "primary" : "default"}
+                                                    onClick={() => formik.setFieldValue("inactivoFilter", !inactivoFilter)}
+                                                />
+                                            </Grid>
+
+                                            <Grid item>
+                                                <Chip
+                                                    variant={"outlined"}
+                                                    label={"retirado"}
+                                                    sx={retiradoFilter ? selectedChip : chipNotSelected}
+                                                    size={"small"}
+                                                    color={retiradoFilter ? "primary" : "default"}
+                                                    onClick={() => formik.setFieldValue("retiradoFilter", !retiradoFilter)}
+                                                />
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
                                 )
                             }
                         </Grid>
@@ -1264,7 +1252,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                         <>
                                             {
                                                 selected.length > 0 && (
-                                                    <Grid container sx={{ mt: "15px", pl: "15px" }}>
+                                                    <Grid container justifyContent={"space-between"} mt={"15px"}>
                                                         <Button
                                                             size={"small"}
                                                             color={"primary"}
@@ -1273,6 +1261,15 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                             startIcon={<SellOutlined fontSize={"small"} />}
                                                         >
                                                             Vender seleccionados {selected.length}
+                                                        </Button>
+
+                                                        <Button
+                                                            startIcon={<FilterAltOff fontSize={"small"}/>}
+                                                            color="error"
+                                                            variant="outlined"
+                                                            onClick={() => setSelected([])}
+                                                        >
+                                                            Limpiar
                                                         </Button>
                                                     </Grid>
                                                 )
