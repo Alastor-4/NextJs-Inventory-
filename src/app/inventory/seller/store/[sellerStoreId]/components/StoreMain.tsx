@@ -395,7 +395,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Grid container columnSpacing={2} justifyContent={"space-between"}>
                     <Grid item xs={'auto'}>
-                        <Typography variant="h6" onClick={toggleModalSellsOpen} sx={{ color: "blue", cursor: "pointer" }}>
+                        <Typography variant="h6" onClick={toggleModalSellsOpen} sx={{ color: "blue", cursor: "pointer", fontSize: "18px" }}>
                             Ventas hoy
                         </Typography>
                     </Grid>
@@ -462,7 +462,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Grid container columnSpacing={2} justifyContent={"space-between"}>
                     <Grid item xs={'auto'}>
-                        <Typography variant="h6" sx={{ color: "blue", cursor: "pointer" }}>
+                        <Typography variant="h6" sx={{ color: "blue", cursor: "pointer", fontSize: "18px" }}>
                             Transferencias hoy
                         </Typography>
                     </Grid>
@@ -489,7 +489,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
         return (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <Typography variant="h6" sx={{ color: "blue", cursor: "pointer" }}>
+                <Typography variant="h6" sx={{ color: "blue", cursor: "pointer", fontSize: "18px" }}>
                     Colecciones
                 </Typography>
 
