@@ -18,6 +18,7 @@ import React, { useEffect, useState } from "react";
 import isBetween from "dayjs/plugin/isBetween";
 import Link from "next/link";
 import dayjs from "dayjs";
+import userProfileStyles from "@/assets/styles/userProfileStyles";
 
 dayjs.extend(isBetween);
 
@@ -262,68 +263,68 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const StoreProducts = () => {
 
         return (
-            <Card variant={"outlined"}>
-                <Link href={`/inventory/seller/store/${sellerStoreId}/product`}>
-                    <CardHeader title={"Productos en tienda"} />
-                </Link>
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                    <Link href={`/inventory/seller/store/${sellerStoreId}/product`}>
+                        Productos
+                    </Link>
+                </Typography>
 
-                <CardContent>
-                    {
-                        storeDepotsStats && (
-                            <Grid container rowSpacing={2}>
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Productos:
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        {storeDepotsStats.depotsTotal} ({storeDepotsStats.depotsRemainingUnitsTotal} total de unidades)
-                                    </Grid>
+                {
+                    storeDepotsStats && (
+                        <Grid container rowSpacing={2} mt={"8px"}>
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Productos:
                                 </Grid>
-
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Productos agotados:
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        {storeDepotsStats.depotsNotRemainingUnitsTotal}
-                                    </Grid>
-                                </Grid>
-
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Productos inactivos:
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        {storeDepotsStats.depotsNotActiveTotal}
-                                    </Grid>
-                                </Grid>
-
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Productos sin precio:
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        {storeDepotsStats.depotsWithoutPriceTotal}
-                                    </Grid>
-                                </Grid>
-
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Productos con descuento:
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        {storeDepotsStats.depotsWithDiscountTotal}
-                                    </Grid>
+                                <Grid item xs={true}>
+                                    {storeDepotsStats.depotsTotal} ({storeDepotsStats.depotsRemainingUnitsTotal} total de unidades)
                                 </Grid>
                             </Grid>
-                        )
-                    }
-                </CardContent>
+
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Productos agotados:
+                                </Grid>
+                                <Grid item xs={true}>
+                                    {storeDepotsStats.depotsNotRemainingUnitsTotal}
+                                </Grid>
+                            </Grid>
+
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Productos inactivos:
+                                </Grid>
+                                <Grid item xs={true}>
+                                    {storeDepotsStats.depotsNotActiveTotal}
+                                </Grid>
+                            </Grid>
+
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Productos sin precio:
+                                </Grid>
+                                <Grid item xs={true}>
+                                    {storeDepotsStats.depotsWithoutPriceTotal}
+                                </Grid>
+                            </Grid>
+
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Productos con descuento:
+                                </Grid>
+                                <Grid item xs={true}>
+                                    {storeDepotsStats.depotsWithDiscountTotal}
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    )
+                }
             </Card>
         )
     }
@@ -331,58 +332,59 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const StoreReservation = () => {
 
         return (
-            <Card variant={"outlined"}>
-                <Link href={`/inventory/seller/store/${sellerStoreId}/reservation`}>
-                    <CardHeader title={"Reservaciones"} />
-                </Link>
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                    <Link href={`/inventory/seller/store/${sellerStoreId}/reservation`}>
+                        Reservaciones
+                    </Link>
+                </Typography>
 
-                <CardContent>
-                    {
-                        storeDepotsStats && (
-                            <Grid container rowSpacing={2}>
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Pendientes:
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        x (x de hoy)
-                                    </Grid>
+                {
+                    storeDepotsStats && (
+                        <Grid container rowSpacing={2} mt={"8px"}>
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Pendientes:
                                 </Grid>
-
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Aceptadas hoy:
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        x
-                                    </Grid>
-                                </Grid>
-
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Canceladas hoy:
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        x
-                                    </Grid>
-                                </Grid>
-
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Vendidas hoy:
-                                    </Grid>
-                                    <Grid item xs={true}>
-                                        x
-                                    </Grid>
+                                <Grid item xs={true}>
+                                    x (x de hoy)
                                 </Grid>
                             </Grid>
-                        )
-                    }
-                </CardContent>
+
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Aceptadas hoy:
+                                </Grid>
+                                <Grid item xs={true}>
+                                    x
+                                </Grid>
+                            </Grid>
+
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Canceladas hoy:
+                                </Grid>
+                                <Grid item xs={true}>
+                                    x
+                                </Grid>
+                            </Grid>
+
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Vendidas hoy:
+                                </Grid>
+                                <Grid item xs={true}>
+                                    x
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    )
+                }
+
             </Card>
         )
     }
@@ -390,108 +392,95 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
     const SellsModule = () => {
         return (
-            <Card variant={"outlined"} sx={{ overflow: "visible" }}>
-                <CardHeader title={
-                    <Grid container spacing={2} justifyContent={"space-between"}>
-                        <Grid item>
-                            <Typography display={"flex"} onClick={toggleModalSellsOpen} variant="h5" sx={{ color: "#0067ca", textDecoration: "underline", cursor: "pointer" }}>
-                                Ventas de hoy
-                            </Typography>
-                        </Grid>
-                        <Grid item container xs={'auto'} mr={"20px"}>
-                            <Grid item>
-                                <IconButton size="small" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`) }} >
-                                    <Schedule color="primary" />
-                                </IconButton>
-                            </Grid>
-                        </Grid>
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <Grid container columnSpacing={2} justifyContent={"space-between"}>
+                    <Grid item xs={'auto'}>
+                        <Typography variant="h6" onClick={toggleModalSellsOpen} sx={{ color: "blue", cursor: "pointer" }}>
+                            Ventas hoy
+                        </Typography>
                     </Grid>
-                } />
-                <CardContent>
-                    {
-                        todaySellsStats && (
-                            <Grid container rowSpacing={2}>
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                                        Total de ventas:
-                                    </Grid>
-                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        {todaySellsStats.sellsTotal} ({todaySellsStats.sellsUnitsTotal} unidades totales) ({todaySellsStats.sellsDifferentProductsTotal} productos diferentes)
-                                    </Grid>
+
+                    <Grid item container xs={'auto'} mr={"20px"}>
+                        <IconButton size="small" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`) }} >
+                            <Schedule color="primary" />
+                        </IconButton>
+                    </Grid>
+                </Grid>
+
+                {
+                    todaySellsStats && (
+                        <Grid container rowSpacing={2} mt={"8px"}>
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                    Total de ventas:
                                 </Grid>
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                                        Productos devueltos:
-                                    </Grid>
-                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        {todaySellsStats.sellsUnitsReturnedTotal}
-                                    </Grid>
-                                </Grid>
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                                        Total recaudado:
-                                    </Grid>
-                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        $ {numberFormat(`${todaySellsStats.sellsAmountTotal}`)}
-                                    </Grid>
-                                </Grid>
-                                <Grid container item spacing={1} xs={12}>
-                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                                        Desglose:
-                                    </Grid>
-                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        $ {numberFormat(`${todaySellsStats.sellsAmountTotal - todaySellsStats.sellerProfitTotal}`)} del dueño | $ {numberFormat(`${todaySellsStats.sellerProfitTotal}`)} del vendedor
-                                    </Grid>
+                                <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    {todaySellsStats.sellsTotal} ({todaySellsStats.sellsUnitsTotal} unidades totales) ({todaySellsStats.sellsDifferentProductsTotal} productos diferentes)
                                 </Grid>
                             </Grid>
-                        )
-                    }
-                </CardContent>
-            </Card >
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                    Productos devueltos:
+                                </Grid>
+                                <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    {todaySellsStats.sellsUnitsReturnedTotal}
+                                </Grid>
+                            </Grid>
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                    Total recaudado:
+                                </Grid>
+                                <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    $ {numberFormat(`${todaySellsStats.sellsAmountTotal}`)}
+                                </Grid>
+                            </Grid>
+                            <Grid container item spacing={1} xs={12}>
+                                <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                    Desglose:
+                                </Grid>
+                                <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    $ {numberFormat(`${todaySellsStats.sellsAmountTotal - todaySellsStats.sellerProfitTotal}`)} del dueño | $ {numberFormat(`${todaySellsStats.sellerProfitTotal}`)} del vendedor
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    )
+                }
+            </Card>
         )
     }
 
     const TodayTransfers = () => {
-
         const handleTransfer = (sent: boolean) => {
             router.push(`/inventory/seller/store/${params.sellerStoreId}/transferMailbox?sent=${sent}`)
-
         }
 
         return (
-            <Card variant={"outlined"}>
-                <CardHeader title={
-                    <Grid container spacing={2}>
-
-                        <Grid item>
-                            Transferencias de hoy
-                        </Grid>
-
-                        <Grid item container xs={'auto'}>
-
-                            <Grid item>
-                                <IconButton size="small" onClick={() => handleTransfer(false)} >
-                                    <Mail color="primary" />
-                                </IconButton>
-                            </Grid>
-
-                            <Grid item >
-                                <IconButton size="small" onClick={() => handleTransfer(true)} >
-                                    <ForwardToInbox color="primary" />
-                                </IconButton>
-                            </Grid>
-
-                        </Grid>
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <Grid container columnSpacing={2} justifyContent={"space-between"}>
+                    <Grid item xs={'auto'}>
+                        <Typography variant="h6" sx={{ color: "blue", cursor: "pointer" }}>
+                            Transferencias hoy
+                        </Typography>
                     </Grid>
-                } />
 
-                <CardContent>
+                    <Grid item container xs={'auto'}>
+                        <IconButton size="small" onClick={() => handleTransfer(false)}>
+                            <Mail color="primary" />
+                        </IconButton>
+
+                        <IconButton size="small" onClick={() => handleTransfer(true)} sx={{ml: "5px"}}>
+                            <ForwardToInbox color="primary" />
+                        </IconButton>
+                    </Grid>
+                </Grid>
+
+                <Grid container rowSpacing={2} mt={"8px"}>
                     contenido aqui
-                </CardContent>
+                </Grid>
             </Card>
         )
     }
@@ -499,29 +488,29 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const StoreCollections = () => {
 
         return (
-            <Card variant={"outlined"}>
-                <CardHeader title={"Colecciones"} />
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <Typography variant="h6" sx={{ color: "blue", cursor: "pointer" }}>
+                    Colecciones
+                </Typography>
 
-                <CardContent>
-                    <Grid container rowSpacing={2}>
-                        <Grid container item spacing={1} xs={12}>
-                            <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
-                                <ChevronRightOutlined fontSize={"small"} />
-                                Colecciones:
-                            </Grid>
-                            <Grid item xs={true}>
-                                - (con xx productos)
-                            </Grid>
+                <Grid container rowSpacing={2} mt={"8px"}>
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            Colecciones:
+                        </Grid>
+                        <Grid item xs={true}>
+                            - (con xx productos)
                         </Grid>
                     </Grid>
-                </CardContent>
+                </Grid>
             </Card>
         )
     }
 
 
     const StoreHours = () => (
-        <Card variant={"outlined"} sx={{ padding: "10px" }}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <Grid container rowSpacing={2}>
                 <Grid item xs={12} sx={{ fontWeight: 600 }}>
                     Horarios de apertura:
@@ -593,7 +582,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
     )
 
     const ReservationHours = () => (
-        <Card variant={"outlined"} sx={{ padding: "10px" }}>
+        <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
             <Grid container rowSpacing={2}>
                 <Grid item xs={12} sx={{ fontWeight: 600 }}>
                     Horarios de reservaciones:
@@ -677,14 +666,19 @@ export default function StoreMain({ userId }: { userId?: number }) {
                 storeDetails && (
                     <CardContent>
                         <Grid container rowSpacing={5}>
-                            <Grid container item spacing={3}>
+                            <Grid container item rowSpacing={2}>
                                 <Grid container item xs={12} justifyContent={"center"}>
-                                    {storeDetails?.name ?? "-"}
+                                    <Typography variant={"h5"}>
+                                        {storeDetails?.name ?? "-"}
+                                    </Typography>
                                 </Grid>
 
-                                <Grid container item xs={12} justifyContent={"center"}>
-                                    <Box sx={{ display: "inline-flex", ml: "10px" }}>
+                                <Grid container item xs={12} rowSpacing={1}>
+                                    <Grid container item xs={12} justifyContent={"center"}>
                                         Ahora mismo:
+                                    </Grid>
+
+                                    <Grid container item xs={12} justifyContent={"center"}>
                                         {
                                             checkOpenCondition() ? (
                                                 <Chip
@@ -726,7 +720,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                                 </>
                                             )
                                         }
-                                    </Box>
+                                    </Grid>
                                 </Grid>
 
                                 <Grid container item xs={12} justifyContent={"center"}>

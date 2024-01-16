@@ -12,16 +12,13 @@ const userProfileStyles = {
     },
 
     cardButton: {
-        width: "200px",
+        padding: "7px",
+        //width: "200px",
 
         "&:hover": {
             boxShadow: 4,
             border: "1px solid black"
         },
-
-        "> a": {
-            textDecoration: "none"
-        }
     },
 
 
