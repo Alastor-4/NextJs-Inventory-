@@ -16,3 +16,17 @@ body {
   color: rgb(var(--foreground-rgb));
   background-color: rgb(121, 143, 161);
 }
+
+a:link,
+a:visited {
+  color: blue;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+  text-decoration: underline;
+}

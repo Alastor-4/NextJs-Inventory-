@@ -107,6 +107,25 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         }
     }
 
+    function getRoleTranslation(roleName: string) {
+        switch (roleName) {
+            case "admin":
+                return "Admin"
+
+            case "store_owner":
+                return "Dueño"
+
+            case "store_keeper":
+                return "Almacenero"
+
+            case "store_seller":
+                return "Vendedor"
+
+            default:
+                return "Usuario"
+        }
+    }
+
     const AdminModule = () => {
         const LinksTemplate = ({ pageAddress, title }: { pageAddress: string, title: string }) => (
             <Grid container>
@@ -406,20 +425,23 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                 <CardContent>
                     <Grid container rowSpacing={5}>
                         <Grid container item rowSpacing={3}>
+                            <Grid container item xs={12} justifyContent={"flex-end"}>
+                                {
+                                    userDetails?.roles?.name && (
+                                        <Chip
+                                            size={"small"}
+                                            label={getRoleTranslation(userDetails.roles.name)}
+                                            color={getColorByRole(userDetails.roles.name)}
+                                            sx={{ border: "1px solid lightGreen", ml: "5px" }}
+                                        />
+                                    )
+                                }
+                            </Grid>
+
                             <Grid container item xs={12} spacing={1}>
                                 <Grid item sx={userProfileStyles.leftFlex}>Nombre:</Grid>
                                 <Grid item sx={userProfileStyles.rightFlex}>
                                     {userDetails?.name ?? "-"}
-                                    {
-                                        userDetails?.roles?.name && (
-                                            <Chip
-                                                size={"small"}
-                                                label={userDetails.roles.name}
-                                                color={getColorByRole(userDetails.roles.name)}
-                                                sx={{ border: "1px solid lightGreen", ml: "5px" }}
-                                            />
-                                        )
-                                    }
                                 </Grid>
                             </Grid>
 
