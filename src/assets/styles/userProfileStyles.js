@@ -13,7 +13,8 @@ const userProfileStyles = {
 
     cardButton: {
         padding: "7px",
-        //width: "200px",
+        width: 1,
+        boxSizing: "border-box",
 
         "&:hover": {
             boxShadow: 4,

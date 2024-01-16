@@ -665,112 +665,110 @@ export default function StoreMain({ userId }: { userId?: number }) {
             {
                 storeDetails && (
                     <CardContent>
-                        <Grid container rowSpacing={5}>
-                            <Grid container item rowSpacing={2}>
-                                <Grid container item xs={12} justifyContent={"center"}>
-                                    <Typography variant={"h5"}>
-                                        {storeDetails?.name ?? "-"}
-                                    </Typography>
-                                </Grid>
-
-                                <Grid container item xs={12} rowSpacing={1}>
-                                    <Grid container item xs={12} justifyContent={"center"}>
-                                        Ahora mismo:
-                                    </Grid>
-
-                                    <Grid container item xs={12} justifyContent={"center"}>
-                                        {
-                                            checkOpenCondition() ? (
-                                                <Chip
-                                                    size={"small"}
-                                                    label={"Abierto"}
-                                                    color={"success"}
-                                                    sx={{ ml: "10px" }}
-                                                />
-                                            ) : (
-                                                <Chip
-                                                    size={"small"}
-                                                    label={"Cerrado"}
-                                                    color={"error"}
-                                                    sx={{ ml: "10px" }}
-                                                />
-                                            )
-                                        }
-
-                                        {
-                                            storeDetails.online_reservation && (
-                                                <>
-                                                    {
-                                                        checkOpenReservationCondition() ? (
-                                                            <Chip
-                                                                size={"small"}
-                                                                label={"Aceptando Reservaciones"}
-                                                                color={"success"}
-                                                                sx={{ ml: "10px" }}
-                                                            />
-                                                        ) : (
-                                                            <Chip
-                                                                size={"small"}
-                                                                label={"Reservaciones No Aceptadas"}
-                                                                color={"error"}
-                                                                sx={{ ml: "10px" }}
-                                                            />
-                                                        )
-                                                    }
-                                                </>
-                                            )
-                                        }
-                                    </Grid>
-                                </Grid>
-
-                                <Grid container item xs={12} justifyContent={"center"}>
-                                    {storeDetails?.slogan ?? "-"}
-                                </Grid>
-
-                                <Grid container item xs={12} justifyContent={"center"}>
-                                    {storeDetails?.description ?? "-"}
-                                </Grid>
-
-                                <Grid container item xs={12} justifyContent={"center"}>
-                                    {storeDetails?.address ?? "-"}
-                                </Grid>
-
-                                <Grid item xs={12} md={6}>
-                                    <StoreProducts />
-                                </Grid>
-
-                                <Grid item xs={12} md={6}>
-                                    <SellsModule />
-                                </Grid>
-
-                                {
-                                    storeDetails.online_reservation && (
-                                        <Grid item xs={12} md={6}>
-                                            <StoreReservation />
-                                        </Grid>
-                                    )
-                                }
-
-                                <Grid item xs={12} md={6}>
-                                    <TodayTransfers />
-                                </Grid>
-
-                                <Grid item xs={12} md={6}>
-                                    <StoreCollections />
-                                </Grid>
-
-                                <Grid item xs={12} md={6}>
-                                    <StoreHours />
-                                </Grid>
-
-                                {
-                                    storeDetails.online_reservation && (
-                                        <Grid item xs={12} md={6}>
-                                            <ReservationHours />
-                                        </Grid>
-                                    )
-                                }
+                        <Grid container item spacing={2}>
+                            <Grid container item xs={12} justifyContent={"center"}>
+                                <Typography variant={"h5"}>
+                                    {storeDetails?.name ?? "-"}
+                                </Typography>
                             </Grid>
+
+                            <Grid container item xs={12} rowSpacing={1}>
+                                <Grid container item xs={12} justifyContent={"center"}>
+                                    Ahora mismo:
+                                </Grid>
+
+                                <Grid container item xs={12} justifyContent={"center"}>
+                                    {
+                                        checkOpenCondition() ? (
+                                            <Chip
+                                                size={"small"}
+                                                label={"Abierto"}
+                                                color={"success"}
+                                                sx={{ ml: "10px" }}
+                                            />
+                                        ) : (
+                                            <Chip
+                                                size={"small"}
+                                                label={"Cerrado"}
+                                                color={"error"}
+                                                sx={{ ml: "10px" }}
+                                            />
+                                        )
+                                    }
+
+                                    {
+                                        storeDetails.online_reservation && (
+                                            <>
+                                                {
+                                                    checkOpenReservationCondition() ? (
+                                                        <Chip
+                                                            size={"small"}
+                                                            label={"Aceptando Reservaciones"}
+                                                            color={"success"}
+                                                            sx={{ ml: "10px" }}
+                                                        />
+                                                    ) : (
+                                                        <Chip
+                                                            size={"small"}
+                                                            label={"Reservaciones No Aceptadas"}
+                                                            color={"error"}
+                                                            sx={{ ml: "10px" }}
+                                                        />
+                                                    )
+                                                }
+                                            </>
+                                        )
+                                    }
+                                </Grid>
+                            </Grid>
+
+                            <Grid container item xs={12} justifyContent={"center"}>
+                                {storeDetails?.slogan ?? "-"}
+                            </Grid>
+
+                            <Grid container item xs={12} justifyContent={"center"}>
+                                {storeDetails?.description ?? "-"}
+                            </Grid>
+
+                            <Grid container item xs={12} justifyContent={"center"}>
+                                {storeDetails?.address ?? "-"}
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <StoreProducts />
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <SellsModule />
+                            </Grid>
+
+                            {
+                                storeDetails.online_reservation && (
+                                    <Grid item xs={12} md={6}>
+                                        <StoreReservation />
+                                    </Grid>
+                                )
+                            }
+
+                            <Grid item xs={12} md={6}>
+                                <TodayTransfers />
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <StoreCollections />
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <StoreHours />
+                            </Grid>
+
+                            {
+                                storeDetails.online_reservation && (
+                                    <Grid item xs={12} md={6}>
+                                        <ReservationHours />
+                                    </Grid>
+                                )
+                            }
                         </Grid>
                     </CardContent>
                 )
