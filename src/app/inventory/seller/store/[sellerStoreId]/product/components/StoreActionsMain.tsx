@@ -377,7 +377,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                         </Typography>
                     </Grid>
 
-                    <Grid container item xs={"auto"} alignItems={"center"}
+                    <Grid item xs={true} alignSelf={"center"}
                         sx={{ color: "rgba(16,27,44,0.8)" }}>
                         {
                             item.compare_function === '='
@@ -742,24 +742,6 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
         )
     }
 
-    async function handleSelectFilter(index: number) {
-        let filters = [...allProductsByDepartment]
-        filters[index].selected = !filters[index].selected
-
-        let selectedProduct = new Map()
-
-        selected.forEach((element: any) => selectedProduct.set(element.id, true))
-
-        let newSelected: any = [];
-        filters.filter((department: any) => department.selected === true)
-            .forEach((department: any) => {
-                const aux = department.products.filter((item: any) => selectedProduct.get(item.id) === true)
-                newSelected = [...newSelected, ...aux]
-            })
-        setSelected(newSelected)
-
-        setAllProductsByDepartment(filters)
-    }
 
     const initialValues = {
         searchBarValue: "",
