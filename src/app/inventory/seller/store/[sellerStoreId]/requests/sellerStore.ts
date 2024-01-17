@@ -4,6 +4,7 @@ import { notifyError } from "@/utils/generalFunctions";
 
 const url = (sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/api`
 const sellsUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/sellsApi`
+const transferUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/transferApi`
 
 const sellerStore = {
     storeDetails: async function (userId, sellerStoreId) {
@@ -44,6 +45,16 @@ const sellerStore = {
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error al cambiar al cambiar el estado de la tienda. Inténtelo nuevamente")
+        }
+
+        return false
+    },
+    getDataTransfer: async function (sellerStoreId) {
+        try {
+            const response = await apiRequest.get(transferUrl(sellerStoreId))
+            return response.data
+        } catch (e) {
+            notifyError("Ha ocurrido un error al obtener los detalles de la transferencia. Inténtelo nuevamente")
         }
 
         return false
