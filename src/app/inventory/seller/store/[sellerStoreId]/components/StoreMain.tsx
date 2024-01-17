@@ -9,7 +9,7 @@ import {
     ArrowLeft, ChevronRightOutlined, ExpandLessOutlined, ExpandMoreOutlined,
     ForwardToInbox, InfoOutlined, Mail, Schedule
 } from "@mui/icons-material"
-import { daysMap, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
+import { daysMap, notifySuccess, notifyWarning, numberFormat, transactionToWarehouse } from "@/utils/generalFunctions";
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
 import { productSellsStatsProps, storeDepotsStatsProps, storeDepotsWithAny, storeSellsDetailsProps, storeWithStoreDepots } from "@/types/interfaces";
 import { useParams, useRouter } from "next/navigation";
@@ -19,8 +19,26 @@ import isBetween from "dayjs/plugin/isBetween";
 import Link from "next/link";
 import dayjs from "dayjs";
 import userProfileStyles from "@/assets/styles/userProfileStyles";
+import { product_store_transfers, store_depot_transfers } from "@prisma/client";
 
 dayjs.extend(isBetween);
+
+interface DetailsTodayTransfer {
+    places: number,
+    units: number,
+    products: number
+    transfers: number
+}
+
+interface todayTransferProps {
+    fromWarehouse: DetailsTodayTransfer
+    toWarehouse: DetailsTodayTransfer
+    fromStore: DetailsTodayTransfer
+    toStore: DetailsTodayTransfer
+    totalTransfers: number
+    totalUnits: number
+    totalProducts: number
+}
 
 export default function StoreMain({ userId }: { userId?: number }) {
     const [productSells, setProductSells] = useState(null)
@@ -29,6 +47,9 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const [storeDetails, setStoreDetails] = useState<storeWithStoreDepots | null>(null);
     const [todaySellsStats, setTodaySellsStats] = useState<productSellsStatsProps | null>(null);
     const [todaySells, setTodaySells] = useState<storeSellsDetailsProps[] | null>(null);
+
+    // today Transfer
+    const [todayTransfers, setTodayTransfers] = useState<todayTransferProps | null>(null)
 
     const params = useParams();
     const router = useRouter();
@@ -43,12 +64,103 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
     //GET initial store and sellsStats details
     useEffect(() => {
+
+        const getDataTransferWarehouseAndStore = (data) => {
+            let fromWarehouse = {
+                places: new Map(),
+                units: 0,
+                products: new Map(),
+                transfers: 0
+            }
+            let toWarehouse = {
+                places: new Map(),
+                units: 0,
+                products: new Map(),
+                transfers: 0
+            }
+            data.forEach((element) => {
+                if (element.transfer_direction === transactionToWarehouse) {
+                    toWarehouse.places.set(element.store_depots.depots.warehouse_id, true)
+                    toWarehouse.products.set(element.store_depot_id, true)
+                    toWarehouse.units += element.units_transferred_quantity
+                    toWarehouse.transfers++
+                } else {
+                    fromWarehouse.places.set(element.store_depots.depots.warehouse_id, true)
+                    fromWarehouse.products.set(element.store_depot_id, true)
+                    fromWarehouse.units += element.units_transferred_quantity
+                    fromWarehouse.transfers++
+                }
+            })
+
+            return {
+                fromWarehouse: {
+                    places: fromWarehouse.places.size,
+                    products: fromWarehouse.products.size,
+                    units: fromWarehouse.units,
+                    transfers: fromWarehouse.transfers
+                },
+                toWarehouse: {
+                    places: toWarehouse.places.size,
+                    products: toWarehouse.products.size,
+                    units: toWarehouse.units,
+                    transfers: toWarehouse.transfers
+                }
+            }
+
+        }
+
+        const getDataTransferStore = (data) => {
+            let fromStore = {
+                places: new Map(),
+                units: 0,
+                products: new Map(),
+                transfers: 0
+            }
+            let toStore = {
+                places: new Map(),
+                units: 0,
+                products: new Map(),
+                transfers: 0
+            }
+
+            data.forEach((element) => {
+                if (element.to_store_id === sellerStoreId) {
+                    fromStore.places.set(element.to_store_id, true)
+                    fromStore.products.set(element.store_depot_id, true)
+                    fromStore.units += element.units_transferred_quantity
+                    fromStore.transfers++
+                } else {
+                    toStore.places.set(element.store_depots.store_id, true)
+                    toStore.products.set(element.store_depot_id, true)
+                    toStore.units += element.units_transferred_quantity
+                    toStore.transfers++
+                }
+            })
+
+            return {
+                fromStore: {
+                    places: fromStore.places.size,
+                    products: fromStore.products.size,
+                    units: fromStore.units,
+                    transfers: fromStore.transfers
+                },
+                toStore: {
+                    places: toStore.places.size,
+                    products: toStore.products.size,
+                    units: toStore.units,
+                    transfers: toStore.transfers
+                }
+            }
+
+        }
+
         async function loadStatsData() {
             const storeDetailsPromise: storeWithStoreDepots = await stores.storeDetails(userId, sellerStoreId);
             const storeTodaySellsDetailsPromise: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId);
+            const storeTodayTransferDetailsPromise = await stores.getDataTransfer(sellerStoreId)
 
-            const [storeDetails, storeTodaySellsDetails] =
-                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise]);
+            const [storeDetails, storeTodaySellsDetails, storeTodayTransferDetails] =
+                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeTodayTransferDetailsPromise]);
 
             if (storeDetails) {
                 setStoreDetails(storeDetails);
@@ -134,6 +246,23 @@ export default function StoreMain({ userId }: { userId?: number }) {
                     sellsUnitsReturnedTotal,
                     sellerProfitTotal,
                 });
+            }
+
+            if (storeTodayTransferDetails) {
+
+                const { fromWarehouse, toWarehouse } = getDataTransferWarehouseAndStore(storeTodayTransferDetails.warehouseAndStore)
+                const { fromStore, toStore } = getDataTransferStore(storeTodayTransferDetails.store)
+
+                const newTodayTransfers = {
+                    fromWarehouse,
+                    toWarehouse,
+                    fromStore,
+                    toStore,
+                    totalTransfers: fromWarehouse.transfers + toWarehouse.transfers + fromStore.transfers + toStore.transfers,
+                    totalProducts: fromWarehouse.products + toWarehouse.products + fromStore.products + toStore.products,
+                    totalUnits: fromWarehouse.units + toWarehouse.units + fromStore.units + toStore.units
+                }
+                setTodayTransfers(newTodayTransfers)
             }
         }
 
@@ -264,7 +393,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
         return (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     <Link href={`/inventory/seller/store/${sellerStoreId}/product`}>
                         Productos
                     </Link>
@@ -333,7 +462,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
         return (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     <Link href={`/inventory/seller/store/${sellerStoreId}/reservation`}>
                         Reservaciones
                     </Link>
@@ -457,7 +586,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
         const handleTransfer = (sent: boolean) => {
             router.push(`/inventory/seller/store/${params.sellerStoreId}/transferMailbox?sent=${sent}`)
         }
-
         return (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Grid container columnSpacing={2} justifyContent={"space-between"}>
@@ -472,14 +600,65 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             <Mail color="primary" />
                         </IconButton>
 
-                        <IconButton size="small" onClick={() => handleTransfer(true)} sx={{ml: "5px"}}>
+                        <IconButton size="small" onClick={() => handleTransfer(true)} sx={{ ml: "5px" }}>
                             <ForwardToInbox color="primary" />
                         </IconButton>
                     </Grid>
                 </Grid>
 
                 <Grid container rowSpacing={2} mt={"8px"}>
-                    contenido aqui
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                            {`Total de transferencias`}
+                        </Grid>
+                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            {todayTransfers?.totalTransfers} ({todayTransfers?.totalUnits} unidades totales) ({todayTransfers?.totalProducts} productos diferentes)
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                            {`Recibidas de ${todayTransfers?.fromWarehouse.places} almacenes`}
+                        </Grid>
+                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            {todayTransfers?.fromWarehouse.transfers} ({todayTransfers?.fromWarehouse.units} unidades totales) ({todayTransfers?.fromWarehouse.products} productos diferentes)
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                            {`Recibidas de ${todayTransfers?.fromStore.places} tiendas`}
+                        </Grid>
+                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            {todayTransfers?.toStore.transfers} ({todayTransfers?.fromStore.units} unidades totales) ({todayTransfers?.fromStore.products} productos diferentes)
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                            {`Enviadas a ${todayTransfers?.toWarehouse.places} almacenes`}
+                        </Grid>
+                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            {todayTransfers?.toWarehouse.transfers} ({todayTransfers?.toWarehouse.units} unidades totales) ({todayTransfers?.toWarehouse.products} productos diferentes)
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                            {`Enviadas a ${todayTransfers?.toStore.places} tiendas`}
+                        </Grid>
+                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            {todayTransfers?.toStore.transfers} ({todayTransfers?.toStore.units} unidades totales) ({todayTransfers?.toStore.products} productos diferentes)
+                        </Grid>
+                    </Grid>
+
+
                 </Grid>
             </Card>
         )
