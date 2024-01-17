@@ -215,7 +215,7 @@ const SellsHistory = () => {
                         </LocalizationProvider>
                     </Grid>
                 </Card>
-                <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
+                <Card variant={"outlined"} sx={{ paddingTop: "20px", mx: "-5px" }}>
                     <Grid container rowSpacing={2}>
                         {
                             allSells?.length! > 0 ?

@@ -7,7 +7,7 @@ import { Close, ExpandLessOutlined, ExpandMoreOutlined } from '@mui/icons-materi
 import { TableNoData } from '@/components/TableNoData';
 import SellsMoreDetails from '../SellsMoreDetails';
 
-const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: ModalSellsTodayProps) => {
+const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData, onlineReservations }: ModalSellsTodayProps) => {
 
     const [showDetails, setShowDetails] = useState<number>(-1);
 
@@ -93,7 +93,7 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
     }
 
     return (
-        <Dialog open={isOpen} fullWidth onClose={handleCloseModal}>
+        <Dialog open={isOpen} fullScreen onClose={handleCloseModal}>
             <DialogTitle
                 display={"flex"}
                 justifyContent={"space-between"}
@@ -114,12 +114,19 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
             </DialogTitle>
             <DialogContent dividers >
                 <Grid item container>
-                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                        <Typography variant='h6'>
-                            Ventas efectuadas: {todaySellsData.length!}
-                        </Typography>
+                    <Grid item xs={12} display={"flex"} justifyContent={"center"}>
+                        <Typography variant='h6'>Ventas efectuadas: {todaySellsData.length!}</Typography>
                     </Grid>
-                    <Card variant={"outlined"} sx={{ paddingTop: "20px", marginTop: "10px" }}>
+                    {onlineReservations && <Grid item container mt={"10px"}>
+                        <Grid item xs={6}>
+                            <Button variant='outlined' color='primary'>Presenciales</Button>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <Button variant='outlined' color='secondary'>Reservaciones</Button>
+                        </Grid>
+                    </Grid>
+                    }
+                    <Card variant={"outlined"} sx={{ paddingTop: "20px", width: "110%", marginTop: "10px", mx: "-15px" }}>
                         <Grid container rowSpacing={2}>
                             {
                                 todaySellsData?.length! > 0
@@ -128,9 +135,8 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
                                             <TableHeader />
                                             <TableContent />
                                         </Table>
-                                    </TableContainer> : (
-                                        <TableNoData hasData={todaySellsData?.length!} />
-                                    )
+                                    </TableContainer> :
+                                    <TableNoData hasData={todaySellsData?.length!} />
                             }
                         </Grid>
                     </Card>

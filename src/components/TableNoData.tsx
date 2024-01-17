@@ -24,7 +24,6 @@ export const TableNoData = ({ hasData, searchCoincidence }: TableNoDataProps) =>
                 !hasData ?
                     <><InfoOutlined sx={{ mr: "5px" }} />No hay datos que mostrar</>
                     : <><Cached sx={{ mr: "5px" }} /> Cargando datos...</>
-
             }
         </Box>
     )

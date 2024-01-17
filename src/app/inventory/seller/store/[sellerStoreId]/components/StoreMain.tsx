@@ -895,6 +895,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
             <ModalSellsToday
                 dialogTitle="Ventas de hoy"
                 isOpen={isModalSellsOpen}
+                onlineReservations={storeDetails?.online_reservation!}
                 setIsOpen={setIsModalSellsOpen}
                 todaySellsData={todaySells!}
             />

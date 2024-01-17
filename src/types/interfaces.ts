@@ -293,6 +293,7 @@ export interface ModalSellsTodayProps {
     isOpen: boolean;
     setIsOpen: (bool: boolean) => void;
     dialogTitle: string;
+    onlineReservations: boolean;
     todaySellsData: storeSellsDetailsProps[];
 }
 export interface StoreModalDefaultProps {
