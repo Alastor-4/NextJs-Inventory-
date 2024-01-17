@@ -353,12 +353,18 @@ export interface TransferUnitsProps {
     loadData: () => Promise<void>;
 }
 export interface productSellsStatsProps {
-    sellsTotal: number;
-    sellsDifferentProductsTotal: number;
-    sellsUnitsTotal: number;
-    sellsAmountTotal: number;
-    sellsUnitsReturnedTotal: number;
-    sellerProfitTotal: number;
+    normalSellsTotal: number;
+    normalSellsDifferentProductsTotal: number;
+    normalSellsUnitsTotal: number;
+    normalSellsAmountTotal: number;
+    normalSellsUnitsReturnedTotal: number;
+    normalSellerProfitTotal: number;
+    reservationSellsTotal: number;
+    reservationSellsDifferentProductsTotal: number;
+    reservationSellsUnitsTotal: number;
+    reservationSellsAmountTotal: number;
+    reservationSellsUnitsReturnedTotal: number;
+    reservationSellerProfitTotal: number;
 }
 export interface StoreEditUnitsProps {
     loadData: () => Promise<void>;
