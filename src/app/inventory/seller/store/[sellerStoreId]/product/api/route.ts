@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import {prisma} from "db";
+import { prisma } from "db";
 
 // Get store products
 export async function GET(request: Request, { params }: { params: { sellerStoreId: string } }) {
@@ -39,8 +39,8 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
                     depots: {
                         include: {
                             store_depots: {
-                                where: {store_id: storeId},
-                                include: {product_offers: true}
+                                where: { store_id: storeId },
+                                include: { product_offers: true }
                             }
                         }
                     },
@@ -59,18 +59,18 @@ export async function PUT(req: Request) {
     const { storeDepotId } = await req.json()
 
     if (storeDepotId) {
-        const storeDepot = await prisma.store_depots.findUnique({where: {id: parseInt(storeDepotId)}})
+        const storeDepot = await prisma.store_depots.findUnique({ where: { id: parseInt(storeDepotId) } })
 
         if (storeDepot?.sell_price?.toString() !== "0" || (storeDepot?.sell_price?.toString() === "0" && storeDepot?.is_active)) {
-            const updatedDepot = await prisma.store_depots.update({data: {is_active: !storeDepot?.is_active}, where: {id: storeDepot?.id}})
+            const updatedDepot = await prisma.store_depots.update({ data: { is_active: !storeDepot?.is_active }, where: { id: storeDepot?.id } })
 
             return NextResponse.json(updatedDepot)
         }
 
-        return new Response('La acción de modificar isActive ha fallado', {status: 400})
+        return new Response('La acción de modificar isActive ha fallado', { status: 400 })
     }
 
-    return new Response('La acción de modificar isActive ha fallado', {status: 500})
+    return new Response('La acción de modificar isActive ha fallado', { status: 500 })
 }
 
 // Sell store depot one unit (default option)
@@ -78,7 +78,7 @@ export async function PATCH(req: Request) {
     const { storeDepotId } = await req.json()
 
     if (storeDepotId) {
-        const storeDepot = await prisma.store_depots.findUnique({where: {id: parseInt(storeDepotId)}})
+        const storeDepot = await prisma.store_depots.findUnique({ where: { id: parseInt(storeDepotId) } })
 
         if (storeDepot?.is_active && !!storeDepot.product_remaining_units && storeDepot.sell_price) {
             const depotPrice = parseFloat(String(storeDepot.sell_price))
@@ -90,7 +90,7 @@ export async function PATCH(req: Request) {
                     : depotPrice
 
             const [updatedStoreDepot] = await prisma.$transaction([
-                prisma.store_depots.update({data: {product_remaining_units: {decrement: 1}}, where: {id: storeDepot.id}}),
+                prisma.store_depots.update({ data: { product_remaining_units: { decrement: 1 } }, where: { id: storeDepot.id } }),
 
                 prisma.sells.create(
                     {
@@ -113,7 +113,7 @@ export async function PATCH(req: Request) {
         }
     }
 
-    return new Response('La acción de vender ha fallado', {status: 400})
+    return new Response('La acción de vender ha fallado', { status: 400 })
 }
 
 // Sell store depots any unit quantity (manual option)
@@ -133,9 +133,9 @@ export async function POST(req: Request) {
 
             for (const sellProductsDatum of sellProductsData) {
                 const updatedDepot = await tx.store_depots.update({
-                    where: {id: parseInt(sellProductsDatum.storeDepotId)},
+                    where: { id: parseInt(sellProductsDatum.storeDepotId) },
                     data: {
-                        product_remaining_units: {decrement: parseInt(sellProductsDatum.unitsQuantity)},
+                        product_remaining_units: { decrement: parseInt(sellProductsDatum.unitsQuantity) },
                     },
                 })
 
@@ -158,7 +158,7 @@ export async function POST(req: Request) {
             return sellItem
         })
     } catch (e) {
-        return new Response(String(e), {status: 400})
+        return new Response(String(e), { status: 400 })
     }
 
     return NextResponse.json(productSellItem)
