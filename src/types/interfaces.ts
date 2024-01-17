@@ -203,6 +203,9 @@ export interface productsProps {
             price_discount_quantity: number | null;
             seller_profit_unit: string | null;
             product_offers?: product_offers[] | null;
+            _count?: {
+                product_offers: number
+            }
         }[];
     }[];
     departments?: departments;

@@ -2,7 +2,7 @@
 
 import React from "react";
 import {
-    AppBar,
+    AppBar, Avatar, AvatarGroup,
     Box,
     Button,
     Card,
@@ -23,21 +23,21 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Toolbar,
+    Toolbar, Tooltip,
     Typography
 } from "@mui/material";
 import { TableNoData } from "@/components/TableNoData";
 import {
     ArrowLeft,
-    ChevronRightOutlined,
+    ChevronRightOutlined, DeleteOutline,
     DescriptionOutlined,
-    Done,
+    Done, EditOutlined,
     FilterAlt, FilterAltOff,
     FilterAltOutlined,
     HelpOutline,
     KeyboardArrowDown,
     KeyboardArrowUp,
-    SellOutlined,
+    SellOutlined, SwapVert,
     VisibilityOutlined
 } from "@mui/icons-material";
 import SearchIcon from '@mui/icons-material/Search';
@@ -45,7 +45,7 @@ import { useRouter } from "next/navigation";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import {CustomTooltip, InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import {
     computeDepotPricePerUnit,
     notifyError,
@@ -60,6 +60,7 @@ import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import InfoTooltip from "@/components/InfoTooltip";
+import {images} from "@prisma/client";
 
 export default function StoreActionsMain({ userId, storeId }: { userId: number, storeId: string }) {
     const router = useRouter()
@@ -358,10 +359,11 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                     container
                     item
                     columnSpacing={1}
+                    maxWidth={"80vw"}
                     sx={{
                         width: 'fit-content',
                         backgroundColor: "lightgray",
-                        padding: "0 4px",
+                        padding: "2px 4px",
                         borderRadius: "5px 2px 2px 2px",
                         border: "1px solid",
                         borderColor: item.is_active ? "seagreen" : "orange",
@@ -370,33 +372,35 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                         textDecorationLine: item.is_active ? "none" : "line-through",
                     }}
                 >
-                    <Grid container item xs={"auto"} alignItems={"center"}>
-                        <Typography variant={"caption"}
-                            sx={{ color: "white", fontWeight: "600" }}>
-                            {`${index + 1} . `}
-                        </Typography>
-                    </Grid>
-
-                    <Grid item xs={true} alignSelf={"center"}
-                        sx={{ color: "rgba(16,27,44,0.8)" }}>
-                        {
-                            item.compare_function === '='
-                                ? `Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
-                                : `Cuando compren más de ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
-                        }
-                    </Grid>
-
-                    <Grid container item xs={"auto"} alignItems={"center"}>
+                    <Grid container item xs={12} justifyContent={"space-between"}>
                         <Checkbox
                             size={"small"}
                             color={item.is_active ? "success" : "default"}
                             checked={item.is_active}
-                            onClick={() => handleToggleOffer(item.id, depotId)}
+                            onClick={async (e) => {
+                                return await handleToggleOffer(item.id, depotId)
+                            }}
                         />
+                    </Grid>
+
+                    <Grid
+                        container
+                        item
+                        xs={12}
+                        sx={{ color: "rgba(16,27,44,0.8)", textWrap: "pretty"}}>
+                        {
+                            item.compare_function === '='
+                                ? `${index + 1}. Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
+                                : `${index + 1}. Cuando compren más de ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
+                        }
                     </Grid>
                 </Grid>
             </Grid>
         )
+
+        function productHasActiveOffer(offers: any[]) {
+            return offers.some((item: any) => item.is_active)
+        }
 
         return (
             <TableBody>
@@ -466,27 +470,65 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                         </TableCell>
 
                                         <TableCell>
-                                            {row.name} <br />
                                             {
-                                                row.description && (
-                                                    <small>
-                                                        {` ${row.description.slice(0, 20)}`}
-                                                    </small>
+                                                row.images?.length! > 0 && (
+                                                    <Box display={"flex"} justifyContent={"center"}>
+                                                        <AvatarGroup
+                                                            max={2}
+                                                            sx={{ flexDirection: "row", width: "fit-content" }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                handleOpenImagesDialog(row.images!)
+                                                            }}
+                                                        >
+                                                            {row?.images?.map(
+                                                                (imageItem: images) => <Avatar
+                                                                    variant={"rounded"}
+                                                                    key={`producto-${imageItem.id}`}
+                                                                    alt={`producto-${imageItem.id}`}
+                                                                    src={imageItem.fileUrl!}
+                                                                    sx={{ cursor: "pointer", border: "1px solid lightblue" }}
+                                                                />
+                                                            )}
+                                                        </AvatarGroup>
+                                                    </Box>
                                                 )
                                             }
+                                            <Box display={"flex"} justifyContent={"center"}>
+                                                {row.name}
+                                            </Box>
                                         </TableCell>
+
                                         <TableCell>
                                             {row?.departments?.name ?? "-"}
                                         </TableCell>
                                         <TableCell>
-                                            <MoneyInfoTag value={displayProductPrice} errorColor={!baseProductPrice} />
-                                            {row.depots[0].store_depots[0].product_offers.length > 0 && (
-                                                <DescriptionOutlined fontSize={"small"} />
-                                            )}
-                                            <br />
-                                            {
-                                                displayPriceDiscount && <InfoTag value={`- ${displayPriceDiscount}`} />
-                                            }
+                                            <Grid container rowSpacing={1}>
+                                                <Grid container item xs={12} flexWrap={"nowrap"} alignItems={"center"}>
+                                                    <MoneyInfoTag
+                                                        value={displayProductPrice}
+                                                        errorColor={!baseProductPrice}
+                                                    />
+                                                    {
+                                                        !!row?.depots![0].store_depots![0].product_offers?.length &&
+                                                        productHasActiveOffer(row?.depots![0].store_depots![0].product_offers) && (
+                                                            <CustomTooltip tooltipText={"Ofertas activas"}>
+                                                                <DescriptionOutlined fontSize={"small"} />
+                                                            </CustomTooltip>
+                                                        )
+                                                    }
+                                                </Grid>
+                                                {
+                                                    displayPriceDiscount && (
+                                                        <Grid item xs={12}>
+                                                            <InfoTag
+                                                                value={`- ${displayPriceDiscount}`}
+                                                                tooltipText={row?.depots![0].store_depots![0].discount_description}
+                                                            />
+                                                        </Grid>
+                                                    )
+                                                }
+                                            </Grid>
                                         </TableCell>
                                         <TableCell>
                                             <Grid container alignItems={"center"}>
@@ -507,7 +549,6 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                     {row.depots[0].store_depots[0].product_remaining_units}
                                                 </Box>
                                             </Grid>
-
                                         </TableCell>
                                         <TableCell>
                                             <Grid container >
@@ -554,7 +595,6 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                             <Collapse in={expandIndex === row.id} timeout="auto" unmountOnExit>
                                                 <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Acciones:</Grid>
                                                         <Grid item xs={"auto"}>
                                                             <Button
                                                                 size={"small"}
@@ -585,39 +625,24 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Producto:</Grid>
                                                         <Grid item xs={true}>
                                                             {row.name}
-                                                            {
-                                                                row.description && (
-                                                                    <small>
-                                                                        {` ${row.description}`}
-                                                                    </small>
-                                                                )
-                                                            }
                                                         </Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"}
-                                                            sx={{ fontWeight: 600 }}>Departamento:</Grid>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Descripción:</Grid>
+                                                        <Grid item xs={true}>
+                                                            {row.description ? row.description : "-"}
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
                                                         <Grid item xs={true}>{row.departments?.name ?? "-"}</Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"}
-                                                            sx={{ fontWeight: 600 }}>Disponibles:</Grid>
-                                                        <Grid item xs={true}>
-                                                            {row.depots[0].store_depots[0].product_remaining_units}
-                                                        </Grid>
-                                                    </Grid>
-
-                                                    <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"}
-                                                            sx={{
-                                                                fontWeight: 600,
-                                                                display: "flex",
-                                                                alignItems: "center"
-                                                            }}>Características:</Grid>
-                                                        <Grid item xs={true}
-                                                            sx={{ display: "flex", alignItems: "center" }}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
+                                                        <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                             {row.characteristics.length > 0
                                                                 ? row.characteristics.map((item: any) => (
                                                                     <Grid
@@ -632,48 +657,18 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                                             fontSize: 14,
                                                                         }}
                                                                     >
-                                                                        <Grid container item alignItems={"center"}
-                                                                            sx={{ marginRight: "3px" }}>
+                                                                        <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
                                                                             <Typography variant={"caption"}
-                                                                                sx={{
-                                                                                    color: "white",
-                                                                                    fontWeight: "600"
-                                                                                }}>
+                                                                                        sx={{ color: "white", fontWeight: "600" }}>
                                                                                 {item.name.toUpperCase()}
                                                                             </Typography>
                                                                         </Grid>
                                                                         <Grid container item alignItems={"center"}
-                                                                            sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                                              sx={{ color: "rgba(16,27,44,0.8)" }}>
                                                                             {item.value}
                                                                         </Grid>
                                                                     </Grid>
-                                                                )
-                                                                ) : "-"
-                                                            }
-                                                        </Grid>
-                                                    </Grid>
-
-                                                    <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Imágenes:</Grid>
-                                                        <Grid item xs={true}>
-                                                            {
-                                                                row.images.length > 0
-                                                                    ? (
-                                                                        <Box
-                                                                            sx={{
-                                                                                cursor: "pointer",
-                                                                                display: "inline-flex",
-                                                                                alignItems: "center",
-                                                                                color: "blue"
-                                                                            }}
-                                                                            onClick={() => handleOpenImagesDialog(row.images)}
-                                                                        >
-                                                                            {row.images.length}
-
-                                                                            <VisibilityOutlined fontSize={"small"}
-                                                                                sx={{ ml: "5px" }} />
-                                                                        </Box>
-                                                                    ) : "no"
+                                                                )) : "-"
                                                             }
                                                         </Grid>
                                                     </Grid>
@@ -705,15 +700,44 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         </Grid>
                                                     </Grid>
 
+                                                    {
+                                                        row?.depots![0].store_depots![0].discount_description && (
+                                                            <Grid container item spacing={1} xs={12}>
+                                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Razón de la rebaja:</Grid>
+                                                                <Grid item xs={true}>
+                                                                    {row?.depots![0].store_depots![0].discount_description}
+                                                                </Grid>
+                                                            </Grid>
+                                                        )
+                                                    }
+
+                                                    <Grid container item columnSpacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Salario del vendedor:</Grid>
+                                                        <Grid item container xs={true}>
+                                                            {
+                                                                row?.depots![0].store_depots![0].seller_profit_percentage
+                                                                    ? `${row?.depots![0].store_depots![0].seller_profit_percentage} %`
+                                                                    : `${row?.depots![0].store_depots![0].seller_profit_quantity} CUP`
+                                                            }
+                                                        </Grid>
+                                                    </Grid>
+
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"}
-                                                            sx={{ fontWeight: 600 }}>Distribución:</Grid>
+                                                              sx={{ fontWeight: 600 }}>Distribución:</Grid>
                                                         <Grid item xs={true}>
                                                             {
                                                                 (baseProductPrice && sellerProfitQuantity && finalProductPrice)
                                                                     ? `Dueño: ${numberFormat(String(finalProductPrice - sellerProfitQuantity))} | Vendedor: ${numberFormat(sellerProfitQuantity)}`
                                                                     : "-"
                                                             }
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item container xs={"auto"} sx={{ fontWeight: 600 }} alignItems={"center"}>Unidades restantes:</Grid>
+                                                        <Grid item container xs={true} alignItems={"center"}>
+                                                            {row.depots[0].store_depots[0].product_remaining_units}
                                                         </Grid>
                                                     </Grid>
 

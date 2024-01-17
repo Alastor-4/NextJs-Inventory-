@@ -119,3 +119,47 @@ export const InfoTag = ({value, color, tooltipText}: any) => {
         </div>
     )
 }
+
+export const CustomTooltip = ({tooltipText, children}: any) => {
+    const [open, setOpen] = React.useState(false)
+
+    return (
+        <ClickAwayListener onClickAway={() => setOpen(false)}>
+            <Tooltip
+                title={tooltipText}
+                open={open}
+                placement="bottom-start"
+                arrow
+                PopperProps={{
+                    disablePortal: true,
+                    sx: {
+                        "& .MuiTooltip-tooltip": {
+                            padding: "5px 10px",
+                            maxWidth: "300px",
+                            lineHeight: "1.7em",
+                            border: "none",
+                            borderRadius: "3px",
+                            backgroundColor: "#2F323A",
+                            textAlign: "center",
+                            fontSize: "16px",
+                            fontStyle: "normal",
+                            fontWeight: "400",
+                            overflowWrap: "break-word",
+                            wordWrap: "normal",
+                            whiteSpace: "normal",
+                            lineBreak: "auto",
+                        }
+                    }
+                }}
+            >
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        return setOpen(true)
+                    }}>
+                    {children}
+                </div>
+            </Tooltip>
+        </ClickAwayListener>
+    )
+}

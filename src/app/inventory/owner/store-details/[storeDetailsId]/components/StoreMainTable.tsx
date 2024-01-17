@@ -6,15 +6,15 @@ import {
     TableHead, TableRow, Toolbar, Tooltip, Typography
 } from "@mui/material";
 import {
-    AddOutlined, ArrowLeft, DescriptionOutlined, EditOutlined,
-    ExpandLessOutlined, ExpandMoreOutlined, FilterAlt, HelpOutline, ShareOutlined, SwapHoriz
+    AddOutlined, ArrowLeft, DescriptionOutlined,
+    ExpandLessOutlined, ExpandMoreOutlined, FilterAlt, HelpOutline, ShareOutlined,
 } from "@mui/icons-material";
 import { StoreMainTableProps, allProductsByDepartmentProps, productsProps, storeDepotsWithAny, storeWithStoreDepots } from "@/types/interfaces";
 import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse";
 import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import {CustomTooltip, InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import { numberFormat } from "@/utils/generalFunctions";
 import { TableNoData } from "@/components/TableNoData";
 import { storeDetails } from "../request/storeDetails";
@@ -228,6 +228,10 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
         setOpenImagesDialog(true)
     }
 
+    function productHasActiveOffer(offers: any[]) {
+        return offers.some((item: any) => item.is_active)
+    }
+
     const TableContent = ({ formik }: { formik: any }) => {
         return (
             <TableBody>
@@ -309,15 +313,19 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                             </TableCell>
                                             <TableCell>
                                                 <Grid container rowSpacing={1}>
-                                                    <Grid item xs={12}>
+                                                    <Grid container item xs={12} flexWrap={"nowrap"} alignItems={"center"}>
                                                         <MoneyInfoTag
                                                             value={displayProductPrice}
                                                             errorColor={!baseProductPrice}
                                                             action={() => setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true })}
                                                         />
-                                                        {product?.depots![0].store_depots![0].product_offers?.length! && (
-                                                            <DescriptionOutlined fontSize={"small"} />
-                                                        )}
+                                                        {
+                                                            !!product?.depots![0].store_depots![0]._count!.product_offers && (
+                                                                <CustomTooltip tooltipText={"Ofertas activas"}>
+                                                                    <DescriptionOutlined fontSize={"small"} />
+                                                                </CustomTooltip>
+                                                            )
+                                                        }
                                                     </Grid>
                                                     {
                                                         displayPriceDiscount && (

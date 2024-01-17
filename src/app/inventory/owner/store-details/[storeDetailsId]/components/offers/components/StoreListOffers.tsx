@@ -297,8 +297,7 @@ function StoreListOffers(props: any) {
                                                 container
                                                 item
                                                 xs={12}
-                                                alignItems={"center"}
-                                                sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                sx={{ color: "rgba(16,27,44,0.8)", textWrap: "pretty"}}>
                                                 {
                                                     item.compare_function === '='
                                                         ? `${index + 1}. Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`

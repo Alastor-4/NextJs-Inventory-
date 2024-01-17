@@ -72,7 +72,7 @@ export async function GET(req: Request, { params }: Params) {
                                         }
                                     ]
                                 },
-                                include: { _count: { select: { product_offers: true } } }
+                                include: { _count: { select: { product_offers: {where: {is_active: true}} } } }
                             }
                         }
                     },
