@@ -526,7 +526,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             Ventas hoy
                         </Typography>
                     </Grid>
-                    <Grid item container xs={'auto'} mr={"20px"}>
+                    <Grid item container xs={'auto'} mr={"20px"}/>
 
                     <Grid item container xs={'auto'}>
                         <IconButton size="small" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`) }} >
