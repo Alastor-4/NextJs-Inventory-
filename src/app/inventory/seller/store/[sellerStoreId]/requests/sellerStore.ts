@@ -50,17 +50,27 @@ const sellerStore = {
         return false
     },
 
-    getDataTransfer: async function (sellerStoreId) {
+    getTodayTransfersStats: async function (sellerStoreId) {
         try {
             const response = await apiRequest.get(transferUrl(sellerStoreId))
             return response.data
         } catch (e) {
-            notifyError("Ha ocurrido un error al obtener los detalles de la transferencia. Inténtelo nuevamente")
+            notifyError("Ha ocurrido un error al obtener los detalles de las transferencia. Inténtelo nuevamente")
         }
 
         return false
     },
 
+    getTodayTransfersDetails: async function (sellerStoreId) {
+        try {
+            const response = await apiRequest.post(transferUrl(sellerStoreId))
+            return response.data
+        } catch (e) {
+            notifyError("Ha ocurrido un error al obtener los detalles de la transferencias. Inténtelo nuevamente")
+        }
+
+        return false
+    },
 }
 
 export default sellerStore;
