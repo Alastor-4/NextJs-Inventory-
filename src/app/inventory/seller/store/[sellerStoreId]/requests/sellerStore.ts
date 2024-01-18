@@ -49,6 +49,7 @@ const sellerStore = {
 
         return false
     },
+
     getDataTransfer: async function (sellerStoreId) {
         try {
             const response = await apiRequest.get(transferUrl(sellerStoreId))

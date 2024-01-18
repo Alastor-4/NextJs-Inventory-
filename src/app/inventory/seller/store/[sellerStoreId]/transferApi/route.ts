@@ -17,7 +17,7 @@ export async function GET(req: Request, { params }: Params) {
     const todayEnd = todayStart.add(1, "day");
 
     try {
-        const resultWarehouseAndStore = await prisma.store_depot_transfers.findMany({
+        const p1 = prisma.store_depot_transfers.findMany({
             where: {
                 created_at: {
                     gte: new Date(todayStart.format("YYYY-MM-DD")),
@@ -27,16 +27,9 @@ export async function GET(req: Request, { params }: Params) {
                     store_id: storeId
                 }
             },
-            include: {
-                store_depots: {
-                    include: {
-                        depots: true
-                    }
-                }
-            }
         })
 
-        const resultStore = await prisma.product_store_transfers.findMany({
+        const p2 = prisma.product_store_transfers.findMany({
             where: {
                 created_at: {
                     gte: new Date(todayStart.format("YYYY-MM-DD")),
@@ -53,10 +46,9 @@ export async function GET(req: Request, { params }: Params) {
                     }
                 ]
             },
-            include: {
-                store_depots: true
-            }
         })
+
+        const [resultWarehouseAndStore, resultStore] = await Promise.all([p1, p2])
 
         return NextResponse.json({
             warehouseAndStore: resultWarehouseAndStore,
@@ -64,8 +56,6 @@ export async function GET(req: Request, { params }: Params) {
         })
 
     } catch (e) {
-
         return new Response("Error al obtener las transferencias de hoy", { status: 400 })
     }
-
 } 
