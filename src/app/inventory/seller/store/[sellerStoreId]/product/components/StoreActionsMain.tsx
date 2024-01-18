@@ -33,7 +33,7 @@ import {
     DescriptionOutlined,
     Done, EditOutlined,
     FilterAlt, FilterAltOff,
-    FilterAltOutlined,
+    FilterAltOutlined, ForwardToInbox,
     HelpOutline,
     KeyboardArrowDown,
     KeyboardArrowUp,
@@ -594,27 +594,6 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                         <TableCell style={{ padding: 0 }} colSpan={6}>
                                             <Collapse in={expandIndex === row.id} timeout="auto" unmountOnExit>
                                                 <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
-                                                    <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"}>
-                                                            <Button
-                                                                size={"small"}
-                                                                variant={"outlined"}
-                                                                disabled={row.depots[0].store_depots[0].product_remaining_units === 0}
-                                                                onClick={() => handleClickTransfer(row)}
-                                                            >
-                                                                Transferir
-                                                            </Button>
-                                                        </Grid>
-                                                        <Grid item xs={"auto"}>
-                                                            <Button
-                                                                size={"small"}
-                                                                variant={"outlined"}
-                                                            >
-                                                                Reservaciones
-                                                            </Button>
-                                                        </Grid>
-                                                    </Grid>
-
                                                     <Grid item xs={12}>
                                                         <Typography variant="subtitle1" gutterBottom component="div">
                                                             Detalles:
@@ -1185,7 +1164,6 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                             />
 
                             <ImagesDisplayDialog
-                                dialogTitle={"Imágenes del producto"}
                                 open={openImageDialog}
                                 setOpen={setOpenImagesDialog}
                                 images={dialogImages}
@@ -1210,7 +1188,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                             <ModalTransfer
                                 open={activeModalTransfer}
                                 setOpen={setActiveModalTransfer}
-                                dialogTitle="Transferencia entre tiendas"
+                                dialogTitle="Transferir a tienda"
                             >
                                 {
                                     activeModalTransfer &&
@@ -1284,17 +1262,29 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                             onClick={() => handleOpenSellProduct(formik)}
                                                             startIcon={<SellOutlined fontSize={"small"} />}
                                                         >
-                                                            Vender seleccionados {selected.length}
+                                                            Vender {selected.length}
                                                         </Button>
 
-                                                        <Button
-                                                            startIcon={<FilterAltOff fontSize={"small"}/>}
+                                                        {
+                                                            selected.length === 1 && (
+                                                                <Button
+                                                                    size={"small"}
+                                                                    variant={"outlined"}
+                                                                    startIcon={<ForwardToInbox color="secondary" />}
+                                                                    onClick={() => handleClickTransfer(selected[0])}
+                                                                >
+                                                                    Transferir
+                                                                </Button>
+                                                            )
+                                                        }
+
+                                                        <IconButton
+                                                            size={"small"}
                                                             color="error"
-                                                            variant="outlined"
                                                             onClick={() => setSelected([])}
                                                         >
-                                                            Limpiar
-                                                        </Button>
+                                                            <FilterAltOff fontSize={"small"}/>
+                                                        </IconButton>
                                                     </Grid>
                                                 )
                                             }
