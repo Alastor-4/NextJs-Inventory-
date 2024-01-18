@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/db";
-import utc from "dayjs/plugin/utc";
-import dayjs from "dayjs";
-
-dayjs.extend(utc);
 
 interface Params {
     params: { sellerStoreId: string }
@@ -13,15 +9,16 @@ interface Params {
 export async function GET(req: Request, { params }: Params) {
     const storeId = parseInt(<string>params.sellerStoreId)
 
-    const todayStart = dayjs.utc().set("h", 0).set("m", 0).set("s", 0);
-    const todayEnd = todayStart.add(1, "day");
+    const today = new Date();
+    const todayStart = new Date(today.setUTCHours(0, 0, 0, 0));
+    const todayEnd = new Date(today.setUTCHours(23, 59, 59, 999));
 
     try {
         const p1 = prisma.store_depot_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format("YYYY-MM-DD")),
-                    lt: new Date(todayEnd.format("YYYY-MM-DD")),
+                    gte: todayStart,
+                    lt: todayEnd,
                 },
                 store_depots: {
                     store_id: storeId
@@ -32,8 +29,8 @@ export async function GET(req: Request, { params }: Params) {
         const p2 = prisma.product_store_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format("YYYY-MM-DD")),
-                    lt: new Date(todayEnd.format("YYYY-MM-DD")),
+                    gte: todayStart,
+                    lt: todayEnd,
                 },
                 OR: [
                     {
@@ -64,15 +61,16 @@ export async function GET(req: Request, { params }: Params) {
 export async function POST(req: Request, { params }: Params) {
     const storeId = parseInt(<string>params.sellerStoreId)
 
-    const todayStart = dayjs.utc().set("h", 0).set("m", 0).set("s", 0);
-    const todayEnd = todayStart.add(1, "day");
+    const today = new Date();
+    const todayStart = new Date(today.setUTCHours(0, 0, 0, 0));
+    const todayEnd = new Date(today.setUTCHours(23, 59, 59, 999));
 
     try {
         const p1 = prisma.store_depot_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format("YYYY-MM-DD")),
-                    lt: new Date(todayEnd.format("YYYY-MM-DD")),
+                    gte: todayStart,
+                    lt: todayEnd,
                 },
                 store_depots: { store_id: storeId }
             },
@@ -99,8 +97,8 @@ export async function POST(req: Request, { params }: Params) {
         const p2 = prisma.product_store_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format("YYYY-MM-DD")),
-                    lt: new Date(todayEnd.format("YYYY-MM-DD")),
+                    gte: todayStart,
+                    lt: todayEnd,
                 },
                 OR: [
                     { store_depots: { store_id: storeId }},
