@@ -13,15 +13,15 @@ interface Params {
 export async function GET(req: Request, { params }: Params) {
     const storeId = parseInt(<string>params.sellerStoreId)
 
-    const todayStart = dayjs.utc().set("h", 0).set("m", 0).set("s", 0);
-    const todayEnd = todayStart.add(1, "day");
+    const todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
+    const todayEnd = todayStart.add(24, "hours")
 
     try {
         const p1 = prisma.store_depot_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format("YYYY-MM-DD")),
-                    lt: new Date(todayEnd.format("YYYY-MM-DD")),
+                    gte: new Date(todayStart.format()),
+                    lt: new Date(todayEnd.format()),
                 },
                 store_depots: {
                     store_id: storeId
@@ -32,8 +32,8 @@ export async function GET(req: Request, { params }: Params) {
         const p2 = prisma.product_store_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format("YYYY-MM-DD")),
-                    lt: new Date(todayEnd.format("YYYY-MM-DD")),
+                    gte: new Date(todayStart.format()),
+                    lt: new Date(todayEnd.format()),
                 },
                 OR: [
                     {
@@ -64,15 +64,15 @@ export async function GET(req: Request, { params }: Params) {
 export async function POST(req: Request, { params }: Params) {
     const storeId = parseInt(<string>params.sellerStoreId)
 
-    const todayStart = dayjs.utc().set("h", 0).set("m", 0).set("s", 0);
-    const todayEnd = todayStart.add(1, "day");
+    const todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
+    const todayEnd = todayStart.add(24, "hours")
 
     try {
         const p1 = prisma.store_depot_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format("YYYY-MM-DD")),
-                    lt: new Date(todayEnd.format("YYYY-MM-DD")),
+                    gte: new Date(todayStart.format()),
+                    lt: new Date(todayEnd.format()),
                 },
                 store_depots: { store_id: storeId }
             },
@@ -99,8 +99,8 @@ export async function POST(req: Request, { params }: Params) {
         const p2 = prisma.product_store_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format("YYYY-MM-DD")),
-                    lt: new Date(todayEnd.format("YYYY-MM-DD")),
+                    gte: new Date(todayStart.format()),
+                    lt: new Date(todayEnd.format()),
                 },
                 OR: [
                     { store_depots: { store_id: storeId }},
