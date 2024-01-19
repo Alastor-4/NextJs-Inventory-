@@ -33,7 +33,7 @@ const sellerStore = {
             const response = await apiRequest.put(url(sellerStoreId), null)
             return response.data
         } catch (e) {
-            notifyError("Ha ocurrido un error al cambiar al cambiar el estado de la tienda. Inténtelo nuevamente")
+            notifyError("Ha ocurrido un error al cambiar el estado de la tienda. Inténtelo nuevamente")
         }
 
         return false
@@ -44,7 +44,7 @@ const sellerStore = {
             const response = await apiRequest.patch(url(sellerStoreId), null)
             return response.data
         } catch (e) {
-            notifyError("Ha ocurrido un error al cambiar al cambiar el estado de la tienda. Inténtelo nuevamente")
+            notifyError("Ha ocurrido un error al cambiar el estado de la tienda. Inténtelo nuevamente")
         }
 
         return false

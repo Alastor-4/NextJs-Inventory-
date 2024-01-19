@@ -32,7 +32,8 @@ export async function GET(req: Request) {
             }
         )
         return NextResponse.json(storeAllSells);
-    } else if (storeId) {
+    }
+    if (storeId) {
         const todayStart = dayjs.utc().set("h", 0).set("m", 0).set("s", 0);
         const todayEnd = todayStart.add(1, "day");
 
@@ -59,9 +60,8 @@ export async function GET(req: Request) {
         )
         return NextResponse.json(storeTodaySells);
     }
-    else {
-        logger.info(`Hay datos undefined que impiden pedir los datos a la bd, en la obtencion de las ventas de los productos en la tienda`)
 
-        return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
-    }
+    logger.info(`Hay datos undefined que impiden pedir los datos a la bd, en la obtencion de las ventas de los productos en la tienda`)
+
+    return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
 }
