@@ -1,3 +1,4 @@
+//@ts-nocheck
 "use client"
 
 import {
@@ -151,21 +152,22 @@ export default function StoreMain({ userId }: { userId?: number }) {
             }
 
             if (storeTodaySellsDetails) {
-                //Estadisticas para compras presenciales
+                let sellsTotal: number = 0;
+                let sellsAmountTotal: number = 0;
+                let sellerProfitTotal: number = 0;
+                let sellsUnitsReturnedTotal: number = 0;
+
                 let normalSellsTotal: number = 0;
                 let normalSellsDifferentProductsTotal: number = 0;
-                let normalSellsUnitsTotal: number = 0;
+                let normalSellsProductsQuantity: number = 0;
                 let normalSellsAmountTotal: number = 0;
-                let normalSellsUnitsReturnedTotal: number = 0;
                 let normalSellerProfitTotal: number = 0;
+                let normalSellsUnitsReturnedTotal: number = 0;
 
-                //Estadísticas para compras por reservaciones
                 let reservationSellsTotal: number = 0;
-                let reservationSellsDifferentProductsTotal: number = 0;
-                let reservationSellsUnitsTotal: number = 0;
                 let reservationSellsAmountTotal: number = 0;
-                let reservationSellsUnitsReturnedTotal: number = 0;
                 let reservationSellerProfitTotal: number = 0;
+                let reservationSellsUnitsReturnedTotal: number = 0;
 
                 let sellsDepotsIdAndSellState: { [key: number]: boolean; } = {};
 
@@ -177,11 +179,8 @@ export default function StoreMain({ userId }: { userId?: number }) {
                         reservationSellsTotal++
                         sells.reservations.reservation_products.forEach(reservationProductItem => {
                             if (!sellsDepotsIdAndSellState[reservationProductItem.store_depots.depot_id!]) {
-                                reservationSellsDifferentProductsTotal++;
-                                sellsDepotsIdAndSellState[reservationProductItem.store_depots.depot_id!] = true
+                                sellsDepotsIdAndSellState[reservationProductItem.store_depots.depot_id!] = true;
                             }
-
-                            reservationSellsUnitsTotal += reservationProductItem.units_quantity;
 
                             sellProfitQuantity += reservationProductItem.store_depots.seller_profit_quantity
                                 ? reservationProductItem.store_depots.seller_profit_quantity * reservationProductItem.units_quantity
@@ -197,8 +196,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                 normalSellsDifferentProductsTotal++;
                                 sellsDepotsIdAndSellState[sellProductItem.store_depots.depot_id!] = true;
                             }
-
-                            normalSellsUnitsTotal += sellProductItem.units_quantity;
+                            normalSellsProductsQuantity += sellProductItem.units_quantity;
 
                             sellProfitQuantity += sellProductItem.store_depots.seller_profit_quantity
                                 ? sellProductItem.store_depots.seller_profit_quantity * sellProductItem.units_quantity
@@ -209,17 +207,24 @@ export default function StoreMain({ userId }: { userId?: number }) {
                         normalSellerProfitTotal += sellProfitQuantity;
                     }
                 })
+                sellsTotal = normalSellsTotal + reservationSellsTotal;
+                sellsAmountTotal = normalSellsAmountTotal + reservationSellsAmountTotal;
+                sellerProfitTotal = normalSellerProfitTotal + reservationSellerProfitTotal;
+                sellsUnitsReturnedTotal = normalSellsUnitsReturnedTotal + reservationSellsUnitsReturnedTotal;
+
                 setTodaySells(storeTodaySellsDetails);
                 setTodaySellsStats({
+                    sellsTotal,
+                    sellsAmountTotal,
+                    sellerProfitTotal,
+                    sellsUnitsReturnedTotal,
                     normalSellsTotal,
                     normalSellsDifferentProductsTotal,
-                    normalSellsUnitsTotal,
+                    normalSellsProductsQuantity,
                     normalSellsAmountTotal,
                     normalSellsUnitsReturnedTotal,
                     normalSellerProfitTotal,
                     reservationSellsTotal,
-                    reservationSellsDifferentProductsTotal,
-                    reservationSellsUnitsTotal,
                     reservationSellsAmountTotal,
                     reservationSellsUnitsReturnedTotal,
                     reservationSellerProfitTotal,
@@ -526,97 +531,124 @@ export default function StoreMain({ userId }: { userId?: number }) {
                         </Typography>
                     </Grid>
                     <Grid item container xs={'auto'} mr={"20px"} />
-
                     <Grid item container xs={'auto'}>
                         <IconButton size="small" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsHistory/`) }} >
                             <Schedule color="primary" />
                         </IconButton>
                     </Grid>
                 </Grid>
-                <Grid container rowSpacing={2} mt={"8px"}>
-                    <Grid sx={{ fontWeight: 600, mb: "-10px" }}>Estadísticas presenciales:</Grid>
-                    <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                            Total de ventas:
-                        </Grid>
-                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"} />
-                            {todaySellsStats?.normalSellsTotal} ({todaySellsStats?.normalSellsUnitsTotal} unidades totales) ({todaySellsStats?.normalSellsDifferentProductsTotal} productos diferentes)
-                        </Grid>
-                    </Grid>
-                    <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                            Productos devueltos:
-                        </Grid>
-                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"} />
-                            {todaySellsStats?.normalSellsUnitsReturnedTotal}
-                        </Grid>
-                    </Grid>
-                    <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                            Total recaudado:
-                        </Grid>
-                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"} />
-                            $ {numberFormat(`${todaySellsStats?.normalSellsAmountTotal}`)}
-                        </Grid>
-                    </Grid>
-                    <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                            Desglose:
-                        </Grid>
-                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"} />
-                            $ {numberFormat(`${todaySellsStats?.normalSellsAmountTotal! - todaySellsStats?.normalSellerProfitTotal!}`)} del dueño | $ {numberFormat(`${todaySellsStats?.normalSellerProfitTotal}`)} del vendedor
-                        </Grid>
-                    </Grid>
+                <Grid container rowSpacing={2} mt={"5px"}>
                     {storeDetails?.online_reservation &&
-                        <Grid container rowSpacing={2} mt={"10px"}>
-                            <Grid item xs={12}>
-                                <Divider orientation="horizontal" color="blue" variant="fullWidth" />
-                            </Grid>
-                            <Grid sx={{ fontWeight: 600, mb: "-10px", mt: "10px" }}>Estadísticas por reservaciones:</Grid>
-                            <Grid container item spacing={1} xs={12}>
-                                <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                        <>
+                            <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
                                     Total de ventas:
                                 </Grid>
-                                <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                                    <ChevronRightOutlined fontSize={"small"} />
-                                    {todaySellsStats?.reservationSellsTotal} ({todaySellsStats?.reservationSellsUnitsTotal} unidades totales) ({todaySellsStats?.reservationSellsDifferentProductsTotal} productos diferentes)
-                                </Grid>
+                                <Grid item xs={true} >{todaySellsStats?.sellsTotal}</Grid>
                             </Grid>
-                            <Grid container item spacing={1} xs={12}>
-                                <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                                    Productos devueltos:
-                                </Grid>
-                                <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                                    <ChevronRightOutlined fontSize={"small"} />
-                                    {todaySellsStats?.reservationSellsUnitsReturnedTotal}
-                                </Grid>
-                            </Grid>
-                            <Grid container item spacing={1} xs={12}>
-                                <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                            <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>
                                     Total recaudado:
                                 </Grid>
+                                <Grid item xs={true} >${numberFormat(`${todaySellsStats?.sellsAmountTotal}`)}</Grid>
                                 <Grid item xs={12} display={"flex"} alignItems={"center"}>
                                     <ChevronRightOutlined fontSize={"small"} />
-                                    $ {numberFormat(`${todaySellsStats?.reservationSellsAmountTotal}`)}
+                                    Dueño: ${numberFormat(`${todaySellsStats?.sellsAmountTotal! - todaySellsStats?.sellerProfitTotal!}`)} | Vendedor: ${numberFormat(`${todaySellsStats?.sellerProfitTotal}`)}
                                 </Grid>
                             </Grid>
-                            <Grid container item spacing={1} xs={12}>
-                                <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                                    Desglose:
+                            {todaySellsStats?.sellsUnitsReturnedTotal! > 0 &&
+                                <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                    <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        Productos devueltos:
+                                    </Grid>
+                                    <Grid item xs={true} >{todaySellsStats?.sellsUnitsReturnedTotal}</Grid>
                                 </Grid>
+                            }
+                        </>
+                    }
+
+                    {/* Presenciales */}
+                    <Grid container rowSpacing={2} marginTop={"2px"}>
+                        {storeDetails?.online_reservation &&
+                            <>
+                                <Grid item xs={12}><Divider orientation="horizontal" variant="fullWidth" /></Grid>
+                                <Grid sx={{ fontWeight: 600, mb: "-10px", mt: "10px" }}>Presenciales:</Grid>
+                            </>
+                        }
+                        <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                            <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                <ChevronRightOutlined fontSize={"small"} />
+                                Total de ventas:
+                            </Grid>
+                            <Grid item xs={true} >{todaySellsStats?.normalSellsTotal}</Grid>
+                        </Grid>
+                        <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>
+                                Productos diferentes:
+                            </Grid>
+                            <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                <ChevronRightOutlined fontSize={"small"} />
+                                {todaySellsStats?.normalSellsDifferentProductsTotal} {`(${todaySellsStats?.normalSellsProductsQuantity} unidades totales)`}
+                            </Grid>
+                        </Grid>
+                        <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>
+                                {storeDetails?.online_reservation ? "Total recaudado" : "Recaudado"}
+                            </Grid>
+                            <Grid item xs={true} >${numberFormat(`${todaySellsStats?.normalSellsAmountTotal}`)}</Grid>
+                            <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                <ChevronRightOutlined fontSize={"small"} />
+                                Dueño: ${numberFormat(`${todaySellsStats?.normalSellsAmountTotal! - todaySellsStats?.normalSellerProfitTotal!}`)} | Vendedor: ${numberFormat(`${todaySellsStats?.normalSellerProfitTotal}`)}
+                            </Grid>
+                        </Grid>
+                        {todaySellsStats?.normalSellsUnitsReturnedTotal! > 0 &&
+                            <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Productos devueltos:
+                                </Grid>
+                                <Grid item xs={true} >{todaySellsStats?.normalSellsUnitsReturnedTotal}</Grid>
+                            </Grid>
+                        }
+                    </Grid>
+
+                    {/* Por reservaciones */}
+                    {storeDetails?.online_reservation &&
+                        <Grid container rowSpacing={2} mt={"10px"}>
+                            <Grid item xs={12}><Divider orientation="horizontal" variant="fullWidth" /></Grid>
+                            <Grid sx={{ fontWeight: 600, mb: "-10px", mt: "10px" }}>Por reservaciones:</Grid>
+                            <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
+                                    Total de ventas:
+                                </Grid>
+                                <Grid item xs={true} >{todaySellsStats?.reservationSellsTotal}</Grid>
+                            </Grid>
+                            <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>
+                                    Recaudado:
+                                </Grid>
+                                <Grid item xs={true} >${numberFormat(`${todaySellsStats?.reservationSellsAmountTotal}`)}</Grid>
                                 <Grid item xs={12} display={"flex"} alignItems={"center"}>
                                     <ChevronRightOutlined fontSize={"small"} />
-                                    $ {numberFormat(`${todaySellsStats?.reservationSellsAmountTotal! - todaySellsStats?.reservationSellerProfitTotal!}`)} del dueño | $ {numberFormat(`${todaySellsStats?.reservationSellerProfitTotal}`)} del vendedor
+                                    Dueño: ${numberFormat(`${todaySellsStats?.reservationSellsAmountTotal! - todaySellsStats?.reservationSellerProfitTotal!}`)} | Vendedor: ${numberFormat(`${todaySellsStats?.reservationSellerProfitTotal}`)}
                                 </Grid>
+                                {todaySellsStats?.reservationSellsUnitsReturnedTotal! > 0 &&
+                                    <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                        <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                            <ChevronRightOutlined fontSize={"small"} />
+                                            Productos devueltos:
+                                        </Grid>
+                                        <Grid item xs={true} >{todaySellsStats?.reservationSellsUnitsReturnedTotal}</Grid>
+                                    </Grid>
+                                }
                             </Grid>
                         </Grid>
                     }
                 </Grid>
-            </Card>
+            </Card >
         )
     }
 
@@ -859,13 +891,12 @@ export default function StoreMain({ userId }: { userId?: number }) {
         <Card variant={"outlined"}>
             <CustomToolbar />
 
-            <ModalSellsToday
+            {todaySells && <ModalSellsToday
                 dialogTitle="Ventas hoy"
                 isOpen={isModalSellsOpen}
-                onlineReservations={storeDetails?.online_reservation!}
                 setIsOpen={setIsModalSellsOpen}
                 todaySellsData={todaySells!}
-            />
+            />}
 
             <ModalTransfersToday
                 isOpen={isModalTransfersOpen}
