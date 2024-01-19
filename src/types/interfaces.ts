@@ -273,7 +273,17 @@ export interface storeDepotsWithAny {
         product_total_units: number | null;
         product_total_remaining_units: number | null;
         created_at: Date;
-        products?: products | null;
+        warehouses?: warehouses | null;
+        products?: {
+            id: number;
+            department_id: number | null;
+            owner_id: number | null;
+            name: string | null;
+            description: string | null;
+            buy_price: number | null;
+            created_at: Date;
+            departments?: departments | null
+        } | null;
     } | null
 }
 
@@ -293,7 +303,6 @@ export interface ModalSellsTodayProps {
     isOpen: boolean;
     setIsOpen: (bool: boolean) => void;
     dialogTitle: string;
-    onlineReservations: boolean;
     todaySellsData: storeSellsDetailsProps[];
 }
 export interface StoreModalDefaultProps {
@@ -354,18 +363,20 @@ export interface TransferUnitsProps {
     loadData: () => Promise<void>;
 }
 export interface productSellsStatsProps {
+    sellsTotal: number;
+    sellsAmountTotal: number;
+    sellerProfitTotal: number;
+    sellsUnitsReturnedTotal: number;
     normalSellsTotal: number;
     normalSellsDifferentProductsTotal: number;
-    normalSellsUnitsTotal: number;
+    normalSellsProductsQuantity: number;
     normalSellsAmountTotal: number;
-    normalSellsUnitsReturnedTotal: number;
     normalSellerProfitTotal: number;
+    normalSellsUnitsReturnedTotal: number;
     reservationSellsTotal: number;
-    reservationSellsDifferentProductsTotal: number;
-    reservationSellsUnitsTotal: number;
     reservationSellsAmountTotal: number;
-    reservationSellsUnitsReturnedTotal: number;
     reservationSellerProfitTotal: number;
+    reservationSellsUnitsReturnedTotal: number;
 }
 export interface StoreEditUnitsProps {
     loadData: () => Promise<void>;

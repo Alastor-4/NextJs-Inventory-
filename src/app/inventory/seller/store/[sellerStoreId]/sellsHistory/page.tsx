@@ -17,7 +17,7 @@ import InfoTooltip from '@/components/InfoTooltip';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useRouter } from "next/navigation";
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/es';
 
 const getMonth = (month: number) => { if (month < 9) return `0${month + 1}`; return month + 1 }
@@ -103,24 +103,16 @@ const SellsHistory = () => {
     )
 
     const TableHeader = () => {
-        const headCells = [
-            { id: "details", label: "", },
-            { id: "total_price", label: "Precio total", },
-            { id: "payment_method", label: "Método de pago", },
-            { id: "sell_products_quantity", label: "Productos vendidos", },
-        ];
-
         return (
             <TableHead>
                 <TableRow>
-                    {headCells.map(headCell => (
-                        <TableCell
-                            key={headCell.id}
-                            align={"left"}
-                        >
-                            {headCell.label}
-                        </TableCell>
-                    ))}
+                    <TableCell id='details' />
+                    <TableCell align='center' id='total_price' sx={{ whiteSpace: "nowrap" }}>Total recaudado</TableCell>
+                    <TableCell align='center' id='payment_method' sx={{ whiteSpace: "nowrap" }}>Forma de pago</TableCell>
+                    <TableCell id='sell_products_quantity'>Productos</TableCell>
+                    <TableCell id='created_at'>Registrado</TableCell>
+                    <TableCell align='center' id='sell_type' sx={{ whiteSpace: "nowrap" }}>Tipo de venta</TableCell>
+                    <TableCell id='units_returned_quantity'>Devoluciones</TableCell>
                 </TableRow>
             </TableHead>
         )
@@ -145,6 +137,7 @@ const SellsHistory = () => {
                     (sell: storeSellsDetailsProps) => (
                         <React.Fragment key={sell.id}>
                             <TableRow
+                                key={sell.id}
                                 hover
                                 tabIndex={-1}
                             >
@@ -162,12 +155,15 @@ const SellsHistory = () => {
                                         </IconButton>
                                     </Tooltip>
                                 </TableCell>
-                                <TableCell>{sell.total_price}</TableCell>
-                                <TableCell>{sell.payment_method}</TableCell>
-                                <TableCell>{sell.sell_products.length!}</TableCell>
+                                <TableCell align='center'>{sell.total_price}</TableCell>
+                                <TableCell align='center'>{sell.payment_method}</TableCell>
+                                <TableCell align='center'>{sell.sell_products.length!}</TableCell>
+                                <TableCell align='center'>{dayjs(sell.created_at).format('h:mm A')}</TableCell>
+                                <TableCell align='center'>{sell.reservations !== null ? "Reservación" : "Presencial"}</TableCell>
+                                <TableCell align='center'>{sell.units_returned_quantity ? sell.units_returned_quantity : "-"}</TableCell>
                             </TableRow>
                             <TableRow >
-                                <TableCell style={{ padding: 0 }} colSpan={6}>
+                                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                                     {showDetails === sell.id && (
                                         <SellsMoreDetails
                                             show={(showDetails === sell.id)}
@@ -207,9 +203,7 @@ const SellsHistory = () => {
                         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='es'>
                             <DemoContainer components={['DatePicker']}>
                                 <DatePicker
-                                    slotProps={{
-                                        field: { clearable: true },
-                                    }}
+                                    slotProps={{ field: { clearable: true } }}
                                     label="Seleccione una fecha" disableFuture shouldDisableDate={hasSell} onChange={handleChange} />
                             </DemoContainer>
                         </LocalizationProvider>
