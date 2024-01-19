@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/db";
-import utc from "dayjs/plugin/utc";
 import dayjs from "dayjs";
-
-dayjs.extend(utc);
 
 interface Params {
     params: { sellerStoreId: string }
