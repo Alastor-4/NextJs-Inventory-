@@ -20,7 +20,7 @@ const sellerStore = {
 
     storeSellsDetails: async function (sellerStoreId: number, allSells?: boolean) {
         try {
-            const response = await apiRequest.get(sellsUrl(sellerStoreId), { params: { sellerStoreId, allSells } });
+            const response = await apiRequest.get(sellsUrl(sellerStoreId), { params: { storeId: sellerStoreId, loadAllSells: allSells } });
             return response.data;
         } catch (e) {
             notifyError(`Ha ocurrido un error obteniendo los datos de las ventas de la tienda. Inténtelo nuevamente`)

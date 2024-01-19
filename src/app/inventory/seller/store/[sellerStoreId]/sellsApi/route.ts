@@ -10,8 +10,8 @@ dayjs.extend(utc);
 // GET store products sells
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
-    const storeId = +searchParams.get("sellerStoreId")!;
-    const allSells = searchParams.get("allSells");
+    const storeId = +searchParams.get("storeId")!;
+    const allSells = searchParams.get("loadAllSells");
 
     if (storeId && (allSells === 'true')) {
         const storeAllSells: storeSellsDetailsProps[] | null = await prisma.sells.findMany(
