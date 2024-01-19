@@ -13,8 +13,8 @@ export async function GET(req: Request) {
     const storeId = +searchParams.get("sellerStoreId")!;
     const allSells = searchParams.get("allSells");
 
-    if (storeId && allSells) {
-        const storeAllSells: storeSellsDetailsProps[] = await prisma.sells.findMany(
+    if (storeId && (allSells === 'true')) {
+        const storeAllSells: storeSellsDetailsProps[] | null = await prisma.sells.findMany(
             {
                 where: {
                     OR: [
@@ -23,21 +23,22 @@ export async function GET(req: Request) {
                     ]
                 },
                 include: {
-                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: true } } } } } },
+                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
                     reservations: {
                         where: { reservation_products: { some: { store_depots: { store_id: storeId } } } },
-                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: true } } } } }, }, },
+                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } } } } } } }, }, },
                     }
                 }
             }
         )
         return NextResponse.json(storeAllSells);
     }
+
     if (storeId) {
         const todayStart = dayjs.utc().set("h", 0).set("m", 0).set("s", 0);
         const todayEnd = todayStart.add(1, "day");
 
-        const storeTodaySells: storeSellsDetailsProps[] = await prisma.sells.findMany(
+        const storeTodaySells: storeSellsDetailsProps[] | null = await prisma.sells.findMany(
             {
                 where: {
                     created_at: {
@@ -50,10 +51,10 @@ export async function GET(req: Request) {
                     ]
                 },
                 include: {
-                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: true } } } } } },
+                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
                     reservations: {
                         where: { reservation_products: { some: { store_depots: { store_id: storeId } } } },
-                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: true } } } } }, }, },
+                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } } } } } } }, }, },
                     }
                 }
             }
