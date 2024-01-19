@@ -1,11 +1,8 @@
 import { storeSellsDetailsProps } from '@/types/interfaces';
 import { NextResponse } from 'next/server'
 import logger from '@/utils/logger';
-import utc from "dayjs/plugin/utc";
 import { prisma } from "db";
 import dayjs from "dayjs";
-
-dayjs.extend(utc);
 
 // GET store products sells
 export async function GET(req: Request) {
@@ -32,18 +29,16 @@ export async function GET(req: Request) {
             }
         )
         return NextResponse.json(storeAllSells);
-    }
-
-    if (storeId) {
-        const todayStart = dayjs.utc().set("h", 0).set("m", 0).set("s", 0);
-        const todayEnd = todayStart.add(1, "day");
+    } else if (storeId) {
+        const todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
+        const todayEnd = todayStart.add(24, "hours")
 
         const storeTodaySells: storeSellsDetailsProps[] | null = await prisma.sells.findMany(
             {
                 where: {
                     created_at: {
-                        gte: new Date(todayStart.format("YYYY-MM-DD")),
-                        lt: new Date(todayEnd.format("YYYY-MM-DD")),
+                        gte: new Date(todayStart.format()),
+                        lt: new Date(todayEnd.format()),
                     },
                     OR: [
                         { sell_products: { some: { store_depots: { store_id: storeId } } } },

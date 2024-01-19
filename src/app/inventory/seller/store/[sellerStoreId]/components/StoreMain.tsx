@@ -981,10 +981,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                 <StoreProducts />
                             </Grid>
 
-                            <Grid item xs={12} md={6}>
-                                <SellsModule />
-                            </Grid>
-
                             {
                                 storeDetails.online_reservation && (
                                     <Grid item xs={12} md={6}>
@@ -992,6 +988,10 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     </Grid>
                                 )
                             }
+
+                            <Grid item xs={12} md={6}>
+                                <SellsModule />
+                            </Grid>
 
                             <Grid item xs={12} md={6}>
                                 <TodayTransfers />
