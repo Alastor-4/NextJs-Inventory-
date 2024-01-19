@@ -17,7 +17,7 @@ import {
     TableContainer,
     Table,
     Tooltip,
-    Chip, Collapse, Box, AvatarGroup, Avatar
+    Chip, Collapse, Box, AvatarGroup, Avatar, ToggleButton, ToggleButtonGroup
 } from '@mui/material';
 import { storeSellsDetailsProps } from '@/types/interfaces';
 import React, { useState } from 'react';
@@ -32,6 +32,7 @@ import {
 import { TableNoData } from '@/components/TableNoData';
 import SellsMoreDetails from '../SellsMoreDetails';
 import {images, product_store_transfers, store_depot_transfers} from "@prisma/client";
+import {transactionToStore, transactionToWarehouse} from "@/utils/generalFunctions";
 
 interface ModalTransfersTodayProps {
     isOpen: boolean;
@@ -137,7 +138,7 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                                             </Grid>
 
                                             <Grid container item xs={12} justifyContent={"center"}>
-                                                {transferItem.stores.name}
+                                                {storeId === +transferItem.to_store_id ? "Origen:" : "Destino:"} {transferItem.stores.name}
                                             </Grid>
                                         </Grid>
                                     </TableCell>
@@ -289,7 +290,6 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                 { id: "product", label: "Producto" },
                 { id: "source", label: "Fuente" },
                 { id: "units", label: "Unidades" },
-                { id: "status", label: "Estado" },
             ];
 
             return (
@@ -361,38 +361,19 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                                     <TableCell>
                                         <Grid container>
                                             <Grid container item xs={12} justifyContent={"center"}>
-                                                {storeId === +transferItem.to_store_id
+                                                {transferItem.transfer_direction === transactionToStore
                                                     ? <Mail fontSize={"small"} color={"primary"}/>
                                                     : <ForwardToInbox fontSize={"small"} color={"secondary"}/>
                                                 }
                                             </Grid>
 
                                             <Grid container item xs={12} justifyContent={"center"}>
-                                                {transferItem.stores.name}
+                                                {transferItem.transfer_direction === transactionToStore ? "Origen:" : "Destino:"}
+                                                {transferItem.store_depots.depots.warehouses.name}
                                             </Grid>
                                         </Grid>
                                     </TableCell>
                                     <TableCell>{transferItem.units_transferred_quantity}</TableCell>
-                                    <TableCell>
-                                        <Chip
-                                            variant={"outlined"}
-                                            color={
-                                                transferItem.to_store_accepted
-                                                    ? "success"
-                                                    : transferItem.transfer_cancelled
-                                                        ? "error"
-                                                        : "warning"
-                                            }
-                                            label={
-                                                transferItem.to_store_accepted
-                                                    ? "Aceptada"
-                                                    : transferItem.transfer_cancelled
-                                                        ? "Cancelada"
-                                                        : "Pendiente"
-                                            }
-                                            size={"small"}
-                                        />
-                                    </TableCell>
                                 </TableRow>
                                 <TableRow >
                                     <TableCell style={{ padding: 0 }} colSpan={5}>
@@ -457,8 +438,8 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{storeId === +transferItem.to_store_id ? "Origen" : "Destino"}</Grid>
-                                                    <Grid item xs={true}>{transferItem.stores.name}</Grid>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{transferItem.transfer_direction === transactionToWarehouse ? "Destino" : "Origen"}</Grid>
+                                                    <Grid item xs={true}>{transferItem.store_depots.depots.warehouses.name}</Grid>
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
@@ -504,6 +485,13 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
         )
     }
 
+    const handleChange = (
+        event: React.MouseEvent<HTMLElement>,
+        newValue: boolean,
+    ) => {
+        setDisplayStoreStoreTransfers(newValue);
+    };
+
     return (
         <Dialog open={isOpen} onClose={handleCloseModal} fullScreen>
             <DialogTitle
@@ -528,14 +516,27 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
             <DialogContent dividers >
                 {
                     !!transfersData
-                        ? <>
-                            {
-                                displayStoreStoreTransfers
-                                    ? <StoreToStoreTransfers storeTransfers={transfersData.store}/>
-                                    : <StoreToWarehouseTransfers
-                                        storeWarehouseTransfers={transfersData.warehouseAndStore}/>
-                            }
-                        </> : <TableNoData/>
+                        ? <Grid container rowSpacing={2}>
+                            <Grid item xs={12}>
+                                <ToggleButtonGroup value={displayStoreStoreTransfers} exclusive onChange={handleChange}>
+                                    <ToggleButton value={true} aria-label="tienda-tienda" color={displayStoreStoreTransfers ? "primary" : "standard"}>
+                                        Tienda-Tienda
+                                    </ToggleButton>
+                                    <ToggleButton value={false} aria-label="almacén-tienda" color={displayStoreStoreTransfers ? "standard" : "primary"}>
+                                        Almacén-Tienda
+                                    </ToggleButton>
+                                </ToggleButtonGroup>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                {
+                                    displayStoreStoreTransfers
+                                        ? <StoreToStoreTransfers storeTransfers={transfersData.store}/>
+                                        : <StoreToWarehouseTransfers
+                                            storeWarehouseTransfers={transfersData.warehouseAndStore}/>
+                                }
+                            </Grid>
+                        </Grid> : <TableNoData/>
                 }
             </DialogContent>
             <DialogActions sx={{ marginRight: "15px", marginTop: "5px" }}>
