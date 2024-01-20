@@ -2,12 +2,12 @@
 
 import {
     AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent,
-    Checkbox, Collapse, Divider, Grid, IconButton, InputBase,
+    Collapse, Divider, Grid, IconButton, InputBase,
     Table, TableBody, TableCell, TableContainer, TableHead,
-    TableRow, TextField, Toolbar, Tooltip, Typography
+    TableRow, TextField, Toolbar, Typography
 } from "@mui/material";
 import {
-    Add, AddOutlined, ArrowLeft, ChevronRightOutlined, DeleteOutline,
+    Add, AddOutlined, ArrowLeft, ChevronRightOutlined,
     Done, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined,
     FilterAlt, HelpOutline, ShareOutlined,
 } from "@mui/icons-material";
@@ -273,10 +273,10 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         />
                     </Grid>
 
-                    <Grid item>
-                        <IconButton color={"primary"} onClick={handleNewUnitsAdd}>
-                            <Done />
-                        </IconButton>
+                    <Grid container item justifyContent={"flex-end"}>
+                        <Button color={"primary"} onClick={handleNewUnitsAdd}>
+                            Aceptar
+                        </Button>
                     </Grid>
                 </Grid>
             </Card>
@@ -330,10 +330,10 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         />
                     </Grid>
 
-                    <Grid item>
-                        <IconButton color={"primary"} onClick={handleUpdateUnits}>
-                            <Done />
-                        </IconButton>
+                    <Grid container item justifyContent={"flex-end"}>
+                        <Button color={"primary"} onClick={handleUpdateUnits}>
+                            Aceptar
+                        </Button>
                     </Grid>
                 </Grid>
             </Card>
@@ -502,6 +502,11 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     const TableHeader = () => {
         const headCells = [
             {
+                id: "details",
+                label: "",
+                padding: "checkbox",
+            },
+            {
                 id: "name",
                 label: "Nombre",
             },
@@ -513,29 +518,17 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 id: "units",
                 label: "Unidades",
             },
-            {
-                id: "created_at",
-                label: "Creación",
-            },
-            {
-                id: "details",
-                label: "",
-            },
         ]
 
         return (
             <TableHead>
                 <TableRow>
-                    <TableCell
-                        key={"checkbox"}
-                        padding={'checkbox'}
-                        sx={{ width: "5px" }}
-                    >
-                    </TableCell>
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
-                            padding={'normal'}
+                            // @ts-ignore
+                            padding={headCell.padding ? headCell.padding : 'normal'}
+                            align={"center"}
                         >
                             {headCell.label}
                         </TableCell>
@@ -608,9 +601,8 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
             setStoreDepotUpdateName(storeName)
             setDisplayUpdateDepotQuantityForm(true)
         }
-        function handleExpand(event: React.MouseEvent<HTMLButtonElement | HTMLTableCellElement, MouseEvent>, rowIndex: number) {
-            event.stopPropagation();
 
+        function handleExpand(rowIndex: number) {
             if (rowIndex === expandIndex) return setExpandIndex(null);
 
             return setExpandIndex(rowIndex);
@@ -629,17 +621,22 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                 hover
                                 tabIndex={-1}
                                 selected={!!selectedProduct && (product.id === selectedProduct.id)}
+                                onClick={() => handleExpand(index)}
                                 sx={tableStyles.row}
                             >
                                 <TableCell>
-                                    <Checkbox
+                                    <IconButton
                                         size={"small"}
-                                        checked={!!selectedProduct && (product.id === selectedProduct.id)}
-                                        onClick={() => handleSelectProduct(product)}
-                                        sx={{ width: "5px" }}
-                                    />
+                                        onClick={() => handleExpand(index)}
+                                    >
+                                        {
+                                            expandIndex === index
+                                                ? <ExpandLessOutlined />
+                                                : <ExpandMoreOutlined />
+                                        }
+                                    </IconButton>
                                 </TableCell>
-                                <TableCell onClick={(event) => handleExpand(event, index)}>
+                                <TableCell>
                                     {
                                         product.images?.length! > 0 && (
                                             <Box display={"flex"} justifyContent={"center"}>
@@ -665,13 +662,11 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                         )
                                     }
 
-                                    <Box display={"flex"}>
+                                    <Box display={"flex"} justifyContent={"center"}>
                                         {product.name}
                                     </Box>
                                 </TableCell>
-                                <TableCell
-                                    onClick={(event) => handleExpand(event, index)}
-                                >
+                                <TableCell>
                                     <Box display={"flex"}>
                                         {product.departments?.name ?? "-"}
                                     </Box>
@@ -696,23 +691,6 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                             </IconButton>
                                         </Grid>
                                     </Grid>
-                                </TableCell>
-                                <TableCell onClick={(event) => handleExpand(event, index)}>
-                                    {dayjs(product.depots![0].created_at).format("DD/MM/YYYY HH:MM")}
-                                </TableCell>
-                                <TableCell>
-                                    <Tooltip title={"Detalles"}>
-                                        <IconButton
-                                            size={"small"}
-                                            onClick={(event) => handleExpand(event, index)}
-                                        >
-                                            {
-                                                expandIndex === index
-                                                    ? <ExpandLessOutlined />
-                                                    : <ExpandMoreOutlined />
-                                            }
-                                        </IconButton>
-                                    </Tooltip>
                                 </TableCell>
                             </TableRow>
 
@@ -911,7 +889,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         </UpdateValueDialog>
 
                         <UpdateValueDialog
-                            dialogTitle={"Enviar productos a " + storeDepotUpdateName}
+                            dialogTitle={"Redistribuir productos"}
                             open={displayUpdateDepotQuantityForm}
                             setOpen={setDisplayUpdateDepotQuantityForm}
                             formik={formik}

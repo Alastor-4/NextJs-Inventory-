@@ -3,10 +3,18 @@
 import {
     Avatar, AvatarGroup, Button, Card, CardContent, Collapse,
     Grid, IconButton, InputBase, Table, TableBody, TableCell,
-    TableContainer, TableHead, TableRow, Tooltip, Typography
+    TableContainer, TableHead, TableRow, Typography
 } from '@mui/material';
 import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse';
-import { EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, FilterAlt, HelpOutline, RemoveOutlined, } from '@mui/icons-material';
+import {
+    AddOutlined,
+    EditOutlined,
+    ExpandLessOutlined,
+    ExpandMoreOutlined,
+    FilterAlt,
+    HelpOutline,
+    RemoveOutlined,
+} from '@mui/icons-material';
 import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
 import FilterProductsByDepartmentsModal from '@/components/modals/FilterProductsByDepartmentsModal';
@@ -165,20 +173,21 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
     const TableHeader = () => {
         const headCells = [
             {
+                id: "more_details",
+                label: "",
+                padding: "checkbox"
+            },
+            {
                 id: "name",
                 label: "Nombre",
             },
             {
                 id: "store_units",
-                label: "Unidades restantes",
+                label: "Unidades",
             },
             {
                 id: "remove",
-                label: "Retirar al almacén",
-            },
-            {
-                id: "more_details",
-                label: "",
+                label: "Retirar",
             },
         ];
 
@@ -188,8 +197,9 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
-                            align={"left"}
-                            padding={'normal'}
+                            align={"center"}
+                            // @ts-ignore
+                            padding={headCell.padding ? headCell.padding : "normal"}
                         >
                             {headCell.label}
                         </TableCell>
@@ -213,6 +223,20 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                         tabIndex={-1}
                                         onClick={() => setShowDetails((showDetails !== index) ? index : -1)}
                                     >
+                                        <TableCell style={{ padding: 0 }}>
+                                            <IconButton
+                                                size={"small"}
+                                                sx={{ m: "3px" }}
+                                                onClick={() => setShowDetails((showDetails !== index) ? index : -1)}
+                                            >
+                                                {
+                                                    (showDetails !== index)
+                                                        ? <ExpandMoreOutlined />
+                                                        : <ExpandLessOutlined />
+                                                }
+                                            </IconButton>
+                                        </TableCell>
+
                                         <TableCell>
                                             <Grid container>
                                                 {
@@ -269,28 +293,12 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                         </TableCell>
 
                                         <TableCell >
-                                            <IconButton color={"primary"} onClick={(e) => {
+                                            <IconButton color={"warning"} onClick={(e) => {
                                                 e.stopPropagation();
                                                 removeProduct(index);
                                             }}>
                                                 <RemoveOutlined />
                                             </IconButton>
-                                        </TableCell>
-
-                                        <TableCell style={{ padding: 0 }} colSpan={5}>
-                                            <Tooltip title={"Detalles"}>
-                                                <IconButton
-                                                    size={"small"}
-                                                    sx={{ m: "3px" }}
-                                                    onClick={() => setShowDetails((showDetails !== index) ? index : -1)}
-                                                >
-                                                    {
-                                                        (showDetails !== index)
-                                                            ? <ExpandMoreOutlined />
-                                                            : <ExpandLessOutlined />
-                                                    }
-                                                </IconButton>
-                                            </Tooltip>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow >
@@ -440,18 +448,23 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                             images={dialogImages}
                         />
 
-                        <CardContent>
+                        <CardContent sx={{padding: "7px"}}>
                             <Grid container item xs={12} justifyContent={"space-between"}>
-                                <Grid item xs={6} md={10}>
+                                <Grid item xs={8} md={10}>
                                     <Typography variant={"subtitle1"}>Productos en tienda</Typography>
                                 </Grid>
-                                <Grid item xs={6} md={2}>
-                                    <Button size={"small"} variant={"contained"} onClick={() => setActiveAddProductFromWarehouse(true)}>
-                                        Agregar nuevo
+                                <Grid item xs={4} md={2}>
+                                    <Button
+                                        size={"small"}
+                                        variant={"contained"}
+                                        startIcon={<AddOutlined fontSize={"small"}/>}
+                                        onClick={() => setActiveAddProductFromWarehouse(true)}
+                                    >
+                                        Nuevo
                                     </Button>
                                 </Grid>
                             </Grid>
-                            <Card variant={"outlined"} sx={{ padding: "10px", marginY: "10px" }}>
+                            <Card variant={"outlined"} sx={{ padding: "10px", mt: "10px", mb: "20px" }}>
                                 <Grid item container alignItems="center" justifyContent="center" sx={{ marginTop: "-10px" }}>
                                     <Grid container item xs={"auto"} alignItems={"center"} >
                                         <Typography variant="subtitle1" sx={{ fontWeight: "400" }}>Búsqueda avanzada</Typography>
@@ -476,7 +489,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                             </Grid>
                                             <Grid item width="100%" paddingLeft="35px" >
                                                 <InputBase
-                                                    placeholder="Buscar depósito..."
+                                                    placeholder="Buscar producto..."
                                                     inputProps={{ 'aria-label': 'search' }}
                                                     {...formik.getFieldProps("searchBarValue")}
                                                 />
@@ -488,11 +501,10 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                     </Grid>
                                 </Grid>
                             </Card>
-                            <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
-                                <Grid container rowSpacing={2}>
-                                    {
-                                        dataProducts?.length! > 0
-                                            ? (dataProducts?.filter(
+                            <Grid container rowSpacing={2}>
+                                {
+                                    dataProducts?.length! > 0
+                                        ? (dataProducts?.filter(
                                                 (product: productsProps) =>
                                                     product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                                                     product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
@@ -502,12 +514,11 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         <TableContent formik={formik} />
                                                     </Table>
                                                 </TableContainer>) : <TableNoData searchCoincidence />
-                                            ) : (
-                                                <TableNoData hasData={depotsInStore!} />
-                                            )
-                                    }
-                                </Grid>
-                            </Card>
+                                        ) : (
+                                            <TableNoData hasData={depotsInStore!} />
+                                        )
+                                }
+                            </Grid>
                         </CardContent>
                     </Card>
                 )

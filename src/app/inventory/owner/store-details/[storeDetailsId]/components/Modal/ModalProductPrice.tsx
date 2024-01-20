@@ -156,9 +156,7 @@ const ModalProductPrice = ({ activeModalPrice, setActiveModalPrice, dialogTitle,
                                                 formik.setFieldValue("currency", e.target.value);
                                             }}
                                         >
-                                            <MenuItem value={"CUP"} >CUP</MenuItem>
-                                            <MenuItem value={"MLC"} >MLC</MenuItem>
-                                            <MenuItem value={"USD"} >USD</MenuItem>
+                                            <MenuItem value={"CUP"}>CUP</MenuItem>
                                         </TextField>
                                     </Grid>
                                 </Grid>

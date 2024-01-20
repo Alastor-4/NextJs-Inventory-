@@ -228,7 +228,7 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                                         </Box>
                                     )
                                 }
-                                <Box display={"flex"}>
+                                <Box display={"flex"} justifyContent={"center"}>
                                     {product.name}
                                 </Box>
                             </TableCell>

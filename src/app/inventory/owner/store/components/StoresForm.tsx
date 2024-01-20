@@ -483,7 +483,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                             />
                         </Grid>
 
-                        <Grid item container xs={12}>
+                        {/*<Grid item container xs={12}>
                             <FormControlLabel
                                 label={"Mostrar catálogo en línea"}
                                 control={
@@ -517,7 +517,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                                     />
                                 </Grid>
                             )
-                        }
+                        }*/}
 
                         <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                             <Button
