@@ -154,6 +154,11 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     const TableHeader = () => {
         const headCells = [
             {
+                id: "details",
+                label: "",
+                padding: "checkbox",
+            },
+            {
                 id: "name",
                 label: "Nombre",
             },
@@ -173,10 +178,6 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                 id: "Active",
                 label: "Estado",
             },
-            {
-                id: "details",
-                label: "",
-            },
         ]
 
         return (
@@ -185,8 +186,9 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
-                            align={"left"}
-                            padding={'normal'}
+                            align={"center"}
+                            // @ts-ignore
+                            padding={headCell.padding ? headCell.padding : "normal"}
                         >
                             {headCell.label}
                         </TableCell>
@@ -279,6 +281,21 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                             tabIndex={-1}
                                             onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
                                         >
+                                            <TableCell style={{ padding: 0 }}>
+                                                <Tooltip title={"Detalles"}>
+                                                    <IconButton
+                                                        size={"small"}
+                                                        sx={{ m: "3px" }}
+                                                        onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
+                                                    >
+                                                        {
+                                                            (showDetails !== product.id)
+                                                                ? <ExpandMoreOutlined />
+                                                                : <ExpandLessOutlined />
+                                                        }
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </TableCell>
                                             <TableCell>
                                                 {
                                                     product.images?.length! > 0 && (
@@ -340,7 +357,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                                     }
                                                 </Grid>
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell align={"center"}>
                                                 {product?.depots![0].store_depots![0].product_remaining_units}
                                             </TableCell>
                                             <TableCell>
@@ -366,21 +383,6 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                                         />
                                                     </Grid>
                                                 </Grid>
-                                            </TableCell>
-                                            <TableCell style={{ padding: 0 }} colSpan={5}>
-                                                <Tooltip title={"Detalles"}>
-                                                    <IconButton
-                                                        size={"small"}
-                                                        sx={{ m: "3px" }}
-                                                        onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
-                                                    >
-                                                        {
-                                                            (showDetails !== product.id)
-                                                                ? <ExpandMoreOutlined />
-                                                                : <ExpandLessOutlined />
-                                                        }
-                                                    </IconButton>
-                                                </Tooltip>
                                             </TableCell>
                                         </TableRow>
                                         <TableRow >
