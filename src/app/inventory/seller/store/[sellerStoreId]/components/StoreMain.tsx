@@ -988,13 +988,13 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                 <StoreProducts />
                             </Grid>
 
-                            {
+                            {/*{
                                 storeDetails.online_reservation && (
                                     <Grid item xs={12} md={6}>
                                         <StoreReservation />
                                     </Grid>
                                 )
-                            }
+                            }*/}
 
                             <Grid item xs={12} md={6}>
                                 <SellsModule />
@@ -1004,21 +1004,21 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                 <TodayTransfers />
                             </Grid>
 
-                            <Grid item xs={12} md={6}>
+                            {/*<Grid item xs={12} md={6}>
                                 <StoreCollections />
-                            </Grid>
+                            </Grid>*/}
 
                             <Grid item xs={12} md={6}>
                                 <StoreHours />
                             </Grid>
 
-                            {
+                            {/*{
                                 storeDetails.online_reservation && (
                                     <Grid item xs={12} md={6}>
                                         <ReservationHours />
                                     </Grid>
                                 )
-                            }
+                            }*/}
                         </Grid>
                     </CardContent>
                 )
