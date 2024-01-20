@@ -273,10 +273,10 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         />
                     </Grid>
 
-                    <Grid item>
-                        <IconButton color={"primary"} onClick={handleNewUnitsAdd}>
-                            <Done />
-                        </IconButton>
+                    <Grid container item justifyContent={"flex-end"}>
+                        <Button color={"primary"} onClick={handleNewUnitsAdd}>
+                            Aceptar
+                        </Button>
                     </Grid>
                 </Grid>
             </Card>
@@ -330,10 +330,10 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                         />
                     </Grid>
 
-                    <Grid item>
-                        <IconButton color={"primary"} onClick={handleUpdateUnits}>
-                            <Done />
-                        </IconButton>
+                    <Grid container item justifyContent={"flex-end"}>
+                        <Button color={"primary"} onClick={handleUpdateUnits}>
+                            Aceptar
+                        </Button>
                     </Grid>
                 </Grid>
             </Card>
