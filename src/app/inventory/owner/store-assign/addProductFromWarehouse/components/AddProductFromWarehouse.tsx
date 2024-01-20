@@ -181,7 +181,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
             },
             {
                 id: "store_units",
-                label: "Cantidad disponible",
+                label: "Cantidad",
             },
             {
                 id: "more_details",
@@ -196,16 +196,12 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                     <TableCell
                         key={"checkbox"}
                         padding={'checkbox'}
-                        sx={{ width: '5px' }}
-                    >
-
-                    </TableCell>
+                    />
 
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
                             align={"left"}
-                        // padding={'normal'}
                         >
                             {headCell.label}
                         </TableCell>
@@ -238,7 +234,6 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                                         size='small'
                                         checked={selectedDepot === index}
                                         onClick={() => setSelectedDepot(selectedDepot === index ? undefined : index)}
-                                        sx={{ width: "5px" }}
                                     />
                                 </TableCell>
 
@@ -268,7 +263,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                                         )
                                     }
 
-                                    <Box display={"flex"}>
+                                    <Box display={"flex"} justifyContent={"center"}>
                                         {row.products.name}
                                     </Box>
                                 </TableCell>
@@ -277,20 +272,18 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                                     {row.product_total_remaining_units}
                                 </TableCell>
 
-                                <TableCell style={{ padding: 0 }} colSpan={5}>
-                                    <Tooltip title={"Detalles"}>
-                                        <IconButton
-                                            size={"small"}
-                                            sx={{ m: "3px" }}
-                                            onClick={() => setShowDetails((showDetails !== row.id) ? row.id : '')}
-                                        >
-                                            {
-                                                (showDetails !== row.id)
-                                                    ? <ExpandMoreOutlined />
-                                                    : <ExpandLessOutlined />
-                                            }
-                                        </IconButton>
-                                    </Tooltip>
+                                <TableCell>
+                                    <IconButton
+                                        size={"small"}
+                                        sx={{ m: "3px" }}
+                                        onClick={() => setShowDetails((showDetails !== row.id) ? row.id : '')}
+                                    >
+                                        {
+                                            (showDetails !== row.id)
+                                                ? <ExpandMoreOutlined />
+                                                : <ExpandLessOutlined />
+                                        }
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                             <TableRow>

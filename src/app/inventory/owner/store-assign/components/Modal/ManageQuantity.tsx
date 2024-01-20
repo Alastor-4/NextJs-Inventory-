@@ -65,7 +65,7 @@ function ManageQuantity({
 
     return (
         <>
-            <Grid container direction={'column'} rowGap={3}>
+            <Grid container direction={'column'} rowGap={1}>
                 <Stack alignItems={"center"}>
                     <Typography variant='h6'>Unidades</Typography>
                 </Stack>
@@ -82,7 +82,7 @@ function ManageQuantity({
 
                 <Grid item container direction="column" alignItems="center" justifyContent={"space-around"}>
                     <Stack spacing={1} alignItems="center" margin={1}>
-                        <small>{`Proveedor ( ${!swap ? "Almacén" : "Tienda"}  )`}</small>
+                        {`Proveedor ${!swap ? "Almacén" : "Tienda"}`}
                         <Box>{!swap ? nameWarehouse : nameStore}</Box>
                     </Stack>
                     <Grid item margin={1}>
@@ -91,7 +91,7 @@ function ManageQuantity({
                         </IconButton>
                     </Grid>
                     <Stack spacing={1} alignItems="center" margin={1}>
-                        <small>{`Destinatario ( ${!swap ? "Tienda" : "Almacén"}  )`}</small>
+                        {`Destinatario ${!swap ? "Tienda" : "Almacén"}`}
                         <Box>{!swap ? nameStore : nameWarehouse}</Box>
                     </Stack>
                 </Grid>
