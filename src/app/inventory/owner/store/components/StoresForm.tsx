@@ -435,46 +435,47 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                             </TextField>
                         </Grid>
 
+                        {formik.values.sellerUser &&
+                            <Grid item xs={12}>
+                                {
+                                    sellProfit
+                                        ? editPercentage(formik)
+                                        : editQuantity(formik)
+                                }
 
-                        <Grid item xs={12}>
-                            {
-                                sellProfit
-                                    ? editPercentage(formik)
-                                    : editQuantity(formik)
-                            }
-
-                            <Grid item container>
-                                <Grid item>
-                                    <Grid item container>
-                                        <Grid item >
-                                            <Checkbox
-                                                size="small"
-                                                checked={sellProfit}
-                                                onClick={() => setSellProfit(true)}
-                                            />
-                                        </Grid>
-                                        <Grid item alignSelf={"center"}>
-                                            <Typography variant="subtitle2">Porcentaje</Typography>
+                                <Grid item container>
+                                    <Grid item>
+                                        <Grid item container>
+                                            <Grid item >
+                                                <Checkbox
+                                                    size="small"
+                                                    checked={sellProfit}
+                                                    onClick={() => setSellProfit(true)}
+                                                />
+                                            </Grid>
+                                            <Grid item alignSelf={"center"}>
+                                                <Typography variant="subtitle2">Porcentaje</Typography>
+                                            </Grid>
                                         </Grid>
                                     </Grid>
-                                </Grid>
 
-                                <Grid item>
-                                    <Grid item container>
-                                        <Grid item >
-                                            <Checkbox
-                                                size="small"
-                                                checked={!sellProfit}
-                                                onClick={() => setSellProfit(false)}
-                                            />
-                                        </Grid>
-                                        <Grid item alignSelf={"center"} >
-                                            <Typography variant="subtitle2">Cantidad</Typography>
+                                    <Grid item>
+                                        <Grid item container>
+                                            <Grid item >
+                                                <Checkbox
+                                                    size="small"
+                                                    checked={!sellProfit}
+                                                    onClick={() => setSellProfit(false)}
+                                                />
+                                            </Grid>
+                                            <Grid item alignSelf={"center"} >
+                                                <Typography variant="subtitle2">Cantidad</Typography>
+                                            </Grid>
                                         </Grid>
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
+                        }
 
                         <Grid item xs={12}>
                             <StoreOpeningDays
