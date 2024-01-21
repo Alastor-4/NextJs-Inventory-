@@ -2,7 +2,7 @@
 
 import {
     AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent,
-    Collapse, Divider, Grid, IconButton, InputBase,
+    Collapse, DialogActions, Divider, Grid, IconButton, InputBase,
     Table, TableBody, TableCell, TableContainer, TableHead,
     TableRow, TextField, Toolbar, Typography
 } from "@mui/material";
@@ -268,6 +268,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             label="Nuevas unidades"
                             size={"small"}
                             onKeyDown={handleKeyDown}
+                            inputMode="numeric"
                             {...formik.getFieldProps("productNewUnitsQuantity")}
                             error={formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity}
                             helperText={(formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity) && formik.errors.productNewUnitsQuantity}
@@ -303,41 +304,49 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 setDisplayUpdateUnitsForm(false);
             }
         }
+        const handleClose = () => {
+            setDisplayUpdateUnitsForm(false);
+        };
 
         return (
-            <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
-                <Grid container item spacing={2}>
-                    <Grid item>
-                        <TextField
-                            name={"updateTotalUnitsQuantity"}
-                            label="Total de unidades"
-                            size={"small"}
-                            onKeyDown={handleKeyDown}
-                            {...formik.getFieldProps("updateTotalUnitsQuantity")}
-                            error={formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity}
-                            helperText={(formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity) && formik.errors.updateTotalUnitsQuantity}
-                        />
-                    </Grid>
-
-                    <Grid item>
-                        <TextField
-                            name={"updateRemainingUnitsQuantity"}
-                            label="Unidades restantes"
-                            size={"small"}
-                            onKeyDown={handleKeyDown}
-                            {...formik.getFieldProps("updateRemainingUnitsQuantity")}
-                            error={formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity}
-                            helperText={(formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity) && formik.errors.updateRemainingUnitsQuantity}
-                        />
-                    </Grid>
-
-                    <Grid container item justifyContent={"flex-end"}>
-                        <Button color={"primary"} onClick={handleUpdateUnits}>
-                            Aceptar
-                        </Button>
-                    </Grid>
+            <Grid container item spacing={2} marginTop={"5px"} >
+                <Grid item xs={6}>
+                    <TextField
+                        name={"updateTotalUnitsQuantity"}
+                        label="Total de unidades"
+                        size={"small"}
+                        inputMode="numeric"
+                        onKeyDown={handleKeyDown}
+                        {...formik.getFieldProps("updateTotalUnitsQuantity")}
+                        error={formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity}
+                        helperText={(formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity) && formik.errors.updateTotalUnitsQuantity}
+                    />
                 </Grid>
-            </Card>
+
+                <Grid item xs={6}>
+                    <TextField
+                        name={"updateRemainingUnitsQuantity"}
+                        label="Unidades restantes"
+                        size={"small"}
+                        inputMode="numeric"
+                        onKeyDown={handleKeyDown}
+                        {...formik.getFieldProps("updateRemainingUnitsQuantity")}
+                        error={formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity}
+                        helperText={(formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity) && formik.errors.updateRemainingUnitsQuantity}
+                    />
+                </Grid>
+                <Grid container item justifyContent={"flex-end"}>
+                    <DialogActions >
+                        <Button color="error" variant="outlined" onClick={handleClose}>Cerrar</Button>
+                        <Button
+                            onClick={handleUpdateUnits}
+                            color="primary"
+                            disabled={!formik.values.updateTotalUnitsQuantity || !formik.values.updateRemainingUnitsQuantity}
+                            variant="outlined">Aceptar
+                        </Button>
+                    </DialogActions>
+                </Grid>
+            </Grid>
         )
     }
 
