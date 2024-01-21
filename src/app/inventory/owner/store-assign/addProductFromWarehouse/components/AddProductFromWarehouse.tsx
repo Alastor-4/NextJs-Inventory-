@@ -175,19 +175,9 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
 
     const TableHeader = () => {
         const headCells = [
-            {
-                id: "name",
-                label: "Nombre",
-            },
-            {
-                id: "store_units",
-                label: "Cantidad",
-            },
-            {
-                id: "more_details",
-                label: "",
-            },
-
+            { id: "name", label: "Nombre", },
+            { id: "store_units", label: "Cantidad", },
+            { id: "more_details", label: "", },
         ]
 
         return (

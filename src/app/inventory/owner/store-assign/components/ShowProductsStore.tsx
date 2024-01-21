@@ -28,6 +28,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import InfoTooltip from '@/components/InfoTooltip';
 import storeAssign from '../requests/store-assign';
 import React, { useEffect, useState } from 'react'
+import { grey } from '@mui/material/colors';
 import { AxiosResponse } from 'axios';
 import { Formik } from 'formik';
 
@@ -448,7 +449,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                             images={dialogImages}
                         />
 
-                        <CardContent sx={{padding: "7px"}}>
+                        <CardContent sx={{ padding: "7px" }}>
                             <Grid container item xs={12} justifyContent={"space-between"}>
                                 <Grid item xs={8} md={10}>
                                     <Typography variant={"subtitle1"}>Productos en tienda</Typography>
@@ -457,7 +458,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                     <Button
                                         size={"small"}
                                         variant={"contained"}
-                                        startIcon={<AddOutlined fontSize={"small"}/>}
+                                        startIcon={<AddOutlined fontSize={"small"} />}
                                         onClick={() => setActiveAddProductFromWarehouse(true)}
                                     >
                                         Nuevo
@@ -497,7 +498,15 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                         </Grid>
                                     </Grid>
                                     <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
-                                        <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                        <Button size="small"
+                                            sx={{
+                                                color: grey[600],
+                                                borderColor: grey[600],
+                                                '&:hover': {
+                                                    borderColor: grey[800],
+                                                    backgroundColor: grey[200],
+                                                },
+                                            }} onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
                                     </Grid>
                                 </Grid>
                             </Card>
@@ -505,15 +514,15 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                 {
                                     dataProducts?.length! > 0
                                         ? (dataProducts?.filter(
-                                                (product: productsProps) =>
-                                                    product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
-                                                    product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
-                                                (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
-                                                    <Table sx={{ width: "100%" }} size={"small"}>
-                                                        <TableHeader />
-                                                        <TableContent formik={formik} />
-                                                    </Table>
-                                                </TableContainer>) : <TableNoData searchCoincidence />
+                                            (product: productsProps) =>
+                                                product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                                                product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
+                                            (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
+                                                <Table sx={{ width: "100%" }} size={"small"}>
+                                                    <TableHeader />
+                                                    <TableContent formik={formik} />
+                                                </Table>
+                                            </TableContainer>) : <TableNoData searchCoincidence />
                                         ) : (
                                             <TableNoData hasData={depotsInStore!} />
                                         )
