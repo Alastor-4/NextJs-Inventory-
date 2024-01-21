@@ -30,12 +30,14 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import { AddOutlined, ArrowLeft, ChangeCircleOutlined, DeleteOutline } from "@mui/icons-material";
+import { AddOutlined, ArrowLeft, ChangeCircleOutlined, Close, DeleteOutline } from "@mui/icons-material";
 import { TableNoData } from "@/components/TableNoData";
 import ownerUsers from "../requests/ownerUsers";
 import { roles, users } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { getRoleTranslation } from '../../../../../utils/getRoleTranslation';
+import { getColorByRole } from "@/utils/getColorbyRole";
 
 interface WorkersMainTableProps {
     roles: roles[];
@@ -79,43 +81,61 @@ export default function WorkersMainTable({ roles, userId }: WorkersMainTableProp
 
     const ChangeRoleDialog = () => {
 
-        const [selectedRole, setSelectedRole] = useState<string>(`${selectedWorker?.role_id!}`);
+        const [selectedRole, setSelectedRole] = useState<{ roleCode: string, roleTranslation: string }>({ roleCode: `${selectedWorker?.role_id!}`, roleTranslation: getRoleTranslation(`${selectedWorker?.role_id!}`) });
 
-        const handleChange = (event: SelectChangeEvent<typeof selectedRole>) => {
-            setSelectedRole(event.target.value!);
+        const handleChange = (event: SelectChangeEvent<typeof selectedRole.roleCode>) => {
+            setSelectedRole({ roleCode: event.target.value!.toString(), roleTranslation: getRoleTranslation(event.target.value!.toString()) });
         };
 
         const handleClose = () => setIsOpenDialog(false);
 
         const handleApplyRole = async () => {
-            const response = await ownerUsers.changeRol(selectedWorker?.id, +selectedRole);
+            const response = await ownerUsers.changeRol(selectedWorker?.id, +selectedRole.roleCode);
             if (response) await refreshAfterAction();
             handleClose()
         }
 
         return (
             <Dialog open={isOpenDialog} onClose={handleClose}>
-                <DialogTitle>{`Cambiar rol de "${selectedWorker ? selectedWorker.username : ""}"`}</DialogTitle>
+                <DialogTitle
+                    display={"flex"}
+                    justifyContent={"space-between"}
+                    alignItems={"center"}
+                    color={"white"}
+                    fontWeight={"400"}
+                    sx={{ bgcolor: '#1976d3' }}
+                >
+                    {`Cambiar rol de "${selectedWorker ? selectedWorker.username : ""}"`}
+                    <IconButton
+                        edge="start"
+                        color="inherit"
+                        onClick={handleClose}
+                        aria-label="close"
+                        sx={{ marginLeft: "10px" }}
+                    >
+                        <Close />
+                    </IconButton>
+                </DialogTitle>
                 <DialogContent>
-                    <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                    <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap', marginTop: "15px" }}>
                         <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
                             <InputLabel id="dialog-select-label">Rol</InputLabel>
                             <Select
                                 labelId="dialog-select-label"
                                 id="dialog-select-label"
-                                value={selectedRole}
+                                value={selectedRole.roleCode}
                                 onChange={handleChange}
                                 input={<OutlinedInput label="Rol" fullWidth />}
                                 fullWidth
                             >
-                                {roles.map((role: roles) => <MenuItem key={role.id} value={role.id}>{role.name}</MenuItem>)}
+                                {roles.map((role: roles) => <MenuItem key={role.id} value={role.id}>{getRoleTranslation(role.name!)}</MenuItem>)}
                             </Select>
                         </FormControl>
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancelar</Button>
-                    <Button color={"primary"} disabled={!selectedRole} onClick={handleApplyRole}>Cambiar</Button>
+                    <Button color="error" variant="outlined" onClick={handleClose}>Cancelar</Button>
+                    <Button color="primary" disabled={!selectedRole} onClick={handleApplyRole} variant="outlined" type='submit'>Cambiar</Button>
                 </DialogActions>
             </Dialog>
         );
@@ -178,31 +198,11 @@ export default function WorkersMainTable({ roles, userId }: WorkersMainTableProp
 
     const TableHeader = () => {
         const headCells = [
-            {
-                id: "username",
-                label: "Usuario",
-                align: "left"
-            },
-            {
-                id: "name",
-                label: "Nombre",
-                align: "left"
-            },
-            {
-                id: "mail",
-                label: "Correo",
-                align: "left"
-            },
-            {
-                id: "phone",
-                label: "Teléfono",
-                align: "left"
-            },
-            {
-                id: "role_id",
-                label: "Role",
-                align: "left"
-            },
+            { id: "username", label: "Usuario", },
+            { id: "name", label: "Nombre", },
+            { id: "mail", label: "Correo", },
+            { id: "phone", label: "Teléfono", },
+            { id: "role_id", label: "Rol", },
         ]
 
         return (
@@ -213,7 +213,6 @@ export default function WorkersMainTable({ roles, userId }: WorkersMainTableProp
                         align={"left"}
                         padding={'checkbox'}
                     >
-
                     </TableCell>
                     {headCells.map(headCell => (
                         <TableCell
@@ -230,25 +229,6 @@ export default function WorkersMainTable({ roles, userId }: WorkersMainTableProp
     }
 
     const TableContent = () => {
-        function getColorByRole(roleName: string) {
-            switch (roleName) {
-                case "admin":
-                    return "primary"
-
-                case "store_owner":
-                    return "secondary"
-
-                case "store_keeper":
-                    return "error"
-
-                case "store_seller":
-                    return "success"
-
-                default:
-                    return "info"
-            }
-        }
-
         return (
             <TableBody>
                 {dataWorkers?.map((worker) => (
@@ -260,7 +240,8 @@ export default function WorkersMainTable({ roles, userId }: WorkersMainTableProp
                         onClick={() => handleSelectItem(worker)}
                     >
                         <TableCell>
-                            <Checkbox size={"small"} checked={!!selectedWorker && (worker.id === selectedWorker.id)} />
+                            <Checkbox size={"small"}
+                                checked={!!selectedWorker && (worker.id === selectedWorker.id)} />
                         </TableCell>
                         <TableCell>{worker.username}</TableCell>
                         <TableCell>{worker.name}</TableCell>
@@ -271,7 +252,7 @@ export default function WorkersMainTable({ roles, userId }: WorkersMainTableProp
                                 worker.roles ? (
                                     <Chip
                                         size={"small"}
-                                        label={worker.roles.name}
+                                        label={getRoleTranslation(worker.roles.name!)}
                                         color={getColorByRole(worker.roles.name!)}
                                         sx={{ border: "1px solid lightGreen" }}
                                     />) : "-"
