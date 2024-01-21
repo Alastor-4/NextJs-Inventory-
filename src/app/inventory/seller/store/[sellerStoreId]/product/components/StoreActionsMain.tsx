@@ -45,7 +45,7 @@ import { useRouter } from "next/navigation";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import {CustomTooltip, InfoTag, MoneyInfoTag} from "@/components/InfoTags";
+import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import {
     computeDepotPricePerUnit,
     notifyError,
@@ -60,7 +60,8 @@ import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import InfoTooltip from "@/components/InfoTooltip";
-import {images} from "@prisma/client";
+import { images } from "@prisma/client";
+import { grey } from "@mui/material/colors";
 
 export default function StoreActionsMain({ userId, storeId }: { userId: number, storeId: string }) {
     const router = useRouter()
@@ -158,36 +159,12 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
 
     const TableHeader = () => {
         const headCells = [
-            {
-                id: "name",
-                label: "Nombre",
-                align: "left"
-            },
-            {
-                id: "department",
-                label: "Departamento",
-                align: "left"
-            },
-            {
-                id: "price",
-                label: "Precio",
-                align: "left"
-            },
-            {
-                id: "status",
-                label: "Disponibles",
-                align: "left"
-            }, {
-                id: "activate_sale",
-                label: "Estado",
-                align: "left"
-            },
-            {
-                id: "sale_of_a_product",
-                label: "",
-                align: "left"
-            },
-
+            { id: "name", label: "Nombre", },
+            { id: "department", label: "Departamento", },
+            { id: "price", label: "Precio", },
+            { id: "status", label: "Disponibles", },
+            { id: "activate_sale", label: "Estado", },
+            { id: "sale_of_a_product", label: "", },
         ]
 
         return (
@@ -201,7 +178,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                     {headCells.map((headCell: any) => (
                         <TableCell
                             key={headCell.id}
-                            align={"left"}
+                            align={"center"}
                             padding={"normal"}
                         >
                             {headCell.label}
@@ -387,7 +364,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                         container
                         item
                         xs={12}
-                        sx={{ color: "rgba(16,27,44,0.8)", textWrap: "pretty"}}>
+                        sx={{ color: "rgba(16,27,44,0.8)", textWrap: "pretty" }}>
                         {
                             item.compare_function === '='
                                 ? `${index + 1}. Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`
@@ -494,14 +471,9 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                     </Box>
                                                 )
                                             }
-                                            <Box display={"flex"} justifyContent={"center"}>
-                                                {row.name}
-                                            </Box>
+                                            <Box display={"flex"} justifyContent={"center"}>{row.name}</Box>
                                         </TableCell>
-
-                                        <TableCell>
-                                            {row?.departments?.name ?? "-"}
-                                        </TableCell>
+                                        <TableCell align="center">{row?.departments?.name ?? "-"}</TableCell>
                                         <TableCell>
                                             <Grid container rowSpacing={1}>
                                                 <Grid container item xs={12} flexWrap={"nowrap"} alignItems={"center"}>
@@ -530,27 +502,25 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                 }
                                             </Grid>
                                         </TableCell>
-                                        <TableCell>
-                                            <Grid container alignItems={"center"}>
-                                                <Box
-                                                    sx={
-                                                        {
-                                                            display: "inline-flex",
-                                                            justifyContent: "center",
-                                                            alignItems: "center",
-                                                            padding: "2px 4px",
-                                                            color: "darkblue",
-                                                            backgroundColor: "lightgrey",
-                                                            borderRadius: "6px",
-                                                            border: "1px solid black",
-                                                            fontSize: "18px"
-                                                        }
-                                                    }>
-                                                    {row.depots[0].store_depots[0].product_remaining_units}
-                                                </Box>
-                                            </Grid>
+                                        <TableCell align="center">
+                                            <Box
+                                                sx={
+                                                    {
+                                                        display: "inline-flex",
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
+                                                        padding: "2px 4px",
+                                                        color: "darkblue",
+                                                        backgroundColor: "lightgrey",
+                                                        borderRadius: "6px",
+                                                        border: "1px solid black",
+                                                        fontSize: "18px"
+                                                    }
+                                                }>
+                                                {row.depots[0].store_depots[0].product_remaining_units}
+                                            </Box>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell sx={{ whiteSpace: "nowrap" }}>
                                             <Grid container >
                                                 <Grid container item xs={12} justifyContent={"center"}>
                                                     <Typography variant={"button"}>
@@ -638,12 +608,12 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                                     >
                                                                         <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
                                                                             <Typography variant={"caption"}
-                                                                                        sx={{ color: "white", fontWeight: "600" }}>
+                                                                                sx={{ color: "white", fontWeight: "600" }}>
                                                                                 {item.name.toUpperCase()}
                                                                             </Typography>
                                                                         </Grid>
                                                                         <Grid container item alignItems={"center"}
-                                                                              sx={{ color: "rgba(16,27,44,0.8)" }}>
+                                                                            sx={{ color: "rgba(16,27,44,0.8)" }}>
                                                                             {item.value}
                                                                         </Grid>
                                                                     </Grid>
@@ -703,7 +673,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"}
-                                                              sx={{ fontWeight: 600 }}>Distribución:</Grid>
+                                                            sx={{ fontWeight: 600 }}>Distribución:</Grid>
                                                         <Grid item xs={true}>
                                                             {
                                                                 (baseProductPrice && sellerProfitQuantity && finalProductPrice)
@@ -1241,7 +1211,16 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                         </Grid>
                                     </Grid>
                                     <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
-                                        <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                        <Button size="small"
+                                            sx={{
+                                                color: grey[600],
+                                                borderColor: grey[600],
+                                                '&:hover': {
+                                                    borderColor: grey[800],
+                                                    backgroundColor: grey[200],
+                                                },
+                                            }}
+                                            onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
                                     </Grid>
                                 </Grid>
                             </Card>
@@ -1283,7 +1262,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                             color="error"
                                                             onClick={() => setSelected([])}
                                                         >
-                                                            <FilterAltOff fontSize={"small"}/>
+                                                            <FilterAltOff fontSize={"small"} />
                                                         </IconButton>
                                                     </Grid>
                                                 )

@@ -175,19 +175,9 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
 
     const TableHeader = () => {
         const headCells = [
-            {
-                id: "name",
-                label: "Nombre",
-            },
-            {
-                id: "store_units",
-                label: "Cantidad",
-            },
-            {
-                id: "more_details",
-                label: "",
-            },
-
+            { id: "name", label: "Nombre", },
+            { id: "store_units", label: "Cantidad", },
+            { id: "more_details", label: "", },
         ]
 
         return (
@@ -584,6 +574,8 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                                                 label={"Cantidad"}
                                                 value={formik.values.units}
                                                 onKeyDown={handleKeyDown}
+                                                autoComplete='off'
+                                                inputMode='numeric'
                                                 size={'small'}
                                                 disabled={selectedDepot === undefined}
                                                 error={formik.errors.units && formik.touched.units}

@@ -214,7 +214,7 @@ function StoreListOffers(props: any) {
                 open={activeModalCreateOffer}
                 setOpen={setActiveModalCreateOffer}
             >
-                <EditOffer offers={null}/>
+                <EditOffer offers={null} />
             </StoreModalOffers>
 
             <StoreModalDefault
@@ -222,22 +222,21 @@ function StoreListOffers(props: any) {
                 open={activeModalEditOffer}
                 setOpen={setActiveModalEditOffer}
             >
-                <EditOffer offer={selectedOffer}/>
+                <EditOffer offer={selectedOffer} />
             </StoreModalDefault>
 
 
             <Grid item container xs={12}>
                 <Grid item container>
-                    <Grid item xs={"auto"} sx={{fontWeight: 600}} alignSelf={'center'}>Ofertas:</Grid>
+                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }} alignSelf={'center'}>Ofertas:</Grid>
 
                     <Grid item>
                         <IconButton
                             size='small'
-                            color='primary'
                             onClick={() => setActiveModalCreateOffer(true)}
-                            sx={{ml: "10px"}}
+                            sx={{ ml: "10px" }}
                         >
-                            <AddOutlined fontSize='small'/>
+                            <AddOutlined fontSize='small' />
                         </IconButton>
                     </Grid>
                 </Grid>
@@ -289,7 +288,7 @@ function StoreListOffers(props: any) {
                                                         return await removeOffer(item.id)
                                                     }}
                                                 >
-                                                    <DeleteOutline fontSize={"small"} color='error'/>
+                                                    <DeleteOutline fontSize={"small"} color='error' />
                                                 </IconButton>
                                             </Grid>
 
@@ -297,7 +296,7 @@ function StoreListOffers(props: any) {
                                                 container
                                                 item
                                                 xs={12}
-                                                sx={{ color: "rgba(16,27,44,0.8)", textWrap: "pretty"}}>
+                                                sx={{ color: "rgba(16,27,44,0.8)", textWrap: "pretty" }}>
                                                 {
                                                     item.compare_function === '='
                                                         ? `${index + 1}. Cuando compren ${item.compare_units_quantity} unidades de este producto, cada unidad tendrá un precio de ${item.price_per_unit} ${currency}`

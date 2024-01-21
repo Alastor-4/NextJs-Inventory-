@@ -121,7 +121,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                 </IconButton>
 
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
 
                                 <IconButton color={"inherit"} onClick={handleUpdate}>
                                     <EditOutlined fontSize={"small"} />
@@ -132,7 +132,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                 </IconButton>
 
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
 
                             </Box>
                         )
@@ -148,32 +148,11 @@ export default function StoresMainTable({ userId }: { userId: number }) {
 
     const TableHeader = () => {
         const headCells = [
-            {
-                id: "name",
-                label: "Nombre",
-                align: "left"
-            },
-            {
-                id: "slogan",
-                label: "Slogan",
-                align: "left"
-            },
-            {
-                id: "active_service",
-                label: "Servicios",
-                align: "left"
-            },
-            {
-                id: "seller",
-                label: "Vendedor",
-                align: "left"
-            },
-            {
-                id: "details",
-                label: "",
-                align: "left"
-            },
-
+            { id: "name", label: "Nombre", },
+            { id: "slogan", label: "Slogan", },
+            { id: "active_service", label: "Servicios", },
+            { id: "seller", label: "Vendedor", },
+            { id: "details", label: "", },
         ]
 
         return (
@@ -216,15 +195,8 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                     onClick={() => handleSelectItem(row)}
                                 />
                             </TableCell>
-
-                            <TableCell>
-                                {row.name}
-                            </TableCell>
-
-                            <TableCell>
-                                {(row.slogan !== '') ? row.slogan : '-'}
-                            </TableCell>
-
+                            <TableCell>{row.name}</TableCell>
+                            <TableCell align="center">{(row.slogan !== '') ? row.slogan : '-'}</TableCell>
                             <TableCell>
                                 <Grid container columnSpacing={1}>
                                     <Grid item >
@@ -234,7 +206,6 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                                 fontSize="small" />
                                         </Tooltip>
                                     </Grid>
-
                                     <Grid item >
                                         <Tooltip title={"Reservaciones"} >
                                             <ShoppingCartOutlined
@@ -244,11 +215,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                     </Grid>
                                 </Grid>
                             </TableCell>
-
-                            <TableCell>
-                                {row.seller_user ? row.seller_user.name.split(" ")[0] : "-"}
-                            </TableCell>
-
+                            <TableCell align="center">{row.seller_user ? row.seller_user.name.split(" ")[0] : "-"}</TableCell>
                             <TableCell style={{ padding: 0 }} colSpan={5}>
                                 <Tooltip title={"Details"}>
                                     <IconButton
@@ -458,7 +425,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                 {
                     data?.length > 0
                         ? (
-                            <TableContainer sx={{width: "100%", overflowX: "auto"}}>
+                            <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
                                 <Table sx={{ width: "100%" }} size={"small"}>
                                     <TableHeader />
 

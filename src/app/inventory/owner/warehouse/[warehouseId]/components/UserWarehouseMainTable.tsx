@@ -2,7 +2,7 @@
 
 import {
     AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent,
-    Collapse, Divider, Grid, IconButton, InputBase,
+    Collapse, DialogActions, Divider, Grid, IconButton, InputBase,
     Table, TableBody, TableCell, TableContainer, TableHead,
     TableRow, TextField, Toolbar, Typography
 } from "@mui/material";
@@ -25,6 +25,7 @@ import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { depots, images } from "@prisma/client";
 import ModalAddProduct from "./ModalAddProduct";
+import { grey } from "@mui/material/colors";
 import { useRouter } from "next/navigation";
 import { AxiosResponse } from "axios";
 import { Formik } from "formik";
@@ -257,29 +258,37 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 setDisplayNewUnitsForm(false);
             }
         }
+        const handleClose = () => {
+            !!formik && formik.resetForm();
+            setDisplayNewUnitsForm(false);
+        };
 
         return (
-            <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
-                <Grid container item spacing={2}>
-                    <Grid item>
-                        <TextField
-                            name={"productNewUnitsQuantity"}
-                            label="Nuevas unidades"
-                            size={"small"}
-                            onKeyDown={handleKeyDown}
-                            {...formik.getFieldProps("productNewUnitsQuantity")}
-                            error={formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity}
-                            helperText={(formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity) && formik.errors.productNewUnitsQuantity}
-                        />
-                    </Grid>
-
-                    <Grid container item justifyContent={"flex-end"}>
-                        <Button color={"primary"} onClick={handleNewUnitsAdd}>
-                            Aceptar
-                        </Button>
-                    </Grid>
+            <Grid container item spacing={2}>
+                <Grid item>
+                    <TextField
+                        name={"productNewUnitsQuantity"}
+                        label="Nuevas unidades"
+                        size={"small"}
+                        onKeyDown={handleKeyDown}
+                        inputMode="numeric"
+                        {...formik.getFieldProps("productNewUnitsQuantity")}
+                        error={formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity}
+                        helperText={(formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity) && formik.errors.productNewUnitsQuantity}
+                    />
                 </Grid>
-            </Card>
+                <Grid container item justifyContent={"flex-end"}>
+                    <DialogActions >
+                        <Button color="error" variant="outlined" onClick={handleClose}>Cerrar</Button>
+                        <Button
+                            onClick={handleNewUnitsAdd}
+                            color="primary"
+                            disabled={!formik.values.productNewUnitsQuantity}
+                            variant="outlined">Aceptar
+                        </Button>
+                    </DialogActions>
+                </Grid>
+            </Grid>
         )
     }
 
@@ -302,41 +311,49 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 setDisplayUpdateUnitsForm(false);
             }
         }
+        const handleClose = () => {
+            setDisplayUpdateUnitsForm(false);
+        };
 
         return (
-            <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
-                <Grid container item spacing={2}>
-                    <Grid item>
-                        <TextField
-                            name={"updateTotalUnitsQuantity"}
-                            label="Total de unidades"
-                            size={"small"}
-                            onKeyDown={handleKeyDown}
-                            {...formik.getFieldProps("updateTotalUnitsQuantity")}
-                            error={formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity}
-                            helperText={(formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity) && formik.errors.updateTotalUnitsQuantity}
-                        />
-                    </Grid>
-
-                    <Grid item>
-                        <TextField
-                            name={"updateRemainingUnitsQuantity"}
-                            label="Unidades restantes"
-                            size={"small"}
-                            onKeyDown={handleKeyDown}
-                            {...formik.getFieldProps("updateRemainingUnitsQuantity")}
-                            error={formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity}
-                            helperText={(formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity) && formik.errors.updateRemainingUnitsQuantity}
-                        />
-                    </Grid>
-
-                    <Grid container item justifyContent={"flex-end"}>
-                        <Button color={"primary"} onClick={handleUpdateUnits}>
-                            Aceptar
-                        </Button>
-                    </Grid>
+            <Grid container item spacing={2} marginTop={"5px"} >
+                <Grid item xs={6}>
+                    <TextField
+                        name={"updateTotalUnitsQuantity"}
+                        label="Total de unidades"
+                        size={"small"}
+                        inputMode="numeric"
+                        onKeyDown={handleKeyDown}
+                        {...formik.getFieldProps("updateTotalUnitsQuantity")}
+                        error={formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity}
+                        helperText={(formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity) && formik.errors.updateTotalUnitsQuantity}
+                    />
                 </Grid>
-            </Card>
+
+                <Grid item xs={6}>
+                    <TextField
+                        name={"updateRemainingUnitsQuantity"}
+                        label="Unidades restantes"
+                        size={"small"}
+                        inputMode="numeric"
+                        onKeyDown={handleKeyDown}
+                        {...formik.getFieldProps("updateRemainingUnitsQuantity")}
+                        error={formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity}
+                        helperText={(formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity) && formik.errors.updateRemainingUnitsQuantity}
+                    />
+                </Grid>
+                <Grid container item justifyContent={"flex-end"}>
+                    <DialogActions >
+                        <Button color="error" variant="outlined" onClick={handleClose}>Cerrar</Button>
+                        <Button
+                            onClick={handleUpdateUnits}
+                            color="primary"
+                            disabled={!formik.values.updateTotalUnitsQuantity || !formik.values.updateRemainingUnitsQuantity}
+                            variant="outlined">Aceptar
+                        </Button>
+                    </DialogActions>
+                </Grid>
+            </Grid>
         )
     }
 
@@ -421,7 +438,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             name={"productStoreDepotDistribution"}
                             label={"Enviar a tienda"}
                             color={"primary"}
-                            type={"number"}
+                            inputMode="numeric"
                             size={"small"}
                             onKeyDown={handleKeyDown}
                             {...formik.getFieldProps("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity")}
@@ -442,7 +459,8 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             color={"primary"}
                             onClick={handleMoveToStore}
                             sx={{ ml: "10px" }}
-                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity}
+                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
+                                || formik.values.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity == 0 ? true : false}
                         >
                             <Done />
                         </IconButton>
@@ -465,7 +483,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                         name={"productStoreDepotDistribution"}
                                         label={"Retirar de tienda"}
                                         color={"secondary"}
-                                        type={"number"}
+                                        inputMode="numeric"
                                         size={"small"}
                                         onKeyDown={handleKeyDown}
                                         {...formik.getFieldProps("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity")}
@@ -486,7 +504,8 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                         color={"secondary"}
                                         onClick={handleMoveToWarehouse}
                                         sx={{ ml: "10px" }}
-                                        disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity}
+                                        disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
+                                            || formik.values.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity == 0 ? true : false}
                                     >
                                         <Done />
                                     </IconButton>
@@ -939,7 +958,16 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                         </Grid>
                                     </Grid>
                                     <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
-                                        <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                        <Button size="small"
+                                            sx={{
+                                                color: grey[600],
+                                                borderColor: grey[600],
+                                                '&:hover': {
+                                                    borderColor: grey[800],
+                                                    backgroundColor: grey[200],
+                                                },
+                                            }}
+                                            onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
                                     </Grid>
                                 </Grid>
                             </Card>

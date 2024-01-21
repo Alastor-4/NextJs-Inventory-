@@ -6,6 +6,7 @@ import {
     Button,
     Card,
     Checkbox,
+    DialogActions,
     FormControlLabel,
     Grid,
     MenuItem,
@@ -434,46 +435,47 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                             </TextField>
                         </Grid>
 
+                        {formik.values.sellerUser &&
+                            <Grid item xs={12}>
+                                {
+                                    sellProfit
+                                        ? editPercentage(formik)
+                                        : editQuantity(formik)
+                                }
 
-                        <Grid item xs={12}>
-                            {
-                                sellProfit
-                                    ? editPercentage(formik)
-                                    : editQuantity(formik)
-                            }
-
-                            <Grid item container>
-                                <Grid item>
-                                    <Grid item container>
-                                        <Grid item >
-                                            <Checkbox
-                                                size="small"
-                                                checked={sellProfit}
-                                                onClick={() => setSellProfit(true)}
-                                            />
-                                        </Grid>
-                                        <Grid item alignSelf={"center"}>
-                                            <Typography variant="subtitle2">Porcentaje</Typography>
+                                <Grid item container>
+                                    <Grid item>
+                                        <Grid item container>
+                                            <Grid item >
+                                                <Checkbox
+                                                    size="small"
+                                                    checked={sellProfit}
+                                                    onClick={() => setSellProfit(true)}
+                                                />
+                                            </Grid>
+                                            <Grid item alignSelf={"center"}>
+                                                <Typography variant="subtitle2">Porcentaje</Typography>
+                                            </Grid>
                                         </Grid>
                                     </Grid>
-                                </Grid>
 
-                                <Grid item>
-                                    <Grid item container>
-                                        <Grid item >
-                                            <Checkbox
-                                                size="small"
-                                                checked={!sellProfit}
-                                                onClick={() => setSellProfit(false)}
-                                            />
-                                        </Grid>
-                                        <Grid item alignSelf={"center"} >
-                                            <Typography variant="subtitle2">Cantidad</Typography>
+                                    <Grid item>
+                                        <Grid item container>
+                                            <Grid item >
+                                                <Checkbox
+                                                    size="small"
+                                                    checked={!sellProfit}
+                                                    onClick={() => setSellProfit(false)}
+                                                />
+                                            </Grid>
+                                            <Grid item alignSelf={"center"} >
+                                                <Typography variant="subtitle2">Cantidad</Typography>
+                                            </Grid>
                                         </Grid>
                                     </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
+                        }
 
                         <Grid item xs={12}>
                             <StoreOpeningDays
@@ -519,27 +521,24 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                             )
                         }*/}
 
-                        <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
-                            <Button
-                                color={"secondary"}
-                                variant={"outlined"}
-                                size={"small"}
-                                sx={{ m: 1 }}
-                                onClick={() => router.push(`/inventory/owner/store`)}
-                            >
-                                Cancel
-                            </Button>
-
-                            <Button
-                                type={"submit"}
-                                color={"primary"}
-                                variant={"outlined"}
-                                size={"small"}
-                                sx={{ m: 1 }}
-                                disabled={!formik.isValid}
-                            >
-                                {updateItem ? "Modificar" : "Crear"}
-                            </Button>
+                        <Grid container item justifyContent={"flex-end"} >
+                            <DialogActions>
+                                <Button
+                                    color="error"
+                                    variant={"outlined"}
+                                    onClick={() => router.push(`/inventory/owner/store`)}
+                                >
+                                    Cerrar
+                                </Button>
+                                <Button
+                                    type={"submit"}
+                                    color={"primary"}
+                                    variant={"outlined"}
+                                    disabled={!formik.isValid}
+                                >
+                                    {updateItem ? "Modificar" : "Crear"}
+                                </Button>
+                            </DialogActions>
                         </Grid>
                     </Grid>
                 </Grid>
