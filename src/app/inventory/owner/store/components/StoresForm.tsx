@@ -6,6 +6,7 @@ import {
     Button,
     Card,
     Checkbox,
+    DialogActions,
     FormControlLabel,
     Grid,
     MenuItem,
@@ -519,27 +520,24 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
                             )
                         }*/}
 
-                        <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
-                            <Button
-                                color={"secondary"}
-                                variant={"outlined"}
-                                size={"small"}
-                                sx={{ m: 1 }}
-                                onClick={() => router.push(`/inventory/owner/store`)}
-                            >
-                                Cancel
-                            </Button>
-
-                            <Button
-                                type={"submit"}
-                                color={"primary"}
-                                variant={"outlined"}
-                                size={"small"}
-                                sx={{ m: 1 }}
-                                disabled={!formik.isValid}
-                            >
-                                {updateItem ? "Modificar" : "Crear"}
-                            </Button>
+                        <Grid container item justifyContent={"flex-end"} >
+                            <DialogActions>
+                                <Button
+                                    color="error"
+                                    variant={"outlined"}
+                                    onClick={() => router.push(`/inventory/owner/store`)}
+                                >
+                                    Cerrar
+                                </Button>
+                                <Button
+                                    type={"submit"}
+                                    color={"primary"}
+                                    variant={"outlined"}
+                                    disabled={!formik.isValid}
+                                >
+                                    {updateItem ? "Modificar" : "Crear"}
+                                </Button>
+                            </DialogActions>
                         </Grid>
                     </Grid>
                 </Grid>
