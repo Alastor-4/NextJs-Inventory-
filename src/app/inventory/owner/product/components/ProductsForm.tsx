@@ -285,6 +285,7 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
                                         label="Precio de compra"
                                         size={"small"}
                                         onKeyDown={handleKeyDownWithDot}
+                                        inputMode="numeric"
                                         fullWidth
                                         {...formik.getFieldProps("buyPrice")}
                                         error={!!formik.errors.buyPrice && formik.touched.buyPrice}
