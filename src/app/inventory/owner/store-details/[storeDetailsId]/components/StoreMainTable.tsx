@@ -14,7 +14,7 @@ import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWa
 import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import {CustomTooltip, InfoTag, MoneyInfoTag} from "@/components/InfoTags";
+import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import { numberFormat } from "@/utils/generalFunctions";
 import { TableNoData } from "@/components/TableNoData";
 import { storeDetails } from "../request/storeDetails";
@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { images } from "@prisma/client";
 import { Formik } from "formik";
 import ModalProductPrice from "./Modal/ModalProductPrice";
+import { grey } from "@mui/material/colors";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -206,7 +207,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
 
                 let oldDepartmentSelected = false
 
-                const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
+                const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id)
                 if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
                     oldDepartmentSelected = true
                 }
@@ -491,7 +492,16 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                             </Grid>
                                         </Grid>
                                         <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
-                                            <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                            <Button size="small"
+                                                sx={{
+                                                    color: grey[600],
+                                                    borderColor: grey[600],
+                                                    '&:hover': {
+                                                        borderColor: grey[800],
+                                                        backgroundColor: grey[200],
+                                                    },
+                                                }}
+                                                onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
                                         </Grid>
                                     </Grid>
                                 </Card>
