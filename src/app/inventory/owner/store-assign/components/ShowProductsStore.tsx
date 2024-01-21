@@ -23,7 +23,6 @@ import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import { characteristics, depots, images } from '@prisma/client';
 import ModalStoreAssign from './Modal/ModalStoreAssign';
 import { TableNoData } from "@/components/TableNoData";
-import ManageQuantity from './Modal/ManageQuantity';
 import SearchIcon from '@mui/icons-material/Search';
 import InfoTooltip from '@/components/InfoTooltip';
 import storeAssign from '../requests/store-assign';
@@ -419,20 +418,16 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                             )
                         }
 
-                        <ModalStoreAssign
+                        {selectedProduct && <ModalStoreAssign
                             dialogTitle={"Trasladar productos"}
                             open={activeManageQuantity}
                             setOpen={setActiveManageQuantity}
-                        >
-                            <ManageQuantity
-                                userId={userId!}
-                                nameStore={dataStore?.name!}
-                                nameWarehouse={dataWarehouse?.name!}
-                                productDetails={selectedProduct!}
-                                updateDepot={updateDepot}
-                                setActiveManageQuantity={setActiveManageQuantity}
-                            />
-                        </ModalStoreAssign>
+                            nameStore={dataStore?.name!}
+                            nameWarehouse={dataWarehouse?.name!}
+                            productDetails={selectedProduct!}
+                            updateDepot={updateDepot}
+                            setActiveManageQuantity={setActiveManageQuantity}
+                        />}
 
                         <ModalAddProductFromWarehouse
                             dialogTitle={"Agregar productos"}
