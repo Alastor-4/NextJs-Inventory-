@@ -1,8 +1,8 @@
-import {ClickAwayListener, Grid, Tooltip} from "@mui/material";
-import {CreditCardOutlined, ErrorOutlined, InfoOutlined} from "@mui/icons-material";
-import React from "react";
+import { ClickAwayListener, Grid, Tooltip } from "@mui/material";
+import { CreditCardOutlined, ErrorOutlined, InfoOutlined } from "@mui/icons-material";
+import React, { useState } from "react";
 
-export const MoneyInfoTag = ({value, errorColor, action}: any) => {
+export const MoneyInfoTag = ({ value, errorColor, action }: any) => {
     return (
         <Grid
             container
@@ -26,8 +26,8 @@ export const MoneyInfoTag = ({value, errorColor, action}: any) => {
             <Grid item xs={"auto"}>
                 {
                     errorColor
-                        ? <ErrorOutlined sx={{mr: "5px"}} fontSize={"small"}/>
-                        : <CreditCardOutlined sx={{mr: "5px"}} fontSize={"small"}/>
+                        ? <ErrorOutlined sx={{ mr: "5px" }} fontSize={"small"} />
+                        : <CreditCardOutlined sx={{ mr: "5px" }} fontSize={"small"} />
                 }
             </Grid>
             <Grid item xs={true}>
@@ -38,7 +38,7 @@ export const MoneyInfoTag = ({value, errorColor, action}: any) => {
 }
 
 
-export const InfoTag = ({value, color, tooltipText}: any) => {
+export const InfoTag = ({ value, color, tooltipText }: any) => {
     const [open, setOpen] = React.useState(false)
 
     return (
@@ -92,7 +92,7 @@ export const InfoTag = ({value, color, tooltipText}: any) => {
                                     {value}
                                 </Grid>
                                 <Grid container item xs={"auto"} alignItems={"center"}>
-                                    <InfoOutlined sx={{ml: "5px"}} fontSize={"small"}/>
+                                    <InfoOutlined sx={{ ml: "5px" }} fontSize={"small"} />
                                 </Grid>
                             </Grid>
                         </Tooltip>
@@ -117,49 +117,5 @@ export const InfoTag = ({value, color, tooltipText}: any) => {
                 )
             }
         </div>
-    )
-}
-
-export const CustomTooltip = ({tooltipText, children}: any) => {
-    const [open, setOpen] = React.useState(false)
-
-    return (
-        <ClickAwayListener onClickAway={() => setOpen(false)}>
-            <Tooltip
-                title={tooltipText}
-                open={open}
-                placement="bottom-start"
-                arrow
-                PopperProps={{
-                    disablePortal: true,
-                    sx: {
-                        "& .MuiTooltip-tooltip": {
-                            padding: "5px 10px",
-                            maxWidth: "300px",
-                            lineHeight: "1.7em",
-                            border: "none",
-                            borderRadius: "3px",
-                            backgroundColor: "#2F323A",
-                            textAlign: "center",
-                            fontSize: "16px",
-                            fontStyle: "normal",
-                            fontWeight: "400",
-                            overflowWrap: "break-word",
-                            wordWrap: "normal",
-                            whiteSpace: "normal",
-                            lineBreak: "auto",
-                        }
-                    }
-                }}
-            >
-                <div
-                    onClick={(e) => {
-                        e.stopPropagation()
-                        return setOpen(true)
-                    }}>
-                    {children}
-                </div>
-            </Tooltip>
-        </ClickAwayListener>
     )
 }
