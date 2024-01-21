@@ -1,9 +1,9 @@
 'use client'
 import { allProductsByDepartmentProps } from '@/types/interfaces';
-import {FilterAlt, FilterAltOff} from '@mui/icons-material';
-import {Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Stack} from '@mui/material';
+import { FilterAlt, FilterAltOff } from '@mui/icons-material';
+import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Stack } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
+import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
 interface FilterProductsByDepartmentsModalProps {
     allProductsByDepartment: allProductsByDepartmentProps[];
@@ -22,7 +22,7 @@ const FilterProductsByDepartmentsModal = (
     useEffect(() => {
         if (allProductsByDepartment) {
             const departmentsCopy = allProductsByDepartment.map(item => (
-                {id: item.id, name: item.name, selected: item.selected}
+                { id: item.id, name: item.name, selected: item.selected }
             ))
 
             setFilteredDepartments(departmentsCopy);
@@ -43,7 +43,7 @@ const FilterProductsByDepartmentsModal = (
 
             if (currentFilterApplied) existFilterApplied = true
 
-            return {...item, selected: currentFilterApplied}
+            return { ...item, selected: currentFilterApplied }
         })
 
         setAllProductsByDepartment(newAllProductsByDepartment);
@@ -75,7 +75,7 @@ const FilterProductsByDepartmentsModal = (
                 justifyContent={"space-between"}
                 alignItems={"center"}
                 color={"white"}
-                padding={{xs: "10px"}}
+                padding={{ xs: "10px" }}
                 sx={{ bgcolor: '#1976d3' }}
             >
                 Filtrar por departamentos

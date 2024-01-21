@@ -15,10 +15,13 @@ import { storeSellsDetailsProps } from '@/types/interfaces';
 import { TableNoData } from '@/components/TableNoData';
 import InfoTooltip from '@/components/InfoTooltip';
 import React, { useEffect, useState } from 'react';
+import { esES } from '@mui/x-date-pickers/locales'
 import { useParams } from 'next/navigation';
 import { useRouter } from "next/navigation";
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/es';
+
+dayjs.locale("es");
 
 const getMonth = (month: number) => { if (month < 9) return `0${month + 1}`; return month + 1 }
 const getDate = (date: number) => { if (date < 10) return `0${date}`; return date }
@@ -107,11 +110,10 @@ const SellsHistory = () => {
             <TableHead>
                 <TableRow>
                     <TableCell id='details' />
-                    <TableCell align='center' id='total_price' sx={{ whiteSpace: "nowrap" }}>Total recaudado</TableCell>
-                    <TableCell align='center' id='payment_method' sx={{ whiteSpace: "nowrap" }}>Forma de pago</TableCell>
+                    <TableCell align='center' id='total_price_payment_method'>Importe total</TableCell>
                     <TableCell id='sell_products_quantity'>Productos</TableCell>
+                    <TableCell align='center' id='sell_type'>Tipo de venta</TableCell>
                     <TableCell id='created_at'>Registrado</TableCell>
-                    <TableCell align='center' id='sell_type' sx={{ whiteSpace: "nowrap" }}>Tipo de venta</TableCell>
                     <TableCell id='units_returned_quantity'>Devoluciones</TableCell>
                 </TableRow>
             </TableHead>
@@ -155,11 +157,10 @@ const SellsHistory = () => {
                                         </IconButton>
                                     </Tooltip>
                                 </TableCell>
-                                <TableCell align='center'>{sell.total_price}</TableCell>
-                                <TableCell align='center'>{sell.payment_method}</TableCell>
+                                <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
                                 <TableCell align='center'>{sell.sell_products.length!}</TableCell>
-                                <TableCell align='center'>{dayjs(sell.created_at).format('h:mm A')}</TableCell>
                                 <TableCell align='center'>{sell.reservations !== null ? "Reservación" : "Presencial"}</TableCell>
+                                <TableCell align='center'>{dayjs(sell.created_at).format('MMM D, YYYY')} <br /> {dayjs(sell.created_at).format('h:mm A')}</TableCell>
                                 <TableCell align='center'>{sell.units_returned_quantity ? sell.units_returned_quantity : "-"}</TableCell>
                             </TableRow>
                             <TableRow >
@@ -200,10 +201,14 @@ const SellsHistory = () => {
                         </Grid>
                     </Grid>
                     <Grid item xs={12} mx={"40px"}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='es'>
+                        <LocalizationProvider
+                            dateAdapter={AdapterDayjs}
+                            localeText={esES.components.MuiLocalizationProvider.defaultProps.localeText}
+                            adapterLocale='es'>
                             <DemoContainer components={['DatePicker']}>
                                 <DatePicker
-                                    slotProps={{ field: { clearable: true } }}
+                                    disabled={sellDates?.length! > 0 ? false : true}
+                                    slotProps={{ field: { clearable: true }, toolbar: { hidden: true } }}
                                     label="Seleccione una fecha" disableFuture shouldDisableDate={hasSell} onChange={handleChange} />
                             </DemoContainer>
                         </LocalizationProvider>
