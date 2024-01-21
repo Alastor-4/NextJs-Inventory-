@@ -1,14 +1,14 @@
 import React from "react";
-import {ClickAwayListener, Tooltip} from "@mui/material";
+import { ClickAwayListener, Tooltip } from "@mui/material";
 
-interface CustomTooltip {
-    isOpenTooltip: boolean,
-    handleTooltipClose: any,
-    message: string,
-    children: React.ReactElement
+interface CustomTooltipProps {
+    isOpenTooltip: boolean;
+    handleTooltipClose: ((event: Event | MouseEvent | TouchEvent | React.SyntheticEvent<Element, Event>) => void);
+    message: string;
+    children: React.ReactElement;
 }
 
-export default function InfoTooltip({isOpenTooltip, handleTooltipClose, message, children}: CustomTooltip) {
+export default function InfoTooltip({ isOpenTooltip, handleTooltipClose, message, children }: CustomTooltipProps) {
 
     return (
         <ClickAwayListener onClickAway={handleTooltipClose}>
