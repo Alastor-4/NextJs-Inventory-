@@ -25,6 +25,7 @@ import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { depots, images } from "@prisma/client";
 import ModalAddProduct from "./ModalAddProduct";
+import { grey } from "@mui/material/colors";
 import { useRouter } from "next/navigation";
 import { AxiosResponse } from "axios";
 import { Formik } from "formik";
@@ -939,7 +940,16 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                         </Grid>
                                     </Grid>
                                     <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
-                                        <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                        <Button size="small"
+                                            sx={{
+                                                color: grey[600],
+                                                borderColor: grey[600],
+                                                '&:hover': {
+                                                    borderColor: grey[800],
+                                                    backgroundColor: grey[200],
+                                                },
+                                            }}
+                                            onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
                                     </Grid>
                                 </Grid>
                             </Card>

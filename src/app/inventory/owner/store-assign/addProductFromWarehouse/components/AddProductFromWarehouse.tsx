@@ -584,6 +584,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                                                 label={"Cantidad"}
                                                 value={formik.values.units}
                                                 onKeyDown={handleKeyDown}
+                                                inputMode='numeric'
                                                 size={'small'}
                                                 disabled={selectedDepot === undefined}
                                                 error={formik.errors.units && formik.touched.units}

@@ -17,6 +17,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import products from "../requests/products";
+import { grey } from '@mui/material/colors';
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
@@ -54,7 +55,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
                 let oldDepartmentSelected = false
 
-                const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
+                const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id)
                 if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
                     oldDepartmentSelected = true
                 }
@@ -77,7 +78,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
             const departments = await products.getDepartmentsByUserAndGlobal(userId)
             setDepartments(departments)
         }
-        
+
         if (!departments) getAllDepartments()
     }, [departments, userId]);
 
@@ -141,7 +142,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
                     let oldDepartmentSelected = false
 
-                    const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
+                    const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id)
                     if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
                         oldDepartmentSelected = true
                     }
@@ -242,7 +243,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 <TableRow>
                     <TableCell
                         key={"checkbox"}
-                        align={"left"}
+                        align={"center"}
                         padding={'checkbox'}
                         sx={{ width: "5px" }}
                     >
@@ -251,7 +252,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
-                            align={"left"}
+                            align={"center"}
                             padding={'normal'}
                             sx={{ width: "auto" }}
                         >
@@ -278,7 +279,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                             tabIndex={-1}
                             selected={!!selectedProduct && (product.id === selectedProduct.id)}
                         >
-                            <TableCell>
+                            <TableCell align="center">
                                 <Checkbox
                                     size={"small"}
                                     checked={!!selectedProduct && (product.id === selectedProduct.id)}
@@ -286,7 +287,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                     sx={{ width: "5px" }}
                                 />
                             </TableCell>
-                            <TableCell>
+                            <TableCell align="center">
                                 <Grid container >
                                     {
                                         product?.images?.length! > 0 && (
@@ -314,13 +315,13 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                     </Grid>
                                 </Grid>
                             </TableCell>
-                            <TableCell>
+                            <TableCell align="center">
                                 {product.description ?? "-"}
                             </TableCell>
-                            <TableCell>
+                            <TableCell align="center">
                                 {product?.departments?.name ?? "-"}
                             </TableCell>
-                            <TableCell>
+                            <TableCell align="center">
                                 {product.characteristics?.length! > 0
                                     ? product.characteristics?.map((characteristics: characteristics) => (
                                         <Grid
@@ -444,7 +445,16 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                             </Grid>
                                         </Grid>
                                         <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
-                                            <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                            <Button size="small"
+                                                sx={{
+                                                    color: grey[600],
+                                                    borderColor: grey[600],
+                                                    '&:hover': {
+                                                        borderColor: grey[800],
+                                                        backgroundColor: grey[200],
+                                                    },
+                                                }}
+                                                onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
                                         </Grid>
                                     </Grid>
                                 </Card>
