@@ -106,7 +106,7 @@ export default function WarehousesMainTable({ userId }) {
                     }
 
                     <Link href={`/inventory/admin/warehouse/create`}>
-                        <IconButton sx={{color: "white"}}>
+                        <IconButton sx={{ color: "white" }}>
                             <AddOutlined />
                         </IconButton>
                     </Link>
@@ -117,26 +117,10 @@ export default function WarehousesMainTable({ userId }) {
 
     const TableHeader = () => {
         const headCells = [
-            {
-                id: "owner",
-                label: "Dueño",
-                align: "left"
-            },
-            {
-                id: "name",
-                label: "Nombre",
-                align: "left"
-            },
-            {
-                id: "description",
-                label: "Descripción",
-                align: "left"
-            },
-            {
-                id: "address",
-                label: "Dirección",
-                align: "left"
-            },
+            { id: "owner", label: "Dueño", },
+            { id: "name", label: "Nombre", },
+            { id: "description", label: "Descripción", },
+            { id: "address", label: "Dirección", },
         ]
 
         return (
@@ -144,7 +128,7 @@ export default function WarehousesMainTable({ userId }) {
                 <TableRow>
                     <TableCell
                         key={"checkbox"}
-                        align={"left"}
+                        align={"center"}
                         padding={'checkbox'}
                     >
 
@@ -152,7 +136,7 @@ export default function WarehousesMainTable({ userId }) {
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
-                            align={"left"}
+                            align={"center"}
                             padding={'normal'}
                         >
                             {headCell.label}
@@ -180,18 +164,10 @@ export default function WarehousesMainTable({ userId }) {
                                 onClick={() => handleSelectItem(row)}
                             />
                         </TableCell>
-                        <TableCell>
-                            {row.users.name}
-                        </TableCell>
-                        <TableCell>
-                            {row.name}
-                        </TableCell>
-                        <TableCell>
-                            {row.description}
-                        </TableCell>
-                        <TableCell>
-                            {row.address}
-                        </TableCell>
+                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.users.name}</TableCell>
+                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.name}</TableCell>
+                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.description.length! !== 0 ? row.description : "-"}</TableCell>
+                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.address.length! !== 0 ? row.adress : "-"}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
