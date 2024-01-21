@@ -258,30 +258,37 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 setDisplayNewUnitsForm(false);
             }
         }
+        const handleClose = () => {
+            !!formik && formik.resetForm();
+            setDisplayNewUnitsForm(false);
+        };
 
         return (
-            <Card variant={"outlined"} sx={{ width: 1, padding: "15px" }}>
-                <Grid container item spacing={2}>
-                    <Grid item>
-                        <TextField
-                            name={"productNewUnitsQuantity"}
-                            label="Nuevas unidades"
-                            size={"small"}
-                            onKeyDown={handleKeyDown}
-                            inputMode="numeric"
-                            {...formik.getFieldProps("productNewUnitsQuantity")}
-                            error={formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity}
-                            helperText={(formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity) && formik.errors.productNewUnitsQuantity}
-                        />
-                    </Grid>
-
-                    <Grid container item justifyContent={"flex-end"}>
-                        <Button color={"primary"} onClick={handleNewUnitsAdd}>
-                            Aceptar
-                        </Button>
-                    </Grid>
+            <Grid container item spacing={2}>
+                <Grid item>
+                    <TextField
+                        name={"productNewUnitsQuantity"}
+                        label="Nuevas unidades"
+                        size={"small"}
+                        onKeyDown={handleKeyDown}
+                        inputMode="numeric"
+                        {...formik.getFieldProps("productNewUnitsQuantity")}
+                        error={formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity}
+                        helperText={(formik.errors.productNewUnitsQuantity && formik.touched.productNewUnitsQuantity) && formik.errors.productNewUnitsQuantity}
+                    />
                 </Grid>
-            </Card>
+                <Grid container item justifyContent={"flex-end"}>
+                    <DialogActions >
+                        <Button color="error" variant="outlined" onClick={handleClose}>Cerrar</Button>
+                        <Button
+                            onClick={handleNewUnitsAdd}
+                            color="primary"
+                            disabled={!formik.values.productNewUnitsQuantity}
+                            variant="outlined">Aceptar
+                        </Button>
+                    </DialogActions>
+                </Grid>
+            </Grid>
         )
     }
 
