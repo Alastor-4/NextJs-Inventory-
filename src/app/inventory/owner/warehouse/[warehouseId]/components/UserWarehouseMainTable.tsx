@@ -438,7 +438,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             name={"productStoreDepotDistribution"}
                             label={"Enviar a tienda"}
                             color={"primary"}
-                            type={"number"}
+                            inputMode="numeric"
                             size={"small"}
                             onKeyDown={handleKeyDown}
                             {...formik.getFieldProps("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity")}
@@ -459,7 +459,8 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             color={"primary"}
                             onClick={handleMoveToStore}
                             sx={{ ml: "10px" }}
-                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity}
+                            disabled={!!formik.errors.productStoreDepotDistribution?.moveFromWarehouseToStoreQuantity
+                                || formik.values.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity == 0 ? true : false}
                         >
                             <Done />
                         </IconButton>
@@ -482,7 +483,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                         name={"productStoreDepotDistribution"}
                                         label={"Retirar de tienda"}
                                         color={"secondary"}
-                                        type={"number"}
+                                        inputMode="numeric"
                                         size={"small"}
                                         onKeyDown={handleKeyDown}
                                         {...formik.getFieldProps("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity")}
@@ -503,7 +504,8 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                         color={"secondary"}
                                         onClick={handleMoveToWarehouse}
                                         sx={{ ml: "10px" }}
-                                        disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity}
+                                        disabled={!!formik.errors.productStoreDepotDistribution?.moveFromStoreToWarehouseQuantity
+                                            || formik.values.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity == 0 ? true : false}
                                     >
                                         <Done />
                                     </IconButton>
