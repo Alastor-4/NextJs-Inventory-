@@ -1,8 +1,8 @@
-import {ClickAwayListener, Grid, Tooltip} from "@mui/material";
-import {CreditCardOutlined, ErrorOutlined, InfoOutlined} from "@mui/icons-material";
-import React from "react";
+import { ClickAwayListener, Grid, Tooltip } from "@mui/material";
+import { CreditCardOutlined, ErrorOutlined, InfoOutlined } from "@mui/icons-material";
+import React, { useState } from "react";
 
-export const MoneyInfoTag = ({value, errorColor, action}: any) => {
+export const MoneyInfoTag = ({ value, errorColor, action }: any) => {
     return (
         <Grid
             container
@@ -26,8 +26,8 @@ export const MoneyInfoTag = ({value, errorColor, action}: any) => {
             <Grid item xs={"auto"}>
                 {
                     errorColor
-                        ? <ErrorOutlined sx={{mr: "5px"}} fontSize={"small"}/>
-                        : <CreditCardOutlined sx={{mr: "5px"}} fontSize={"small"}/>
+                        ? <ErrorOutlined sx={{ mr: "5px" }} fontSize={"small"} />
+                        : <CreditCardOutlined sx={{ mr: "5px" }} fontSize={"small"} />
                 }
             </Grid>
             <Grid item xs={true}>
@@ -38,7 +38,7 @@ export const MoneyInfoTag = ({value, errorColor, action}: any) => {
 }
 
 
-export const InfoTag = ({value, color, tooltipText}: any) => {
+export const InfoTag = ({ value, color, tooltipText }: any) => {
     const [open, setOpen] = React.useState(false)
 
     return (
@@ -92,7 +92,7 @@ export const InfoTag = ({value, color, tooltipText}: any) => {
                                     {value}
                                 </Grid>
                                 <Grid container item xs={"auto"} alignItems={"center"}>
-                                    <InfoOutlined sx={{ml: "5px"}} fontSize={"small"}/>
+                                    <InfoOutlined sx={{ ml: "5px" }} fontSize={"small"} />
                                 </Grid>
                             </Grid>
                         </Tooltip>
@@ -120,7 +120,12 @@ export const InfoTag = ({value, color, tooltipText}: any) => {
     )
 }
 
-export const CustomTooltip = ({tooltipText, children}: any) => {
+interface CustomTooltipProps {
+    tooltipText: string;
+    children?: React.ReactNode;
+}
+
+export const CustomTooltip = ({ tooltipText, children }: CustomTooltipProps) => {
     const [open, setOpen] = React.useState(false)
 
     return (

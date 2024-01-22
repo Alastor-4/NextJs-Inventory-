@@ -141,9 +141,8 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
-                            align={"left"}
+                            align={"center"}
                             padding={'normal'}
-                            sx={{ width: "auto" }}
                         >
                             {headCell.label}
                         </TableCell>
@@ -176,9 +175,9 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
                                     sx={{ width: "5px" }}
                                 />
                             </TableCell>
-                            <TableCell>{department.name}</TableCell>
-                            <TableCell align={department.description?.length === 0 ? "center" : "left"}>{department.description?.length === 0 ? "-" : department.description}</TableCell>
-                            <TableCell>{department.products?.length!}</TableCell>
+                            <TableCell align="center">{department.name}</TableCell>
+                            <TableCell align="center">{department.description?.length === 0 ? "-" : department.description}</TableCell>
+                            <TableCell align="center">{department.products?.length!}</TableCell>
                         </TableRow>
                     ))}
             </TableBody>

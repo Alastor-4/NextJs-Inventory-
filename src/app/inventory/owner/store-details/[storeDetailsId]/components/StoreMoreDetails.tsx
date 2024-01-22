@@ -1,14 +1,14 @@
-import {EditOutlined, SwapVert} from '@mui/icons-material'
-import {Collapse, Grid, IconButton, Typography} from '@mui/material'
+import { EditOutlined, SwapVert } from '@mui/icons-material'
+import { Collapse, Grid, IconButton, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import StoreListOffers from './offers/components/StoreListOffers'
 import StoreModalDefault from './Modal/StoreModalDefault'
 import StoreEditSellerProfit from './Modal/StoreEditSellerProfit'
-import {InfoTag, MoneyInfoTag} from "@/components/InfoTags";
-import {numberFormat} from "@/utils/generalFunctions";
+import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import { numberFormat } from "@/utils/generalFunctions";
 import TransferUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/TransferUnits";
 import StoreEditUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/StoreEditUnits";
-import {storeDepotsWithAny} from "@/types/interfaces";
+import { storeDepotsWithAny } from "@/types/interfaces";
 import ModalProductPrice from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/ModalProductPrice";
 
 function StoreMoreDetails(props: any) {
@@ -189,7 +189,7 @@ function StoreMoreDetails(props: any) {
                             </Grid>
 
                             <Grid item>
-                                <IconButton sx={{ padding: 0 }} size="small" color="primary" onClick={() => setActiveModalSellerProfit(true)} >
+                                <IconButton sx={{ padding: 0 }} size="small" onClick={() => setActiveModalSellerProfit(true)} >
                                     <EditOutlined fontSize="small" />
                                 </IconButton>
                             </Grid>
@@ -198,7 +198,7 @@ function StoreMoreDetails(props: any) {
 
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"}
-                              sx={{ fontWeight: 600 }}>Distribución:</Grid>
+                            sx={{ fontWeight: 600 }}>Distribución:</Grid>
                         <Grid item xs={true}>
                             {
                                 (baseProductPrice && sellerProfitQuantity && finalProductPrice)

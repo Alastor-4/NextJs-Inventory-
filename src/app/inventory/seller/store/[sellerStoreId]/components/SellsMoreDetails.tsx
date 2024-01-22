@@ -17,10 +17,8 @@ const SellsMoreDetails = ({ show, sell_products }: SellsMoreDetailsProps) => {
                             <TableCell align="center">Producto</TableCell>
                             <TableCell align="center">Departamento</TableCell>
                             <TableCell align="center">Almacén</TableCell>
-                            <TableCell align="center">Descripción</TableCell>
-                            <TableCell align="center" sx={{ whiteSpace: "nowrap" }}>Precio por unidad</TableCell>
                             <TableCell align="center">Unidades</TableCell>
-                            <TableCell align="center" sx={{ whiteSpace: "nowrap" }}>Total vendido</TableCell>
+                            <TableCell align="center">Importe</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -37,19 +35,6 @@ const SellsMoreDetails = ({ show, sell_products }: SellsMoreDetailsProps) => {
                                 </TableCell>
                                 <TableCell align='center' sx={{ whiteSpace: "nowrap" }}>
                                     {sell_product.store_depots.depots?.warehouses?.name}
-                                </TableCell>
-                                <TableCell align="center">
-                                    {sell_product.store_depots.depots?.products?.description}
-                                </TableCell>
-                                <TableCell align="center">
-                                    {!!sell_product.store_depots.price_discount_quantity ?
-                                        `${(sell_product.store_depots.sell_price - sell_product.store_depots.price_discount_quantity)} ${sell_product.store_depots.sell_price_unit}`
-                                        :
-                                        !!sell_product.store_depots.price_discount_percentage ?
-                                            `${(sell_product.store_depots.sell_price / 100) * (100 - sell_product.store_depots.price_discount_percentage)} ${sell_product.store_depots.sell_price_unit}`
-                                            :
-                                            `${sell_product.store_depots.sell_price} ${sell_product.store_depots.sell_price_unit}`
-                                    }
                                 </TableCell>
                                 <TableCell align="center">
                                     {sell_product.units_quantity}

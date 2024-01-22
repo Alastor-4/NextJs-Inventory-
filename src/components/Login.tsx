@@ -230,6 +230,7 @@ export default function Login() {
                                         label="Teléfono*"
                                         size={"small"}
                                         onKeyDown={handleKeyDown}
+                                        inputMode="tel"
                                         fullWidth
                                         variant="outlined"
                                         {...formik.getFieldProps("phone")}
@@ -243,6 +244,7 @@ export default function Login() {
                                         size={"small"}
                                         fullWidth
                                         variant="outlined"
+                                        inputMode="email"
                                         {...formik.getFieldProps("mail")}
                                         error={formik.errors.mail && formik.touched.mail}
                                         helperText={(formik.errors.mail && formik.touched.mail) && formik.errors.mail}

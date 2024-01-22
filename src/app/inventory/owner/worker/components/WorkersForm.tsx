@@ -1,16 +1,17 @@
 "use client"
 
-import { AppBar, Box, Button, Card, Grid, TextField, Toolbar, Typography } from "@mui/material";
+import { AppBar, Box, Button, Card, Grid, IconButton, TextField, Toolbar, Typography } from "@mui/material";
 import workerSearchResultStyles from "@/assets/styles/workerSearchResultStyles";
 import { Done, InfoOutlined } from "@mui/icons-material";
 import { handleKeyDown } from "@/utils/handleKeyDown";
 import ownerUsers from "../requests/ownerUsers";
 import { useRouter } from 'next/navigation';
 import React, { useState } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup"
 import { users } from "@prisma/client";
 import { AxiosResponse } from "axios";
+import { useFormik } from "formik";
+import * as Yup from "yup"
+import InfoTooltip from "@/components/InfoTooltip";
 
 interface WorkersFormProps {
     ownerId?: number;
@@ -42,6 +43,13 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
     const [displaySearchResult, setDisplaySearchResult] = useState(false);
     const [foundUserData, setFoundUserData] = useState<users | null>(null);
 
+    const [isOpenTooltipUp, setIsOpenTooltipUp] = useState<boolean>(false);
+    const handleTooltipUpClose = () => setIsOpenTooltipUp(false);
+    const handleTooltipUpOpen = () => setIsOpenTooltipUp(true);
+
+    const [isOpenTooltipDown, setIsOpenTooltipDown] = useState<boolean>(false);
+    const handleTooltipDownClose = () => setIsOpenTooltipDown(false);
+    const handleTooltipDownOpen = () => setIsOpenTooltipDown(true);
     interface valuesProps {
         username: string;
         phone: number | string;
@@ -106,11 +114,19 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
 
                     <Grid item>
                         <Typography variant={"subtitle1"} sx={{ paddingLeft: "20px" }}>
-                            <InfoOutlined sx={{ marginRight: "5px" }} />
-                            Proporcione los datos exactos de un usuario para hacerlo su trabajador y darle acceso en el sistema.
-                            El usuario debe existir en el sistema, con su cuenta verificada y no puede ser trabajador de
-                            otro usuario. Si el usuario es ya trabajador de algún usuario, primero debe darse baja para
-                            que sea elegible en esta opción.
+                            Proporcione los datos exactos de un usuario para hacerlo su trabajador.
+                        </Typography>
+                        <Typography variant={"subtitle1"} sx={{ paddingLeft: "20px" }}>
+                            El usuario debe estar registrado y verificado en el sistema, y no puede ser trabajador.
+                            <InfoTooltip
+                                isOpenTooltip={isOpenTooltipUp}
+                                handleTooltipClose={handleTooltipUpClose}
+                                message="Si el usuario es ya trabajador de algún usuario, primero debe darse baja para
+                            que sea elegible en esta opción">
+                                <IconButton sx={{ marginBottom: "3px" }} onClick={handleTooltipUpOpen}>
+                                    <InfoOutlined />
+                                </IconButton>
+                            </InfoTooltip>
                         </Typography>
                     </Grid>
 
@@ -131,6 +147,7 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
                                 label="Teléfono del usuario"
                                 size={"small"}
                                 onKeyDown={handleKeyDown}
+                                inputMode="tel"
                                 fullWidth
                                 {...formik.getFieldProps("phone")}
                                 error={!!formik.errors.phone && formik.touched.phone}
@@ -187,7 +204,6 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
                                                             <Grid item sx={workerSearchResultStyles.rightPart}>
                                                                 {foundUserData.username}
                                                             </Grid>
-
                                                             <Grid item sx={workerSearchResultStyles.leftPart}>
                                                                 Nombre:
                                                             </Grid>
@@ -216,12 +232,17 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
                                                 </Grid>
                                             ) : (
                                                 <Grid container>
-                                                    <Typography variant={"body1"}>
+                                                    <Typography variant={"body1"} component="div">
                                                         No se encontró ningun usuario con coincida con los datos
-                                                        proporcionados. Pruebe proporcionando los valores exactos de
-                                                        usuario y teléfono. Tenga en cuanta que el usuario debe tener su
-                                                        cuanta verificada (tener acceso a nuestro sistema) y no puede ser
-                                                        trabajador de ningun otro usuario.
+                                                        proporcionados.
+                                                        <InfoTooltip
+                                                            isOpenTooltip={isOpenTooltipDown}
+                                                            handleTooltipClose={handleTooltipDownClose}
+                                                            message="Póngase en contacto con el usuario y verifique los datos.">
+                                                            <IconButton sx={{ marginBottom: "3px" }} onClick={handleTooltipDownOpen}>
+                                                                <InfoOutlined />
+                                                            </IconButton>
+                                                        </InfoTooltip>
                                                     </Typography>
                                                 </Grid>
                                             )

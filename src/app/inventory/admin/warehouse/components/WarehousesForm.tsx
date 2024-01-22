@@ -10,7 +10,7 @@ import warehouses from "../requests/warehouses";
 
 export default function WarehousesForm() {
     const [ownerUsers, setOwnerUsers] = React.useState([]);
-    
+
     const [updateItem, setUpdateItem] = React.useState();
 
     const params = useParams();
@@ -24,10 +24,10 @@ export default function WarehousesForm() {
                 setOwnerUsers(ownerUsers)
             }
         }
-        
+
         fetchOwnerUsers()
     }, [])
-    
+
     React.useEffect(() => {
         async function fetchWarehouse(id: any) {
             let item = await warehouses.warehouseDetails(id)
@@ -42,7 +42,7 @@ export default function WarehousesForm() {
             fetchWarehouse(params.warehouseId)
         }
     }, [ownerUsers, params.warehouseId, setUpdateItem])
-    
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
@@ -64,17 +64,17 @@ export default function WarehousesForm() {
     )
 
     const initialValues = {
-        owner: updateItem ? updateItem.users : "",
+        owner: updateItem ? updateItem.users.id : "",
         name: updateItem ? updateItem.name : "",
         description: updateItem ? updateItem.description : "",
         address: updateItem ? updateItem.address : "",
     }
 
     const validationSchema = Yup.object({
-        owner: Yup.object().required("campo requerido"),
-        name: Yup.string().required("campo requerido"),
-        description: Yup.string().required("campo requerido"),
-        address: Yup.string().required("campo requerido"),
+        owner: Yup.string().required("Este campo es requerido"),
+        name: Yup.string().required("Este campo es requerido"),
+        description: Yup.string(),
+        address: Yup.string(),
     })
 
     const handleSubmit = async (values) => {
@@ -87,7 +87,7 @@ export default function WarehousesForm() {
                     name: values.name,
                     description: values.description,
                     address: values.address,
-                    ownerId: values.owner.id
+                    ownerId: values.owner
                 })
         } else {
             response = await warehouses.create(
@@ -95,7 +95,7 @@ export default function WarehousesForm() {
                     name: values.name,
                     description: values.description,
                     address: values.address,
-                    ownerId: values.owner.id
+                    ownerId: values.owner
                 })
         }
 
@@ -134,7 +134,7 @@ export default function WarehousesForm() {
                                 helperText={(formik.errors.owner && formik.touched.owner) && formik.errors.owner}
                             >
                                 {
-                                    ownerUsers.map(item => (<MenuItem key={item.username} value={item}>{item.name}</MenuItem>))
+                                    ownerUsers.map(item => (<MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>))
                                 }
                             </TextField>
                         </Grid>
@@ -178,13 +178,13 @@ export default function WarehousesForm() {
 
                     <Grid container item justifyContent={"flex-end"} sx={{ paddingRight: "25px" }}>
                         <Button
-                            color={"secondary"}
+                            color={"error"}
                             variant={"outlined"}
                             size={"small"}
                             sx={{ m: 1 }}
                             onClick={() => router.push(`/inventory/admin/warehouse`)}
                         >
-                            Cancel
+                            Cerrar
                         </Button>
 
                         <Button
@@ -195,7 +195,7 @@ export default function WarehousesForm() {
                             sx={{ m: 1 }}
                             disabled={!formik.isValid}
                         >
-                            {updateItem ? "Actualizar" : "Crear"}
+                            {updateItem ? "Modificar" : "Crear"}
                         </Button>
                     </Grid>
                 </Grid>

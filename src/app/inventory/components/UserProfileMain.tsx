@@ -23,6 +23,8 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import { signOut } from "next-auth/react";
 import { userStatsRequest } from "@/app/inventory/request/userStats";
+import { getRoleTranslation } from "@/utils/getRoleTranslation";
+import { getColorByRole } from "@/utils/getColorbyRole";
 
 export default function UserProfileMain({ userId }: { userId: number }) {
     const [userDetails, setUserDetails] = useState<null | any>(null)
@@ -207,7 +209,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
         return (
             <Card variant="outlined" sx={userProfileStyles.cardButton}>
-                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     Administrar
                 </Typography>
 
@@ -251,7 +253,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
     ) => {
         const DepartmentsButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     Departamentos
                 </Typography>
 
@@ -286,7 +288,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
         const WarehouseButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     Almacenes
                 </Typography>
 
@@ -324,7 +326,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
         const StoreButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     Tiendas
                 </Typography>
 
@@ -362,7 +364,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
         const ProductButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     Productos
                 </Typography>
 
@@ -383,7 +385,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
         const UsersButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     Trabajadores
                 </Typography>
 
@@ -430,7 +432,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
     const SellerModule = ({ sellerStores }: { sellerStores: any[] }) => {
         const StoreButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
-                <Typography variant={"h6"} sx={{overflowX: "auto", flexWrap: "nowrap", fontSize: "18px"}}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     Tiendas
                 </Typography>
 

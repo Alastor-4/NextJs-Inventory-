@@ -74,15 +74,6 @@ export interface ProductsFormProps {
     handleForceRender: () => void;
     setOpen: (bool: boolean) => void;
 }
-export interface ManageQuantityProps {
-    userId: number;
-    nameStore: string;
-    nameWarehouse: string;
-    productDetails: productsProps;
-    updateDepot: (addUnits: number, depot: depots) => Promise<void>;
-    setActiveManageQuantity: (bool: boolean) => void;
-}
-
 export interface AddProductFromWarehouseProps {
     dataStore?: storeWithStoreDepots;
     warehouseId?: number | null;
@@ -157,7 +148,11 @@ export interface ModalStoreAssignProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
     dialogTitle: string;
-    children?: ReactNode;
+    nameStore: string;
+    nameWarehouse: string;
+    productDetails: productsProps;
+    updateDepot: (addUnits: number, depot: depots) => Promise<void>;
+    setActiveManageQuantity: (bool: boolean) => void;
 }
 
 export interface warehousesWithDepots {
