@@ -3,10 +3,9 @@
 import React, { useEffect, useState } from "react";
 import {
     AppBar,
-    Box,
+    Box, Button,
     Card,
     CardContent,
-    CardHeader,
     Chip,
     Divider,
     Grid,
@@ -16,8 +15,8 @@ import {
 } from "@mui/material";
 import {
     ArrowCircleRightOutlined,
-    ChevronRightOutlined,
-    LogoutOutlined,
+    ChevronRightOutlined, HomeOutlined,
+    LogoutOutlined, RocketLaunchOutlined,
 } from "@mui/icons-material";
 import userProfileStyles from "@/assets/styles/userProfileStyles"
 import Link from "next/link";
@@ -125,6 +124,70 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                 return "Usuario"
         }
     }
+
+    const WelcomeModule = () => (
+        <Grid container rowSpacing={1}>
+            <Grid item xs={12}>
+                <Typography variant={"subtitle1"} display={"flex"} alignItems={"center"}>
+                    <RocketLaunchOutlined sx={{mr: "5px"}}/> Bienvenido a Inventario Plus
+                </Typography>
+            </Grid>
+
+            <Grid container item xs={12} alignItems={"center"}>
+                <Grid item xs={"auto"}>
+                    <ChevronRightOutlined/>
+                </Grid>
+
+                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                    Este sistema ha sido pensado para ayudar con todo el proceso de gestión y venta de cualquier
+                    producto. Cada etapa de este proceso ha sido automatizada.
+                </Grid>
+            </Grid>
+
+            <Grid container item xs={12} alignItems={"center"}>
+                <Grid item xs={"auto"}>
+                    <ChevronRightOutlined/>
+                </Grid>
+
+                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                    Inventario+ no hace diferencias entre ningún producto, el límite es su imaginación.
+                </Grid>
+            </Grid>
+
+            <Grid container item xs={12} alignItems={"center"}>
+                <Grid item xs={"auto"}>
+                    <ChevronRightOutlined/>
+                </Grid>
+
+                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                    Esta aplicación esta destinada a aquellos usuario que son trabajadores de tiendas
+                    gestionadas en este sitema. Si busca comprar online en estas tiendas debe utilizar xxxxx.
+                </Grid>
+            </Grid>
+
+            <Grid container item xs={12} alignItems={"center"}>
+                <Grid item xs={"auto"}>
+                    <ChevronRightOutlined/>
+                </Grid>
+
+                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                    Si quiere comezar a gestionar su tienda en nuestro sistema pongase en contacto con el equipo de
+                    soporte mediante xxxxx.
+                </Grid>
+            </Grid>
+
+            <Grid container item xs={12} alignItems={"center"}>
+                <Grid item xs={"auto"}>
+                    <ChevronRightOutlined/>
+                </Grid>
+
+                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                    Si su objetivo es ser trabajador de algun dueño con tienda(s) en nuestro sitema, este dueño ya le
+                    puede buscar y hacerlo su trabajador.
+                </Grid>
+            </Grid>
+        </Grid>
+    )
 
     const AdminModule = () => {
         const LinksTemplate = ({ pageAddress, title }: { pageAddress: string, title: string }) => (
@@ -340,35 +403,25 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         )
 
         return (
-            <Grid container rowSpacing={3}>
-                <Grid item xs={12}>
-                    <Divider flexItem color={"primary"} variant={"fullWidth"} orientation={"horizontal"} />
+            <Grid container item spacing={2}>
+                <Grid container item xs={6} justifyContent={"center"}>
+                    <DepartmentsButton />
                 </Grid>
 
-                <Grid item xs={12}>
-                    <Typography variant={"h5"} sx={{ textAlign: "center" }}>Administración</Typography>
+                <Grid container item xs={6} justifyContent={"center"}>
+                    <ProductButton />
                 </Grid>
 
-                <Grid container item spacing={2}>
-                    <Grid container item xs={6} justifyContent={"center"}>
-                        <DepartmentsButton />
-                    </Grid>
+                <Grid container item xs={6} justifyContent={"center"}>
+                    <UsersButton />
+                </Grid>
 
-                    <Grid container item xs={6} justifyContent={"center"}>
-                        <ProductButton />
-                    </Grid>
+                <Grid container item xs={6} justifyContent={"center"}>
+                    <WarehouseButton />
+                </Grid>
 
-                    <Grid container item xs={6} justifyContent={"center"}>
-                        <UsersButton />
-                    </Grid>
-
-                    <Grid container item xs={6} justifyContent={"center"}>
-                        <WarehouseButton />
-                    </Grid>
-
-                    <Grid container item xs={6} justifyContent={"center"}>
-                        <StoreButton />
-                    </Grid>
+                <Grid container item xs={6} justifyContent={"center"}>
+                    <StoreButton />
                 </Grid>
             </Grid>
         )
@@ -401,22 +454,17 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         )
 
         return (
-            <Grid container rowSpacing={3}>
-                <Grid item xs={12}>
-                    <Divider flexItem color={"primary"} variant={"fullWidth"} orientation={"horizontal"} />
-                </Grid>
-
-                <Grid item xs={12}>
-                    <Typography variant={"h5"} sx={{ textAlign: "center" }}>Vendedor</Typography>
-                </Grid>
-
-                <Grid container item spacing={2}>
-                    <Grid container item xs={6} justifyContent={"center"}>
-                        <StoreButton />
-                    </Grid>
+            <Grid container item spacing={2}>
+                <Grid container item xs={6} justifyContent={"center"}>
+                    <StoreButton />
                 </Grid>
             </Grid>
         )
+    }
+
+    const [activeTab, setActiveTab] = React.useState<string>("welcome")
+    function handleChangeActiveTab(value: string) {
+        setActiveTab(value)
     }
 
     return (
@@ -425,8 +473,8 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                 <CustomToolbar />
 
                 <CardContent>
-                    <Grid container rowSpacing={5}>
-                        <Grid container item rowSpacing={3}>
+                    <Grid container rowSpacing={3}>
+                        <Grid container item rowSpacing={2}>
                             <Grid container item xs={12} justifyContent={"flex-end"}>
                                 {
                                     userDetails?.roles?.name && (
@@ -475,40 +523,80 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                                 </Grid>
                             </Grid>
                         </Grid>
-                        {
-                            userRole === 'admin' && (
-                                <Grid item xs={12}>
-                                    <AdminModule />
-                                </Grid>
-                            )
-                        }
 
-                        {
-                            userRole === "store_owner" &&
-                            globalAndOwnerDepartments &&
-                            ownerWarehouses &&
-                            ownerStores &&
-                            ownerProductsCount !== null &&
-                            ownerWorkersCount !== null && (
-                                <Grid item xs={12}>
+                        <Grid item xs={12}>
+                            <Divider flexItem color={"primary"} variant={"fullWidth"} orientation={"horizontal"} />
+                        </Grid>
+
+                        <Grid container item xs={12} rowSpacing={1}>
+                            <Grid item xs={12}>
+                                <IconButton
+                                    size={"small"}
+                                    onClick={() => handleChangeActiveTab("welcome")}
+                                    color={activeTab === "welcome" ? "primary" : "inherit"}
+                                >
+                                    <HomeOutlined />
+                                </IconButton>
+
+                                {
+                                    userRole === 'admin' && (
+                                        <Button
+                                            color={activeTab === "admin" ? "primary" : "inherit"}
+                                            onClick={() => handleChangeActiveTab("admin")}
+                                        >
+                                            Admin
+                                        </Button>
+                                    )
+                                }
+
+                                {
+                                    userRole === "store_owner" &&
+                                    globalAndOwnerDepartments &&
+                                    ownerWarehouses &&
+                                    ownerStores &&
+                                    ownerProductsCount !== null &&
+                                    ownerWorkersCount !== null && (
+                                        <Button
+                                            color={activeTab === "owner" ? "primary" : "inherit"}
+                                            onClick={() => handleChangeActiveTab("owner")}
+                                        >
+                                            Dueño
+                                        </Button>
+                                    )
+                                }
+
+                                {
+                                    (userRole === "store_owner" || userRole === "store_seller") && sellerStores && (
+                                        <Button
+                                            color={activeTab === "seller" ? "primary" : "inherit"}
+                                            onClick={() => handleChangeActiveTab("seller")}
+                                        >
+                                            Vendedor
+                                        </Button>
+                                    )
+                                }
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                {activeTab === "welcome" && <WelcomeModule/>}
+
+                                {activeTab === "admin" && <AdminModule/>}
+
+                                {activeTab === "owner" && (
                                     <OwnerModule
-                                        globalAndOwnerDepartments={globalAndOwnerDepartments}
-                                        ownerWarehouses={ownerWarehouses}
-                                        ownerStores={ownerStores}
-                                        ownerProductsCount={ownerProductsCount}
-                                        ownerWorkersCount={ownerWorkersCount}
+                                        globalAndOwnerDepartments={globalAndOwnerDepartments!}
+                                        ownerProductsCount={ownerProductsCount!}
+                                        ownerWarehouses={ownerWarehouses!}
+                                        ownerStores={ownerStores!}
+                                        ownerWorkersCount={ownerWorkersCount!}
                                     />
-                                </Grid>
-                            )
-                        }
+                                )}
 
-                        {
-                            (userRole === "store_owner" || userRole === "store_seller") && sellerStores && (
-                                <Grid item xs={12}>
-                                    <SellerModule sellerStores={sellerStores} />
-                                </Grid>
-                            )
-                        }
+                                {activeTab === "seller" && (
+                                    <SellerModule sellerStores={sellerStores!}/>
+                                )}
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </CardContent>
             </Card>
