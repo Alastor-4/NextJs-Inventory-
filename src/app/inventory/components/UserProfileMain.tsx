@@ -146,8 +146,8 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                 </Grid>
 
                 <Grid item xs={true} sx={{textWrap: "pretty"}}>
-                    Si su objetivo es ser trabajador de algun dueño con tienda(s) en nuestro sitema, este dueño ya le
-                    puede buscar y hacerlo su trabajador.
+                    Si su objetivo es ser trabajador de algún dueño con tienda(s) en nuestro sistema, este debe hacerlo su
+                    trabajador mediante esa funcionalidad en su panel administrativo.
                 </Grid>
             </Grid>
         </Grid>
