@@ -89,44 +89,6 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         </AppBar>
     )
 
-    function getColorByRole(roleName: string) {
-        switch (roleName) {
-            case "admin":
-                return "primary"
-
-            case "store_owner":
-                return "secondary"
-
-            case "store_keeper":
-                return "error"
-
-            case "store_seller":
-                return "success"
-
-            default:
-                return "info"
-        }
-    }
-
-    function getRoleTranslation(roleName: string) {
-        switch (roleName) {
-            case "admin":
-                return "Admin"
-
-            case "store_owner":
-                return "Dueño"
-
-            case "store_keeper":
-                return "Almacenero"
-
-            case "store_seller":
-                return "Vendedor"
-
-            default:
-                return "Usuario"
-        }
-    }
-
     const WelcomeModule = () => (
         <Grid container rowSpacing={1}>
             <Grid item xs={12}>
