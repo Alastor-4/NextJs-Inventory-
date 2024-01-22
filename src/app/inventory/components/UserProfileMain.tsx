@@ -431,6 +431,22 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         setActiveTab(value)
     }
 
+    React.useEffect(() => {
+        switch (userRole) {
+            case "admin":
+                return setActiveTab("admin")
+
+            case "store_owner":
+                return setActiveTab("owner")
+
+            case "store_seller":
+                return setActiveTab("seller")
+
+            default:
+                break
+        }
+    }, [userRole])
+
     return (
         <>
             <Card variant={"outlined"}>
