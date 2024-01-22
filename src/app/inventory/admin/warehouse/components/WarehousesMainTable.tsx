@@ -165,9 +165,9 @@ export default function WarehousesMainTable({ userId }) {
                             />
                         </TableCell>
                         <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.users.name}</TableCell>
-                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.name}</TableCell>
-                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.description.length! !== 0 ? row.description : "-"}</TableCell>
-                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.address.length! !== 0 ? row.adress : "-"}</TableCell>
+                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.name ?? "-"}</TableCell>
+                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.description ?? "-"}</TableCell>
+                        <TableCell sx={{ whiteSpace: "nowrap" }} align="center">{row.address ?? "-"}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
