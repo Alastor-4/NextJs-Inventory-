@@ -112,25 +112,27 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
                         <CustomToolbar />
                     </Grid>
 
-                    <Grid item>
-                        <Typography variant={"subtitle1"} sx={{ paddingLeft: "20px" }}>
+                    <Grid item sx={{ paddingX: "25px" }}>
+                        <Typography variant={"subtitle1"} sx={{ textWrap: "balance" }}>
                             Proporcione los datos exactos de un usuario para hacerlo su trabajador.
-                        </Typography>
-                        <Typography variant={"subtitle1"} sx={{ paddingLeft: "20px" }}>
-                            El usuario debe estar registrado y verificado en el sistema, y no puede ser trabajador.
-                            <InfoTooltip
-                                isOpenTooltip={isOpenTooltipUp}
-                                handleTooltipClose={handleTooltipUpClose}
-                                message="Si el usuario es ya trabajador de algún usuario, primero debe darse baja para
-                            que sea elegible en esta opción">
-                                <IconButton sx={{ marginBottom: "3px" }} onClick={handleTooltipUpOpen}>
-                                    <InfoOutlined />
-                                </IconButton>
-                            </InfoTooltip>
                         </Typography>
                     </Grid>
 
-                    <Grid container item rowSpacing={4} sx={{ padding: "25px" }}>
+                    <Grid item sx={{ paddingX: "25px" }}>
+                        El usuario debe estar registrado y verificado en el sistema y no puede ser trabajador de ningún usuario.
+                        <InfoTooltip
+                            isOpenTooltip={isOpenTooltipUp}
+                            handleTooltipClose={handleTooltipUpClose}
+                            message="Si el usuario es ya trabajador de algún usuario, primero debe darse baja para
+                            que sea elegible en esta opción"
+                        >
+                            <IconButton size={"small"} onClick={handleTooltipUpOpen}>
+                                <InfoOutlined fontSize={"small"}/>
+                            </IconButton>
+                        </InfoTooltip>
+                    </Grid>
+
+                    <Grid container item rowSpacing={2} sx={{ paddingX: "25px" }}>
                         <Grid item xs={12}>
                             <TextField
                                 label="Nombre de usuario"
@@ -192,15 +194,10 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
                                             ? (
                                                 <Grid container rowSpacing={2}>
                                                     <Grid item xs={12}>
-                                                        <Typography variant={"body1"}>
-                                                            Encontrado un usuario que coincide con los datos proporcionados
-                                                        </Typography>
+                                                        Usuario encontrado:
                                                     </Grid>
                                                     <Grid container item rowSpacing={2}>
                                                         <Grid container item rowSpacing={1}>
-                                                            <Grid item sx={workerSearchResultStyles.leftPart}>
-                                                                Usuario:
-                                                            </Grid>
                                                             <Grid item sx={workerSearchResultStyles.rightPart}>
                                                                 {foundUserData.username}
                                                             </Grid>
@@ -231,24 +228,21 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
                                                     </Grid>
                                                 </Grid>
                                             ) : (
-                                                <Grid container>
-                                                    <Typography variant={"body1"} component="div">
-                                                        No se encontró ningun usuario con coincida con los datos
-                                                        proporcionados.
-                                                        <InfoTooltip
-                                                            isOpenTooltip={isOpenTooltipDown}
-                                                            handleTooltipClose={handleTooltipDownClose}
-                                                            message="Póngase en contacto con el usuario y verifique los datos.">
-                                                            <IconButton sx={{ marginBottom: "3px" }} onClick={handleTooltipDownOpen}>
-                                                                <InfoOutlined />
-                                                            </IconButton>
-                                                        </InfoTooltip>
-                                                    </Typography>
+                                                <Grid item xs={12} sx={{textWrap: "pretty"}}>
+                                                    No se encontró ningún usuario coincidente con los datos proporcionados.
+                                                    <InfoTooltip
+                                                        isOpenTooltip={isOpenTooltipDown}
+                                                        handleTooltipClose={handleTooltipDownClose}
+                                                        message="Póngase en contacto con el usuario y verifique los datos."
+                                                    >
+                                                        <IconButton size={"small"} onClick={handleTooltipDownOpen}>
+                                                            <InfoOutlined fontSize={"small"}/>
+                                                        </IconButton>
+                                                    </InfoTooltip>
                                                 </Grid>
                                             )
                                     }
                                 </Card>
-
                             </Grid>
                         )
                     }

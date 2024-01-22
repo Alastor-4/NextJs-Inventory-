@@ -36,7 +36,7 @@ import ownerUsers from "../requests/ownerUsers";
 import { roles, users } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getRoleTranslation } from '../../../../../utils/getRoleTranslation';
+import { getRoleTranslation } from '@/utils/getRoleTranslation';
 import { getColorByRole } from "@/utils/getColorbyRole";
 
 interface WorkersMainTableProps {
