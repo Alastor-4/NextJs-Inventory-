@@ -159,7 +159,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
 
                 notifySuccess("Se ha eliminado el producto");
             }
-        } else notifyError("Error al eliminar el producto. Solo es posibe eliminar productos que no están siendo usados en el sistema");
+        } else notifyError("Error al eliminar el producto. Solo es posibe eliminar productos que no están siendo usados en el sistema", true);
     }
 
     const handleNavigateBack = () => { router.push(`/inventory`); }
