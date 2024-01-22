@@ -546,97 +546,101 @@ export default function StoreMain({ userId }: { userId?: number }) {
                         </IconButton>
                     </Grid>
                 </Grid>
-                <Grid container rowSpacing={2} mt={"5px"}>
-                    {storeDetails?.online_reservation &&
-                        <>
-                            <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
-                                    <ChevronRightOutlined fontSize={"small"} />
-                                    Total de ventas:
-                                </Grid>
-                                <Grid item xs={true}>{todaySellsStats?.sellsTotal}</Grid>
-                            </Grid>
-                            <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
-                                    <ChevronRightOutlined fontSize={"small"} />
-                                    Recaudado
-                                </Grid>
-                                <Grid container item xs={true}>
-                                    <Grid item xs={12}>
-                                        Total: ${todaySellsStats?.sellsAmountTotal}
-                                    </Grid>
-
-                                    <Grid item xs={12}>
-                                        Dueño: ${numberFormat(`${todaySellsStats?.sellsAmountTotal! - todaySellsStats?.sellerProfitTotal!}`)} | Vendedor: ${numberFormat(`${todaySellsStats?.sellerProfitTotal}`)}
-                                    </Grid>
-                                </Grid>
+                <Grid container rowSpacing={1} mt={"5px"}>
+                    <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                        <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            Total de ventas:
+                        </Grid>
+                        <Grid item xs={true}>{todaySellsStats?.sellsTotal}</Grid>
+                    </Grid>
+                    <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                        <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            Recaudado
+                        </Grid>
+                        <Grid container item xs={true}>
+                            <Grid item xs={12}>
+                                Total: ${todaySellsStats?.sellsAmountTotal}
                             </Grid>
 
-                            {todaySellsStats?.sellsUnitsReturnedTotal! > 0 &&
-                                <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                    <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
-                                        <ChevronRightOutlined fontSize={"small"} />
-                                        Productos devueltos:
-                                    </Grid>
-                                    <Grid item xs={true} >{todaySellsStats?.sellsUnitsReturnedTotal}</Grid>
-                                </Grid>
-                            }
-                        </>
+                            <Grid item xs={12}>
+                                Dueño: ${numberFormat(`${todaySellsStats?.sellsAmountTotal! - todaySellsStats?.sellerProfitTotal!}`)}
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                Vendedor: ${numberFormat(`${todaySellsStats?.sellerProfitTotal}`)}
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    {todaySellsStats?.sellsUnitsReturnedTotal! > 0 &&
+                        <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                            <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                <ChevronRightOutlined fontSize={"small"} />
+                                Productos devueltos:
+                            </Grid>
+                            <Grid item xs={true} >{todaySellsStats?.sellsUnitsReturnedTotal}</Grid>
+                        </Grid>
                     }
 
                     {/* Presenciales */}
                     <Grid container rowSpacing={1} marginTop={"2px"}>
-                        {/* {storeDetails?.online_reservation &&
-                            <> */}
-                        {/* <Grid item xs={12}><Divider orientation="horizontal" variant="fullWidth" /></Grid> */}
+                        {storeDetails?.online_reservation &&
+                            <>
+                                <Grid item xs={12}><Divider orientation="horizontal" variant="fullWidth"/></Grid>
 
-                        {/* <Grid sx={{ fontWeight: 600, mb: "5px", mt: "10px" }}>Presenciales:</Grid> */}
+                                <Grid sx={{fontWeight: 600, mb: "5px", mt: "10px"}}>Presenciales:</Grid>
 
-                        <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                            <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
-                                <ChevronRightOutlined fontSize={"small"} />
-                                Total:
-                            </Grid>
-                            <Grid item xs={true} >{todaySellsStats?.normalSellsTotal}</Grid>
-                        </Grid>
-
-                        <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                            <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
-                                <ChevronRightOutlined fontSize={"small"} />
-                                Productos:
-                            </Grid>
-                            <Grid item xs={true}>
-                                {todaySellsStats?.normalSellsDifferentProductsTotal} {`(${todaySellsStats?.normalSellsProductsQuantity} unidades totales)`}
-                            </Grid>
-                        </Grid>
-
-                        <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                            <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
-                                <ChevronRightOutlined fontSize={"small"} />
-                                Recaudado
-                            </Grid>
-                            <Grid container item xs={true}>
-                                <Grid item xs={12}>
-                                    Total: ${todaySellsStats?.normalSellsAmountTotal}
+                                <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                    <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Total:
+                                    </Grid>
+                                    <Grid item xs={true}>{todaySellsStats?.normalSellsTotal}</Grid>
                                 </Grid>
 
-                                <Grid item xs={12}>
-                                    Dueño: ${numberFormat(`${todaySellsStats?.normalSellsAmountTotal! - todaySellsStats?.normalSellerProfitTotal!}`)} | Vendedor: ${numberFormat(`${todaySellsStats?.normalSellerProfitTotal}`)}
+                                <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                    <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Productos:
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {todaySellsStats?.normalSellsDifferentProductsTotal} {`(${todaySellsStats?.normalSellsProductsQuantity} unidades totales)`}
+                                    </Grid>
                                 </Grid>
-                            </Grid>
-                        </Grid>
 
-                        {todaySellsStats?.normalSellsUnitsReturnedTotal! > 0 &&
-                            <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
-                                    <ChevronRightOutlined fontSize={"small"} />
-                                    Productos devueltos:
+                                <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                    <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
+                                        <ChevronRightOutlined fontSize={"small"}/>
+                                        Recaudado
+                                    </Grid>
+                                    <Grid container item xs={true}>
+                                        <Grid item xs={12}>
+                                            Total: ${todaySellsStats?.normalSellsAmountTotal}
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            Dueño: ${numberFormat(`${todaySellsStats?.normalSellsAmountTotal! - todaySellsStats?.normalSellerProfitTotal!}`)}
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            Vendedor: ${numberFormat(`${todaySellsStats?.normalSellerProfitTotal}`)}
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={true} >{todaySellsStats?.normalSellsUnitsReturnedTotal}</Grid>
-                            </Grid>
+
+                                {todaySellsStats?.normalSellsUnitsReturnedTotal! > 0 &&
+                                    <Grid container item spacing={1} xs={12} alignItems={"center"}>
+                                        <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
+                                            <ChevronRightOutlined fontSize={"small"}/>
+                                            Productos devueltos:
+                                        </Grid>
+                                        <Grid item xs={true}>{todaySellsStats?.normalSellsUnitsReturnedTotal}</Grid>
+                                    </Grid>
+                                }
+                            </>
                         }
-                        {/* </>
-                        } */}
                     </Grid>
 
                     {/* Por reservaciones */}
@@ -655,11 +659,23 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             </Grid>
 
                             <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
-                                    <ChevronRightOutlined fontSize={"small"} />
-                                    Recaudado:
+                                <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
+                                    <ChevronRightOutlined fontSize={"small"}/>
+                                    Recaudado
                                 </Grid>
-                                <Grid item xs={true}>Dueño: ${numberFormat(`${todaySellsStats?.reservationSellsAmountTotal! - todaySellsStats?.reservationSellerProfitTotal!}`)} | Vendedor: ${numberFormat(`${todaySellsStats?.reservationSellerProfitTotal}`)}</Grid>
+                                <Grid container item xs={true}>
+                                    <Grid item xs={12}>
+                                        Total: ${todaySellsStats?.reservationSellsAmountTotal}
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        Dueño: ${numberFormat(`${todaySellsStats?.reservationSellsAmountTotal! - todaySellsStats?.reservationSellerProfitTotal!}`)}
+                                    </Grid>
+
+                                    <Grid item xs={12}>
+                                        Vendedor: ${numberFormat(`${todaySellsStats?.reservationSellerProfitTotal}`)}
+                                    </Grid>
+                                </Grid>
                             </Grid>
                         </Grid>
                     }
