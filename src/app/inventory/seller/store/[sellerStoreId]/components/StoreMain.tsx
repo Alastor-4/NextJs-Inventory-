@@ -256,7 +256,11 @@ export default function StoreMain({ userId }: { userId?: number }) {
     // modal today sells details
     const [isModalSellsOpen, setIsModalSellsOpen] = useState<boolean>(false);
     const toggleModalSellsOpen = () => {
-        if (todaySells?.length > 0) setIsModalSellsOpen(!isModalSellsOpen);
+        if (todaySells?.length > 0) {
+            setIsModalSellsOpen(!isModalSellsOpen)
+        } else {
+            notifySuccess("La tienda no posee ventas registradas hoy")
+        }
     };
 
     // modal today transfers details
@@ -264,12 +268,18 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const [isModalTransfersOpen, setIsModalTransfersOpen] = useState<boolean>(false);
 
     const openModalTransfersDetails = async () => {
-        if (!todayTransfersDetails) {
-            const data = await stores.getTodayTransfersDetails(sellerStoreId)
-            if (data) setTodayTransfersDetails(data)
+
+
+        if(todayTransfers?.totalTransfers) {
+            if (!todayTransfersDetails) {
+                const data = await stores.getTodayTransfersDetails(sellerStoreId)
+                if (data) setTodayTransfersDetails(data)
+            }
+
+            return setIsModalTransfersOpen(true)
         }
 
-        return setIsModalTransfersOpen(true)
+        return notifySuccess("La tienda no posee transferencias registradas hoy")
     };
 
     const CustomToolbar = () => (
