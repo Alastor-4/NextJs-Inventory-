@@ -20,7 +20,6 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import userProfileStyles from "@/assets/styles/userProfileStyles";
 import { product_store_transfers, store_depot_transfers } from "@prisma/client";
-import { storeDetails } from '../../../../owner/store-details/[storeDetailsId]/request/storeDetails';
 import ModalTransfersToday from "@/app/inventory/seller/store/[sellerStoreId]/components/Modal/ModalTransfersToday";
 
 dayjs.extend(isBetween);
@@ -277,7 +276,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={() => router.back()}>
+                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={() => router.push("/inventory")}>
                         <ArrowLeft fontSize={"large"} />
                     </IconButton>
                     <Typography

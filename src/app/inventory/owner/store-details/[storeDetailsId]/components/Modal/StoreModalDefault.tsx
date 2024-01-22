@@ -16,7 +16,6 @@ export const StoreModalDefault = ({ children, dialogTitle, setOpen, open }: Stor
                 justifyContent={"space-between"}
                 alignItems={"center"}
                 color={"white"}
-                fontWeight={"400"}
                 sx={{ bgcolor: '#1976d3' }}
             >
                 {dialogTitle}
