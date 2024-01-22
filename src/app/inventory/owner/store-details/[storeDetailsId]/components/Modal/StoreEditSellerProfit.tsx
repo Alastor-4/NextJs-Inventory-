@@ -54,7 +54,7 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
             <Grid container gap={1}>
                 <TextField
                     name='percentage'
-                    label="Porcentaje"
+                    label="Porciento"
                     {...formik.getFieldProps("percentage")}
                     value={formik.values.percentage ?? ""}
                     error={formik.errors.percentage && formik.touched.percentage}
@@ -65,7 +65,7 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
                     select
                     value={'%'}
                 >
-                    <MenuItem value={"%"} >%</MenuItem>
+                    <MenuItem value={"%"}>%</MenuItem>
                 </TextField>
             </Grid>
         </>
@@ -88,7 +88,7 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
                     select
                     value={storeDepot?.sell_price_unit}
                 >
-                    <MenuItem value={storeDepot?.sell_price_unit!} >CUP</MenuItem>
+                    <MenuItem value={storeDepot?.sell_price_unit!}>CUP</MenuItem>
                 </TextField>
             </Grid>
         </>
@@ -106,17 +106,17 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
                     <form onSubmit={formik.handleSubmit}>
                         <Grid container direction={'column'} rowSpacing={2} >
                             <Grid item container columnSpacing={1}>
-                                <Grid item>
+                                <Grid item xs={6}>
                                     <Button
-                                        variant={!selectedButton ? "contained" : "outlined"}
+                                        variant={!selectedButton ? "outlined" : "text"}
                                         onClick={() => setSelectedButton(false)}
-                                    >Porcentaje</Button>
+                                    >Porciento</Button>
                                 </Grid>
-                                <Grid item>
+                                <Grid item xs={6}>
                                     <Button
-                                        variant={selectedButton ? "contained" : "outlined"}
+                                        variant={selectedButton ? "outlined" : "text"}
                                         onClick={() => setSelectedButton(true)}
-                                    >Cantidad fija</Button>
+                                    >Cantidad</Button>
                                 </Grid>
                             </Grid>
                             <Grid item container >

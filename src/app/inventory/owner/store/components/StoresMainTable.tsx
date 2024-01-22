@@ -4,7 +4,6 @@ import React from "react";
 import {
     AppBar,
     Box,
-    Button,
     Card,
     CardContent,
     Checkbox,
@@ -32,12 +31,13 @@ import {
     EditOutlined,
     ExpandLessOutlined,
     ExpandMoreOutlined,
+    ProductionQuantityLimits,
     ShoppingCartOutlined,
     StorefrontOutlined
 } from "@mui/icons-material";
 
 import { useRouter } from "next/navigation";
-import { daysMap } from "@/utils/generalFunctions";
+import {daysMap, notifyError} from "@/utils/generalFunctions";
 import dayjs from "dayjs";
 import stores from "../requests/stores";
 
@@ -76,6 +76,8 @@ export default function StoresMainTable({ userId }: { userId: number }) {
             const updatedStores = await stores.allUserStores(userId)
             if (updatedStores) setData(updatedStores)
             setSelected(null);
+        } else {
+            notifyError("Ha fallado la eliminación de la tienda. La tienda no puede ser eliminar si ya se ha utilizada y se han generado datos", true)
         }
     }
 
@@ -116,6 +118,13 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                 <IconButton
                                     color={"inherit"}
                                     onClick={() => router.push(`/inventory/owner/store-details/${selected.id}`)}
+                                >
+                                    <ProductionQuantityLimits fontSize={"small"} />
+                                </IconButton>
+
+                                <IconButton
+                                    color={"inherit"}
+                                    onClick={() => router.push(`/inventory/seller/store/${selected.id}`)}
                                 >
                                     <StorefrontOutlined fontSize={"small"} />
                                 </IconButton>
@@ -396,16 +405,6 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                                     </Grid>
                                                 )
                                             }
-
-                                            <Grid item xs={12}>
-                                                <Button
-                                                    variant={"outlined"}
-                                                    color={"info"}
-                                                    onClick={() => router.push(`/inventory/owner/store-details/${row.id}`)}
-                                                >
-                                                    Administrar productos
-                                                </Button>
-                                            </Grid>
                                         </Grid>
                                     </Collapse>
                                 )}

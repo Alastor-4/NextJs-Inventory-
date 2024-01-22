@@ -131,21 +131,21 @@ const TransferUnits = ({ nameStore, storeDepot, productId, setActiveTransferUnit
             {(formik: any) => (
                 <Grid container rowGap={2}>
                     <Grid container item xs={12} rowSpacing={1}>
-                        <Grid item xs={12} order={swap ? 2 : 1}>
+                        <Grid container item xs={12} order={swap ? 2 : 1} justifyContent={"center"}>
                             <Typography variant='subtitle1'>Unidades en almacén: {selectedWarehouseDepot?.product_total_remaining_units}</Typography>
                         </Grid>
 
-                        <Grid item xs={12} order={swap ? 1 : 2}>
+                        <Grid container item xs={12} order={swap ? 1 : 2} justifyContent={"center"}>
                             <Typography variant='subtitle1'>Unidades en tienda: {storeDepot?.product_remaining_units}</Typography>
                         </Grid>
                     </Grid>
 
                     <Grid container item xs={12} spacing={1}>
-                        <Grid item xs={12} md={6}>
+                        <Grid container item xs={12} md={6} justifyContent={"center"}>
                             Proveedor {swap ? "Tienda" : "Almacén"}
                         </Grid>
 
-                        <Grid item xs={12} md={6}>
+                        <Grid container item xs={12} md={6} justifyContent={"center"}>
                             {swap ? nameStore : selectWarehouse(formik)}
                         </Grid>
                     </Grid>
@@ -157,11 +157,11 @@ const TransferUnits = ({ nameStore, storeDepot, productId, setActiveTransferUnit
                     </Grid>
 
                     <Grid container item xs={12} spacing={1}>
-                        <Grid item xs={12} md={6}>
+                        <Grid container item xs={12} md={6} justifyContent={"center"}>
                             Destinatario {swap ? "Almacén" : "Tienda"}
                         </Grid>
 
-                        <Grid item xs={12} md={6}>
+                        <Grid container item xs={12} md={6} justifyContent={"center"}>
                             {swap ? selectWarehouse(formik) : nameStore}
                         </Grid>
                     </Grid>

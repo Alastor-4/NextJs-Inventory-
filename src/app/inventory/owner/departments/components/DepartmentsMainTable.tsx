@@ -64,16 +64,6 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
     const handleTooltipClose = () => setIsOpenTooltip(false);
     const handleTooltipOpen = () => setIsOpenTooltip(true);
 
-    //Handle delete department
-    const handleRemove = async () => {
-        const response = await departmentsRequests.deleteDepartment(selectedDepartment?.id!);
-        if (response) {
-            setSelectedDepartment(null);
-            handleForceRender();
-            notifySuccess("Se ha eliminado el departamento");
-        }
-    }
-
     const handleNavigateBack = () => router.push(`/inventory`);
 
     const CustomToolbar = () => (
@@ -102,10 +92,6 @@ export const DepartmentsMainTable = ({ userId }: DepartmentsMainTableProps) => {
                             <Box sx={{ display: "flex" }}>
                                 <IconButton color={"inherit"} onClick={toggleModalUpdate}>
                                     <EditOutlined fontSize={"small"} />
-                                </IconButton>
-
-                                <IconButton color={"inherit"} onClick={handleRemove}>
-                                    <DeleteOutline fontSize={"small"} />
                                 </IconButton>
 
                                 <Divider orientation="vertical" variant="middle" flexItem
