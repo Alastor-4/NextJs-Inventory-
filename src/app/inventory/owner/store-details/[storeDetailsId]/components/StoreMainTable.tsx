@@ -415,9 +415,9 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
         <>
             <CustomToolbar />
 
-            {isFilterModalOpen && allProductsByDepartment?.length && (
+            {isFilterModalOpen && (allProductsByDepartment?.length! > 0) && (
                 <FilterProductsByDepartmentsModal
-                    allProductsByDepartment={allProductsByDepartment}
+                    allProductsByDepartment={allProductsByDepartment!}
                     setAllProductsByDepartment={setAllProductsByDepartment}
                     setFiltersApplied={setFiltersApplied}
                     isFilterModalOpen={isFilterModalOpen}

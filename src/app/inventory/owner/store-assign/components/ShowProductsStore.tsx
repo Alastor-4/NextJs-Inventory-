@@ -407,7 +407,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                 (formik) => (
                     <Card variant={"outlined"}>
                         {
-                            isFilterModalOpen && allProductsByDepartment?.length && (
+                            isFilterModalOpen && (allProductsByDepartment?.length! > 0) && (
                                 <FilterProductsByDepartmentsModal
                                     allProductsByDepartment={allProductsByDepartment!}
                                     setAllProductsByDepartment={setAllProductsByDepartment}
