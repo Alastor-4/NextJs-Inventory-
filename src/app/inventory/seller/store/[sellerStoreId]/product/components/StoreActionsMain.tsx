@@ -32,7 +32,7 @@ import {
 import { TableNoData } from "@/components/TableNoData";
 import {
     ArrowLeft,
-    DescriptionOutlined,
+    DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
     FilterAlt,
     FilterAltOff,
     FilterAltOutlined,
@@ -439,7 +439,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                         selected={!!selected.find((item: any) => item.id === row.id)}
                                         onClick={() => handleExpandRow(row.id)}
                                     >
-                                        <TableCell>
+                                        <TableCell sx={{ padding: 0 }}>
                                             <Checkbox
                                                 size='small'
                                                 checked={!!selected.find((item: any) => item.id === row.id)}
@@ -447,6 +447,14 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                     !row.depots[0].store_depots[0].product_remaining_units}
                                                 onClick={(e) => handleSelectItem(e, row)}
                                             />
+
+                                            <IconButton size={"small"}>
+                                                {
+                                                    (expandIndex !== row.id)
+                                                        ? <ExpandMoreOutlined/>
+                                                        : <ExpandLessOutlined/>
+                                                }
+                                            </IconButton>
                                         </TableCell>
 
                                         <TableCell>

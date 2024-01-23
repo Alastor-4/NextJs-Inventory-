@@ -3,7 +3,7 @@
 import {
     AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent, Grid,
     IconButton, InputBase, Switch, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Toolbar, Tooltip, Typography
+    TableHead, TableRow, Toolbar, Typography
 } from "@mui/material";
 import {
     AddOutlined, ArrowLeft, DescriptionOutlined,
@@ -283,19 +283,16 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                             onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
                                         >
                                             <TableCell style={{ padding: 0 }}>
-                                                <Tooltip title={"Detalles"}>
-                                                    <IconButton
-                                                        size={"small"}
-                                                        sx={{ m: "3px" }}
-                                                        onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
-                                                    >
-                                                        {
-                                                            (showDetails !== product.id)
-                                                                ? <ExpandMoreOutlined />
-                                                                : <ExpandLessOutlined />
-                                                        }
-                                                    </IconButton>
-                                                </Tooltip>
+                                                <IconButton
+                                                    size={"small"}
+                                                    onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
+                                                >
+                                                    {
+                                                        (showDetails !== product.id)
+                                                            ? <ExpandMoreOutlined />
+                                                            : <ExpandLessOutlined />
+                                                    }
+                                                </IconButton>
                                             </TableCell>
                                             <TableCell>
                                                 {
