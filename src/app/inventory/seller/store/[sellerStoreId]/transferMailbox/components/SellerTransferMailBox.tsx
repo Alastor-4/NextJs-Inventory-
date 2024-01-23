@@ -9,6 +9,7 @@ import {images} from '@prisma/client'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import {DataTransferReceived, TransferStoreDepots} from './TypeTransfers'
 import ModalSellProducts from './ModalSellProducts'
+import {notifyError, notifySuccess} from "@/utils/generalFunctions";
 
 interface SellerTransferMailboxProps {
     userId?: number
@@ -209,14 +210,17 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                     }
 
                     if (ok) {
-                        changeStatus({
+                        await changeStatus({
                             id: dataItem.id,
                             from_store_accepted: false,
                             to_store_accepted: true,
                             transfer_cancelled: false
                         })
-                    }
 
+                        notifySuccess("Transferencia aceptada. Producto agregado a su tienda")
+                    } else {
+                        notifyError("El proceso de Aceptar transferencia ha fallado", true)
+                    }
                 }
 
                 const handleSell = async () => {
@@ -245,8 +249,11 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                         }
 
                         await changeStatus(dataCancel)
-                    }
 
+                        notifySuccess("Transferencia cancelada. Producto retornado a la tienda origen")
+                    } else {
+                        notifyError("El proceso de Cancelar transferencia ha fallado", true)
+                    }
                 }
 
 
