@@ -745,12 +745,12 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
     const validationSchema = Yup.object({
         productSell: Yup.object({
             products: Yup.array().of(Yup.object({
-                maxUnitsQuantity: Yup.number(),
+                maxUnitsQuantity: Yup.number().integer().typeError("Debe ser un número"),
                 unitsQuantity: Yup
-                    .number()
-                    .required("especifíque cantidad")
-                    .min(1, "cantidad mayor que 0")
-                    .max(Yup.ref("maxUnitsQuantity"), `cantidad no disponible`),
+                    .number().integer().typeError("Debe ser un número")
+                    .required("Requerido")
+                    .min(1, "Al menos 1")
+                    .max(Yup.ref("maxUnitsQuantity"), "Cantidad superior a la cantidad disponible"),
             })).required(),
             paymentMethod: Yup.string().required("especifíque método"),
         })
@@ -1136,13 +1136,13 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                 (formik) => (
                     <Card variant={"outlined"}>
                         <>
-                            <FilterProductsByDepartmentsModal
+                            {isFilterModalOpen && (allProductsByDepartment.length! > 0) && <FilterProductsByDepartmentsModal
                                 allProductsByDepartment={allProductsByDepartment!}
                                 setAllProductsByDepartment={setAllProductsByDepartment}
                                 setFiltersApplied={setFiltersApplied}
                                 isFilterModalOpen={isFilterModalOpen}
                                 toggleModalFilter={toggleModalFilter}
-                            />
+                            />}
 
                             <ImagesDisplayDialog
                                 open={openImageDialog}

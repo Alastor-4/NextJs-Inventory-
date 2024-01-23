@@ -22,9 +22,9 @@ export const StoreEditUnits = ({ dataRow, setActiveModalEditUnits, loadData, }: 
 
     const setValidationSchema = (
         Yup.object({
-            units: Yup.number()
-                .min(remainingUnits!, `valor mayor que las unidades restantes en la tienda (${remainingUnits})`)
-                .required("valor requerido")
+            units: Yup.number().typeError("Debe ser un número")
+                .min(remainingUnits!, `Valor mayor que las unidades restantes en la tienda (${remainingUnits})`)
+                .required("Este campo es requerido")
         })
     )
 

@@ -126,7 +126,16 @@ const SellsHistory = () => {
             filteredSells = allSells?.filter(
                 (sell: storeSellsDetailsProps) => {
                     const splitDate = (date: Date | string) => {
-                        return new Date(date).toISOString().split('T')[0];
+                        if (date instanceof Date) {
+                            return new Date(date).toISOString().split('T')[0];
+                        } else {
+                            const normalizeDate = new Date(date);
+                            if (isNaN(normalizeDate.getTime())) {
+                                return '';
+                            } else {
+                                return normalizeDate.toISOString().split('T')[0];
+                            }
+                        }
                     };
                     if (splitDate(sell.created_at) === splitDate(selectedDate)) return sell
                 });
@@ -217,14 +226,40 @@ const SellsHistory = () => {
                 <Card variant={"outlined"} sx={{ paddingTop: "20px", mx: "-5px" }}>
                     <Grid container rowSpacing={2}>
                         {
-                            allSells?.length! > 0 ?
-                                (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
-                                    <Table sx={{ width: "100%" }} size={"small"}>
-                                        <TableHeader />
-                                        <TableContent />
-                                    </Table>
-                                </TableContainer>) :
-                                <TableNoData hasData={allSells?.length!} />
+                            allSells?.length! > 0 && selectedDate ?
+                                // selectedDate ?
+                                (allSells?.filter(
+                                    (sell: storeSellsDetailsProps) => {
+                                        const splitDate = (date: Date | string) => {
+                                            if (date instanceof Date) {
+                                                return new Date(date).toISOString().split('T')[0];
+                                            } else {
+                                                const normalizeDate = new Date(date);
+                                                if (isNaN(normalizeDate.getTime())) {
+                                                    return '';
+                                                } else {
+                                                    return normalizeDate.toISOString().split('T')[0];
+                                                }
+                                            }
+                                        };
+                                        if (splitDate(sell.created_at) === splitDate(selectedDate!)) return sell
+                                    }).length! > 0) ?
+                                    (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
+                                        <Table sx={{ width: "100%" }} size={"small"}>
+                                            <TableHeader />
+                                            <TableContent />
+                                        </Table>
+                                    </TableContainer>) :
+                                    <TableNoData searchCoincidence />
+                                : allSells?.length! > 0 ?
+                                    (<TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
+                                        <Table sx={{ width: "100%" }} size={"small"}>
+                                            <TableHeader />
+                                            <TableContent />
+                                        </Table>
+                                    </TableContainer>)
+                                    :
+                                    <TableNoData hasData={allSells?.length!} />
                         }
                     </Grid>
                 </Card>

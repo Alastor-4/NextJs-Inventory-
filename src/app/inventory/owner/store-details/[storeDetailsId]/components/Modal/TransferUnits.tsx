@@ -47,10 +47,10 @@ const TransferUnits = ({ nameStore, storeDepot, productId, setActiveTransferUnit
 
     const setValidationSchema = () => (
         Yup.object({
-            units: Yup.number()
+            units: Yup.number().typeError("Debe ser un número")
                 .min(0, "Cantidad positiva")
                 .max(maxUnits.cant, maxUnits.text)
-                .required("Campo obligatorio")
+                .required("Este campo es obligatorio")
         })
     )
 

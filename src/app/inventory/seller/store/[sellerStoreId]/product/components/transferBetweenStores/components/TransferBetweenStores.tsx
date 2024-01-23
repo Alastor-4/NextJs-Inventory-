@@ -37,15 +37,13 @@ function TransferBetweenStores({ storeId, storeDepot, badItem, cancelChecked, lo
     const setValidationSchema = () => (
         Yup.object({
             selectedStore: Yup.string()
-                .required("Campo obligatorio"),
+                .required("Este campo es obligatorio"),
             units: Yup.number()
-                .typeError("Solo unidades numéricas")
+                .typeError("Debe ser un número")
                 .min(1, "El mínimo es 1")
                 .max(storeDepot.product_remaining_units, `El máximo es ${storeDepot.product_remaining_units} `)
-                .required("Campo obligatorio"),
-
+                .required("Este campo es obligatorio"),
             text: Yup.string()
-
         })
     )
 
