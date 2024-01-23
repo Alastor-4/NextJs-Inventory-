@@ -118,7 +118,7 @@ function TransferBetweenStores({ storeId, storeDepot, badItem, cancelChecked, lo
                                     <Grid item xs={6}>
                                         <TextField
                                             name={'units'}
-                                            label={'Unidades a transferir'}
+                                            label={'Unidades'}
                                             {...formik.getFieldProps("units")}
                                             size='small'
 
