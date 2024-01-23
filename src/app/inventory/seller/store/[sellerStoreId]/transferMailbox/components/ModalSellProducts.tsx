@@ -30,18 +30,15 @@ interface ModalSellProductsProps {
 }
 
 export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen, storeDepot, dataItem, handleAccept }: ModalSellProductsProps) {
-
-
     const handleClose = () => {
         setOpen(false);
     };
-
 
     const SellProductForm = () => {
         const [totalPrice, setTotalPrice] = useState(parseInt(storeDepot.sell_price))
         const [productOffer, setProductOffer] = useState<string>("-")
 
-        const paymentMethods = ["Efectivo CUP", "Transferencia CUP", "Efectivo USD", "Transferencia MLC", "Otro"]
+        const paymentMethods = ["Efectivo CUP", "Transferencia CUP", "Otro"]
 
         const defaultValues = () => {
             setTotalPrice(0)
@@ -85,8 +82,7 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
                     .min(1, "Mínimo 1 unidad")
                     .max(dataItem.units_transferred_quantity, `Máximo ${dataItem.units_transferred_quantity} unidades`)
                     .required("Campo requerido"),
-
-                paymentMethod: Yup.string()
+                paymentMethod: Yup.string().required("Campo requerido"),
             })
         )
         const handleSubmit = async (values: { units: string, paymentMethod: string }) => {
@@ -105,12 +101,9 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
                 handleAccept(dataItem.units_transferred_quantity - units)
 
                 notifySuccess("Se completó la venta")
-
             }
-
-
-
         }
+
         return (
             <Formik
                 initialValues={{ units: "1", paymentMethod: '' }}

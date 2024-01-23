@@ -1,14 +1,15 @@
 "use client"
-import { ArrowLeft, ArrowLeftOutlined, Cancel, Done, Money, VisibilityOutlined } from '@mui/icons-material'
-import { AppBar, Box, Button, Card, CardContent, Chip, Grid, IconButton, Toolbar, Typography } from '@mui/material'
-import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import {ArrowLeft, ArrowLeftOutlined, Cancel, Done, Money, VisibilityOutlined} from '@mui/icons-material'
+import {AppBar, Box, Button, Card, CardContent, Chip, Grid, IconButton, Toolbar, Typography} from '@mui/material'
+import {useRouter} from 'next/navigation'
+import React, {useEffect, useState} from 'react'
 import transfer from '../request/transfer'
 import dayjs from 'dayjs'
-import { images } from '@prisma/client'
+import {images} from '@prisma/client'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
-import { DataTransferReceived, TransferStoreDepots } from './TypeTransfers'
+import {DataTransferReceived, TransferStoreDepots} from './TypeTransfers'
 import ModalSellProducts from './ModalSellProducts'
+import {notifyError, notifySuccess} from "@/utils/generalFunctions";
 
 interface SellerTransferMailboxProps {
     userId?: number
@@ -37,7 +38,6 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
             if (item.from_store_accepted) return 1
             if (item.to_store_accepted) return 2
             else return 3
-
         }
 
         const getAllTransfersReceived = async () => {
@@ -146,12 +146,8 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
     }
 
     function ShowTransfer({ transfers }: { transfers: DataTransferReceived[] }) {
-
         const ShowTransferDetails = ({ dataItem }: { dataItem: DataTransferReceived }) => {
-
-
             const TransferOptions = () => {
-
                 const [activeModalSell, setActiveModalSell] = useState(false)
                 const [storeDepotDetails, setStoreDepotDetails] = useState<null | TransferStoreDepots>(null)
 
@@ -164,13 +160,10 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                 }
 
                 const updateProductUnits = async (data: { id: number, product_remaining_units: number, product_units: number }) => {
-                    const result = await transfer.addNewUnits(storeId!, data)
-
-                    return result
+                    return await transfer.addNewUnits(storeId!, data)
                 }
 
                 const handleAccept = async (remainingUnits: number) => {
-
                     let ok: number | boolean = false
                     let product = await transfer.getStoreDepot(storeId!, dataItem.store_depots.depots.product_id)
 
@@ -180,8 +173,8 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                             product_remaining_units: product.product_remaining_units + dataItem.units_transferred_quantity,
                             product_units: product.product_units + dataItem.units_transferred_quantity
                         }
-                        ok = await transfer.addNewUnits(storeId!, data)
 
+                        ok = await transfer.addNewUnits(storeId!, data)
                     } else {
                         const data = {
                             store_id: storeId!,
@@ -217,14 +210,17 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                     }
 
                     if (ok) {
-                        changeStatus({
+                        await changeStatus({
                             id: dataItem.id,
                             from_store_accepted: false,
                             to_store_accepted: true,
                             transfer_cancelled: false
                         })
-                    }
 
+                        notifySuccess("Transferencia aceptada. Producto agregado a su tienda")
+                    } else {
+                        notifyError("El proceso de Aceptar transferencia ha fallado", true)
+                    }
                 }
 
                 const handleSell = async () => {
@@ -253,8 +249,11 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                         }
 
                         await changeStatus(dataCancel)
-                    }
 
+                        notifySuccess("Transferencia cancelada. Producto retornado a la tienda origen")
+                    } else {
+                        notifyError("El proceso de Cancelar transferencia ha fallado", true)
+                    }
                 }
 
 
@@ -272,9 +271,8 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
 
                         />
                         <Card variant='outlined' sx={{ padding: '10px' }}>
-
                             <Grid item container gap={1} justifyContent={'space-evenly'}>
-                                <Grid item >
+                                <Grid item>
                                     <Button
                                         variant='outlined'
                                         color='success'
@@ -285,10 +283,10 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                         Aceptar
                                     </Button>
                                 </Grid>
-                                <Grid item >
+                                <Grid item>
                                     <Button
                                         variant='outlined'
-                                        color='success'
+                                        color='primary'
                                         size='small'
                                         startIcon={<Money fontSize='small' />}
                                         onClick={handleSell}
@@ -296,7 +294,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                         Vender
                                     </Button>
                                 </Grid>
-                                <Grid item >
+                                <Grid item>
                                     <Button
                                         variant='outlined'
                                         color='error'
@@ -313,76 +311,6 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                 )
             }
 
-            const StoreDetails = () => (
-                <Card variant='outlined' sx={{ padding: '10px' }}>
-                    <Grid container>
-                        <Typography variant="subtitle1" gutterBottom component="div" sx={{ textDecoration: "underline" }}>
-                            Detalles de la Tienda:
-                        </Typography>
-
-                        <Grid item container rowSpacing={1}>
-                            <Grid item container spacing={1}>
-                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
-                                <Grid item>
-                                    {`${dataItem.store_depots.stores.name} `}
-                                    <small>{dataItem.store_depots.stores.description ?? ""}</small>
-                                </Grid>
-                            </Grid>
-
-                            <Grid item container spacing={1}>
-                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Slogan:</Grid>
-                                <Grid item>
-                                    {`${dataItem.store_depots.stores.slogan === "" ? "-" : dataItem.store_depots.stores.slogan}`}
-                                </Grid>
-                            </Grid>
-
-                            <Grid item container spacing={1}>
-                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Dirección:</Grid>
-                                <Grid item>
-                                    {`${dataItem.store_depots.stores.address === "" ? "-" : dataItem.store_depots.stores.address}`}
-                                </Grid>
-                            </Grid>
-
-
-                            <Grid item container columnGap={1} alignItems={'center'}>
-                                <Grid item sx={{ fontWeight: 600 }}>Mensaje: </Grid>
-                                {
-                                    dataItem.transfer_notes
-                                        ? (
-                                            <Grid
-                                                container
-                                                item
-                                                sx={{
-                                                    width: 'fit-content',
-                                                    backgroundColor: "lightgray",
-                                                    padding: "2px 4px",
-                                                    borderRadius: "5px 2px 2px 2px",
-                                                    border: "1px solid",
-                                                    borderColor: "seagreen",
-                                                    fontSize: 14,
-                                                    cursor: "default",
-                                                    textDecorationLine: "none",
-                                                }}
-                                            >
-                                                <Grid container item xs={true} alignItems={"center"}
-                                                    sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                    {
-                                                        dataItem.transfer_notes
-                                                    }
-                                                </Grid>
-                                            </Grid>
-                                        )
-                                        : '-'
-                                }
-                            </Grid>
-
-                        </Grid>
-
-                    </Grid>
-                </Card>
-
-            )
-
             const ProductDetails = () => {
                 const [openImageDialog, setOpenImagesDialog] = React.useState(false)
                 const [dialogImages, setDialogImages] = React.useState<images[]>([])
@@ -394,27 +322,49 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
 
                 return (
                     <Card variant='outlined' sx={{ padding: '10px' }}>
-
                         <ImagesDisplayDialog
-                            dialogTitle={"Imágenes del producto"}
                             open={openImageDialog}
                             setOpen={setOpenImagesDialog}
                             images={dialogImages}
                         />
 
                         <Grid container>
-                            <Typography variant="subtitle1" gutterBottom component="div" sx={{ textDecoration: "underline" }}>
-                                Detalles del Producto:
-                            </Typography>
-
                             <Grid item container rowSpacing={1}>
                                 <Grid item container spacing={1}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Nombre:</Grid>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Tienda:</Grid>
                                     <Grid item>
-                                        {`${dataItem.store_depots.depots.products.name} `}
-                                        <small>{dataItem.store_depots.depots.products.description ?? ""}</small>
+                                        {dataItem.store_depots.stores.name}
                                     </Grid>
                                 </Grid>
+
+                                {
+                                    dataItem.transfer_notes && (
+                                        <Grid item container spacing={1}>
+                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Notas:</Grid>
+                                            <Grid item>
+                                                {dataItem.transfer_notes}
+                                            </Grid>
+                                        </Grid>
+                                    )
+                                }
+
+                                <Grid item container spacing={1}>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Producto:</Grid>
+                                    <Grid item>
+                                        {`${dataItem.store_depots.depots.products.name} `}
+                                    </Grid>
+                                </Grid>
+
+                                {
+                                    dataItem.store_depots.depots.products.description && (
+                                        <Grid item container spacing={1}>
+                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Descripción:</Grid>
+                                            <Grid item>
+                                                {dataItem.store_depots.depots.products.description}
+                                            </Grid>
+                                        </Grid>
+                                    )
+                                }
 
                                 <Grid item container spacing={1}>
                                     <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
@@ -498,21 +448,16 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                         }
                                     </Grid>
                                 </Grid>
-
                             </Grid>
-
                         </Grid>
                     </Card>
                 )
-
             }
 
             return (
                 <Card sx={{ padding: '10px' }}>
-                    <Grid container spacing={1} fontSize={14.5}>
-
-                        <Grid item container position={'relative'} >
-
+                    <Grid container spacing={1}>
+                        <Grid item container position={'relative'}>
                             <Box component={'div'} position={'absolute'} >
                                 <IconButton size='small' sx={{ padding: 0 }} onClick={() => handleClickSelected(null)} >
                                     <ArrowLeftOutlined color='primary' />
@@ -526,15 +471,12 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                     size='small'
                                 />
                             </Grid>
-
                         </Grid>
 
-                        <Grid item xs={12}>
-                            <StoreDetails />
-                        </Grid>
                         <Grid item xs={12}>
                             <ProductDetails />
                         </Grid>
+
                         {
                             dataItem.transferStatus === 1 && !sent && (
                                 <Grid item xs={12}>
@@ -542,8 +484,6 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                 </Grid>
                             )
                         }
-
-
                     </Grid>
                 </Card>
             )

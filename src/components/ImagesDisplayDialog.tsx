@@ -32,7 +32,15 @@ export default function ImagesDisplayDialog({ dialogTitle, images, open, setOpen
     }, [images]);
 
     return (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog
+            open={open}
+            fullWidth
+            onClose={handleClose}
+            PaperProps={{
+                sx: {
+                    backgroundColor: "lightgray"
+                }
+            }}>
             {
                 dialogTitle && (
                     <DialogTitle>{dialogTitle}</DialogTitle>
@@ -47,7 +55,7 @@ export default function ImagesDisplayDialog({ dialogTitle, images, open, setOpen
                                 <Avatar
                                     src={images[imageIndex]?.fileUrl ?? ""}
                                     variant={"rounded"}
-                                    sx={{ width: "300px", maxWidth: "300px", height: "auto" }}
+                                    sx={{ width: "280px", maxWidth: "280px", height: "auto" }}
                                 />
                             )
                         }
