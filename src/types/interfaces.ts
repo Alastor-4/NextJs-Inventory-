@@ -85,6 +85,7 @@ export interface UpdateValueDialogProps {
     dialogTitle: string;
     children: ReactNode;
     formik?: any;
+    fullScreen?: boolean;
 }
 
 export interface storeDepotsStatsProps {

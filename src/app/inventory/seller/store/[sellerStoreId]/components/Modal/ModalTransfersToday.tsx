@@ -13,25 +13,25 @@ import {
     TableRow,
     TableHead,
     TableBody,
-    Card,
     TableContainer,
     Table,
     Tooltip,
-    Chip, Collapse, Box, AvatarGroup, Avatar, ToggleButton, ToggleButtonGroup
+    Chip,
+    Collapse,
+    Box,
+    AvatarGroup,
+    Avatar
 } from '@mui/material';
-import { storeSellsDetailsProps } from '@/types/interfaces';
 import React, { useState } from 'react';
 import {
     Close,
     ExpandLessOutlined,
-    ExpandMoreOutlined, ForwardToInbox,
-    InboxOutlined,
+    ExpandMoreOutlined,
+    ForwardToInbox,
     Mail,
-    OutboundOutlined
 } from '@mui/icons-material';
 import { TableNoData } from '@/components/TableNoData';
-import SellsMoreDetails from '../SellsMoreDetails';
-import {images, product_store_transfers, store_depot_transfers} from "@prisma/client";
+import {images} from "@prisma/client";
 import {transactionToStore, transactionToWarehouse} from "@/utils/generalFunctions";
 
 interface ModalTransfersTodayProps {
@@ -274,12 +274,17 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
         }
 
         return (
-            <TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
-                <Table sx={{ width: "100%" }} size={"small"}>
-                    <TableHeader />
-                    <TableContent storeTransfers={storeTransfers}/>
-                </Table>
-            </TableContainer>
+            <>
+                {storeTransfers.length > 0
+                    ? (
+                        <TableContainer sx={{width: "100%", maxHeight: "70vh", overflowX: "auto"}}>
+                            <Table sx={{width: "100%"}} size={"small"}>
+                                <TableHeader/>
+                                <TableContent storeTransfers={storeTransfers}/>
+                            </Table>
+                        </TableContainer>
+                    ) : <TableNoData/>}
+            </>
         )
     }
 
@@ -476,12 +481,19 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
         }
 
         return (
-            <TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
-                <Table sx={{ width: "100%" }} size={"small"}>
-                    <TableHeader />
-                    <TableContent storeWarehouseTransfers={storeWarehouseTransfers}/>
-                </Table>
-            </TableContainer>
+           <>
+               {
+                   storeWarehouseTransfers.length > 0
+                       ? (
+                           <TableContainer sx={{width: "100%", maxHeight: "70vh", overflowX: "auto"}}>
+                               <Table sx={{width: "100%"}} size={"small"}>
+                                   <TableHeader/>
+                                   <TableContent storeWarehouseTransfers={storeWarehouseTransfers}/>
+                               </Table>
+                           </TableContainer>
+                       ) : <TableNoData/>
+               }
+           </>
         )
     }
 
@@ -517,15 +529,20 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                 {
                     !!transfersData
                         ? <Grid container rowSpacing={2}>
-                            <Grid item xs={12}>
-                                <ToggleButtonGroup value={displayStoreStoreTransfers} exclusive onChange={handleChange}>
-                                    <ToggleButton value={true} aria-label="tienda-tienda" color={displayStoreStoreTransfers ? "primary" : "standard"}>
-                                        Tienda-Tienda
-                                    </ToggleButton>
-                                    <ToggleButton value={false} aria-label="almacén-tienda" color={displayStoreStoreTransfers ? "standard" : "primary"}>
-                                        Almacén-Tienda
-                                    </ToggleButton>
-                                </ToggleButtonGroup>
+                            <Grid container item xs={12} justifyContent={"center"}>
+                                <Button
+                                    variant={displayStoreStoreTransfers ? "outlined" : "text"}
+                                    onClick={() => setDisplayStoreStoreTransfers(true)}
+                                >
+                                    Tienda-Tienda
+                                </Button>
+
+                                <Button
+                                    variant={displayStoreStoreTransfers ? "text" : "outlined"}
+                                    onClick={() => setDisplayStoreStoreTransfers(false)}
+                                >
+                                    Almacén-Tienda
+                                </Button>
                             </Grid>
 
                             <Grid item xs={12}>

@@ -18,7 +18,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                     {children}
                 </ImageUploadProvider>
                 <Backdrop
-                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.modal + 1 }}
+                    sx={{ color: '#fff', backgroundColor: "rgba(0, 0, 0, 0.5)", zIndex: (theme) => theme.zIndex.modal + 1 }}
                     open={loading}
                 >
                     <CircularProgress color="inherit" />
