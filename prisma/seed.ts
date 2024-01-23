@@ -86,37 +86,30 @@ async function main() {
             {
                 name: 'Zapatos de niño',
                 description: 'Todo tipo de zapatos para niños y niñas',
-                usersId: 1,
             },
             {
                 name: 'Zapatos de mujer',
                 description: 'Zapatillas y sandalias para mujeres',
-                usersId: 1,
             },
             {
                 name: 'Zapatos de hombre',
                 description: 'Zapatillas y chancletas para hombres',
-                usersId: 1,
             },
             {
                 name: 'Ropa de mujer',
                 description: 'Pantalones, pesqueras, blusas, vestidos y licras de mujer',
-                usersId: 1,
             },
             {
                 name: 'Ropa de hombre',
                 description: 'Pantalones, pesqueras, camisas y shorts de hombre',
-                usersId: 1,
             },
             {
                 name: 'Talabartería',
                 description: 'Cintos, carteras, riñoneras y mochilas',
-                usersId: 1,
             },
             {
                 name: 'Bisutería',
                 description: 'Artículos varios de bisutería',
-                usersId: 1,
             },
         ],
     })
