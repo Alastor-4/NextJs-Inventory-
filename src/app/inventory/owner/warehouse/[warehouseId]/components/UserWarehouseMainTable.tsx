@@ -139,17 +139,19 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
 
     const validationSchema = Yup.object({
         searchBarValue: Yup.string(),
-        productNewUnitsQuantity: Yup.number().min(0, "Tiene que ser mayor que cero"),
-        updateTotalUnitsQuantity: Yup.number().min(0, "Tiene que ser mayor que cero").nullable(),
-        updateRemainingUnitsQuantity: Yup.number().min(0, "Tiene que ser mayor que cero").nullable(),
+        productNewUnitsQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero"),
+        updateTotalUnitsQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero").nullable(),
+        updateRemainingUnitsQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero").nullable(),
         productStoreDepotDistribution: Yup.object({
-            warehouseQuantity: Yup.number().integer(),
-            storeQuantity: Yup.number().integer().nullable(),
+            warehouseQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero"),
+            storeQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero").nullable(),
             moveFromWarehouseToStoreQuantity: Yup
-                .number()
+                .number().integer().typeError("Tiene que ser un número entero")
+                .min(0, "Tiene que ser mayor que cero")
                 .max(Yup.ref("warehouseQuantity"), "No existe esa cantidad en el almacén"),
             moveFromStoreToWarehouseQuantity: Yup
-                .number()
+                .number().integer().typeError("Tiene que ser un número entero")
+                .min(0, "Tiene que ser mayor que cero")
                 .max(Yup.ref("storeQuantity"), "No existe esa cantidad en la tienda")
         })
     })
@@ -866,7 +868,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 (formik) => (
                     <Card variant={"outlined"}>
                         {
-                            isFilterModalOpen && allProductsByDepartment?.length && (
+                            isFilterModalOpen && (allProductsByDepartment?.length! > 0) && (
                                 <FilterProductsByDepartmentsModal
                                     allProductsByDepartment={allProductsByDepartment!}
                                     setAllProductsByDepartment={setAllProductsByDepartment}

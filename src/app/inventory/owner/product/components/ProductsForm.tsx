@@ -58,7 +58,7 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
     const validationSchema = Yup.object({
         name: Yup.string().required("Este campo es requerido"),
         description: Yup.string(),
-        buyPrice: Yup.number().nullable(),
+        buyPrice: Yup.number().typeError('Debe ser un número').min(0, "No puedes ser un número negativo").nullable(),
         images: Yup.array(),
         imagesMaxErrorField: Yup.string(),
         department: Yup.number().required("Debes seleccionar un departamento"),

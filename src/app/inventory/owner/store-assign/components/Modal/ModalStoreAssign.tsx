@@ -33,10 +33,10 @@ export default function ModalStoreAssign({
 
     const setValidationSchema = () => (
         Yup.object({
-            units: Yup.number()
+            units: Yup.number().typeError("Debe ser un número")
                 .min(0, "No puedes pasar una cantidad negativa")
                 .max(maxUnits.cant!, maxUnits.text)
-                .required("Campo obligatorio")
+                .required("Este campo es obligatorio")
         })
     )
 

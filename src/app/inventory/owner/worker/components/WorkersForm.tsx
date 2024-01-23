@@ -63,7 +63,7 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
         username: Yup.string().required("Este campo es requerido"),
         phone: Yup.string()
             .required('Este campo es requerido')
-            .matches(/^\d{8}$/, 'El telefono debe tener 8 dígitos'),
+            .matches(/^\d{8}$/, 'El teléfono debe tener 8 dígitos'),
     })
 
     const handleSubmit = async (values: valuesProps) => {

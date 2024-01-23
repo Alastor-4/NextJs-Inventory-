@@ -370,7 +370,8 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
 
     const setValidationSchema = (
         Yup.object({
-            units: Yup.number()
+            units: Yup.number().integer().typeError("Debe ser un número")
+                .min(0, "No puedes ser un número negativo")
                 .max(data[selectedDepot ?? 0]?.product_total_remaining_units, "Máximo excedido")
                 .required("Cantidad requerida")
         })

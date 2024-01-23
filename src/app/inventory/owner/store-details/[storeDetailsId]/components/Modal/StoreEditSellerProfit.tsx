@@ -15,14 +15,14 @@ export const StoreEditSellerProfit = ({ storeDepot, setActiveModalSellerProfit, 
     });
     const setValidationSchema = () => (
         Yup.object({
-            percentage: Yup.number()
+            percentage: Yup.number().typeError("Debe ser un número")
                 .min(0, "El limite inferior es 0")
                 .max(100, "El limite superior es 100")
-                .required("Campo requerido"),
-            quantity: Yup.number()
+                .required("Este campo es requerido"),
+            quantity: Yup.number().typeError("Debe ser un número")
                 .min(0, "El limite inferior es 0")
                 .max(parseFloat(`${storeDepot?.sell_price!}`), `El limite superior es ${storeDepot?.sell_price}`)
-                .required("Campo requerido")
+                .required("Este campo es requerido")
         })
     )
 

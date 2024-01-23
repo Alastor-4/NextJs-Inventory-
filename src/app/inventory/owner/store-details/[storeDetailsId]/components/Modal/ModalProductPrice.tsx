@@ -45,17 +45,17 @@ const ModalProductPrice = ({ activeModalPrice, setActiveModalPrice, dialogTitle,
     })
 
     const validationSchema = Yup.object({
-        price: Yup.number().required("Defina un precio"),
+        price: Yup.number().typeError("Debe ser un número").required("Defina un precio"),
         currency: Yup.string().required("Seleccione moneda"),
         discount: activePercentage
             ? (
-                Yup.number()
+                Yup.number().typeError("Debe ser un número")
                     .min(0, 'Mayor que 0')
                     .max(100, 'Menor que 100')
                     .required("Defina un valor")
             )
             : (
-                Yup.number()
+                Yup.number().typeError("Debe ser un número")
                     .max(newSellPrice!, `Menor que precio (${newSellPrice})`)
                     .min(0, "Mayor que 0")
                     .required("Defina una valor")

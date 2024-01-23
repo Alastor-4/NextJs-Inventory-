@@ -16,6 +16,7 @@ import InfoTooltip from "@/components/InfoTooltip";
 import { AxiosResponse } from "axios";
 import { useFormik } from "formik";
 import * as Yup from "yup"
+import { grey } from "@mui/material/colors";
 
 export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormProps) => {
 
@@ -80,7 +81,9 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
 
     const validationSchema = Yup.object({
         product: Yup.object().required("Seleccione un producto"),
-        productTotalUnits: Yup.number().integer().required("Especifique cantidad"),
+        productTotalUnits: Yup.number().integer().typeError("Deber ser un número")
+            .min(0, "No puedes ser un número negativo").
+            required("Especifique cantidad"),
     })
 
     const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
@@ -112,7 +115,7 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
 
                     let oldDepartmentSelected = false
 
-                    const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id )
+                    const oldDepartmentIndex = allProductsByDepartment?.findIndex((productsByDepartmentItem: allProductsByDepartmentProps) => productsByDepartmentItem.id === productsByDepartments.id)
                     if (oldDepartmentIndex! > -1 && allProductsByDepartment![oldDepartmentIndex!].selected) {
                         oldDepartmentSelected = true
                     }
@@ -288,9 +291,9 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
             />
 
             {
-                isFilterModalOpen && allProductsByDepartment?.length && (
+                isFilterModalOpen && (allProductsByDepartment?.length! > 0) && (
                     <FilterProductsByDepartmentsModal
-                        allProductsByDepartment={allProductsByDepartment}
+                        allProductsByDepartment={allProductsByDepartment!}
                         setAllProductsByDepartment={setAllProductsByDepartment}
                         setFiltersApplied={setFiltersApplied}
                         isFilterModalOpen={isFilterModalOpen}
@@ -334,7 +337,16 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                                 </Grid>
                             </Grid>
                             <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
-                                <Button size="small" color="primary" onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                <Button size="small"
+                                    sx={{
+                                        color: grey[600],
+                                        borderColor: grey[600],
+                                        '&:hover': {
+                                            borderColor: grey[800],
+                                            backgroundColor: grey[200],
+                                        },
+                                    }}
+                                    onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
                             </Grid>
                         </Grid>
                     </Card>
@@ -345,6 +357,7 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                                     label="Cantidad de unidades"
                                     size={"small"}
                                     onKeyDown={handleKeyDown}
+                                    disabled={dataProducts?.length === 0}
                                     {...formik.getFieldProps("productTotalUnits")}
                                     error={!!formik.errors.productTotalUnits && formik.touched.productTotalUnits}
                                     helperText={(formik.errors.productTotalUnits && formik.touched.productTotalUnits) && formik.errors.productTotalUnits}
