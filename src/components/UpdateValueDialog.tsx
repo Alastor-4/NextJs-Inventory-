@@ -3,7 +3,7 @@ import { CloseIcon } from "next/dist/client/components/react-dev-overlay/interna
 import { UpdateValueDialogProps } from "@/types/interfaces";
 import React from "react";
 
-export default function UpdateValueDialog({ dialogTitle, open, formik, setOpen, children }: UpdateValueDialogProps) {
+export default function UpdateValueDialog({ dialogTitle, open, formik, setOpen, children, fullScreen }: UpdateValueDialogProps) {
 
     const handleClose = () => {
         !!formik && formik.resetForm();
@@ -11,7 +11,7 @@ export default function UpdateValueDialog({ dialogTitle, open, formik, setOpen, 
     };
 
     return (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog open={open} onClose={handleClose} fullScreen={fullScreen}>
             <AppBar sx={{ position: 'relative' }}>
                 <Toolbar>
                     <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
