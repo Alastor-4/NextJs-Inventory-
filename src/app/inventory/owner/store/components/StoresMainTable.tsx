@@ -161,7 +161,6 @@ export default function StoresMainTable({ userId }: { userId: number }) {
             { id: "slogan", label: "Slogan", },
             { id: "active_service", label: "Servicios", },
             { id: "seller", label: "Vendedor", },
-            { id: "details", label: "", },
         ]
 
         return (
@@ -169,7 +168,6 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                 <TableRow>
                     <TableCell
                         key={"checkbox"}
-                        align={"left"}
                         padding={'checkbox'}
                     />
                     {headCells.map(headCell => (
@@ -197,12 +195,20 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                             tabIndex={-1}
                             onClick={() => setShowDetails((showDetails !== index) ? index : '')}
                         >
-                            <TableCell>
+                            <TableCell sx={{ padding: 0 }}>
                                 <Checkbox
                                     size={"small"}
                                     checked={selected && (row.id === selected.id)}
                                     onClick={() => handleSelectItem(row)}
                                 />
+
+                                <IconButton size={"small"}>
+                                    {
+                                        (showDetails !== index)
+                                            ? <ExpandMoreOutlined />
+                                            : <ExpandLessOutlined />
+                                    }
+                                </IconButton>
                             </TableCell>
                             <TableCell>{row.name}</TableCell>
                             <TableCell align="center">{(row.slogan !== '') ? row.slogan : '-'}</TableCell>
@@ -225,21 +231,6 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                 </Grid>
                             </TableCell>
                             <TableCell align="center">{row.seller_user ? row.seller_user.name.split(" ")[0] : "-"}</TableCell>
-                            <TableCell style={{ padding: 0 }} colSpan={5}>
-                                <Tooltip title={"Details"}>
-                                    <IconButton
-                                        size={"small"}
-                                        sx={{ m: "3px" }}
-                                        onClick={() => setShowDetails((showDetails !== index) ? index : '')}
-                                    >
-                                        {
-                                            (showDetails !== index)
-                                                ? <ExpandMoreOutlined />
-                                                : <ExpandLessOutlined />
-                                        }
-                                    </IconButton>
-                                </Tooltip>
-                            </TableCell>
                         </TableRow>
 
 

@@ -243,18 +243,13 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 <TableRow>
                     <TableCell
                         key={"checkbox"}
-                        align={"center"}
                         padding={'checkbox'}
-                        sx={{ width: "5px" }}
-                    >
-
-                    </TableCell>
+                   />
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
                             align={"center"}
                             padding={'normal'}
-                            sx={{ width: "auto" }}
                         >
                             {headCell.label}
                         </TableCell>
@@ -279,7 +274,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                             tabIndex={-1}
                             selected={!!selectedProduct && (product.id === selectedProduct.id)}
                         >
-                            <TableCell align="center">
+                            <TableCell>
                                 <Checkbox
                                     size={"small"}
                                     checked={!!selectedProduct && (product.id === selectedProduct.id)}

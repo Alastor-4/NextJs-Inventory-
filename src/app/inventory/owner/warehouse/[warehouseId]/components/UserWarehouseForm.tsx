@@ -54,7 +54,7 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
     }, [ownerId, warehouseId]);
 
     useEffect(() => {
-        if (allProductsByDepartment?.length) {
+        if (allProductsByDepartment) {
             let allProducts: productsProps[] = [];
 
             allProductsByDepartment.forEach((productsByDepartments) => {
@@ -107,7 +107,7 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
         if (!response) return;
 
         if (response?.status === 200) {
-            let allProductsByDepartmentWithoutDepots: allProductsByDepartmentProps[] | null = await warehouseDepots.allProductsWithoutDepots(ownerId!, warehouseId!)
+            let allProductsByDepartmentWithoutDepots: allProductsByDepartmentProps[] | false = await warehouseDepots.allProductsWithoutDepots(ownerId!, warehouseId!)
 
             if (allProductsByDepartmentWithoutDepots) {
                 allProductsByDepartmentWithoutDepots = allProductsByDepartmentWithoutDepots.map((productsByDepartments: allProductsByDepartmentProps) => {
@@ -127,6 +127,7 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                         }
                     )
                 })
+
                 setAllProductsByDepartment(allProductsByDepartmentWithoutDepots);
 
                 formik.resetForm();
@@ -135,7 +136,6 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
             } else {
                 notifyError("Error al cargar los datos")
             }
-
         } else {
             //ToDo: catch validation errors
         }
@@ -350,39 +350,37 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                             </Grid>
                         </Grid>
                     </Card>
-                    <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>
-                        <Grid container item justifyContent="center" justifyItems="center" alignItems="start">
-                            <Grid item xs={7} >
-                                <TextField
-                                    label="Cantidad de unidades"
-                                    size={"small"}
-                                    onKeyDown={handleKeyDown}
-                                    disabled={dataProducts?.length === 0}
-                                    {...formik.getFieldProps("productTotalUnits")}
-                                    error={!!formik.errors.productTotalUnits && formik.touched.productTotalUnits}
-                                    helperText={(formik.errors.productTotalUnits && formik.touched.productTotalUnits) && formik.errors.productTotalUnits}
-                                />
-                            </Grid>
-                            <Grid item xs={4} marginTop="5px" marginX={1}>
-                                <Button
-                                    fullWidth
-                                    type={"submit"}
-                                    color={"primary"}
-                                    variant={"contained"}
-                                    size={"small"}
-                                    disabled={!formik.getFieldProps('product').value || !formik.getFieldProps('productTotalUnits').value || !formik.isValid}
-                                >
-                                    Crear
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Card>
 
-                    <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
-                        <Grid container rowSpacing={2}>
-                            {
-                                dataProducts?.length! > 0
-                                    ? (dataProducts?.filter(
+                    <Grid container item justifyContent="center" justifyItems="center" alignItems="start" mt={"20px"}>
+                        <Grid item xs={7} >
+                            <TextField
+                                label="Unidades"
+                                size={"small"}
+                                onKeyDown={handleKeyDown}
+                                disabled={dataProducts?.length === 0}
+                                {...formik.getFieldProps("productTotalUnits")}
+                                error={!!formik.errors.productTotalUnits && formik.touched.productTotalUnits}
+                                helperText={(formik.errors.productTotalUnits && formik.touched.productTotalUnits) && formik.errors.productTotalUnits}
+                            />
+                        </Grid>
+                        <Grid item xs={4} marginTop="5px" marginX={1}>
+                            <Button
+                                fullWidth
+                                type={"submit"}
+                                color={"primary"}
+                                variant={"contained"}
+                                size={"small"}
+                                disabled={!formik.getFieldProps('product').value || !formik.getFieldProps('productTotalUnits').value || !formik.isValid}
+                            >
+                                Crear
+                            </Button>
+                        </Grid>
+                    </Grid>
+
+                    <Grid container rowSpacing={2} mt={"20px"}>
+                        {
+                            dataProducts?.length! > 0
+                                ? (dataProducts?.filter(
                                         (product: productsProps) =>
                                             product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                                             product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
@@ -392,12 +390,11 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                                                 <TableContent formik={formik} />
                                             </Table>
                                         </TableContainer>) : <TableNoData searchCoincidence />
-                                    ) : (
-                                        <TableNoData hasData={dataProducts?.length!} />
-                                    )
-                            }
-                        </Grid>
-                    </Card>
+                                ) : (
+                                    <TableNoData hasData={dataProducts?.length!} />
+                                )
+                        }
+                    </Grid>
                 </CardContent>
             </form>
         </>
