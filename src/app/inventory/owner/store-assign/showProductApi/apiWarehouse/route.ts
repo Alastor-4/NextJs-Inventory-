@@ -13,42 +13,39 @@ export async function GET(req: Request) {
                 some: {
                     depots: {
                         some: {
-                            AND: [{
+                            AND: [
+                                {warehouse_id: warehouseId},
+                                {
+                                    OR: [
+                                        {
+                                            NOT: {
+                                                store_depots: {
+                                                    some: {
+                                                        store_id: storeId
+                                                    }
+                                                }
+                                            }
 
-                                warehouse_id: warehouseId
-                            },
-                            {
-                                OR: [{
-                                    NOT: {
-                                        store_depots: {
-                                            some: {
-                                                store_id: storeId
+                                        },
+                                        {
+                                            store_depots: {
+                                                some: {
+                                                    AND: [
+                                                        {store_id: storeId},
+                                                        {product_units: -1}
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            NOT: {
+                                                store_depots: {
+                                                    some: {}
+                                                }
                                             }
                                         }
-                                    }
-
-                                }, {
-                                    store_depots: {
-                                        some: {
-                                            AND: [
-                                                { store_id: storeId },
-                                                { product_units: -1 }
-                                            ]
-
-                                        }
-                                    }
-                                },
-
-                                {
-                                    NOT: {
-                                        store_depots: {
-                                            some: {}
-                                        }
-                                    }
-
+                                    ]
                                 }
-                                ]
-                            }
                             ]
                         }
                     }
@@ -60,41 +57,39 @@ export async function GET(req: Request) {
                 where: {
                     depots: {
                         some: {
-                            AND: [{
-
-                                warehouse_id: warehouseId
-                            },
-                            {
-                                OR: [{
-                                    store_depots: {
-                                        some: {
-                                            AND: [
-                                                { store_id: storeId },
-                                                { product_units: -1 }
-                                            ]
+                            AND: [
+                                {warehouse_id: warehouseId},
+                                {
+                                    OR: [
+                                        {
+                                            store_depots: {
+                                                some: {
+                                                    AND: [
+                                                        {store_id: storeId},
+                                                        {product_remaining_units: -1}
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        {
+                                            store_depots: {
+                                                some: {
+                                                    store_id: {not: storeId}
+                                                }
+                                            }
+                                        },
+                                        {
+                                            NOT: {
+                                                store_depots: {
+                                                    some: {}
+                                                }
+                                            }
                                         }
-                                    }
-                                }, {
-                                    store_depots: {
-                                        some: {
-                                            store_id: { not: storeId }
-                                        }
-                                    }
-                                }, {
-                                    NOT: {
-                                        store_depots: {
-                                            some: {}
-                                        }
-                                    }
-
+                                    ]
                                 }
-                                ]
-                            }
                             ]
-
                         }
                     }
-
                 },
                 include: {
                     departments: true,

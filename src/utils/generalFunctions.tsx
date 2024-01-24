@@ -26,7 +26,10 @@ export const notifyError = (message: string, requireUserConfirm?: boolean) => re
     ? enqueueSnackbar(message, { variant: "error", persist: true, action: actionClose })
     : enqueueSnackbar(message, { variant: "error", autoHideDuration: 6000 })
 
-export const notifyWarning = (message: string) => enqueueSnackbar(message, { variant: "warning" })
+export const notifyWarning = (message: string, requireUserConfirm?: boolean) => requireUserConfirm
+    // @ts-ignore
+    ? enqueueSnackbar(message, {variant: "warning", persist: true, action: actionClose})
+    : enqueueSnackbar(message, {variant: "warning", autoHideDuration: 6000})
 
 //return offer price per unit from first applicable offer found. return false if no applicable offer found
 function evaluateOffers(offerItems: any[], itemsQuantity: number): number | false {

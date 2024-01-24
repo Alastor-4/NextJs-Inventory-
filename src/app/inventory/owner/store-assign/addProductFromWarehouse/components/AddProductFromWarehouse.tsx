@@ -16,7 +16,6 @@ import { Formik } from 'formik';
 import * as Yup from "yup"
 
 export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFromWarehouseProps) => {
-
     const [dataDepotsWarehouses, setDataDepotsWarehouse] = useState<any>([]);
     const [dataProductsByDepartment, setDataProductsByDepartment] = useState<any>([])
     const [data, setData] = useState<any>([]);
@@ -37,10 +36,9 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
         const getData = async () => {
             const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(dataStore?.id!)
 
-            newDataDepotsWarehouses.length === 0 && dataDepotsWarehouses.length === 0
-                ? notifyWarning("No hay almacenes que tengan productos para agregar")
+            newDataDepotsWarehouses.length === 0
+                ? notifyWarning("Esta tienda posee todos los productos disponibles en sus almacenes", true)
                 : setDataDepotsWarehouse(newDataDepotsWarehouses)
-
         }
 
         const loadDepartamentsFromSelectedInitialWarehouse = (indWarehouse: number, mirrorDataDepotsWarehouses: any) => {
@@ -60,8 +58,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                 newDataProductsByDepartment.push({ departmentName: key, depots: depots })
             })
 
-            setDataProductsByDepartment(newDataProductsByDepartment);
-
+            setDataProductsByDepartment(newDataProductsByDepartment)
         }
 
         const getDataSpecificWarehouse = async () => {
@@ -70,17 +67,14 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
             setSelectedWarehouse(0);
             setDataDepotsWarehouse(newDataDepotsWarehouses)
 
-            if (newDataDepotsWarehouses[0].depots.length === 0 && dataDepotsWarehouses.length === 0) {
-                notifyWarning("El almacén no tiene produtos para agregar")
+            if (newDataDepotsWarehouses[0].depots.length === 0) {
+                notifyWarning("El almacén no posee nuevos produtos para agregar", true)
             }
         }
 
-        if (dataDepotsWarehouses.length === 0) {
-            if (!warehouseId) getData()
-            else getDataSpecificWarehouse();
-        }
-
-    }, [dataDepotsWarehouses, dataStore?.id, warehouseId])
+        if (!warehouseId) getData()
+        else getDataSpecificWarehouse()
+    }, [dataStore?.id, warehouseId])
 
     // Puede pasar que q se oculte el último depósito
     // existente de un departamento seleccionado,por lo
@@ -177,7 +171,6 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
         const headCells = [
             { id: "name", label: "Nombre", },
             { id: "store_units", label: "Cantidad", },
-            { id: "more_details", label: "", },
         ]
 
         return (
@@ -219,12 +212,23 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                                 selected={selectedDepot === index}
                                 onClick={() => setShowDetails((showDetails !== row.id) ? row.id : '')}
                             >
-                                <TableCell>
+                                <TableCell padding={"checkbox"} align={"center"}>
                                     <Checkbox
                                         size='small'
                                         checked={selectedDepot === index}
-                                        onClick={() => setSelectedDepot(selectedDepot === index ? undefined : index)}
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            setSelectedDepot(selectedDepot === index ? undefined : index)
+                                        }}
                                     />
+
+                                    <IconButton size={"small"}>
+                                        {
+                                            (showDetails !== row.id)
+                                                ? <ExpandMoreOutlined />
+                                                : <ExpandLessOutlined />
+                                        }
+                                    </IconButton>
                                 </TableCell>
 
                                 <TableCell>
@@ -260,20 +264,6 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
 
                                 <TableCell>
                                     {row.product_total_remaining_units}
-                                </TableCell>
-
-                                <TableCell>
-                                    <IconButton
-                                        size={"small"}
-                                        sx={{ m: "3px" }}
-                                        onClick={() => setShowDetails((showDetails !== row.id) ? row.id : '')}
-                                    >
-                                        {
-                                            (showDetails !== row.id)
-                                                ? <ExpandMoreOutlined />
-                                                : <ExpandLessOutlined />
-                                        }
-                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                             <TableRow>
