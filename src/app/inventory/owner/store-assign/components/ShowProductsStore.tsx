@@ -18,7 +18,7 @@ import {
 import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
 import FilterProductsByDepartmentsModal from '@/components/modals/FilterProductsByDepartmentsModal';
-import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
+import {notifySuccess, transactionToStore, transactionToWarehouse} from '@/utils/generalFunctions';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import { characteristics, depots, images } from '@prisma/client';
 import ModalStoreAssign from './Modal/ModalStoreAssign';
@@ -30,6 +30,7 @@ import React, { useEffect, useState } from 'react'
 import { grey } from '@mui/material/colors';
 import { AxiosResponse } from 'axios';
 import { Formik } from 'formik';
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) => {
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
@@ -156,17 +157,29 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
     }
     // No borra el elemento de la tabla sino q cambia el valor
     // de product_units a -1 para q no c filtre y asi conservar los datos
-    const removeProduct = async (index: number) => {
+    const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false)
+    const [selectedProductIndex, setSelectedProductIndex] = React.useState<null | number>(null)
+
+    const handleCloseConfirmDialog = () => setOpenConfirmDialog(false)
+    const handleOpenConfirmDialog = (selectedProductIndex: number) => {
+        setSelectedProductIndex(selectedProductIndex)
+
+        return setOpenConfirmDialog(true)
+    }
+
+    const removeProduct = async () => {
         if (!dataProducts) return;
-        const newProduct = dataProducts[index];
+        const newProduct = dataProducts[selectedProductIndex!];
         const newProductStoreDepots = newProduct.depots![0].store_depots![0];
-        const updateData = { ...newProductStoreDepots, product_units: -1 }
+        const updateData = { ...newProductStoreDepots, product_remaining_units: -1 }
 
         const result: boolean | AxiosResponse = await storeAssign.updateProductStore(updateData);
         if (!result) return;
 
         if (result.status === 200) {
-            await updateDepot(dataProducts[index].depots![0].store_depots![0].product_remaining_units!, dataProducts[index].depots![0], newProduct);
+            await updateDepot(dataProducts[selectedProductIndex!].depots![0].store_depots![0].product_remaining_units!, dataProducts[selectedProductIndex!].depots![0], newProduct);
+
+            notifySuccess("Producto retirado de la tienda")
         }
     }
 
@@ -226,7 +239,6 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                         <TableCell style={{ padding: 0 }}>
                                             <IconButton
                                                 size={"small"}
-                                                sx={{ m: "3px" }}
                                                 onClick={() => setShowDetails((showDetails !== index) ? index : -1)}
                                             >
                                                 {
@@ -295,17 +307,17 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                         <TableCell >
                                             <IconButton color={"warning"} onClick={(e) => {
                                                 e.stopPropagation();
-                                                removeProduct(index);
+                                                handleOpenConfirmDialog(index);
                                             }}>
                                                 <RemoveOutlined />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
                                     <TableRow >
-                                        <TableCell style={{ padding: 0 }} colSpan={5}>
+                                        <TableCell style={{ padding: 0 }} colSpan={4}>
                                             {showDetails === index && (
                                                 <Collapse in={showDetails === index} timeout="auto" unmountOnExit>
-                                                    <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
+                                                    <Grid container spacing={1} sx={{ padding: "8px 10px" }}>
                                                         <Grid item xs={12}>
                                                             <Typography variant="subtitle1" gutterBottom component="div">
                                                                 Detalles:
@@ -374,7 +386,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
-                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Total de unidades ingresadas:</Grid>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades ingresadas en tienda:</Grid>
                                                             <Grid item xs={true}>
                                                                 {product.depots![0].store_depots![0].product_units}
                                                             </Grid>
@@ -388,8 +400,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         </Grid>
                                                     </Grid>
                                                 </Collapse>
-                                            )
-                                            }
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 </React.Fragment>
@@ -442,6 +453,14 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                             open={openImagesDialog}
                             setOpen={setOpenImagesDialog}
                             images={dialogImages}
+                        />
+
+                        <ConfirmDeleteDialog
+                            open={openConfirmDialog}
+                            handleClose={handleCloseConfirmDialog}
+                            title={"Confirmar accion"}
+                            message={"Confirma eliminar este producto de la tienda?"}
+                            confirmAction={removeProduct}
                         />
 
                         <CardContent sx={{ padding: "7px" }}>

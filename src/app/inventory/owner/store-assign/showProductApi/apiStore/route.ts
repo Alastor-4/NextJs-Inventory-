@@ -41,7 +41,7 @@ export async function GET(req: Request) {
                                             store_id: storeId
                                         },
                                         {
-                                            product_units: { not: -1 }
+                                           product_remaining_units: { not: -1 }
                                         }
                                     ]
                                 }
