@@ -11,6 +11,7 @@ import React, { useState } from 'react';
 import { AxiosResponse } from "axios";
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import {notifySuccess} from "@/utils/generalFunctions";
 
 export default function ModalStoreAssign({
     dialogTitle, open, setOpen, nameStore,
@@ -41,7 +42,6 @@ export default function ModalStoreAssign({
     )
 
     const handleSubmit = async ({ units }: { units: string }) => {
-
         const unitsValue = +units;
 
         let productStoreDepots = productDetails.depots![0].store_depots![0];
@@ -60,8 +60,11 @@ export default function ModalStoreAssign({
             (!swap)
                 ? updateDepot(-unitsValue, productDepots)
                 : updateDepot(unitsValue, productDepots)
+
+            notifySuccess("Se han transferido las unidades del producto")
         }
-        setActiveManageQuantity(false);
+
+        setActiveManageQuantity(false)
     }
 
     return (
@@ -132,7 +135,7 @@ export default function ModalStoreAssign({
                                             helperText={(formik.errors.units && formik.touched.units) && formik.errors.units}
                                         />
                                     </Stack>
-                                    <DialogActions sx={{ marginRight: "10px", marginTop: "10px" }}>
+                                    <DialogActions sx={{ marginTop: "10px", display: "flex", justifyContent: "center" }}>
                                         <Button color="error" variant="outlined" onClick={() => { }}>Cerrar</Button>
                                         <Button color="primary" disabled={!formik.values.units} variant="outlined" type='submit'>Aceptar
                                         </Button>

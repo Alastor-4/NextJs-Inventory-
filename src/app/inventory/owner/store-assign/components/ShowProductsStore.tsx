@@ -226,7 +226,6 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                         <TableCell style={{ padding: 0 }}>
                                             <IconButton
                                                 size={"small"}
-                                                sx={{ m: "3px" }}
                                                 onClick={() => setShowDetails((showDetails !== index) ? index : -1)}
                                             >
                                                 {
@@ -302,10 +301,10 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                         </TableCell>
                                     </TableRow>
                                     <TableRow >
-                                        <TableCell style={{ padding: 0 }} colSpan={5}>
+                                        <TableCell style={{ padding: 0 }} colSpan={4}>
                                             {showDetails === index && (
                                                 <Collapse in={showDetails === index} timeout="auto" unmountOnExit>
-                                                    <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
+                                                    <Grid container spacing={1} sx={{ padding: "8px 10px" }}>
                                                         <Grid item xs={12}>
                                                             <Typography variant="subtitle1" gutterBottom component="div">
                                                                 Detalles:
@@ -374,7 +373,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
-                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Total de unidades ingresadas:</Grid>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades ingresadas en tienda:</Grid>
                                                             <Grid item xs={true}>
                                                                 {product.depots![0].store_depots![0].product_units}
                                                             </Grid>
@@ -388,8 +387,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         </Grid>
                                                     </Grid>
                                                 </Collapse>
-                                            )
-                                            }
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 </React.Fragment>
