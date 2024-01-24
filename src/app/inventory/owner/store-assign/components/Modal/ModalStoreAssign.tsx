@@ -14,8 +14,7 @@ import * as Yup from 'yup';
 import {notifySuccess} from "@/utils/generalFunctions";
 
 export default function ModalStoreAssign({
-    dialogTitle, open, setOpen, nameStore,
-    nameWarehouse, productDetails, updateDepot, setActiveManageQuantity
+    dialogTitle, open, setOpen, nameStore, nameWarehouse, productDetails, updateDepot, setActiveManageQuantity
 }: ModalStoreAssignProps) {
 
     const handleClose = () => {
@@ -136,7 +135,7 @@ export default function ModalStoreAssign({
                                         />
                                     </Stack>
                                     <DialogActions sx={{ marginTop: "10px", display: "flex", justifyContent: "center" }}>
-                                        <Button color="error" variant="outlined" onClick={() => { }}>Cerrar</Button>
+                                        <Button color="error" variant="outlined" onClick={handleClose}>Cerrar</Button>
                                         <Button color="primary" disabled={!formik.values.units} variant="outlined" type='submit'>Aceptar
                                         </Button>
                                     </DialogActions>
