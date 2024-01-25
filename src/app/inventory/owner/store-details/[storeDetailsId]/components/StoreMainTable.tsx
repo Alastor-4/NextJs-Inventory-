@@ -23,7 +23,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import StoreMoreDetails from "./StoreMoreDetails";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { images } from "@prisma/client";
 import { Formik } from "formik";
 import ModalProductPrice from "./Modal/ModalProductPrice";
@@ -31,16 +31,16 @@ import { grey } from "@mui/material/colors";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps) => {
+export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
     const router = useRouter();
+    const { storeDetailsId } = useParams();
 
     // Guardan datos de bd
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
     const [filtersApplied, setFiltersApplied] = useState<boolean>(false);
-    const [depotsInStore, setDepotsInStore] = useState<number | null>(dataStoreDetails?.store_depots?.length!);
 
-    const [dataStore, setDataStore] = useState<storeWithStoreDepots | null>(dataStoreDetails);
+    const [dataStore, setDataStore] = useState<storeWithStoreDepots | null>(null);
 
     // Se usan habilitar modales o detalles
     const [showDetails, setShowDetails] = useState<number>(-1);
@@ -59,12 +59,12 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
 
     //GET initial data
     useEffect(() => {
-        fetcher(`/inventory/owner/store-details/${dataStoreDetails?.id}/api`).then((data: allProductsByDepartmentProps[]) =>
+        fetcher(`/inventory/owner/store-details/${storeDetailsId}/api`).then((data: allProductsByDepartmentProps[]) =>
             setAllProductsByDepartment(data.map((productsByDepartments: allProductsByDepartmentProps) => ({
                 ...productsByDepartments,
                 selected: false
             }))));
-    }, [dataStoreDetails]);
+    }, [storeDetailsId]);
 
     //Update allProducts at change
     useEffect(() => {
@@ -90,12 +90,12 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
     //GET store name
     useEffect(() => {
         const getDataStore = async () => {
-            const datastore = await stores.storeDetails(userId!, dataStoreDetails?.id!);
+            const datastore = await stores.storeDetails(userId!, storeDetailsId!);
             setDataStore(datastore);
         }
-        if (!dataStore) getDataStore();
+        getDataStore();
 
-    }, [dataStoreDetails?.id, userId, dataStore]);
+    }, [storeDetailsId, userId]);
 
     const handleNavigateBack = () => router.back();
     // active - noActive
@@ -517,7 +517,7 @@ export const StoreMainTable = ({ userId, dataStoreDetails }: StoreMainTableProps
                                                         </Table>
                                                     </TableContainer>) : <TableNoData searchCoincidence />
                                                 ) : (
-                                                    <TableNoData hasData={depotsInStore} />
+                                                    <TableNoData hasData={dataStore?.store_depots?.length!} />
                                                 )
                                         }
                                     </Grid>

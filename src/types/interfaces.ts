@@ -98,7 +98,6 @@ export interface storeDepotsStatsProps {
 }
 export interface StoreMainTableProps {
     userId?: number;
-    dataStoreDetails: storeWithStoreDepots | null;
 }
 
 export interface departmentsWithProductsCount {
