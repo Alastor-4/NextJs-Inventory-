@@ -21,20 +21,11 @@ export async function GET(req: Request) {
                                     OR: [
                                         {
                                             AND: [
-                                                {
-                                                    store_id: storeId
-                                                },
-                                                {
-                                                    product_units: -1
-                                                }
+                                                {store_id: storeId},
+                                                {product_remaining_units: -1}
                                             ]
                                         },
-                                        {
-                                            NOT: {
-                                                store_id: storeId
-                                            }
-                                        }
-
+                                        {store_id: {not: storeId}}
                                     ]
                                 }
                             }
@@ -49,17 +40,8 @@ export async function GET(req: Request) {
                 include: {
                     store_depots: {
                         where: {
-                            AND: [
-
-                                {
-                                    store_id: storeId
-                                },
-
-                                {
-                                    product_units: -1
-                                }
-
-                            ]
+                            store_id: storeId,
+                            product_remaining_units: -1,
                         }
                     },
                     products: {
@@ -74,7 +56,6 @@ export async function GET(req: Request) {
 
         }
     })
-
 
     return NextResponse.json(result)
 }

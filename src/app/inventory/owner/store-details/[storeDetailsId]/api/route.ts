@@ -19,15 +19,8 @@ export async function GET(req: Request, { params }: Params) {
                         some: {
                             store_depots: {
                                 some: {
-                                    AND: [
-                                        {
-                                            store_id: storeId
-                                        },
-                                        {
-                                            product_units: { not: -1 }
-                                        }
-                                    ]
-
+                                    store_id: storeId,
+                                    product_remaining_units: { not: -1 },
                                 }
                             }
                         }
@@ -43,14 +36,8 @@ export async function GET(req: Request, { params }: Params) {
                         some: {
                             store_depots: {
                                 some: {
-                                    AND: [
-                                        {
-                                            store_id: storeId
-                                        },
-                                        {
-                                            product_units: { not: -1 }
-                                        }
-                                    ]
+                                    store_id: storeId,
+                                    product_remaining_units: { not: -1 },
                                 }
                             }
                         }
@@ -63,14 +50,8 @@ export async function GET(req: Request, { params }: Params) {
                         include: {
                             store_depots: {
                                 where: {
-                                    AND: [
-                                        {
-                                            store_id: storeId
-                                        },
-                                        {
-                                            product_units: { not: -1 }
-                                        }
-                                    ]
+                                    store_id: storeId,
+                                    product_remaining_units: { not: -1 },
                                 },
                                 include: { _count: { select: { product_offers: {where: {is_active: true}} } } }
                             }

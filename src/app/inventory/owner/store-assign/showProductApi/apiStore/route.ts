@@ -14,14 +14,8 @@ export async function GET(req: Request) {
                         some: {
                             store_depots: {
                                 some: {
-                                    AND: [
-                                        {
-                                            store_id: storeId
-                                        },
-                                        {
-                                            product_units: { not: -1 }
-                                        }
-                                    ]
+                                    store_id: storeId,
+                                    product_remaining_units: { not: -1 },
                                 }
                             }
                         }
@@ -36,14 +30,8 @@ export async function GET(req: Request) {
                         some: {
                             store_depots: {
                                 some: {
-                                    AND: [
-                                        {
-                                            store_id: storeId
-                                        },
-                                        {
-                                           product_remaining_units: { not: -1 }
-                                        }
-                                    ]
+                                    store_id: storeId,
+                                    product_remaining_units: { not: -1 },
                                 }
                             }
                         }
@@ -53,16 +41,28 @@ export async function GET(req: Request) {
                     departments: true,
                     depots: {
                         include: {
-                            store_depots: true
+                            store_depots: {
+                                where: {
+                                    OR: [
+                                        {store_id: {not: storeId}},
+                                        {
+                                            AND: [
+                                                {store_id: storeId},
+                                                {product_remaining_units: -1}
+                                            ]
+                                        },
+                                    ]
+                                }
+                            }
                         }
                     },
                     characteristics: true,
                     images: true,
-
                 }
             }
         }
     })
+
     return NextResponse.json(result)
 }
 export async function PUT(req: Request) {

@@ -3,7 +3,7 @@ import { prisma } from "db"
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
-    const storeId = await +searchParams.get("storeId")!;
+    const storeId = parseInt(<string>searchParams.get("storeId"))
 
     const result = await prisma.warehouses.findMany({
         where: {
@@ -16,20 +16,11 @@ export async function GET(req: Request) {
                                     OR: [
                                         {
                                             AND: [
-                                                {
-                                                    store_id: storeId
-                                                },
-                                                {
-                                                    product_units: -1
-                                                }
+                                                {store_id: storeId},
+                                                {product_remaining_units: -1}
                                             ]
                                         },
-                                        {
-                                            NOT: {
-                                                store_id: storeId
-                                            }
-                                        }
-
+                                        {store_id: {not: storeId}}
                                     ]
                                 }
                             }
@@ -54,20 +45,11 @@ export async function GET(req: Request) {
                                     OR: [
                                         {
                                             AND: [
-                                                {
-                                                    store_id: storeId
-                                                },
-                                                {
-                                                    product_units: -1
-                                                }
+                                                {store_id: storeId},
+                                                {product_remaining_units: -1}
                                             ]
                                         },
-                                        {
-                                            NOT: {
-                                                store_id: storeId
-                                            }
-                                        }
-
+                                        {store_id: {not: storeId}}
                                     ]
                                 }
                             }
@@ -83,15 +65,8 @@ export async function GET(req: Request) {
                     store_depots: {
                         where: {
                             AND: [
-
-                                {
-                                    store_id: storeId
-                                },
-
-                                {
-                                    product_units: -1
-                                }
-
+                                {store_id: storeId},
+                                {product_remaining_units: -1},
                             ]
                         }
                     },
