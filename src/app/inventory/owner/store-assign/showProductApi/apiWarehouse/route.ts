@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "db"
 
+//get available depots to create store-depots (create or add units to a removed store-depot). removed store-depots has product_remaining_units = -1
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url)
 
@@ -18,21 +19,18 @@ export async function GET(req: Request) {
                                 {
                                     OR: [
                                         {
-                                            NOT: {
-                                                store_depots: {
-                                                    some: {
-                                                        store_id: storeId
-                                                    }
+                                            store_depots: {
+                                                some: {
+                                                    store_id: {not: storeId}
                                                 }
                                             }
-
                                         },
                                         {
                                             store_depots: {
                                                 some: {
                                                     AND: [
                                                         {store_id: storeId},
-                                                        {product_units: -1}
+                                                        {product_remaining_units: -1}
                                                     ]
                                                 }
                                             }
@@ -64,17 +62,17 @@ export async function GET(req: Request) {
                                         {
                                             store_depots: {
                                                 some: {
-                                                    AND: [
-                                                        {store_id: storeId},
-                                                        {product_remaining_units: -1}
-                                                    ]
+                                                    store_id: {not: storeId}
                                                 }
                                             }
                                         },
                                         {
                                             store_depots: {
                                                 some: {
-                                                    store_id: {not: storeId}
+                                                    AND: [
+                                                        {store_id: storeId},
+                                                        {product_remaining_units: -1}
+                                                    ]
                                                 }
                                             }
                                         },
@@ -92,21 +90,35 @@ export async function GET(req: Request) {
                     }
                 },
                 include: {
+                    depots: {
+                        include: {
+                            store_depots: {
+                                where: {
+                                    OR: [
+                                        {
+                                            store_id: {not: storeId}
+                                        },
+                                        {
+                                            AND: [
+                                                {store_id: storeId},
+                                                {product_remaining_units: -1}
+                                            ]
+                                        },
+                                    ]
+                                }
+                            }
+                        }
+                    },
                     departments: true,
                     characteristics: true,
                     images: true,
-                    depots: {
-                        include: {
-                            store_depots: true
-                        }
-                    }
                 }
             }
         }
 
     })
-    return NextResponse.json(result);
 
+    return NextResponse.json(result);
 }
 
 export async function POST(req: Request) {
