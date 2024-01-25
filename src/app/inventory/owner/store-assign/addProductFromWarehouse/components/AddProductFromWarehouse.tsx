@@ -72,8 +72,11 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
             }
         }
 
-        if (!warehouseId) getData()
-        else getDataSpecificWarehouse()
+        if (warehouseId) {
+            getDataSpecificWarehouse()
+        } else {
+            getData() //FixMe: when this function is executed warehouseId para is not send to route handler and function most failed
+        }
     }, [dataStore?.id, warehouseId])
 
     // Puede pasar que q se oculte el último depósito
@@ -409,25 +412,27 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                 store_id,
                 depot_id,
                 sell_price,
-                sell_price_units,
+                sell_price_unit,
+                product_units,
                 price_discount_percentage,
                 price_discount_quantity,
                 seller_profit_percentage,
                 seller_profit_quantity,
             } = data[ind].store_depots[0];
+
             const dataRequest = {
                 id,
                 store_id,
                 depot_id,
-                product_units: units,
+                product_units: product_units + units,
                 product_remaining_units: units,
                 sell_price,
-                sell_price_units,
+                sell_price_unit,
                 price_discount_percentage,
                 price_discount_quantity,
                 seller_profit_percentage,
                 seller_profit_quantity,
-                is_active: true,
+                is_active: false,
             }
 
             request = await requestWarehouse.updateStoreDepots(dataRequest)
