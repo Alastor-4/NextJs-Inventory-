@@ -75,7 +75,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
         if (warehouseId) {
             getDataSpecificWarehouse()
         } else {
-            getData() //FixMe: when this function is executed warehouseId para is not send to route handler and function most failed
+            getData() //FixMe: Only search over owner' warehouses
         }
     }, [dataStore?.id, warehouseId])
 
