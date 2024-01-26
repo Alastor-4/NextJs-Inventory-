@@ -1,13 +1,12 @@
-// @ts-nocheck
 import apiRequest from "@/api"
-import {notifyError} from "@/utils/generalFunctions";
+import { notifyError } from "@/utils/generalFunctions";
 
-const url = (userId, sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/product/api`
+const url = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/product/api`
 
 const sellerStoreProduct = {
-    allProductByDepartments: async function (userId, sellerStoreId) {
+    allProductByDepartments: async function (sellerStoreId: number) {
         try {
-            const response = await apiRequest.get(url(userId, sellerStoreId))
+            const response = await apiRequest.get(url(sellerStoreId))
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error obteniendo los productos. Inténtelo nuevamente")
@@ -16,9 +15,9 @@ const sellerStoreProduct = {
         return false
     },
 
-    toggleIsActiveStoreDepot: async function (userId, sellerStoreId, storeDepotId) {
+    toggleIsActiveStoreDepot: async function (sellerStoreId: number, storeDepotIndex: number) {
         try {
-            const response = await apiRequest.put(url(userId, sellerStoreId), {storeDepotId})
+            const response = await apiRequest.put(url(sellerStoreId), { storeDepotId: storeDepotIndex })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error cambiando el estado del producto. Inténtelo nuevamente")
@@ -27,9 +26,9 @@ const sellerStoreProduct = {
         return false
     },
 
-    sellStoreDepotDefault: async function (userId, sellerStoreId, storeDepotId) {
+    sellStoreDepotDefault: async function (sellerStoreId: number, storeDepotIndex: number) {
         try {
-            const response = await apiRequest.patch(url(userId, sellerStoreId), {storeDepotId})
+            const response = await apiRequest.patch(url(sellerStoreId), { storeDepotId: storeDepotIndex })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error creando la venta del producto. Inténtelo nuevamente")
@@ -38,9 +37,9 @@ const sellerStoreProduct = {
         return false
     },
 
-    sellStoreDepotManual: async function ({userId, sellerStoreId, sellData, sellProductsData}) {
+    sellStoreDepotManual: async function ({ sellerStoreId, sellData, sellProductsData }: any) {
         try {
-            const response = await apiRequest.post(url(userId, sellerStoreId), {sellData, sellProductsData})
+            const response = await apiRequest.post(url(sellerStoreId), { sellData, sellProductsData })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error creando la venta de los productos. Inténtelo nuevamente")

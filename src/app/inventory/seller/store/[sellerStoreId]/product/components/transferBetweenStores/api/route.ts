@@ -8,7 +8,7 @@ interface Params {
 }
 
 export async function GET(req: Request, { params }: Params) {
-    const storeId = parseInt(params.sellerStoreId)
+    const storeId = +params.sellerStoreId!;
 
     const result = await prisma.stores.findMany({
         where: {
