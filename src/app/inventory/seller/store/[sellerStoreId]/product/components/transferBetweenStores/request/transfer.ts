@@ -1,10 +1,10 @@
-import apiRequest from "@/api";
 import { notifyError } from "@/utils/generalFunctions";
+import apiRequest from "@/api";
 
-const url = (storeId: string) => `/inventory/seller/store/${storeId}/product/components/transferBetweenStores/api`
+const url = (storeId: number) => `/inventory/seller/store/${storeId}/product/components/transferBetweenStores/api`;
 
 export const transfer = {
-    getAllStores: async function (storeId: string) {
+    getAllStores: async function (storeId: number) {
         try {
             const request = await apiRequest.get(url(storeId))
 
@@ -15,7 +15,7 @@ export const transfer = {
         return false
     },
 
-    updateStore: async function (storeId: string, data: any) {
+    updateStore: async function (storeId: number, data: any) {
         try {
             const request = await apiRequest.put(url(storeId), data)
 
@@ -26,7 +26,7 @@ export const transfer = {
         return false
     },
 
-    createTransfer: async function (storeId: string, data: any) {
+    createTransfer: async function (storeId: number, data: any) {
         try {
             const request = await apiRequest.post(url(storeId), data)
 

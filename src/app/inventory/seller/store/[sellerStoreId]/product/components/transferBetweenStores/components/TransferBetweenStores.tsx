@@ -1,32 +1,26 @@
-import { Button, Grid, MenuItem, TextField, TextareaAutosize } from '@mui/material'
-import { Formik } from 'formik'
-import * as Yup from 'yup'
-import React, { useEffect, useState } from 'react'
-import { transfer } from '../request/transfer'
-import { notifySuccess } from '@/utils/generalFunctions'
+import { Button, Grid, MenuItem, TextField } from '@mui/material';
+import { TransferBetweenStoresProps } from '@/types/interfaces';
+import { notifySuccess } from '@/utils/generalFunctions';
+import React, { useEffect, useState } from 'react';
+import { transfer } from '../request/transfer';
+import { stores } from '@prisma/client';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
-interface Props {
-    storeId: string
-    storeDepot: any
-    badItem: number
-    cancelChecked: (badItem: number) => void
-    loadData: () => void
-}
+const TransferBetweenStores = ({ storeId, storeDepot, badItem, cancelChecked, loadData }: TransferBetweenStoresProps) => {
 
-function TransferBetweenStores({ storeId, storeDepot, badItem, cancelChecked, loadData }: Props) {
-
-    const [storeList, setStoreList] = useState([])
+    const [storeList, setStoreList] = useState<stores[] | null>([]);
 
     useEffect(() => {
         const getStoreList = async () => {
-            const newStoreList = await transfer.getAllStores(storeId)
+            const newStoreList = await transfer.getAllStores(storeId);
             if (newStoreList) {
-                setStoreList(newStoreList)
+                setStoreList(newStoreList);
             }
         }
 
-        getStoreList()
-    }, [storeId])
+        getStoreList();
+    }, [storeId]);
 
     const setInitialValues = {
         selectedStore: '',
@@ -41,7 +35,7 @@ function TransferBetweenStores({ storeId, storeDepot, badItem, cancelChecked, lo
             units: Yup.number()
                 .typeError("Debe ser un número")
                 .min(1, "El mínimo es 1")
-                .max(storeDepot.product_remaining_units, `El máximo es ${storeDepot.product_remaining_units} `)
+                .max(storeDepot.product_remaining_units!, `El máximo es ${storeDepot.product_remaining_units} `)
                 .required("Este campo es obligatorio"),
             text: Yup.string()
         })
@@ -60,21 +54,16 @@ function TransferBetweenStores({ storeId, storeDepot, badItem, cancelChecked, lo
 
         const dataStore = {
             id: storeDepot.id,
-            product_remaining_units: storeDepot.product_remaining_units - values.units
+            product_remaining_units: storeDepot.product_remaining_units! - values.units
         }
 
-        let result = await transfer.updateStore(storeId, dataStore)
-
+        let result = await transfer.updateStore(storeId, dataStore);
         if (result) {
-
-            result = await transfer.createTransfer(storeId, data)
-
+            result = await transfer.createTransfer(storeId, data);
             if (result) {
-                notifySuccess("Se realizó la transferencia")
-
-                if (+values.units === storeDepot.product_remaining_units) cancelChecked(badItem)
-
-                loadData()
+                notifySuccess("Se realizó la transferencia");
+                if (+values.units === storeDepot.product_remaining_units) cancelChecked(badItem);
+                loadData();
             }
         }
     }
@@ -102,30 +91,23 @@ function TransferBetweenStores({ storeId, storeDepot, badItem, cancelChecked, lo
                                         helperText={(formik.errors.selectedStore && formik.touched.selectedStore) && formik.errors.selectedStore}
                                     >
                                         {
-                                            storeList.map((store: any, index: number) => (
+                                            storeList?.map((store: stores, index: number) => (
                                                 <MenuItem key={index} value={store.id}>{store.name}</MenuItem>
                                             ))
                                         }
-
                                     </TextField>
-
                                 </Grid>
-
                                 <Grid item container alignItems={'center'}>
-
                                     <Grid item xs={6}>
                                         <TextField
                                             name={'units'}
                                             label={'Unidades'}
                                             {...formik.getFieldProps("units")}
                                             size='small'
-
                                             error={formik.errors.units && formik.touched.units}
                                             helperText={(formik.errors.units && formik.touched.units) && formik.errors.units}
                                         />
-
                                     </Grid>
-
                                     <Grid item marginX={'auto'}  >
                                         <Button
                                             type='submit'
@@ -136,10 +118,7 @@ function TransferBetweenStores({ storeId, storeDepot, badItem, cancelChecked, lo
                                             Aceptar
                                         </Button>
                                     </Grid>
-
                                 </Grid>
-
-
                                 <Grid item xs={12}>
                                     <TextField
                                         fullWidth
@@ -149,15 +128,10 @@ function TransferBetweenStores({ storeId, storeDepot, badItem, cancelChecked, lo
                                         rows={4}
                                         {...formik.getFieldProps('text')}
                                     />
-
                                 </Grid>
-
                             </Grid>
                         </form>
-
                     )
-
-
                 }
             </Formik>
         </>
