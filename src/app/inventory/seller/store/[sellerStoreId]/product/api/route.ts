@@ -3,7 +3,7 @@ import { prisma } from "db";
 
 // Get store products
 export async function GET(request: Request, { params }: { params: { sellerStoreId: string } }) {
-    const storeId = parseInt(params.sellerStoreId)
+    const storeId = +params.sellerStoreId!
 
     const storeProducts = await prisma.departments.findMany({
         where: {

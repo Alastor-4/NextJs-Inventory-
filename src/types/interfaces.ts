@@ -100,6 +100,17 @@ export interface StoreMainTableProps {
     userId?: number;
 }
 
+export interface StoreActionsMainProps {
+    storeId?: number;
+}
+
+export interface TransferBetweenStoresProps {
+    storeId: number;
+    storeDepot: storeDepotsWithAny;
+    badItem: number;
+    cancelChecked: (badItem: number) => void;
+    loadData: () => void;
+}
 export interface departmentsWithProductsCount {
     id: number;
     name: string | null;
