@@ -7,7 +7,6 @@ interface Params {
     params: { sellerStoreId: string }
 }
 
-
 // Get store details
 export async function GET(req: Request, { params }: Params) {
     const { searchParams } = new URL(req.url)
@@ -25,7 +24,7 @@ export async function GET(req: Request, { params }: Params) {
                 include: {
                     store_open_days: { orderBy: { week_day_number: "asc" } },
                     store_reservation_days: { orderBy: { week_day_number: "asc" } },
-                    store_depots: true,
+                    store_depots: {where: {product_remaining_units: {not: -1}}},
                 }
             }
         )

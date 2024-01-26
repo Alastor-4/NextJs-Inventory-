@@ -13,7 +13,8 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
                         some: {
                             store_depots: {
                                 some: {
-                                    store_id: storeId
+                                    store_id: storeId,
+                                    product_remaining_units: {not: -1}
                                 }
                             }
                         }
@@ -28,7 +29,8 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
                         some: {
                             store_depots: {
                                 some: {
-                                    store_id: storeId
+                                    store_id: storeId,
+                                    product_remaining_units: {not: -1}
                                 }
                             }
                         }
@@ -39,7 +41,10 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
                     depots: {
                         include: {
                             store_depots: {
-                                where: { store_id: storeId },
+                                where: {
+                                    store_id: storeId,
+                                    product_remaining_units: {not: -1},
+                                },
                                 include: { product_offers: true }
                             }
                         }

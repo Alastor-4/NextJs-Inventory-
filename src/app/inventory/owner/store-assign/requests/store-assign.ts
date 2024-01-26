@@ -12,7 +12,7 @@ const storeAssign = {
             const response = await apiRequest.get(showProductStoreUrl, { params: { storeId: storeId } })
             return response.data
         } catch (e) {
-            //ToDo: notify error here
+            notifyError(`Ha ocurrido un error obteniendo los datos de los productos`)
         }
 
         return false
@@ -22,7 +22,7 @@ const storeAssign = {
         try {
             return await apiRequest.put(showProductStoreUrl, data)
         } catch (e) {
-            //ToDo: notify error here
+            notifyError(`Ha ocurrido un error modificando los datos`)
         }
 
         return false
@@ -32,34 +32,13 @@ const storeAssign = {
         try {
             return await apiRequest.put(showProductWarehouseUrl, data)
         } catch (e) {
-            //ToDo: notify error here
+            notifyError(`Ha ocurrido un error modificando los datos`)
         }
 
         return false
     },
 
     // Peticiones para el component ShowProductWarehouse
-    allProductByDepartmentWarehouse: async function (storeId: any, warehouseId: any) {
-        try {
-            const response = await apiRequest.get(showProductWarehouseUrl, { params: { storeId: storeId, warehouseId: warehouseId } })
-            return response.data
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
-
-    postProductToStoreDepot: async function (data: any) {
-        try {
-            const response = await apiRequest.post(showProductWarehouseUrl, data)
-            return response.status
-        } catch (e) {
-            //ToDo: notify error here
-        }
-
-        return false
-    },
     createTransaction: async function (data: any) {
         try {
             const response = await apiRequest.post(transactionUrl, data)
@@ -67,6 +46,7 @@ const storeAssign = {
         } catch (e) {
             notifyError("Error al registar la transacción")
         }
+
         return false
     }
 }
