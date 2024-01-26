@@ -21,6 +21,7 @@ import { grey } from '@mui/material/colors';
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const router = useRouter();
@@ -129,6 +130,11 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const handleTooltipOpen = () => setIsOpenTooltip(true);
 
     //Handle delete product
+    const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false)
+
+    const handleCloseConfirmDialog = () => setOpenConfirmDialog(false)
+    const handleOpenConfirmDialog = () => setOpenConfirmDialog(true)
+
     const handleRemove = async () => {
         const response = await products.delete(selectedProduct?.id!);
         if (response) {
@@ -201,7 +207,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                     <EditOutlined fontSize={"small"} />
                                 </IconButton>
 
-                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                <IconButton color={"inherit"} onClick={handleOpenConfirmDialog}>
                                     <DeleteOutline fontSize={"small"} />
                                 </IconButton>
 
@@ -397,6 +403,14 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                     handleForceRender={reloadData}
                 />
             </ModalUpdateProduct>
+
+            <ConfirmDeleteDialog
+                open={openConfirmDialog}
+                handleClose={handleCloseConfirmDialog}
+                title={"Confirmar acción"}
+                message={"Tenga en cuenta que solo es posible eliminar productos que no están siendo usados en el sistema. Confirma eliminar el producto?"}
+                confirmAction={handleRemove}
+            />
 
             <Formik
                 initialValues={{ searchBarValue: "" }}
