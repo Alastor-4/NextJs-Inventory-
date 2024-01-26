@@ -90,13 +90,12 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                     const products = allProducts?.filter((product: productsProps) => {
                         if ((!filteredConditions[0].value || product.depots![0].store_depots![0].is_active && filteredConditions[0].value)
                             && (!filteredConditions[1].value || !product.depots![0].store_depots![0].is_active && filteredConditions[1].value)
-                            && (!filteredConditions[2].value || product.depots![0].store_depots![0].product_remaining_units === -1 && filteredConditions[2].value)
-                            && (!filteredConditions[3].value || product.depots![0].store_depots![0].sell_price === "0" && filteredConditions[3].value)
-                            && (!filteredConditions[4].value || (product.depots![0].store_depots![0].price_discount_percentage || product.depots![0].store_depots![0].price_discount_quantity) && filteredConditions[4].value)
-                            && (!filteredConditions[5].value || product.depots![0].store_depots![0].product_offers?.length! > 0 && filteredConditions[5].value)
-                            && (!filteredConditions[6].value || product.depots![0].store_depots![0].product_remaining_units! === 0 && filteredConditions[6].value)
-                            && (!filteredConditions[7].value || product.depots![0].store_depots![0].product_remaining_units! < 10 && filteredConditions[7].value)
-                            && (!filteredConditions[8].value || product.depots![0].store_depots![0].product_remaining_units! < 20 && filteredConditions[8].value)
+                            && (!filteredConditions[2].value || product.depots![0].store_depots![0].sell_price === "0" && filteredConditions[2].value)
+                            && (!filteredConditions[3].value || (product.depots![0].store_depots![0].price_discount_percentage || product.depots![0].store_depots![0].price_discount_quantity) && filteredConditions[3].value)
+                            && (!filteredConditions[4].value || product.depots![0].store_depots![0].product_offers?.length! > 0 && filteredConditions[4].value)
+                            && (!filteredConditions[5].value || product.depots![0].store_depots![0].product_remaining_units! === 0 && filteredConditions[5].value)
+                            && (!filteredConditions[6].value || product.depots![0].store_depots![0].product_remaining_units! < 10 && filteredConditions[6].value)
+                            && (!filteredConditions[7].value || product.depots![0].store_depots![0].product_remaining_units! < 20 && filteredConditions[7].value)
                         ) return product;
                     })
                     allProducts = [...products!];
@@ -692,7 +691,6 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
         searchBarValue: "",
         onSellFilter: false,
         inactiveFilter: false,
-        retiredFilter: false,
         withOutPriceFilter: false,
         withDiscountFilter: false,
         withOffersFilter: false,

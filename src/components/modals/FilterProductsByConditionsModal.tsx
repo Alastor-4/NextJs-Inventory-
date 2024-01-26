@@ -17,14 +17,13 @@ const FilterProductsByConditionsModal = (
         : FilterProductsByConditionsModalProps) => {
 
     const {
-        onSellFilter, inactiveFilter, retiredFilter, withOutPriceFilter, withDiscountFilter,
+        onSellFilter, inactiveFilter, withOutPriceFilter, withDiscountFilter,
         withOffersFilter, withoutDisponibilityFilter, disponibilityLessThan10Filter, disponibilityLessThan20Filter
     } = formik.values;
 
     const filterConditionsList: { label: string, name: string, value: boolean }[] = useMemo(() => [
         { label: 'En venta', name: 'onSellFilter', value: onSellFilter },
         { label: 'Inactivo', name: 'inactiveFilter', value: inactiveFilter },
-        { label: 'Retirado', name: 'retiredFilter', value: retiredFilter },
         { label: 'Sin precio', name: 'withOutPriceFilter', value: withOutPriceFilter },
         { label: 'Con descuento', name: 'withDiscountFilter', value: withDiscountFilter },
         { label: 'Con oferta', name: 'withOffersFilter', value: withOffersFilter },
@@ -32,7 +31,7 @@ const FilterProductsByConditionsModal = (
         { label: 'Con disponibilidad < 10', name: 'disponibilityLessThan10Filter', value: disponibilityLessThan10Filter },
         { label: 'Con disponibilidad < 20', name: 'disponibilityLessThan20Filter', value: disponibilityLessThan20Filter },
     ], [disponibilityLessThan10Filter, disponibilityLessThan20Filter,
-        inactiveFilter, onSellFilter, retiredFilter, withDiscountFilter,
+        inactiveFilter, onSellFilter, withDiscountFilter,
         withOffersFilter, withOutPriceFilter, withoutDisponibilityFilter]);
 
     const [filteredConditionsModalList, setFilteredConditionsModalList] = useState<{ label: string, name: string, value: boolean }[] | null>(null);
