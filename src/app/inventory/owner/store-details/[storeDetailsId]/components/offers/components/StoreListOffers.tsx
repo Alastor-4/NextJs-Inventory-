@@ -1,16 +1,12 @@
 import { AddOutlined, DeleteOutline, EditOutlined, WarningOutlined } from '@mui/icons-material';
 import {
-    Box,
     Button,
-    Card,
     Checkbox,
-    Divider,
     Grid,
     IconButton,
     InputAdornment,
     MenuItem,
     TextField,
-    Typography
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { storeDetails } from '../../../request/storeDetails';
@@ -20,6 +16,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import StoreModalOffers from './StoreModalOffers';
 import { notifyError, notifySuccess, notifyWarning } from '@/utils/generalFunctions';
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 function StoreListOffers(props: any) {
     const { priceProduct, currency, storeDepotId } = props;
@@ -183,12 +180,23 @@ function StoreListOffers(props: any) {
         )
     }
 
-    const removeOffer = async (offerId: any) => {
-        const response = await storeDetails.removeProductOffers(params.storeDetailsId, offerId)
+    //handle delete offer
+    const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false)
+    const [toRemoveOfferId, setToRemoveOfferId] = React.useState<number | null>(null)
 
-        if (response === false) {
-            notifyError("No se ha podido eliminar la oferta")
-        } else await getDataOffers()
+    const handleCloseConfirmDialog = () => setOpenConfirmDialog(false)
+    const handleOpenConfirmDialog = (offerId: number) => {
+        setToRemoveOfferId(offerId)
+        setOpenConfirmDialog(true)
+    }
+
+    const removeOffer = async () => {
+        const response = await storeDetails.removeProductOffers(params.storeDetailsId, toRemoveOfferId)
+
+        if (response) {
+            await getDataOffers()
+            notifySuccess("Oferta eliminada satisfactoriamente")
+        }
     }
 
     const handleToggleOffer = async (offerId: any) => {
@@ -225,6 +233,13 @@ function StoreListOffers(props: any) {
                 <EditOffer offer={selectedOffer} />
             </StoreModalDefault>
 
+            <ConfirmDeleteDialog
+                open={openConfirmDialog}
+                handleClose={handleCloseConfirmDialog}
+                title={"Confirmar acción"}
+                message={"Confirma eliminar oferta?"}
+                confirmAction={removeOffer}
+            />
 
             <Grid item container xs={12}>
                 <Grid item container>
@@ -283,9 +298,9 @@ function StoreListOffers(props: any) {
 
                                                 <IconButton
                                                     size={"small"}
-                                                    onClick={async (e) => {
+                                                    onClick={(e) => {
                                                         e.stopPropagation()
-                                                        return await removeOffer(item.id)
+                                                        return handleOpenConfirmDialog(item.id)
                                                     }}
                                                 >
                                                     <DeleteOutline fontSize={"small"} color='error' />
