@@ -1,9 +1,9 @@
 'use client'
+import { Button, Chip, Dialog, DialogActions, DialogTitle, Grid, IconButton, Stack } from '@mui/material';
+import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import { allProductsByDepartmentProps } from '@/types/interfaces';
 import { FilterAlt, FilterAltOff } from '@mui/icons-material';
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Stack } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
 interface FilterProductsByDepartmentsModalProps {
     allProductsByDepartment: allProductsByDepartmentProps[];
