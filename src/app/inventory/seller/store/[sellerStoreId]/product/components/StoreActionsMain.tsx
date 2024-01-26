@@ -1,140 +1,128 @@
 "use client"
 
-import React from "react";
 import {
-    AppBar,
-    Avatar,
-    AvatarGroup,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Checkbox,
-    Chip,
-    Collapse,
-    Divider,
-    FormHelperText,
-    Grid,
-    IconButton,
-    InputBase,
-    MenuItem,
-    Switch,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Toolbar,
-    Typography
+    AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent, Checkbox, Collapse,
+    Divider, FormHelperText, Grid, IconButton, InputBase, MenuItem, Switch, Table, TableBody,
+    TableCell, TableContainer, TableHead, TableRow, TextField, Toolbar, Typography
 } from "@mui/material";
-import { TableNoData } from "@/components/TableNoData";
 import {
-    ArrowLeft,
-    DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
-    FilterAlt,
-    FilterAltOff,
-    FilterAltOutlined,
-    ForwardToInbox,
-    HelpOutline,
-    KeyboardArrowDown,
-    KeyboardArrowRight,
-    KeyboardArrowUp,
+    ArrowLeft, DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
+    FilterAlt, FilterAltOff, ForwardToInbox, HelpOutline, KeyboardArrowRight,
     SellOutlined,
 } from "@mui/icons-material";
-import SearchIcon from '@mui/icons-material/Search';
-import { useRouter } from "next/navigation";
-import * as Yup from "yup";
-import { Formik } from "formik";
-import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
-import {
-    computeDepotPricePerUnit,
-    notifyError,
-    notifySuccess,
-    notifyWarning,
-    numberFormat
-} from "@/utils/generalFunctions";
+import { computeDepotPricePerUnit, notifyError, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
-import UpdateValueDialog from "@/components/UpdateValueDialog";
 import { storeDetails } from "@/app/inventory/owner/store-details/[storeDetailsId]/request/storeDetails";
-import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
-import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
+import { StoreActionsMainProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
+import FilterProductsByConditionsModal from "@/components/modals/FilterProductsByConditionsModal";
+import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
+import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
+import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
+import UpdateValueDialog from "@/components/UpdateValueDialog";
+import { images, product_offers } from "@prisma/client";
+import { TableNoData } from "@/components/TableNoData";
+import SearchIcon from '@mui/icons-material/Search';
+import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
-import { images } from "@prisma/client";
+import { useRouter } from "next/navigation";
 import { grey } from "@mui/material/colors";
+import { Formik } from "formik";
+import * as Yup from "yup";
 
-export default function StoreActionsMain({ userId, storeId }: { userId: number, storeId: string }) {
-    const router = useRouter()
+const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
+    const router = useRouter();
 
-    const [data, setData] = React.useState<null | any[]>(null)
-    const [allProductsByDepartment, setAllProductsByDepartment] = React.useState<any>([])
+    const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
+    const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
+    const [filtersDeparmentsApplied, setFiltersDeparmentsApplied] = useState<boolean>(false);
+    const [filtersConditionsApplied, setFiltersConditionsApplied] = useState<boolean>(false);
+    const [filteredConditions, setFilteredConditions] = useState<{ label: string, name: string, value: boolean }[] | null>(null);
+    const [activeModalTransfer, setActiveModalTransfer] = useState<boolean>(false);
+    const [productSelectedForTransfer, setProductSelectedForTransfer] = useState<productsProps | null>(null);
 
-    //Create Modal handler
-    const [isFilterModalOpen, setIsFilterModalOpen] = React.useState<boolean>(false);
-
-    const toggleModalFilter = () => {
-        if (!data) return;
-        setIsFilterModalOpen(!isFilterModalOpen);
+    const [isFilterDepartmentsModalOpen, setIsFilterDepartmentsModalOpen] = useState<boolean>(false);
+    const toggleModalDepartmentsFilter = () => {
+        if (!dataProducts) return;
+        setIsFilterDepartmentsModalOpen(!isFilterDepartmentsModalOpen);
     }
 
-    const [isOpenTooltip, setIsOpenTooltip] = React.useState<boolean>(false);
+    const [isFilterConditionsModalOpen, setIsFilterConditionsModalOpen] = useState<boolean>(false);
+    const toggleModalConditionsFilter = () => {
+        if (!dataProducts) return;
+        setIsFilterConditionsModalOpen(!isFilterConditionsModalOpen);
+    }
+
+    const [isOpenTooltip, setIsOpenTooltip] = useState<boolean>(false);
     const handleTooltipClose = () => setIsOpenTooltip(false);
     const handleTooltipOpen = () => setIsOpenTooltip(true);
 
-    const [filtersApplied, setFiltersApplied] = React.useState<boolean>(false);
-    const [activeModalTransfer, setActiveModalTransfer] = React.useState(false)
-    const [productSelectedForTransfer, setProductSelectedForTransfer] = React.useState<null | any>(null)
+    //GET initial data
+    useEffect(() => {
+        const getAllProductsByDepartment = async () => {
+            const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await sellerStoreProduct.allProductByDepartments(storeId!);
 
-    //get initial data
-    React.useEffect(() => {
-        async function loadInitialData(userId: string, storeId: string) {
-            const response = await sellerStoreProduct.allProductByDepartments(userId, storeId)
-            if (response) {
-
-                setAllProductsByDepartment(response.map((item: any) => ({
-                    ...item,
+            if (newAllProductsByDepartment) {
+                setAllProductsByDepartment(newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
+                    ...productsByDepartments,
                     selected: false
                 })))
             }
         }
-
-        if (userId && storeId) {
-            loadInitialData(String(userId), storeId)
+        if (storeId) {
+            getAllProductsByDepartment();
         }
-    }, [userId, storeId])
+    }, [storeId]);
 
-    React.useEffect(() => {
-        if (allProductsByDepartment.length) {
-            let allProducts: any[] = []
+    //Update allProducts at change
+    useEffect(() => {
+        if (allProductsByDepartment?.length) {
+            let allProducts: productsProps[] = [];
 
-            allProductsByDepartment.forEach((productsByDepartments: any) => {
+            allProductsByDepartment.forEach((productsByDepartments) => {
                 //when there are no filters applied all departments are returned
-                if (!filtersApplied || productsByDepartments.selected) {
+
+                if (!filtersDeparmentsApplied || productsByDepartments.selected) {
                     allProducts = [...allProducts, ...productsByDepartments.products!];
+                }
+                if (filtersConditionsApplied && filteredConditions) {
+                    const products = allProducts?.filter((product: productsProps) => {
+                        if ((!filteredConditions[0].value || product.depots![0].store_depots![0].is_active && filteredConditions[0].value)
+                            && (!filteredConditions[1].value || !product.depots![0].store_depots![0].is_active && filteredConditions[1].value)
+                            && (!filteredConditions[2].value || product.depots![0].store_depots![0].product_remaining_units === -1 && filteredConditions[2].value)
+                            && (!filteredConditions[3].value || product.depots![0].store_depots![0].sell_price === "0" && filteredConditions[3].value)
+                            && (!filteredConditions[4].value || (product.depots![0].store_depots![0].price_discount_percentage || product.depots![0].store_depots![0].price_discount_quantity) && filteredConditions[4].value)
+                            && (!filteredConditions[5].value || product.depots![0].store_depots![0].product_offers?.length! > 0 && filteredConditions[5].value)
+                            && (!filteredConditions[6].value || product.depots![0].store_depots![0].product_remaining_units! === 0 && filteredConditions[6].value)
+                            && (!filteredConditions[7].value || product.depots![0].store_depots![0].product_remaining_units! < 10 && filteredConditions[7].value)
+                            && (!filteredConditions[8].value || product.depots![0].store_depots![0].product_remaining_units! < 20 && filteredConditions[8].value)
+                        ) return product;
+                    })
+                    allProducts = [...products!];
                 }
             });
 
-            allProducts.sort((a, b) => {
-                if (a.name < b.name)
-                    return -1
-
-                if (a.name > a.name)
-                    return 1
-
-                return 0
-            })
-
-            // @ts-ignore
-            setData(allProducts)
+            allProducts.sort((a: productsProps, b: productsProps) => {
+                if (a?.name! < b?.name!) return -1;
+                if (a?.name! > a?.name!) return 1;
+                return 0;
+            });
+            setDataProducts(allProducts);
         }
-
-    }, [allProductsByDepartment, filtersApplied])
+    }, [allProductsByDepartment, filtersDeparmentsApplied, filtersConditionsApplied, filteredConditions]);
 
     function handleNavigateBack() {
         router.back()
+    }
+
+    //Image handlers
+    const [openImageDialog, setOpenImagesDialog] = useState<boolean>(false);
+    const [dialogImages, setDialogImages] = useState<images[] | null>(null);
+
+    const handleOpenImagesDialog = (images: images[]) => {
+        setDialogImages(images);
+        setOpenImagesDialog(true);
     }
 
     const CustomToolbar = () => (
@@ -193,143 +181,124 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
     }
 
     //expand description
-    const [expandIndex, setExpandIndex] = React.useState<null | number>(null)
+    const [expandIndex, setExpandIndex] = useState<number | null>(null);
 
-    function handleExpandRow(index: number) {
+    const handleExpandRow = (index: number) => {
         if (expandIndex === index) {
-            setExpandIndex(null)
+            setExpandIndex(null);
         } else {
-            setExpandIndex(index)
+            setExpandIndex(index);
         }
     }
 
     //selected products
-    const [selected, setSelected] = React.useState<any[]>([])
+    const [selectedProducts, setSelectedProducts] = useState<productsProps[]>([]);
 
-    const cancelChecked = (badItem: any) => {
-        const newSelected = selected.filter((item: any) => item.id !== badItem)
-        setSelected(newSelected)
+    const cancelChecked = (badItemIndex: number) => {
+        const newSelectedProducts = selectedProducts.filter((product: productsProps) => product.id !== badItemIndex);
+        setSelectedProducts(newSelectedProducts)
     }
 
-    const [openImageDialog, setOpenImagesDialog] = React.useState(false)
-    const [dialogImages, setDialogImages] = React.useState<any[]>([])
+    const handleToggleIsActive = async (e: any, badItem: number, storeDepotIndex: number) => {
+        e.stopPropagation();
 
-    function handleOpenImagesDialog(images: any[]) {
-        setDialogImages(images)
-        setOpenImagesDialog(true)
-    }
-
-    async function handleToggleIsActive(e: any, badItem: number, storeDepotId: number) {
-        e.stopPropagation()
-
-        const updatedDepot = await sellerStoreProduct.toggleIsActiveStoreDepot(userId, storeId, storeDepotId)
+        const updatedDepot = await sellerStoreProduct.toggleIsActiveStoreDepot(storeId!, storeDepotIndex);
 
         if (updatedDepot) {
-            const newDepartments = [...allProductsByDepartment]
-            for (const allProductsByDepartmentElement of allProductsByDepartment) {
-                const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+            const newDepartments = [...allProductsByDepartment!];
+            for (const productsByDepartments of allProductsByDepartment!) {
+                const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
 
-                const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === storeDepotId)
+                const productIndex = productsByDepartments!.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === storeDepotIndex);
                 if (productIndex > -1) {
-                    newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].is_active = updatedDepot.is_active
+                    newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].is_active = updatedDepot.is_active;
                 }
             }
 
-            setAllProductsByDepartment(newDepartments)
+            setAllProductsByDepartment(newDepartments);
 
             if (updatedDepot.is_active) {
-                notifySuccess("Producto en venta ahora")
+                notifySuccess("Producto en venta ahora");
             } else {
                 cancelChecked(badItem)
-                notifyWarning("Producto quitado de la venta")
+                notifyWarning("Producto quitado de la venta");
             }
         }
     }
 
-    async function handleSellProduct(e: any, storeDepotId: number, badItem: number) {
-        e.stopPropagation()
+    const handleSellProduct = async (e: any, storeDepotIndex: number, badItemIndex: number) => {
+        e.stopPropagation();
 
-        const updatedDepot = await sellerStoreProduct.sellStoreDepotDefault(userId, storeId, storeDepotId)
+        const updatedDepot = await sellerStoreProduct.sellStoreDepotDefault(storeId!, storeDepotIndex);
 
         if (updatedDepot) {
-            const newDepartments = [...allProductsByDepartment]
-            for (const allProductsByDepartmentElement of allProductsByDepartment) {
-                const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+            const newDepartments = [...allProductsByDepartment!]
+            for (const productsByDepartments of allProductsByDepartment!) {
+                const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
 
-                const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === storeDepotId)
+                const productIndex = productsByDepartments!.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === storeDepotIndex);
                 if (productIndex > -1) {
-                    newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units = updatedDepot.product_remaining_units
+                    newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units = updatedDepot.product_remaining_units;
                 }
             }
 
             setAllProductsByDepartment(newDepartments)
 
-            if (updatedDepot.product_remaining_units === 0) cancelChecked(badItem)
+            if (updatedDepot.product_remaining_units === 0) cancelChecked(badItemIndex);
 
-            notifySuccess("Vendida una unidad del producto")
+            notifySuccess("Vendida una unidad del producto");
         }
     }
 
-    function handleSelectItem(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, row: any) {
-        e.stopPropagation()
+    const handleSelectItem = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: productsProps) => {
+        e.stopPropagation();
 
-        let newSelected = [...selected]
-        const rowIndex = selected.findIndex(item => item.id === row.id)
+        let newSelectedProducts = [...selectedProducts];
+        const productIndex = selectedProducts.findIndex((productSelected: productsProps) => productSelected.id === product.id);
 
-        if (rowIndex > -1) {
-            newSelected.splice(rowIndex, 1)
+        if (productIndex > -1) {
+            newSelectedProducts.splice(productIndex, 1);
         } else {
-            newSelected.push(row)
+            newSelectedProducts.push(product);
         }
 
-        setSelected(newSelected)
+        setSelectedProducts(newSelectedProducts);
     }
 
-    const handleClickTransfer = (row: any) => {
-        setActiveModalTransfer(true)
-        setProductSelectedForTransfer(row)
+    const handleClickTransfer = (product: productsProps) => {
+        setActiveModalTransfer(true);
+        setProductSelectedForTransfer(product);
     }
 
-    const TableContent = ({ formik }: { formik: any }) => {
-        const {
-            searchBarValue,
-            enVentaFilter,
-            inactivoFilter,
-            retiradoFilter,
-            sinPrecioFilter,
-            conDescuentoFilter,
-            conOfertasFilter,
-            sinDisponibilidadFilter,
-            disponibilidad10Filter,
-            disponibilidad20Filter
-        } = formik.values
+    const TableContent = ({ formik }: any) => {
+        const { searchBarValue } = formik.values;
 
         const handleToggleOffer = async (offerId: number, storeDepotId: number) => {
-            const response = await storeDetails.toggleProductOffers(storeId, offerId)
+            const response = await storeDetails.toggleProductOffers(storeId, offerId);
 
             if (response) {
-                const newDepartments = [...allProductsByDepartment]
-                for (const allProductsByDepartmentElement of allProductsByDepartment) {
-                    const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+                const newDepartments = [...allProductsByDepartment!];
+                for (const productsByDepartments of allProductsByDepartment!) {
+                    const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
 
-                    const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === storeDepotId)
+                    const productIndex = productsByDepartments!.products!.findIndex((item: any) => item.depots[0].store_depots[0].id === storeDepotId)
                     if (productIndex > -1) {
-                        const offers = allProductsByDepartment[departmentIndex].products[productIndex].depots[0].store_depots[0].product_offers
+                        const offers = allProductsByDepartment![departmentIndex].products![productIndex].depots![0].store_depots![0].product_offers;
 
-                        const offerIndex = offers.findIndex((item: any) => item.id === response.id)
-                        if (offerIndex > -1) {
-                            newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_offers[offerIndex] = response
+                        const offerIndex = offers?.findIndex((offer: any) => offer.id === response.id);
+                        if (offerIndex! > -1) {
+                            newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].product_offers![offerIndex!] = response;
                         }
                     }
                 }
 
-                setAllProductsByDepartment(newDepartments)
+                setAllProductsByDepartment(newDepartments);
 
                 response.is_active
                     ? notifySuccess("Oferta habilitada nuevamente")
-                    : notifyWarning("La oferta ha sido deshabilitada y no se está aplicando")
+                    : notifyWarning("La oferta ha sido deshabilitada y no se está aplicando");
             } else {
-                notifyError("No se ha podido cambiar el estado a la oferta")
+                notifyError("No se ha podido cambiar el estado a la oferta");
             }
         }
 
@@ -358,7 +327,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                             color={item.is_active ? "success" : "default"}
                             checked={item.is_active}
                             onClick={async (e) => {
-                                return await handleToggleOffer(item.id, depotId)
+                                return await handleToggleOffer(item.id, depotId);
                             }}
                         />
                     </Grid>
@@ -378,98 +347,90 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
             </Grid>
         )
 
-        function productHasActiveOffer(offers: any[]) {
-            return offers.some((item: any) => item.is_active)
+        const productHasActiveOffer = (offers: product_offers[]) => {
+            return offers.some((offer: product_offers) => offer.is_active);
         }
 
         return (
             <TableBody>
-                {data?.filter(
-                    item =>
-                        (!searchBarValue || (searchBarValue && (item.name.toUpperCase().includes(searchBarValue.toUpperCase()) || item.description.toUpperCase().includes(searchBarValue.toUpperCase())))) &&
-                        (!enVentaFilter || (enVentaFilter && item.depots[0].store_depots[0].is_active)) &&
-                        (!inactivoFilter || (inactivoFilter && !item.depots[0].store_depots[0].is_active)) &&
-                        (!retiradoFilter || (retiradoFilter && item.depots[0].store_depots[0].product_remaining_units === -1)) &&
-                        (!sinPrecioFilter || (sinPrecioFilter && item.depots[0].store_depots[0].sell_price === "0")) &&
-                        (!conDescuentoFilter || (conDescuentoFilter && (item.depots[0].store_depots[0].price_discount_percentage || item.depots[0].store_depots[0].price_discount_quantity))) &&
-                        (!conOfertasFilter || (conOfertasFilter && item.depots[0].store_depots[0].product_offers.length > 0)) &&
-                        (!sinDisponibilidadFilter || (sinDisponibilidadFilter && item.depots[0].store_depots[0].product_remaining_units === 0)) &&
-                        (!disponibilidad10Filter || (disponibilidad10Filter && item.depots[0].store_depots[0].product_remaining_units < 10)) &&
-                        (!disponibilidad20Filter || (disponibilidad20Filter && item.depots[0].store_depots[0].product_remaining_units < 20))
+                {dataProducts?.filter(
+                    (product: productsProps) =>
+                        product?.name?.toUpperCase().includes(searchBarValue.toUpperCase()) ||
+                        product?.description?.toUpperCase().includes(searchBarValue.toUpperCase())
                 )
                     .map(
-                        (row) => {
-                            const baseProductPrice = row.depots[0].store_depots[0].sell_price === "0"
+                        (product: productsProps) => {
+                            const baseProductPrice = product.depots![0].store_depots![0].sell_price === "0"
                                 ? null
-                                : numberFormat(row.depots[0].store_depots[0].sell_price)
+                                : numberFormat(product.depots![0].store_depots![0].sell_price);
 
                             const priceDiscountQuantity = baseProductPrice
-                                ? row.depots[0].store_depots[0].price_discount_percentage
-                                    ? row.depots[0].store_depots[0].price_discount_percentage * parseFloat(String(baseProductPrice)) / 100
-                                    : row.depots[0].store_depots[0].price_discount_quantity
-                                : null
+                                ? product.depots![0].store_depots![0].price_discount_percentage
+                                    ? product.depots![0].store_depots![0].price_discount_percentage * parseFloat(String(baseProductPrice)) / 100
+                                    : product.depots![0].store_depots![0].price_discount_quantity
+                                : null;
 
                             const finalProductPrice = baseProductPrice && priceDiscountQuantity
                                 ? (parseFloat(String(baseProductPrice)) - priceDiscountQuantity)
-                                : baseProductPrice
+                                : baseProductPrice;
 
                             const sellerProfitQuantity = finalProductPrice
-                                ? row.depots[0].store_depots[0].seller_profit_percentage
-                                    ? row.depots[0].store_depots[0].seller_profit_percentage * finalProductPrice / 100
-                                    : row.depots[0].store_depots[0].seller_profit_quantity
-                                : null
+                                ? product.depots![0].store_depots![0].seller_profit_percentage
+                                    ? product.depots![0].store_depots![0].seller_profit_percentage * finalProductPrice / 100
+                                    : product.depots![0].store_depots![0].seller_profit_quantity
+                                : null;
 
                             const displayProductPrice = finalProductPrice
-                                ? `${numberFormat(String(finalProductPrice)) + " " + row.depots[0].store_depots[0].sell_price_unit}`
-                                : "sin precio"
+                                ? `${numberFormat(String(finalProductPrice)) + " " + product.depots![0].store_depots![0].sell_price_unit}`
+                                : "sin precio";
 
                             const displayPriceDiscount = baseProductPrice
-                                ? row.depots[0].store_depots[0].price_discount_percentage
-                                    ? numberFormat(row.depots[0].store_depots[0].price_discount_percentage) + " %"
-                                    : row.depots[0].store_depots[0].price_discount_quantity
-                                        ? numberFormat(row.depots[0].store_depots[0].price_discount_quantity) + " " + row.depots[0].store_depots[0].sell_price_unit
+                                ? product.depots![0].store_depots![0].price_discount_percentage
+                                    ? numberFormat(`${product.depots![0].store_depots![0].price_discount_percentage}`) + " %"
+                                    : product.depots![0].store_depots![0].price_discount_quantity
+                                        ? numberFormat(`${product.depots![0].store_depots![0].price_discount_quantity}`) + " " + product.depots![0].store_depots![0].sell_price_unit
                                         : null
-                                : null
+                                : null;
 
                             return (
-                                <React.Fragment key={row.id}>
+                                <React.Fragment key={product.id}>
                                     <TableRow
                                         hover
                                         tabIndex={-1}
-                                        selected={!!selected.find((item: any) => item.id === row.id)}
-                                        onClick={() => handleExpandRow(row.id)}
+                                        selected={!!selectedProducts.find((productSelected: productsProps) => productSelected.id === product.id)}
+                                        onClick={() => handleExpandRow(product.id)}
                                     >
                                         <TableCell sx={{ padding: 0 }}>
                                             <Checkbox
                                                 size='small'
-                                                checked={!!selected.find((item: any) => item.id === row.id)}
-                                                disabled={!row.depots[0].store_depots[0].is_active ||
-                                                    !row.depots[0].store_depots[0].product_remaining_units}
-                                                onClick={(e) => handleSelectItem(e, row)}
+                                                checked={!!selectedProducts.find((productSelected: productsProps) => productSelected.id === product.id)}
+                                                disabled={!product.depots![0].store_depots![0].is_active ||
+                                                    !product.depots![0].store_depots![0].product_remaining_units}
+                                                onClick={(e) => handleSelectItem(e, product)}
                                             />
 
                                             <IconButton size={"small"}>
                                                 {
-                                                    (expandIndex !== row.id)
-                                                        ? <ExpandMoreOutlined/>
-                                                        : <ExpandLessOutlined/>
+                                                    (expandIndex !== product.id)
+                                                        ? <ExpandMoreOutlined />
+                                                        : <ExpandLessOutlined />
                                                 }
                                             </IconButton>
                                         </TableCell>
 
                                         <TableCell>
                                             {
-                                                row.images?.length! > 0 && (
+                                                product.images?.length! > 0 && (
                                                     <Box display={"flex"} justifyContent={"center"}>
                                                         <AvatarGroup
                                                             max={2}
                                                             sx={{ flexDirection: "row", width: "fit-content" }}
                                                             onClick={(e) => {
                                                                 e.stopPropagation()
-                                                                handleOpenImagesDialog(row.images!)
+                                                                handleOpenImagesDialog(product.images!)
                                                             }}
                                                         >
-                                                            {row?.images?.map(
+                                                            {product?.images?.map(
                                                                 (imageItem: images) => <Avatar
                                                                     variant={"rounded"}
                                                                     key={`producto-${imageItem.id}`}
@@ -482,9 +443,9 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                     </Box>
                                                 )
                                             }
-                                            <Box display={"flex"} justifyContent={"center"}>{row.name}</Box>
+                                            <Box display={"flex"} justifyContent={"center"}>{product.name}</Box>
                                         </TableCell>
-                                        <TableCell align="center">{row?.departments?.name ?? "-"}</TableCell>
+                                        <TableCell align="center">{product?.departments?.name ?? "-"}</TableCell>
                                         <TableCell>
                                             <Grid container rowSpacing={1}>
                                                 <Grid container item xs={12} flexWrap={"nowrap"} alignItems={"center"}>
@@ -493,8 +454,8 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         errorColor={!baseProductPrice}
                                                     />
                                                     {
-                                                        !!row?.depots![0].store_depots![0].product_offers?.length &&
-                                                        productHasActiveOffer(row?.depots![0].store_depots![0].product_offers) && (
+                                                        !!product?.depots![0].store_depots![0].product_offers?.length &&
+                                                        productHasActiveOffer(product?.depots![0].store_depots![0].product_offers) && (
                                                             <CustomTooltip tooltipText={"Ofertas activas"}>
                                                                 <DescriptionOutlined fontSize={"small"} />
                                                             </CustomTooltip>
@@ -506,7 +467,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         <Grid item xs={12}>
                                                             <InfoTag
                                                                 value={`- ${displayPriceDiscount}`}
-                                                                tooltipText={row?.depots![0].store_depots![0].discount_description}
+                                                                tooltipText={product?.depots![0].store_depots![0].discount_description}
                                                             />
                                                         </Grid>
                                                     )
@@ -528,14 +489,14 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         fontSize: "18px"
                                                     }
                                                 }>
-                                                {row.depots[0].store_depots[0].product_remaining_units}
+                                                {product.depots![0].store_depots![0].product_remaining_units}
                                             </Box>
                                         </TableCell>
                                         <TableCell sx={{ whiteSpace: "nowrap" }}>
                                             <Grid container >
                                                 <Grid container item xs={12} justifyContent={"center"}>
                                                     <Typography variant={"button"}>
-                                                        {row.depots[0].store_depots[0].is_active
+                                                        {product.depots![0].store_depots![0].is_active
                                                             ? "en venta"
                                                             : "inactivo"
                                                         }
@@ -546,8 +507,8 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         size={"small"}
                                                         color={"success"}
                                                         disabled={!baseProductPrice}
-                                                        checked={row.depots[0].store_depots[0].is_active}
-                                                        onClick={(e) => handleToggleIsActive(e, row.id, row.depots[0].store_depots[0].id)}
+                                                        checked={product.depots![0].store_depots![0].is_active!}
+                                                        onClick={(e) => handleToggleIsActive(e, product.id, product.depots![0].store_depots![0].id)}
                                                     />
                                                 </Grid>
                                             </Grid>
@@ -555,12 +516,12 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
 
                                         <TableCell>
                                             {
-                                                row.depots[0].store_depots[0].is_active &&
-                                                !!row.depots[0].store_depots[0].product_remaining_units && (
+                                                product.depots![0].store_depots![0].is_active &&
+                                                !!product.depots![0].store_depots![0].product_remaining_units && (
                                                     <Grid container>
                                                         <IconButton
                                                             color={"primary"}
-                                                            onClick={(e) => handleSellProduct(e, row.depots[0].store_depots[0].id, row.id)}
+                                                            onClick={(e) => handleSellProduct(e, product.depots![0].store_depots![0].id, product.id)}
                                                         >
                                                             <SellOutlined fontSize={"small"} />
                                                         </IconButton>
@@ -572,7 +533,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
 
                                     <TableRow>
                                         <TableCell style={{ padding: 0 }} colSpan={6}>
-                                            <Collapse in={expandIndex === row.id} timeout="auto" unmountOnExit>
+                                            <Collapse in={expandIndex === product.id} timeout="auto" unmountOnExit>
                                                 <Grid container spacing={1} sx={{ padding: "8px 26px" }}>
                                                     <Grid item xs={12}>
                                                         <Typography variant="subtitle1" gutterBottom component="div">
@@ -583,27 +544,27 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Producto:</Grid>
                                                         <Grid item xs={true}>
-                                                            {row.name}
+                                                            {product.name}
                                                         </Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Descripción:</Grid>
                                                         <Grid item xs={true}>
-                                                            {row.description ? row.description : "-"}
+                                                            {product.description ? product.description : "-"}
                                                         </Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
-                                                        <Grid item xs={true}>{row.departments?.name ?? "-"}</Grid>
+                                                        <Grid item xs={true}>{product.departments?.name ?? "-"}</Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
                                                         <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
-                                                            {row.characteristics.length > 0
-                                                                ? row.characteristics.map((item: any) => (
+                                                            {product.characteristics?.length! > 0
+                                                                ? product.characteristics?.map((item: any) => (
                                                                     <Grid
                                                                         key={item.id}
                                                                         sx={{
@@ -638,7 +599,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         <Grid item xs={true}>
                                                             {
                                                                 baseProductPrice
-                                                                    ? baseProductPrice + " " + row.depots[0].store_depots[0].sell_price_unit
+                                                                    ? baseProductPrice + " " + product.depots![0].store_depots![0].sell_price_unit
                                                                     : "sin precio"
                                                             }
                                                         </Grid>
@@ -660,11 +621,11 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                     </Grid>
 
                                                     {
-                                                        row?.depots![0].store_depots![0].discount_description && (
+                                                        product?.depots![0].store_depots![0].discount_description && (
                                                             <Grid container item spacing={1} xs={12}>
                                                                 <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Razón de la rebaja:</Grid>
                                                                 <Grid item xs={true}>
-                                                                    {row?.depots![0].store_depots![0].discount_description}
+                                                                    {product?.depots![0].store_depots![0].discount_description}
                                                                 </Grid>
                                                             </Grid>
                                                         )
@@ -674,9 +635,9 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Salario del vendedor:</Grid>
                                                         <Grid item container xs={true}>
                                                             {
-                                                                row?.depots![0].store_depots![0].seller_profit_percentage
-                                                                    ? `${row?.depots![0].store_depots![0].seller_profit_percentage} %`
-                                                                    : `${row?.depots![0].store_depots![0].seller_profit_quantity} CUP`
+                                                                product?.depots![0].store_depots![0].seller_profit_percentage
+                                                                    ? `${product?.depots![0].store_depots![0].seller_profit_percentage} %`
+                                                                    : `${product?.depots![0].store_depots![0].seller_profit_quantity} CUP`
                                                             }
                                                         </Grid>
                                                     </Grid>
@@ -687,7 +648,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                         <Grid item xs={true}>
                                                             {
                                                                 (baseProductPrice && sellerProfitQuantity && finalProductPrice)
-                                                                    ? `Dueño: ${numberFormat(String(finalProductPrice - sellerProfitQuantity))} | Vendedor: ${numberFormat(sellerProfitQuantity)}`
+                                                                    ? `Dueño: ${numberFormat(String(finalProductPrice - sellerProfitQuantity))} | Vendedor: ${numberFormat(`${sellerProfitQuantity}`)}`
                                                                     : "-"
                                                             }
                                                         </Grid>
@@ -696,19 +657,19 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item container xs={"auto"} sx={{ fontWeight: 600 }} alignItems={"center"}>Unidades restantes:</Grid>
                                                         <Grid item container xs={true} alignItems={"center"}>
-                                                            {row.depots[0].store_depots[0].product_remaining_units}
+                                                            {product.depots![0].store_depots![0].product_remaining_units}
                                                         </Grid>
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={12} sx={{ fontWeight: 600 }}>Ofertas:</Grid>
                                                         <Grid container item xs={12} rowSpacing={1}>
-                                                            {row.depots[0].store_depots[0].product_offers.map((item: any, index: number) => (
+                                                            {product.depots![0].store_depots![0].product_offers?.map((item: any, index: number) => (
                                                                 <OfferItem
                                                                     item={item}
                                                                     index={index}
-                                                                    currency={row.depots[0].store_depots[0].sell_price_unit}
-                                                                    depotId={row.depots[0].store_depots[0].id}
+                                                                    currency={product.depots![0].store_depots![0].sell_price_unit!}
+                                                                    depotId={product.depots![0].store_depots![0].id}
                                                                     key={item.id}
                                                                 />
                                                             ))}
@@ -724,19 +685,20 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
             </TableBody>
         )
     }
-    const paymentMethods = ["Efectivo CUP", "Transferencia CUP", "Otro"]
+
+    const paymentMethods = ["Efectivo CUP", "Transferencia CUP", "Otro"];
 
     const initialValues = {
         searchBarValue: "",
-        enVentaFilter: false,
-        inactivoFilter: false,
-        retiradoFilter: false,
-        sinPrecioFilter: false,
-        conDescuentoFilter: false,
-        conOfertasFilter: false,
-        sinDisponibilidadFilter: false,
-        disponibilidad10Filter: false,
-        disponibilidad20Filter: false,
+        onSellFilter: false,
+        inactiveFilter: false,
+        retiredFilter: false,
+        withOutPriceFilter: false,
+        withDiscountFilter: false,
+        withOffersFilter: false,
+        withoutDisponibilityFilter: false,
+        disponibilityLessThan10Filter: false,
+        disponibilityLessThan20Filter: false,
 
         productSell: {
             products: [
@@ -764,12 +726,12 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
         })
     })
 
+    const [displayProductSellForm, setDisplayProductSellForm] = useState<boolean>(false);
 
-    const [displayProductSellForm, setDisplayProductSellForm] = React.useState<boolean>(false)
-    function handleOpenSellProduct(formik: any) {
-        let productsData: any = []
-        selected.forEach(item => {
-            const storeDepot = item.depots[0].store_depots[0]
+    const handleOpenSellProduct = (formik: any) => {
+        let productsData: any = [];
+        selectedProducts.forEach((productSelected: productsProps) => {
+            const storeDepot = productSelected.depots![0].store_depots![0];
 
             productsData.push({
                 maxUnitsQuantity: storeDepot.product_remaining_units,
@@ -777,10 +739,10 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
             })
         })
 
-        formik.setFieldValue("productSell.products", productsData)
-        formik.setFieldValue("productSell.paymentMethod", paymentMethods[0])
+        formik.setFieldValue("productSell.products", productsData);
+        formik.setFieldValue("productSell.paymentMethod", paymentMethods[0]);
 
-        setDisplayProductSellForm(true)
+        setDisplayProductSellForm(true);
     }
 
     const ProductSellForm = ({ formik, closeForm }: { formik: any, closeForm: any }) => {
@@ -788,22 +750,21 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
             let sellProduct: any[] = []
 
             formik.values.productSell.products.forEach((item: any, index: number) => {
-                const storeDepot = selected[index].depots[0].store_depots[0]
+                const storeDepot = selectedProducts[index].depots![0].store_depots![0];
 
                 sellProduct.push({
                     storeDepotId: storeDepot.id,
                     unitsQuantity: item.unitsQuantity,
                     price: computeDepotPricePerUnit(storeDepot, item.unitsQuantity) * item.unitsQuantity
-                })
+                });
             })
 
-            const totalPrice = sellProduct.reduce((accumulate, current) => accumulate + current.price, 0)
+            const totalPrice = sellProduct.reduce((accumulate, current) => accumulate + current.price, 0);
 
             const sell = { paymentMethod: formik.values.productSell.paymentMethod, totalPrice: totalPrice }
 
             const sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(
                 {
-                    userId,
                     sellerStoreId: storeId,
                     sellData: sell,
                     sellProductsData: sellProduct,
@@ -811,64 +772,61 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
             )
 
             if (sellItemResponse) {
-                const newDepartments = [...allProductsByDepartment]
+                const newDepartments = [...allProductsByDepartment!];
 
                 sellProduct.forEach(sellProductItem => {
-                    for (const allProductsByDepartmentElement of allProductsByDepartment) {
-                        const departmentIndex = allProductsByDepartment.indexOf(allProductsByDepartmentElement)
+                    for (const productsByDepartments of allProductsByDepartment!) {
+                        const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
 
-                        const productIndex = allProductsByDepartmentElement.products.findIndex((item: any) => item.depots[0].store_depots[0].id === sellProductItem.storeDepotId)
+                        const productIndex = productsByDepartments.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === sellProductItem.storeDepotId);
                         if (productIndex > -1) {
-                            newDepartments[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units
-                                = allProductsByDepartment[departmentIndex].products[productIndex].depots[0].store_depots[0].product_remaining_units - sellProductItem.unitsQuantity
+                            newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units
+                                = allProductsByDepartment![departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units! - sellProductItem.unitsQuantity;
                         }
                     }
                 })
 
-                setAllProductsByDepartment(newDepartments)
+                setAllProductsByDepartment(newDepartments);
 
-                notifySuccess("La venta ha sido registrada")
+                notifySuccess("La venta ha sido registrada");
             }
-            formik.resetForm()
-            closeForm()
-            setSelected([])
+            formik.resetForm();
+            closeForm();
+            setSelectedProducts([]);
         }
 
-        function getTotals() {
+        const getTotals = () => {
             let totalProducts = 0
             let totalPrice = 0
 
             formik.values.productSell.products.forEach((item: any, index: number) => {
-                totalProducts += item.unitsQuantity
-
-                const storeDepot = selected[index].depots[0].store_depots[0]
-
-                const pricePerUnit = computeDepotPricePerUnit(storeDepot, item.unitsQuantity)
-
-                totalPrice += (pricePerUnit * item.unitsQuantity)
+                totalProducts += item.unitsQuantity;
+                const storeDepot = selectedProducts[index].depots![0].store_depots![0];
+                const pricePerUnit = computeDepotPricePerUnit(storeDepot, item.unitsQuantity);
+                totalPrice += (pricePerUnit * item.unitsQuantity);
             })
-
             return { totalProducts, totalPrice }
         }
+
         return (
             <Grid container item spacing={3}>
                 <Grid container item xs={12} rowSpacing={2}>
                     {
                         formik.values.productSell.products.map((item: any, index: number) => {
-                            const storeDepot = selected[index].depots[0].store_depots[0]
+                            const storeDepot = selectedProducts[index].depots![0].store_depots![0];
 
-                            const pricePerUnit = computeDepotPricePerUnit(storeDepot, item.unitsQuantity)
+                            const pricePerUnit = computeDepotPricePerUnit(storeDepot, item.unitsQuantity);
 
                             return (
-                                <Grid container item xs={12} key={selected[index].id} alignItems={'center'}>
-                                    <Grid container item xs={12} flexWrap={"nowrap"} sx={{overflowX: "auto"}}>
+                                <Grid container item xs={12} key={selectedProducts[index].id} alignItems={'center'}>
+                                    <Grid container item xs={12} flexWrap={"nowrap"} sx={{ overflowX: "auto" }}>
                                         <Grid container item xs={"auto"} justifyContent={"center"}>
-                                            <KeyboardArrowRight fontSize={"small"}/>
+                                            <KeyboardArrowRight fontSize={"small"} />
                                         </Grid>
 
                                         <Grid item xs={true}>
-                                            {selected[index].name + " "}
-                                            <small>{selected[index].description}</small>
+                                            {selectedProducts[index].name + " "}
+                                            <small>{selectedProducts[index].description}</small>
                                         </Grid>
                                     </Grid>
 
@@ -886,7 +844,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                         </Grid>
 
                                         <Grid container item xs={true} alignItems={"center"}>
-                                           <Divider sx={{width: 1}}/>
+                                            <Divider sx={{ width: 1 }} />
                                         </Grid>
 
                                         <Grid container item xs={"auto"} alignItems={"center"}>
@@ -897,7 +855,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                     {
                                         formik.errors.productSell?.products[index]?.unitsQuantity && formik.touched.productSell?.products[index]?.unitsQuantity && (
                                             <Grid item xs={12}>
-                                                <FormHelperText sx={{color: "#d32f2f"}}>
+                                                <FormHelperText sx={{ color: "#d32f2f" }}>
                                                     {formik.errors.productSell?.products[index]?.unitsQuantity}
                                                 </FormHelperText>
                                             </Grid>
@@ -952,205 +910,49 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
     const loadData = async () => {
         let selectedDepartment = new Map();
 
-        allProductsByDepartment.forEach((element: any) => {
-            if (element.selected) selectedDepartment.set(element.id, true)
+        allProductsByDepartment?.forEach((productsByDepartments) => {
+            if (productsByDepartments.selected) selectedDepartment.set(productsByDepartments.id, true);
         })
 
-        const newAllProductByDepartments = await sellerStoreProduct.allProductByDepartments(userId, storeId)
+        const newAllProductByDepartments: allProductsByDepartmentProps[] | null = await sellerStoreProduct.allProductByDepartments(storeId!);
 
         if (newAllProductByDepartments) {
             setAllProductsByDepartment(
-                newAllProductByDepartments.map((item: any) => ({
-                    ...item,
-                    selected: selectedDepartment.has(item.id) ? true : false
-                })))
+                newAllProductByDepartments.map((productsByDepartments: allProductsByDepartmentProps) => ({
+                    ...productsByDepartments,
+                    selected: selectedDepartment.has(productsByDepartments.id) ? true : false
+                })));
         }
-
-        setActiveModalTransfer(false)
-
+        setActiveModalTransfer(false);
     }
-
-    const DepartmentsFilter = ({ formik }: any) => {
-        const {
-            enVentaFilter,
-            inactivoFilter,
-            retiradoFilter,
-            sinPrecioFilter,
-            conDescuentoFilter,
-            conOfertasFilter,
-            sinDisponibilidadFilter,
-            disponibilidad10Filter,
-            disponibilidad20Filter
-        } = formik.values
-
-        //styles chip
-        const selectedChip = {
-            border: "2px solid",
-            backgroundColor: "lightgray"
-        }
-        const chipNotSelected = {
-            m: "1px"
-        }
-
-        const [displayFilterSection, setDisplayFilterSection] = React.useState(false)
-
-        return (
-            <Card variant={"outlined"} sx={{ padding: "5px" }}>
-                {
-                    data && data.length > 0 && (
-                        <Grid container item rowSpacing={2} >
-                            <Grid item xs={12}>
-                                <Typography variant={"subtitle2"} sx={{ display: "flex", alignItems: "center" }}>
-                                    Filtrar sobre los departamentos seleccionados.
-
-                                    <IconButton onClick={() => setDisplayFilterSection(!displayFilterSection)}>
-                                        {displayFilterSection ? <KeyboardArrowDown fontSize={"small"} /> :
-                                            <KeyboardArrowUp fontSize={"small"} />}
-                                    </IconButton>
-
-                                    <FilterAltOutlined fontSize={"small"} sx={{ ml: "15px" }} />
-                                    {(enVentaFilter && 1) + (inactivoFilter && 1) + (retiradoFilter && 1) + (sinPrecioFilter && 1) + (conDescuentoFilter && 1) + (conOfertasFilter && 1) + (sinDisponibilidadFilter && 1) + (disponibilidad10Filter && 1) + (disponibilidad20Filter && 1)}
-                                </Typography>
-                            </Grid>
-
-                            {
-                                displayFilterSection && (
-                                    <Grid item container rowSpacing={1}>
-                                        <Grid container item xs={12} md={"auto"} columnSpacing={1} flexWrap={"nowrap"} overflow={"auto"}>
-                                            <Grid item>
-                                                <Chip
-                                                    variant={"outlined"}
-                                                    label={"en venta"}
-                                                    sx={enVentaFilter ? selectedChip : chipNotSelected}
-                                                    size={"small"}
-                                                    color={enVentaFilter ? "primary" : "default"}
-                                                    onClick={() => formik.setFieldValue("enVentaFilter", !enVentaFilter)}
-                                                />
-                                            </Grid>
-
-                                            <Grid item>
-                                                <Chip
-                                                    variant={"outlined"}
-                                                    label={"con descuento"}
-                                                    sx={conDescuentoFilter ? selectedChip : chipNotSelected}
-                                                    size={"small"}
-                                                    color={conDescuentoFilter ? "primary" : "default"}
-                                                    onClick={() => formik.setFieldValue("conDescuentoFilter", !conDescuentoFilter)}
-                                                />
-                                            </Grid>
-
-                                            <Grid item>
-                                                <Chip
-                                                    variant={"outlined"}
-                                                    label={"disponibilidad < 20"}
-                                                    sx={disponibilidad20Filter ? selectedChip : chipNotSelected}
-                                                    size={"small"}
-                                                    color={disponibilidad20Filter ? "primary" : "default"}
-                                                    onClick={() => formik.setFieldValue("disponibilidad20Filter", !disponibilidad20Filter)}
-                                                />
-                                            </Grid>
-                                        </Grid>
-
-                                        <Grid container item xs={12} md={"auto"} columnSpacing={1} flexWrap={"nowrap"} overflow={"auto"}>
-                                            <Grid item>
-                                                <Chip
-                                                    variant={"outlined"}
-                                                    label={"con ofertas"}
-                                                    sx={conOfertasFilter ? selectedChip : chipNotSelected}
-                                                    size={"small"}
-                                                    color={conOfertasFilter ? "primary" : "default"}
-                                                    onClick={() => formik.setFieldValue("conOfertasFilter", !conOfertasFilter)}
-                                                />
-                                            </Grid>
-
-                                            <Grid item>
-                                                <Chip
-                                                    variant={"outlined"}
-                                                    label={"sin precio"}
-                                                    sx={sinPrecioFilter ? selectedChip : chipNotSelected}
-                                                    size={"small"}
-                                                    color={sinPrecioFilter ? "primary" : "default"}
-                                                    onClick={() => formik.setFieldValue("sinPrecioFilter", !sinPrecioFilter)}
-                                                />
-                                            </Grid>
-
-                                            <Grid item>
-                                                <Chip
-                                                    variant={"outlined"}
-                                                    label={"disponibilidad < 10"}
-                                                    sx={disponibilidad10Filter ? selectedChip : chipNotSelected}
-                                                    size={"small"}
-                                                    color={disponibilidad10Filter ? "primary" : "default"}
-                                                    onClick={() => formik.setFieldValue("disponibilidad10Filter", !disponibilidad10Filter)}
-                                                />
-                                            </Grid>
-                                        </Grid>
-
-                                        <Grid container item xs={12} md={"auto"} columnSpacing={1} flexWrap={"nowrap"} overflow={"auto"}>
-                                            <Grid item>
-                                                <Chip
-                                                    variant={"outlined"}
-                                                    label={"sin disponibilidad"}
-                                                    sx={sinDisponibilidadFilter ? selectedChip : chipNotSelected}
-                                                    size={"small"}
-                                                    color={sinDisponibilidadFilter ? "primary" : "default"}
-                                                    onClick={() => formik.setFieldValue("sinDisponibilidadFilter", !sinDisponibilidadFilter)}
-                                                />
-                                            </Grid>
-
-                                            <Grid item>
-                                                <Chip
-                                                    variant={"outlined"}
-                                                    label={"inactivo"}
-                                                    sx={inactivoFilter ? selectedChip : chipNotSelected}
-                                                    size={"small"}
-                                                    color={inactivoFilter ? "primary" : "default"}
-                                                    onClick={() => formik.setFieldValue("inactivoFilter", !inactivoFilter)}
-                                                />
-                                            </Grid>
-
-                                            <Grid item>
-                                                <Chip
-                                                    variant={"outlined"}
-                                                    label={"retirado"}
-                                                    sx={retiradoFilter ? selectedChip : chipNotSelected}
-                                                    size={"small"}
-                                                    color={retiradoFilter ? "primary" : "default"}
-                                                    onClick={() => formik.setFieldValue("retiradoFilter", !retiradoFilter)}
-                                                />
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                )
-                            }
-                        </Grid>
-                    )
-                }
-
-            </Card>
-        )
-    }
-
 
     return (
         <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={() => {
-
-            }}
+            onSubmit={() => { }}
         >
             {
                 (formik) => (
                     <Card variant={"outlined"}>
                         <>
-                            {isFilterModalOpen && (allProductsByDepartment.length! > 0) && <FilterProductsByDepartmentsModal
-                                allProductsByDepartment={allProductsByDepartment!}
-                                setAllProductsByDepartment={setAllProductsByDepartment}
-                                setFiltersApplied={setFiltersApplied}
-                                isFilterModalOpen={isFilterModalOpen}
-                                toggleModalFilter={toggleModalFilter}
-                            />}
+                            {isFilterDepartmentsModalOpen && (allProductsByDepartment!.length! > 0)
+                                && <FilterProductsByDepartmentsModal
+                                    allProductsByDepartment={allProductsByDepartment!}
+                                    setAllProductsByDepartment={setAllProductsByDepartment}
+                                    setFiltersApplied={setFiltersDeparmentsApplied}
+                                    isFilterModalOpen={isFilterDepartmentsModalOpen}
+                                    toggleModalFilter={toggleModalDepartmentsFilter}
+                                />}
+
+                            {isFilterConditionsModalOpen && (allProductsByDepartment?.length! > 0)
+                                && <FilterProductsByConditionsModal
+                                    setFilteredConditions={setFilteredConditions}
+                                    formik={formik}
+                                    setFiltersApplied={setFiltersConditionsApplied}
+                                    isFilterModalOpen={isFilterConditionsModalOpen}
+                                    toggleModalFilter={toggleModalConditionsFilter}
+                                />}
 
                             <ImagesDisplayDialog
                                 open={openImageDialog}
@@ -1183,21 +985,17 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                 {
                                     activeModalTransfer &&
                                     <TransferBetweenStores
-                                        storeId={storeId}
-                                        storeDepot={productSelectedForTransfer.depots[0].store_depots[0]}
-                                        badItem={productSelectedForTransfer.id}
+                                        storeId={storeId!}
+                                        storeDepot={productSelectedForTransfer?.depots![0].store_depots![0]!}
+                                        badItem={productSelectedForTransfer?.id!}
                                         cancelChecked={cancelChecked}
                                         loadData={loadData}
                                     />
-
                                 }
                             </ModalTransfer>
                         </>
-
                         <CustomToolbar />
-
                         <CardContent>
-
                             <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>
                                 <Grid item container alignItems="center" justifyContent="center" sx={{ marginTop: "-10px" }}>
                                     <Grid container item xs={"auto"} alignItems={"center"} >
@@ -1207,7 +1005,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                         <InfoTooltip
                                             isOpenTooltip={isOpenTooltip}
                                             handleTooltipClose={handleTooltipClose}
-                                            message={"Puede buscar por nombre y descripción ó filtrar por departamentos"}
+                                            message={"Puede buscar por nombre y descripción ó filtrar por departamentos o condiciones"}
                                         >
                                             <IconButton onClick={handleTooltipOpen}>
                                                 <HelpOutline />
@@ -1216,7 +1014,7 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                     </Grid>
                                 </Grid>
                                 <Grid container spacing={2} alignItems="center">
-                                    <Grid item xs={true} md={8}>
+                                    <Grid item md={12} mx={"auto"}>
                                         <Grid item container xs={12} border={"1px solid gray"} borderRadius={"5px"} margin="4px" position="relative" >
                                             <Grid item position="absolute" height="100%" paddingLeft="4px" display="flex" alignItems="center" justifyContent="center" >
                                                 <SearchIcon color="action" />
@@ -1230,79 +1028,105 @@ export default function StoreActionsMain({ userId, storeId }: { userId: number, 
                                             </Grid>
                                         </Grid>
                                     </Grid>
-                                    <Grid container item xs={"auto"} md={4} justifyContent={"center"}>
-                                        <Button size="small"
-                                            sx={{
-                                                color: grey[600],
-                                                borderColor: grey[600],
-                                                '&:hover': {
-                                                    borderColor: grey[800],
-                                                    backgroundColor: grey[200],
-                                                },
-                                            }}
-                                            onClick={toggleModalFilter} startIcon={<FilterAlt />} variant="outlined">Filtrar</Button>
+                                    <Grid item container xs={12}>
+                                        <Card variant="outlined" sx={{ padding: "10px", marginTop: "5px", overflow: "visible", width: "100%" }}>
+                                            <Typography component={"span"} sx={{ marginTop: "-22px", display: "flex", width: "128px", paddingX: "6px", backgroundColor: "white" }}>
+                                                Aplicar filtros por:
+                                            </Typography>
+                                            <Grid item container xs={12} justifyContent={"space-between"} marginTop={"5px"}>
+                                                <Grid item xs={6}>
+                                                    <Button size="small"
+                                                        sx={{
+                                                            color: grey[600],
+                                                            borderColor: grey[600],
+                                                            '&:hover': {
+                                                                borderColor: grey[800],
+                                                                backgroundColor: grey[200],
+                                                            },
+                                                        }}
+                                                        onClick={toggleModalDepartmentsFilter} startIcon={<FilterAlt />} variant="outlined">Departamentos</Button>
+                                                </Grid>
+                                                <Grid item xs={5}>
+                                                    <Button size="small"
+                                                        sx={{
+                                                            color: grey[600],
+                                                            borderColor: grey[600],
+                                                            '&:hover': {
+                                                                borderColor: grey[800],
+                                                                backgroundColor: grey[200],
+                                                            },
+                                                        }}
+                                                        onClick={toggleModalConditionsFilter} startIcon={<FilterAlt />} variant="outlined">Condiciones</Button>
+                                                </Grid>
+                                            </Grid>
+                                        </Card>
                                     </Grid>
                                 </Grid>
                             </Card>
-
-                            <DepartmentsFilter formik={formik} />
-
-                            {
-                                data && data.length > 0
-                                    ? (
-                                        <>
-                                            {
-                                                selected.length > 0 && (
-                                                    <Grid container justifyContent={"space-between"} mt={"15px"}>
-                                                        <Button
-                                                            size={"small"}
-                                                            color={"primary"}
-                                                            variant={"outlined"}
-                                                            onClick={() => handleOpenSellProduct(formik)}
-                                                            startIcon={<SellOutlined fontSize={"small"} />}
-                                                        >
-                                                            Vender {selected.length}
-                                                        </Button>
-
-                                                        {
-                                                            selected.length === 1 && (
+                            <Card variant={"outlined"} sx={{ paddingTop: "20px" }}>
+                                <Grid container rowSpacing={2}>
+                                    {
+                                        dataProducts?.length! > 0
+                                            ? (dataProducts?.filter(
+                                                (product: productsProps) =>
+                                                    product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
+                                                    product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())
+                                            ).length! > 0 ?
+                                                <>
+                                                    {
+                                                        selectedProducts.length > 0 && (
+                                                            <Grid container justifyContent={"space-between"} mt={"15px"}>
                                                                 <Button
                                                                     size={"small"}
+                                                                    color={"primary"}
                                                                     variant={"outlined"}
-                                                                    startIcon={<ForwardToInbox color="secondary" />}
-                                                                    onClick={() => handleClickTransfer(selected[0])}
+                                                                    onClick={() => handleOpenSellProduct(formik)}
+                                                                    startIcon={<SellOutlined fontSize={"small"} />}
                                                                 >
-                                                                    Transferir
+                                                                    Vender {selectedProducts.length}
                                                                 </Button>
-                                                            )
-                                                        }
-
-                                                        <IconButton
-                                                            size={"small"}
-                                                            color="error"
-                                                            onClick={() => setSelected([])}
-                                                        >
-                                                            <FilterAltOff fontSize={"small"} />
-                                                        </IconButton>
-                                                    </Grid>
-                                                )
-                                            }
-
-                                            <TableContainer sx={{ width: "100%", maxHeight: "500px", mt: "20px" }}>
-                                                <Table sx={{ width: "100%" }} size={"small"}>
-                                                    <TableHeader />
-                                                    <TableContent formik={formik} />
-                                                </Table>
-                                            </TableContainer>
-                                        </>
-                                    ) : (
-                                        <TableNoData />
-                                    )
-                            }
-                        </CardContent>
-                    </Card>
+                                                                {
+                                                                    selectedProducts.length === 1 && (
+                                                                        <Button
+                                                                            size={"small"}
+                                                                            variant={"outlined"}
+                                                                            startIcon={<ForwardToInbox color="secondary" />}
+                                                                            onClick={() => handleClickTransfer(selectedProducts[0])}
+                                                                        >
+                                                                            Transferir
+                                                                        </Button>
+                                                                    )
+                                                                }
+                                                                <IconButton
+                                                                    size={"small"}
+                                                                    color="error"
+                                                                    onClick={() => setSelectedProducts([])}
+                                                                >
+                                                                    <FilterAltOff fontSize={"small"} />
+                                                                </IconButton>
+                                                            </Grid>
+                                                        )
+                                                    }
+                                                    <TableContainer sx={{ width: "100%", maxHeight: "500px" }}>
+                                                        <Table sx={{ width: "100%" }} size={"small"}>
+                                                            <TableHeader />
+                                                            <TableContent formik={formik} />
+                                                        </Table>
+                                                    </TableContainer>
+                                                </>
+                                                : <TableNoData searchCoincidence />
+                                            ) : (
+                                                <TableNoData searchCoincidence={filtersConditionsApplied && dataProducts?.length! === 0} />
+                                            )
+                                    }
+                                </Grid>
+                            </Card>
+                        </CardContent >
+                    </Card >
                 )
             }
-        </Formik>
+        </Formik >
     )
 }
+
+export default StoreActionsMain
