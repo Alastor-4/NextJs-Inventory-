@@ -37,9 +37,10 @@ import {
 } from "@mui/icons-material";
 
 import { useRouter } from "next/navigation";
-import {daysMap, notifyError} from "@/utils/generalFunctions";
+import {daysMap, notifyError, notifySuccess} from "@/utils/generalFunctions";
 import dayjs from "dayjs";
 import stores from "../requests/stores";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 export default function StoresMainTable({ userId }: { userId: number }) {
 
@@ -70,12 +71,18 @@ export default function StoresMainTable({ userId }: { userId: number }) {
         }
     }
 
+    //handle delete offer
+    const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false)
+    const handleCloseConfirmDialog = () => setOpenConfirmDialog(false)
+    const handleOpenConfirmDialog = () => setOpenConfirmDialog(true)
+
     async function handleRemove() {
         const response = await stores.delete(userId, selected.id)
         if (response) {
             const updatedStores = await stores.allUserStores(userId)
             if (updatedStores) setData(updatedStores)
             setSelected(null);
+            notifySuccess("Tienda eliminada satisfactoriamente")
         } else {
             notifyError("Ha fallado la eliminación de la tienda. La tienda no puede ser eliminar si ya se ha utilizada y se han generado datos", true)
         }
@@ -136,7 +143,7 @@ export default function StoresMainTable({ userId }: { userId: number }) {
                                     <EditOutlined fontSize={"small"} />
                                 </IconButton>
 
-                                <IconButton color={"inherit"} onClick={handleRemove}>
+                                <IconButton color={"inherit"} onClick={handleOpenConfirmDialog}>
                                     <DeleteOutline fontSize={"small"} />
                                 </IconButton>
 
@@ -410,6 +417,14 @@ export default function StoresMainTable({ userId }: { userId: number }) {
     return (
         <Card variant={"outlined"}>
             <CustomToolbar />
+
+            <ConfirmDeleteDialog
+                open={openConfirmDialog}
+                handleClose={handleCloseConfirmDialog}
+                title={"Confirmar acción"}
+                message={"Tenga en cuenta que solo es posible eliminar tiendas que no están siendo usados en el sistema. Confirma eliminar la tienda?"}
+                confirmAction={handleRemove}
+            />
 
             <CardContent>
                 {
