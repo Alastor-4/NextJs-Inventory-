@@ -458,7 +458,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                         <ConfirmDeleteDialog
                             open={openConfirmDialog}
                             handleClose={handleCloseConfirmDialog}
-                            title={"Confirmar accion"}
+                            title={"Confirmar acción"}
                             message={"Confirma eliminar este producto de la tienda?"}
                             confirmAction={removeProduct}
                         />
