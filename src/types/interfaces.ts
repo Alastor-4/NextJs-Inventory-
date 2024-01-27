@@ -183,6 +183,8 @@ export interface productsProps {
     name: string | null;
     description: string | null;
     buy_price: number | null;
+    is_approved: boolean,
+    created_by_id: number,
     created_at: Date;
     depots?: {
         id: number;
@@ -252,6 +254,7 @@ export interface productsProps {
             product_offers?: product_offers[] | null;
         }[];
     }[];
+    created_by_user: users
 }
 
 export interface storeDepotsWithAny {
