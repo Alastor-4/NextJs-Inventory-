@@ -44,7 +44,6 @@ model depots {
   id                            Int            @id @default(autoincrement())
   product_id                    Int?
   warehouse_id                  Int?
-  inserted_by_id                Int?
   product_total_units           Int?
   product_total_remaining_units Int?
   created_at                    DateTime       @default(now()) @db.Timestamp(0)
@@ -64,6 +63,7 @@ model products {
   name            String?           @db.VarChar(255)
   description     String?           @db.VarChar(255)
   buy_price       Float?
+  is_approved     Boolean           @default(false)
   created_at      DateTime          @default(now()) @db.Timestamp(0)
   characteristics characteristics[]
   depots          depots[]
@@ -95,8 +95,10 @@ model store_depot_transfers {
   store_depot_id             Int?
   units_transferred_quantity Int?
   transfer_direction         String?       @db.VarChar(255)
+  created_by_id              Int
   created_at                 DateTime      @default(now()) @db.Timestamp(0)
   store_depots               store_depots? @relation(fields: [store_depot_id], references: [id])
+  created_by_user            users         @relation("created_by_user", fields: [created_by_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depot_transfer_user_FK")
 
   @@index([store_depot_id], map: "store_depot_transfers_store_depot_fkey")
 }
@@ -168,24 +170,25 @@ model stores {
 }
 
 model users {
-  id                 Int            @id @default(autoincrement())
-  username           String         @unique(map: "username") @db.VarChar(255)
-  password_hash      String?        @db.VarChar(255)
-  role_id            Int?
-  name               String?        @db.VarChar(255)
-  mail               String         @unique(map: "mail") @db.VarChar(255)
-  phone              String?        @unique(map: "phone") @db.VarChar(255)
-  is_active          Boolean?       @default(true)
-  is_verified        Boolean?       @default(false)
-  work_for_user_id   Int?
-  created_at         DateTime       @default(now()) @db.Timestamp(0)
-  reservations       reservations[]
-  sells              sells[]
-  user_seller_stores stores[]       @relation("seller_user")
-  user_owner_stores  stores[]       @relation("owner_user")
-  roles              roles?         @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
-  warehouses         warehouses[]
-  departments        departments[]  @relation("departments_user")
+  id                    Int                     @id @default(autoincrement())
+  username              String                  @unique(map: "username") @db.VarChar(255)
+  password_hash         String?                 @db.VarChar(255)
+  role_id               Int?
+  name                  String?                 @db.VarChar(255)
+  mail                  String                  @unique(map: "mail") @db.VarChar(255)
+  phone                 String?                 @unique(map: "phone") @db.VarChar(255)
+  is_active             Boolean?                @default(true)
+  is_verified           Boolean?                @default(false)
+  work_for_user_id      Int?
+  created_at            DateTime                @default(now()) @db.Timestamp(0)
+  reservations          reservations[]
+  sells                 sells[]
+  user_seller_stores    stores[]                @relation("seller_user")
+  user_owner_stores     stores[]                @relation("owner_user")
+  roles                 roles?                  @relation(fields: [role_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "users_ibfk_1")
+  warehouses            warehouses[]
+  departments           departments[]           @relation("departments_user")
+  store_depot_transfers store_depot_transfers[] @relation("created_by_user")
 
   @@index([role_id], map: "role_id")
 }
