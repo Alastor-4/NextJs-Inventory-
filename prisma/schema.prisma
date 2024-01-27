@@ -64,11 +64,13 @@ model products {
   description     String?           @db.VarChar(255)
   buy_price       Float?
   is_approved     Boolean           @default(false)
+  created_by_id   Int
   created_at      DateTime          @default(now()) @db.Timestamp(0)
   characteristics characteristics[]
   depots          depots[]
   images          images[]
   departments     departments?      @relation(fields: [department_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "products_ibfk_1")
+  created_by_user users             @relation("created_by_user", fields: [created_by_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "product_user_FK")
 
   @@index([department_id], map: "department_id")
 }
@@ -189,6 +191,7 @@ model users {
   warehouses            warehouses[]
   departments           departments[]           @relation("departments_user")
   store_depot_transfers store_depot_transfers[] @relation("created_by_user")
+  product_creted_user   products[]              @relation("created_by_user")
 
   @@index([role_id], map: "role_id")
 }
