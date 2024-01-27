@@ -14,14 +14,16 @@ export async function GET(req: Request) {
                     products: { some: { owner_id: +userId! } }
                 },
                 include: {
-                    products: { include: { departments: true, characteristics: true, images: true } }
+                    products: {
+                        include: { departments: true, characteristics: true, images: true, created_by_user: true },
+                        where: {owner_id: +userId!}
+                    }
                 }
             }
         )
 
         return NextResponse.json(departments)
     } catch (error) {
-        console.log('[PRODUCT_GET_ALL]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -38,6 +40,8 @@ export async function POST(req: Request) {
                 description,
                 department_id: +departmentId!,
                 buy_price: +buyPrice!,
+                is_approved: true,
+                created_by_id: +userId!,
             },
         }
 
@@ -52,7 +56,6 @@ export async function POST(req: Request) {
 
         return NextResponse.json(newProduct)
     } catch (error) {
-        console.log('[PRODUCT_CREATE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -99,7 +102,6 @@ export async function PUT(req: Request) {
 
         return NextResponse.json(updatedProduct)
     } catch (error) {
-        console.log('[PRODUCT_UPDATE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -116,7 +118,6 @@ export async function PATCH(req: Request) {
 
         return NextResponse.json(updatedProduct);
     } catch (error) {
-        console.log('[PRODUCT_UPDATE_METADATA_IMAGE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -131,7 +132,6 @@ export async function DELETE(req: Request) {
 
         return NextResponse.json(deletedProduct)
     } catch (error) {
-        console.log('[PRODUCT_DELETE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

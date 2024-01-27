@@ -5,7 +5,7 @@ import {
     Checkbox, Divider, Grid, IconButton, InputBase, Table, TableBody,
     TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography,
 } from "@mui/material";
-import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined, FilterAlt, HelpOutline } from "@mui/icons-material";
+import {AddOutlined, ArrowLeft, DeleteOutline, Done, EditOutlined, FilterAlt, HelpOutline} from "@mui/icons-material";
 import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
@@ -17,7 +17,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import products from "../requests/products";
-import { grey } from '@mui/material/colors';
+import {grey, orange} from '@mui/material/colors';
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
@@ -242,6 +242,10 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 id: "characteristics",
                 label: "Características",
             },
+            {
+                id: "created_by",
+                label: "Creador",
+            },
         ]
 
         return (
@@ -279,6 +283,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                             hover
                             tabIndex={-1}
                             selected={!!selectedProduct && (product.id === selectedProduct.id)}
+                            sx={{backgroundColor: product.is_approved ? "white": orange["600"]}}
                         >
                             <TableCell>
                                 <Checkbox
@@ -351,6 +356,9 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                     )
                                     ) : "-"
                                 }
+                            </TableCell>
+                            <TableCell align="center">
+                                {product.created_by_user.name}
                             </TableCell>
                         </TableRow>
                     ))}
