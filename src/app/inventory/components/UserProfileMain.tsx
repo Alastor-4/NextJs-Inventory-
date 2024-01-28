@@ -382,7 +382,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         )
     }
 
-    const KeeperModule = ({ ownerProductsCount, ownerWarehouses }: { ownerProductsCount: number, ownerWarehouses: any[] }) => {
+    const KeeperModule = ({ ownerStores, ownerProductsCount, ownerWarehouses }: { ownerStores: any[], ownerProductsCount: number, ownerWarehouses: any[] }) => {
         const ProductButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
@@ -429,6 +429,44 @@ export default function UserProfileMain({ userId }: { userId: number }) {
             </Card>
         )
 
+        const StoreButton = () => (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
+                    Tiendas
+                </Typography>
+
+                <Grid container rowSpacing={1} mt={"8px"}>
+                    {ownerStores.map((item, index) => (
+                        <Grid container key={item.id}>
+                            <Link href={`/inventory/keeper/store-details/${item.id}`} >
+                                <Grid container columnSpacing={1} item sx={index > 0 ? { mt: "10px" } : { mt: "0" }}>
+                                    <Grid container item xs={"auto"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                    </Grid>
+                                    <Grid item xs={true}>
+                                        {item.name}
+                                    </Grid>
+                                </Grid>
+                            </Link>
+                        </Grid>
+                    ))}
+
+                    <Grid container>
+                        <Link href={`/inventory/keeper/store`}>
+                            <Grid container columnSpacing={1} item xs={12} sx={{ mt: "15px" }}>
+                                <Grid container item xs={"auto"} alignItems={"center"}>
+                                    <ArrowCircleRightOutlined fontSize={"small"} />
+                                </Grid>
+                                <Grid item xs={true}>
+                                    Mis tiendas
+                                </Grid>
+                            </Grid>
+                        </Link>
+                    </Grid>
+                </Grid>
+            </Card>
+        )
+
         return (
             <Grid container item spacing={2}>
                 <Grid container item xs={6} justifyContent={"center"}>
@@ -437,6 +475,10 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
                 <Grid container item xs={6} justifyContent={"center"}>
                     <WarehouseButton />
+                </Grid>
+
+                <Grid container item xs={6} justifyContent={"center"}>
+                    <StoreButton />
                 </Grid>
             </Grid>
         )
@@ -634,7 +676,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                                 )}
 
                                 {activeTab === "keeper" && (
-                                    <KeeperModule ownerProductsCount={ownerProductsCount!} ownerWarehouses={ownerWarehouses!} />
+                                    <KeeperModule ownerProductsCount={ownerProductsCount!} ownerWarehouses={ownerWarehouses!} ownerStores={ownerStores!} />
                                 )}
 
                                 {activeTab === "seller" && (
