@@ -69,6 +69,17 @@ const products = {
         return false
     },
 
+    approve: async function (productId) {
+        try {
+            const response = await apiRequest.put(updateUrl, { productId: productId })
+            return response.data
+        } catch (e) {
+            //ToDo: notify error here
+        }
+
+        return false
+    },
+
     getDepartmentsByUserAndGlobal: async function (usersId: number) {
         try {
             const response = await apiRequest.get(urlApiDepartments, { params: { usersId } });
