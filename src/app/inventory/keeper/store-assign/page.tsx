@@ -1,3 +1,4 @@
+
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
 import StoreDepotsAssign from "./components/StoreDepotsAssign";
 import { storeWithStoreDepots } from "@/types/interfaces";
@@ -8,11 +9,12 @@ import { prisma } from "db";
 export default async function Page({ searchParams }: { searchParams: { storeId: string, warehouseId: string } }) {
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
+    const user = await prisma.users.findUnique({ where: { id: userId! } });
 
     const { storeId, warehouseId } = searchParams;
 
-    const ownerWarehouses: warehouses[] = await prisma.warehouses.findMany({ where: { owner_id: userId } });
-    const ownerStores: storeWithStoreDepots[] = await prisma.stores.findMany({ where: { owner_id: userId }, include: { store_depots: true } });
+    const ownerWarehouses: warehouses[] = await prisma.warehouses.findMany({ where: { owner_id: user?.work_for_user_id } });
+    const ownerStores: storeWithStoreDepots[] = await prisma.stores.findMany({ where: { owner_id: user?.work_for_user_id! }, include: { store_depots: true } });
 
     return (
         <main>

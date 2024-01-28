@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
 import { prisma } from "db";
 
 // GET all depots in warehouse
 export async function GET(req: Request, { params }: { params: { warehouseId: string } }) {
     try {
-        const { searchParams } = new URL(req.url)
-        const ownerId = +searchParams.get("userId")!
-        const warehouseId = +params.warehouseId
+        const { searchParams } = new URL(req.url);
+        const ownerId = +searchParams.get("ownerId")!;
+        const warehouseId = +params.warehouseId;
 
         if (ownerId && warehouseId) {
             const warehouseDepots = await prisma.departments.findMany({
@@ -21,19 +21,9 @@ export async function GET(req: Request, { params }: { params: { warehouseId: str
                 },
                 include: {
                     products: {
-                        where: {
-                            depots: {
-                                some: { warehouse_id: warehouseId }
-                            }
-                        },
-                        include:
-                        {
-                            departments: true,
-                            characteristics: true,
-                            images: true,
-                            depots: {
-                                where: { warehouse_id: warehouseId }
-                            }
+                        where: { depots: { some: { warehouse_id: warehouseId } }, is_approved: true },
+                        include: {
+                            departments: true, characteristics: true, images: true, depots: { where: { warehouse_id: warehouseId } }
                         }
                     }
                 }

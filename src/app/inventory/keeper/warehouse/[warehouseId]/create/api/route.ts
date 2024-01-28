@@ -12,21 +12,13 @@ export async function GET(req: Request, { params }: { params: { warehouseId: str
             {
                 where: {
                     AND: [
-                        {
-                            products: {
-                                some: { owner_id: ownerId }
-                            },
-                        },
-                        {
-                            products: {
-                                some: { depots: { none: { warehouse_id: warehouseId } } }
-                            },
-                        },
+                        { products: { some: { owner_id: ownerId } }, },
+                        { products: { some: { depots: { none: { warehouse_id: warehouseId } } } }, },
                     ]
                 },
                 include: {
                     products: {
-                        where: { depots: { none: { warehouse_id: warehouseId } }, is_approved: false },
+                        where: { depots: { none: { warehouse_id: warehouseId } }, is_approved: true },
                         include: { departments: true, characteristics: true, images: true },
                     }
                 }

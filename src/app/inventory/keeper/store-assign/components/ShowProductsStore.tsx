@@ -5,15 +5,14 @@ import {
     Grid, IconButton, InputBase, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Typography
 } from '@mui/material';
-import {
-    AddOutlined, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined,
-    FilterAlt, HelpOutline, RemoveOutlined
-} from '@mui/icons-material';
 import ModalAddProductFromWarehouse from '../addProductFromWarehouse/components/ModalAddProductFromWarehouse';
+import {
+    AddOutlined, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined, FilterAlt, HelpOutline, RemoveOutlined,
+} from '@mui/icons-material';
 import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
-import { notifySuccess, transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
 import FilterProductsByDepartmentsModal from '@/components/modals/FilterProductsByDepartmentsModal';
+import { notifySuccess, transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import { characteristics, depots, images } from '@prisma/client';

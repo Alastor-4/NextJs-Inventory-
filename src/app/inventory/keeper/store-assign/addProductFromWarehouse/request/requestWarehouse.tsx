@@ -1,8 +1,8 @@
 import apiRequest from "@/api"
 import { notifyError } from "@/utils/generalFunctions";
 
-const url = "/inventory/owner/store-assign/addProductFromWarehouse/api";
-const urlSpecificComponent = "/inventory/owner/store-assign/addProductFromWarehouse/api/specificComponent";
+const url = "/inventory/keeper/store-assign/addProductFromWarehouse/api";
+const urlSpecificComponent = "/inventory/keeper/store-assign/addProductFromWarehouse/api/specificComponent";
 
 const requestWarehouse = {
     getAllWarehousesWithTheirDepots: async function (storeId: number) {
@@ -12,7 +12,7 @@ const requestWarehouse = {
             return request.data
 
         } catch (e) {
-            notifyError("Error obteniendo los datos de los depósitos")
+            notifyError("Error obteniendo los datos de los depósitos");
         }
 
         return false
@@ -21,7 +21,6 @@ const requestWarehouse = {
     getWarehouseWithTheirDepots: async function (storeId: number, warehouseId: number) {
         try {
             const request = await apiRequest.get(urlSpecificComponent, { params: { storeId: storeId, warehouseId: warehouseId } })
-
             return request.data
 
         } catch (e) {
