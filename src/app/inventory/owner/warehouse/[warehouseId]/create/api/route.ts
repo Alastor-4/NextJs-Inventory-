@@ -26,7 +26,7 @@ export async function GET(req: Request, { params }: { params: { warehouseId: str
                 },
                 include: {
                     products: {
-                        where: { depots: { none: { warehouse_id: warehouseId } } },
+                        where: { depots: { none: { warehouse_id: warehouseId } }, is_approved: false },
                         include: { departments: true, characteristics: true, images: true },
                     }
                 }

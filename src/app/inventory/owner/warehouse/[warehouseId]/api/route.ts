@@ -42,7 +42,6 @@ export async function GET(req: Request, { params }: { params: { warehouseId: str
             return NextResponse.json(warehouseDepots)
         }
     } catch (error) {
-        console.log('[DEPOTS_WAREHOUSE_GET_ALL]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -50,7 +49,7 @@ export async function GET(req: Request, { params }: { params: { warehouseId: str
 // CREATE new warehouse depot
 export async function POST(req: Request) {
     try {
-        const { warehouseId, productId, insertedById, productTotalUnits } = await req.json()
+        const { warehouseId, productId, productTotalUnits } = await req.json()
 
         const createdDepot = await prisma.depots.create(
             {
@@ -59,14 +58,12 @@ export async function POST(req: Request) {
                     product_id: +productId,
                     product_total_units: +productTotalUnits,
                     product_total_remaining_units: +productTotalUnits,
-                    // inserted_by_id: insertedById
                 }
             }
         )
 
         return NextResponse.json(createdDepot)
     } catch (error) {
-        console.log('[DEPOT_WAREHOUSE_CREATE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -90,7 +87,6 @@ export async function PUT(req: Request) {
             return NextResponse.json(updatedDeposit)
         }
     } catch (error) {
-        console.log('[DEPOT_WAREHOUSE_UPDATE_UNITS]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -114,7 +110,6 @@ export async function PATCH(req: Request) {
             return NextResponse.json(updatedDeposit)
         }
     } catch (error) {
-        console.log('[DEPOT_WAREHOUSE_PATCH_UNITS]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -129,7 +124,6 @@ export async function DELETE(req: Request) {
 
         return NextResponse.json(deletedDepot)
     } catch (error) {
-        console.log('[DEPOT_WAREHOUSE_DELETE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

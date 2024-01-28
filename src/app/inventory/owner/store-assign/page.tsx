@@ -1,5 +1,5 @@
 import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
-import StoreDepotsAssign from "@/components/StoreDepotsAssign";
+import StoreDepotsAssign from "./components/StoreDepotsAssign";
 import { storeWithStoreDepots } from "@/types/interfaces";
 import { getServerSession } from "next-auth";
 import { warehouses } from "@prisma/client";
