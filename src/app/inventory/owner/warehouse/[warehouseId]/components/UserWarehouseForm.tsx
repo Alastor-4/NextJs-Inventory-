@@ -376,11 +376,11 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                             </Button>
                         </Grid>
                     </Grid>
-
-                    <Grid container rowSpacing={2} mt={"20px"}>
-                        {
-                            dataProducts?.length! > 0
-                                ? (dataProducts?.filter(
+                    <Card variant={"outlined"} sx={{ marginTop: "20px" }}>
+                        <Grid container rowSpacing={2} mt={"20px"}>
+                            {
+                                dataProducts?.length! > 0
+                                    ? (dataProducts?.filter(
                                         (product: productsProps) =>
                                             product?.name?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase()) ||
                                             product?.description?.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).length! > 0 ?
@@ -390,11 +390,12 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                                                 <TableContent formik={formik} />
                                             </Table>
                                         </TableContainer>) : <TableNoData searchCoincidence />
-                                ) : (
-                                    <TableNoData hasData={dataProducts?.length!} />
-                                )
-                        }
-                    </Grid>
+                                    ) : (
+                                        <TableNoData hasData={dataProducts?.length!} />
+                                    )
+                            }
+                        </Grid>
+                    </Card>
                 </CardContent>
             </form>
         </>
