@@ -1,8 +1,8 @@
 import apiRequest from "@/api"
-import {notifyError} from "@/utils/generalFunctions";
+import { notifyError } from "@/utils/generalFunctions";
 
-const url = "/inventory/owner/store-assign/addProductFromWarehouse/api"
-const urlSpecificComponent = "/inventory/owner/store-assign/addProductFromWarehouse/api/specificComponent"
+const url = "/inventory/owner/store-assign/addProductFromWarehouse/api";
+const urlSpecificComponent = "/inventory/owner/store-assign/addProductFromWarehouse/api/specificComponent";
 
 const requestWarehouse = {
     getAllWarehousesWithTheirDepots: async function (storeId: number) {
