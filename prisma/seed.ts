@@ -47,13 +47,6 @@ async function main() {
         },
     })
 
-    await prisma.roles.create({
-        data: {
-            name: 'store_keeper',
-            description: 'Almacenero de la tienda',
-        }
-    })
-
     const ownerUser = await prisma.users.findFirst({ where: { roles: { name: "store_owner" } } })
     await prisma.roles.create({
         data: {
@@ -71,6 +64,24 @@ async function main() {
                 },
             },
         },
+    })
+
+    await prisma.roles.create({
+        data: {
+            name: 'store_keeper',
+            description: 'Almacenero',
+            users: {
+                create: {
+                    username: "dgabad95",
+                    name: "Dayan Keeper",
+                    mail: "dgabad95@gmail.com",
+                    phone: "52691613",
+                    password_hash: "$2a$10$x5GLfSkIGWV5j2sW9OMg6.LovR90KNsFB.JB2xF3rryn7rj3NwqeS",
+                    is_verified: true,
+                    work_for_user_id: ownerUser.id
+                },
+            },
+        }
     })
 
     await prisma.roles.create({
