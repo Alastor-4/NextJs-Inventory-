@@ -2,60 +2,51 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    AppBar,
-    Box, Button,
-    Card,
-    CardContent,
-    Chip,
-    Divider,
-    Grid,
-    IconButton,
-    Toolbar,
-    Typography
+    AppBar, Box, Button, Card, CardContent, Chip,
+    Divider, Grid, IconButton, Toolbar, Typography
 } from "@mui/material";
 import {
-    ArrowCircleRightOutlined,
-    ChevronRightOutlined, HomeOutlined,
-    LogoutOutlined, RocketLaunchOutlined,
+    ArrowCircleRightOutlined, ChevronRightOutlined, HomeOutlined,
+    LogoutOutlined, RocketLaunchOutlined
 } from "@mui/icons-material";
-import userProfileStyles from "@/assets/styles/userProfileStyles"
-import Link from "next/link";
-import dayjs from "dayjs";
-import { signOut } from "next-auth/react";
 import { userStatsRequest } from "@/app/inventory/request/userStats";
+import userProfileStyles from "@/assets/styles/userProfileStyles";
 import { getRoleTranslation } from "@/utils/getRoleTranslation";
 import { getColorByRole } from "@/utils/getColorbyRole";
+import { signOut } from "next-auth/react";
+import Link from "next/link";
+import dayjs from "dayjs";
 
 export default function UserProfileMain({ userId }: { userId: number }) {
-    const [userDetails, setUserDetails] = useState<null | any>(null)
-    const [userRole, setUserRole] = useState<null | any>(null)
+    const [userDetails, setUserDetails] = useState<null | any>(null);
+    const [userRole, setUserRole] = useState<null | any>(null);
 
-    const [ownerWarehouses, setOwnerWarehouses] = useState<null | any[]>(null)
-    const [ownerStores, setOwnerStores] = useState<null | any[]>(null)
-    const [ownerProductsCount, setOwnerProductsCount] = useState<null | number>(null)
-    const [globalAndOwnerDepartments, setGlobalAndOwnerDepartments] = useState<null | any[]>(null)
-    const [ownerWorkersCount, setOwnerWorkersCount] = useState<null | number>(null)
+    const [ownerWarehouses, setOwnerWarehouses] = useState<null | any[]>(null);
+    const [ownerStores, setOwnerStores] = useState<null | any[]>(null);
+    const [ownerProductsCount, setOwnerProductsCount] = useState<null | number>(null);
+    const [globalAndOwnerDepartments, setGlobalAndOwnerDepartments] = useState<null | any[]>(null);
+    const [ownerWorkersCount, setOwnerWorkersCount] = useState<null | number>(null);
 
-    const [sellerStores, setSellerStores] = useState<null | any[]>(null)
+    const [sellerStores, setSellerStores] = useState<null | any[]>(null);
 
     useEffect(() => {
         async function fetchData() {
-            const response = await userStatsRequest.defaultStats(userId)
+            const response = await userStatsRequest.defaultStats(userId);
 
             if (response) {
-                setOwnerWarehouses(response.ownerWarehouses)
-                setGlobalAndOwnerDepartments(response.globalAndOwnerDepartments)
-                setUserDetails(response.userDetails)
-                setUserRole(response.userRole)
-                setOwnerWarehouses(response.ownerWarehouses)
-                setOwnerStores(response.ownerStores)
-                setOwnerProductsCount(response.ownerProductsCount)
-                setOwnerWorkersCount(response.ownerWorkersCount)
-                setSellerStores(response.sellerStores)
+                setOwnerWarehouses(response.ownerWarehouses);
+                setGlobalAndOwnerDepartments(response.globalAndOwnerDepartments);
+                setUserDetails(response.userDetails);
+                setUserRole(response.userRole);
+                setOwnerWarehouses(response.ownerWarehouses);
+                setOwnerStores(response.ownerStores);
+                setOwnerProductsCount(response.ownerProductsCount);
+                setOwnerWorkersCount(response.ownerWorkersCount);
+                setSellerStores(response.sellerStores);
             }
         }
 
-        fetchData()
+        fetchData();
     }, [userId]);
 
     const CustomToolbar = () => (
@@ -93,16 +84,16 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         <Grid container rowSpacing={1}>
             <Grid item xs={12}>
                 <Typography variant={"subtitle1"} display={"flex"} alignItems={"center"}>
-                    <RocketLaunchOutlined sx={{mr: "5px"}}/> Bienvenido a Inventario Plus
+                    <RocketLaunchOutlined sx={{ mr: "5px" }} /> Bienvenido a Inventario Plus
                 </Typography>
             </Grid>
 
             <Grid container item xs={12} alignItems={"center"}>
                 <Grid item xs={"auto"}>
-                    <ChevronRightOutlined/>
+                    <ChevronRightOutlined />
                 </Grid>
 
-                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                <Grid item xs={true} sx={{ textWrap: "pretty" }}>
                     Este sistema ha sido pensado para ayudar con todo el proceso de gestión y venta de cualquier
                     producto. Cada etapa de este proceso ha sido automatizada.
                 </Grid>
@@ -110,20 +101,20 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
             <Grid container item xs={12} alignItems={"center"}>
                 <Grid item xs={"auto"}>
-                    <ChevronRightOutlined/>
+                    <ChevronRightOutlined />
                 </Grid>
 
-                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                <Grid item xs={true} sx={{ textWrap: "pretty" }}>
                     Inventario+ no hace diferencias entre ningún producto, el límite es su imaginación.
                 </Grid>
             </Grid>
 
             <Grid container item xs={12} alignItems={"center"}>
                 <Grid item xs={"auto"}>
-                    <ChevronRightOutlined/>
+                    <ChevronRightOutlined />
                 </Grid>
 
-                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                <Grid item xs={true} sx={{ textWrap: "pretty" }}>
                     Esta aplicación esta destinada a aquellos usuario que son trabajadores de tiendas
                     gestionadas en este sitema. Si busca comprar online en estas tiendas debe utilizar xxxxx.
                 </Grid>
@@ -131,10 +122,10 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
             <Grid container item xs={12} alignItems={"center"}>
                 <Grid item xs={"auto"}>
-                    <ChevronRightOutlined/>
+                    <ChevronRightOutlined />
                 </Grid>
 
-                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                <Grid item xs={true} sx={{ textWrap: "pretty" }}>
                     Si quiere comezar a gestionar su tienda en nuestro sistema pongase en contacto con el equipo de
                     soporte mediante xxxxx.
                 </Grid>
@@ -142,10 +133,10 @@ export default function UserProfileMain({ userId }: { userId: number }) {
 
             <Grid container item xs={12} alignItems={"center"}>
                 <Grid item xs={"auto"}>
-                    <ChevronRightOutlined/>
+                    <ChevronRightOutlined />
                 </Grid>
 
-                <Grid item xs={true} sx={{textWrap: "pretty"}}>
+                <Grid item xs={true} sx={{ textWrap: "pretty" }}>
                     Si su objetivo es ser trabajador de algún dueño con tienda(s) en nuestro sistema, este debe hacerlo su
                     trabajador mediante esa funcionalidad en su panel administrativo.
                 </Grid>
@@ -391,6 +382,37 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         )
     }
 
+    const KeeperModule = ({ ownerProductsCount }: { ownerProductsCount: number }) => {
+        const ProductButton = () => (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
+                    Productos
+                </Typography>
+
+                <Grid container rowSpacing={1} mt={"8px"}>
+                    <Link href={`/inventory/keeper/product`}>
+                        <Grid container item rowSpacing={2}>
+                            <Grid container item xs={"auto"} alignItems={"center"}>
+                                <ChevronRightOutlined fontSize={"small"} />
+                            </Grid>
+                            <Grid item xs={"auto"}>
+                                {`${ownerProductsCount} ${ownerProductsCount === 1 ? "producto" : "productos"}`}
+                            </Grid>
+                        </Grid>
+                    </Link>
+                </Grid>
+            </Card>
+        )
+
+        return (
+            <Grid container item spacing={2}>
+                <Grid container item xs={6} justifyContent={"center"}>
+                    <ProductButton />
+                </Grid>
+            </Grid>
+        )
+    }
+
     const SellerModule = ({ sellerStores }: { sellerStores: any[] }) => {
         const StoreButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
@@ -426,22 +448,21 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         )
     }
 
-    const [activeTab, setActiveTab] = React.useState<string>("welcome")
+    const [activeTab, setActiveTab] = useState<string>("welcome");
     function handleChangeActiveTab(value: string) {
-        setActiveTab(value)
+        setActiveTab(value);
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         switch (userRole) {
             case "admin":
-                return setActiveTab("admin")
-
+                return setActiveTab("admin");
             case "store_owner":
-                return setActiveTab("owner")
-
+                return setActiveTab("owner");
+            case "store_keeper":
+                return setActiveTab("keeper");
             case "store_seller":
-                return setActiveTab("seller")
-
+                return setActiveTab("seller");
             default:
                 break
         }
@@ -544,6 +565,17 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                                         </Button>
                                     )
                                 }
+                                {
+                                    userRole === "store_keeper" &&
+                                    ownerProductsCount !== null && (
+                                        <Button
+                                            color={activeTab === "keeper" ? "primary" : "inherit"}
+                                            onClick={() => handleChangeActiveTab("keeper")}
+                                        >
+                                            Almacenero
+                                        </Button>
+                                    )
+                                }
 
                                 {
                                     (userRole === "store_owner" || userRole === "store_seller") && sellerStores && (
@@ -558,9 +590,9 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                             </Grid>
 
                             <Grid item xs={12}>
-                                {activeTab === "welcome" && <WelcomeModule/>}
+                                {activeTab === "welcome" && <WelcomeModule />}
 
-                                {activeTab === "admin" && <AdminModule/>}
+                                {activeTab === "admin" && <AdminModule />}
 
                                 {activeTab === "owner" && (
                                     <OwnerModule
@@ -572,8 +604,12 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                                     />
                                 )}
 
+                                {activeTab === "keeper" && (
+                                    <KeeperModule ownerProductsCount={ownerProductsCount!} />
+                                )}
+
                                 {activeTab === "seller" && (
-                                    <SellerModule sellerStores={sellerStores!}/>
+                                    <SellerModule sellerStores={sellerStores!} />
                                 )}
                             </Grid>
                         </Grid>
