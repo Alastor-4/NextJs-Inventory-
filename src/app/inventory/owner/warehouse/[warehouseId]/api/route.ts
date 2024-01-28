@@ -59,7 +59,7 @@ export async function POST(req: Request) {
                     product_id: +productId,
                     product_total_units: +productTotalUnits,
                     product_total_remaining_units: +productTotalUnits,
-                    inserted_by_id: insertedById
+                    // inserted_by_id: insertedById
                 }
             }
         )

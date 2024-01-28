@@ -192,7 +192,6 @@ export interface productsProps {
         id: number;
         product_id: number | null;
         warehouse_id: number | null;
-        inserted_by_id: number | null;
         product_total_units: number | null;
         product_total_remaining_units: number | null;
         created_at: Date;
@@ -280,7 +279,6 @@ export interface storeDepotsWithAny {
         id: number;
         product_id: number | null;
         warehouse_id: number | null;
-        inserted_by_id: number | null;
         product_total_units: number | null;
         product_total_remaining_units: number | null;
         created_at: Date;
@@ -367,6 +365,7 @@ export interface storeSellsDetailsProps {
 }
 
 export interface TransferUnitsProps {
+    userId?: number;
     nameStore: string | null;
     storeDepot: storeDepotsWithAny | null;
     productId: number | null

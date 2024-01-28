@@ -787,7 +787,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                             <Grid container item spacing={1} xs={12}>
                                                 <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Creación:</Grid>
                                                 <Grid item xs={true}>
-                                                    {`${dayjs(product.depots![0].created_at).format("DD/MM/YYYY HH:MM")} por ${product.depots![0].inserted_by_id}`}
+                                                    {`${dayjs(product.depots![0].created_at).format("DD/MM/YYYY HH:MM")}`}
                                                 </Grid>
                                             </Grid>
 
