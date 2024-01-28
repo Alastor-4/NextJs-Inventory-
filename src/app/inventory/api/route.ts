@@ -35,8 +35,14 @@ export async function GET(req: Request) {
         }
 
         if (userRole === "store_keeper") {
-            ownerProductsCount = await prisma.products.count({ where: { owner_id: userDetails?.work_for_user_id! } });
-            ownerWarehouses = await prisma.warehouses.findMany({ where: { owner_id: userDetails?.work_for_user_id! }, include: { depots: true } });
+            const productsCountPromise = await prisma.products.count({ where: { owner_id: userDetails?.work_for_user_id! } });
+            const ownerStoresPromise = prisma.stores.findMany({ where: { owner_id: userDetails?.work_for_user_id! } });
+            const ownerWarehousesPromise = await prisma.warehouses.findMany({ where: { owner_id: userDetails?.work_for_user_id! }, include: { depots: true } });
+
+            const ownerQueries = await Promise.all([productsCountPromise, ownerStoresPromise, ownerWarehousesPromise]);
+            ownerProductsCount = ownerQueries[0];
+            ownerStores = ownerQueries[1];
+            ownerWarehouses = ownerQueries[2];
         }
         if (userRole === "store_seller") {
             sellerStores = await prisma.stores.findMany({ where: { seller_user_id: +userId! } })
