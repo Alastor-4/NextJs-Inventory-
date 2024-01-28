@@ -191,7 +191,7 @@ model users {
   warehouses            warehouses[]
   departments           departments[]           @relation("departments_user")
   store_depot_transfers store_depot_transfers[] @relation("created_by_user")
-  product_creted_user   products[]              @relation("created_by_user")
+  product_created_user  products[]              @relation("created_by_user")
 
   @@index([role_id], map: "role_id")
 }
