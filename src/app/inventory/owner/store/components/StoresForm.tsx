@@ -1,50 +1,38 @@
 "use client"
 
 import {
-    AppBar,
-    Box,
-    Button,
-    Card,
-    Checkbox,
-    DialogActions,
-    FormControlLabel,
-    Grid,
-    MenuItem,
-    Switch,
-    TextField,
-    Toolbar,
-    Typography
+    AppBar, Box, Button, Card, Checkbox, DialogActions,
+    FormControlLabel, Grid, MenuItem, Switch, TextField, Toolbar, Typography
 } from "@mui/material";
-import React from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup"
+import { openDaysStores } from "@/request/openDaysStores";
+import { notifyError } from "@/utils/generalFunctions";
+import StoreOpeningDays from "./StoreOpeningDays";
+import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
 import stores from "../requests/stores";
-import { openDaysStores } from "@/request/openDaysStores";
+import { useFormik } from "formik";
+import * as Yup from "yup"
 import dayjs from "dayjs";
-import StoreOpeningDays from "./StoreOpeningDays";
-import { notifyError } from "@/utils/generalFunctions";
 
-
-export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: number, storeId: string | undefined, sellerUsers: any }) {
+const StoresForm = ({ userId, storeId, sellerUsers }: { userId?: number, storeId: string | undefined, sellerUsers: any }) => {
     const router = useRouter()
 
     //Url de las api
-    const urlApiStoreOpenDays = "/inventory/owner/store/apiOpenDays"
-    const urlApiStoreOpenReservations = "/inventory/owner/store/apiReservations"
+    const urlApiStoreOpenDays = "/inventory/owner/store/apiOpenDays";
+    const urlApiStoreOpenReservations = "/inventory/owner/store/apiReservations";
 
-    const [updateItem, setUpdateItem] = React.useState<any>()
-    const [userSeller, setUserSeller] = React.useState("")
+    const [updateItem, setUpdateItem] = useState<any>();
+    const [userSeller, setUserSeller] = useState("");
 
-    const [sellProfit, setSellProfit] = React.useState(true);
+    const [sellProfit, setSellProfit] = useState<boolean>(true);
 
-    const [activeCollection, setActiveCollection] = React.useState(false);
-    const [activeReservations, setActiveReservations] = React.useState(false);
+    const [activeCollection, setActiveCollection] = useState<boolean>(false);
+    const [activeReservations, setActiveReservations] = useState<boolean>(false);
 
-    const defaultStartTime = dayjs()
-    const defaultEndTime = dayjs()
+    const defaultStartTime = dayjs();
+    const defaultEndTime = dayjs();
 
-    const [storeOpeningDays] = React.useState([
+    const [storeOpeningDays] = useState([
         {
             id: null,
             weekDayNumber: 1,
@@ -97,7 +85,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
         },
     ])
 
-    const [storeReservationDays] = React.useState([
+    const [storeReservationDays] = useState([
         {
             id: null,
             weekDayNumber: 1,
@@ -150,7 +138,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
         },
     ])
 
-    React.useEffect(() => {
+    useEffect(() => {
         async function fetchStore(id: any) {
             const store = await stores.storeDetails(userId!, id)
             setUpdateItem(store)
@@ -164,7 +152,7 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
         }
     }, [sellerUsers, storeId, userId])
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (updateItem) {
             setSellProfit(updateItem?.fixed_seller_profit_quantity === null)
             setActiveCollection(updateItem ? updateItem.online_catalog : false)
@@ -546,3 +534,5 @@ export default function StoresForm({ userId, storeId, sellerUsers }: { userId?: 
         </Card>
     )
 }
+
+export default StoresForm

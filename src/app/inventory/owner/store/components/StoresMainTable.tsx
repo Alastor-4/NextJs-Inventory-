@@ -1,48 +1,24 @@
 "use client"
 
-import React from "react";
 import {
-    AppBar,
-    Box,
-    Card,
-    CardContent,
-    Checkbox,
-    Collapse,
-    Divider,
-    Grid,
-    IconButton,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Toolbar,
-    Tooltip,
-    Typography
+    AppBar, Box, Card, CardContent, Checkbox, Collapse, Divider,
+    Grid, IconButton, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Toolbar, Tooltip, Typography
 } from "@mui/material";
-import { TableNoData } from "@/components/TableNoData";
 import {
-    AddOutlined,
-    ArrowLeft,
-    AutoStories,
-    ChevronRightOutlined,
-    DeleteOutline,
-    EditOutlined,
-    ExpandLessOutlined,
-    ExpandMoreOutlined,
-    ProductionQuantityLimits,
-    ShoppingCartOutlined,
-    StorefrontOutlined
+    AddOutlined, ArrowLeft, AutoStories, ChevronRightOutlined, DeleteOutline, EditOutlined,
+    ExpandLessOutlined, ExpandMoreOutlined, ProductionQuantityLimits, ShoppingCartOutlined, StorefrontOutlined
 } from "@mui/icons-material";
-
-import { useRouter } from "next/navigation";
-import {daysMap, notifyError, notifySuccess} from "@/utils/generalFunctions";
-import dayjs from "dayjs";
-import stores from "../requests/stores";
+import React from "react";
+import { daysMap, notifyError, notifySuccess } from "@/utils/generalFunctions";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import { StoresMainTableProps } from "@/types/interfaces";
+import { TableNoData } from "@/components/TableNoData";
+import { useRouter } from "next/navigation";
+import stores from "../requests/stores";
+import dayjs from "dayjs";
 
-export default function StoresMainTable({ userId }: { userId: number }) {
+const StoresMainTable = ({ userId }: StoresMainTableProps) => {
 
     const [data, setData] = React.useState<any>(null)
     const [showDetails, setShowDetails] = React.useState(false)
@@ -446,3 +422,5 @@ export default function StoresMainTable({ userId }: { userId: number }) {
         </Card>
     )
 }
+
+export default StoresMainTable
