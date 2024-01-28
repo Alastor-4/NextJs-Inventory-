@@ -13,8 +13,10 @@ import { StoreMainTableProps, allProductsByDepartmentProps, productsProps, store
 import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse";
 import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/AddProductFromWarehouse";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
-import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
+import ModalProductPrice from "./Modal/ModalProductPrice";
+import { useParams, useRouter } from "next/navigation";
 import { numberFormat } from "@/utils/generalFunctions";
 import { TableNoData } from "@/components/TableNoData";
 import { storeDetails } from "../request/storeDetails";
@@ -23,15 +25,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import StoreMoreDetails from "./StoreMoreDetails";
-import { useParams, useRouter } from "next/navigation";
+import { grey } from "@mui/material/colors";
 import { images } from "@prisma/client";
 import { Formik } from "formik";
-import ModalProductPrice from "./Modal/ModalProductPrice";
-import { grey } from "@mui/material/colors";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
+export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
     const router = useRouter();
     const { storeDetailsId } = useParams();
 
@@ -59,7 +59,7 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
 
     //GET initial data
     useEffect(() => {
-        fetcher(`/inventory/owner/store-details/${storeDetailsId}/api`).then((data: allProductsByDepartmentProps[]) =>
+        fetcher(`/inventory/keeper/store-details/${storeDetailsId}/api`).then((data: allProductsByDepartmentProps[]) =>
             setAllProductsByDepartment(data.map((productsByDepartments: allProductsByDepartmentProps) => ({
                 ...productsByDepartments,
                 selected: false
@@ -90,12 +90,12 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
     //GET store name
     useEffect(() => {
         const getDataStore = async () => {
-            const datastore = await stores.storeDetails(userId!, storeDetailsId!);
+            const datastore = await stores.storeDetails(ownerId!, storeDetailsId!);
             setDataStore(datastore);
         }
         getDataStore();
 
-    }, [storeDetailsId, userId]);
+    }, [storeDetailsId, ownerId]);
 
     const handleNavigateBack = () => router.back();
     // active - noActive
@@ -141,7 +141,7 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                 </Box>
 
                 <Box sx={{ display: "flex" }}>
-                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/owner/store-assign?storeId=${dataStore?.id}`)} >
+                    <IconButton color={"inherit"} onClick={() => router.push(`/inventory/keeper/store-assign?storeId=${dataStore?.id}`)} >
                         <ShareOutlined fontSize={"small"} />
                     </IconButton>
                     <IconButton color={"inherit"} onClick={() => setActiveAddProductFromWarehouse(true)} >
@@ -313,7 +313,7 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                                                         <MoneyInfoTag
                                                             value={displayProductPrice}
                                                             errorColor={!baseProductPrice}
-                                                            action={() => setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true })}
+                                                        // action={() => setActiveModalPrice({ storeDepot: { ...product?.depots![0].store_depots![0] }, active: true })}
                                                         />
                                                         {
                                                             !!product?.depots![0].store_depots![0]._count!.product_offers && (
@@ -410,7 +410,7 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                 images={dialogImages!}
             />
 
-            {
+            {/* {
                 activeModalPrice.active && (
                     <ModalProductPrice
                         dialogTitle="Editar Precio"
@@ -420,7 +420,7 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                         loadData={loadData}
                     />
                 )
-            }
+            } */}
 
             <ModalAddProductFromWarehouse
                 dialogTitle={"Agregar productos"}
