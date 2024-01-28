@@ -154,31 +154,12 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
 
     const TableHeader = () => {
         const headCells = [
-            {
-                id: "details",
-                label: "",
-                padding: "checkbox",
-            },
-            {
-                id: "name",
-                label: "Nombre",
-            },
-            {
-                id: "departaments",
-                label: "Departamento",
-            },
-            {
-                id: "buy_Price",
-                label: "Precio",
-            },
-            {
-                id: "units",
-                label: "Unidades",
-            },
-            {
-                id: "Active",
-                label: "Estado",
-            },
+            { id: "details", label: "", padding: "checkbox", },
+            { id: "name", label: "Nombre", },
+            { id: "departaments", label: "Departamento", },
+            { id: "buy_Price", label: "Precio", },
+            { id: "units", label: "Unidades", },
+            { id: "Active", label: "Estado", },
         ]
 
         return (
@@ -387,6 +368,7 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                                             <TableCell style={{ padding: 0 }} colSpan={6}>
                                                 {showDetails === product.id && (
                                                     <StoreMoreDetails
+                                                        userId={userId}
                                                         show={(showDetails === product.id)}
                                                         loadData={loadData}
                                                         row={product}

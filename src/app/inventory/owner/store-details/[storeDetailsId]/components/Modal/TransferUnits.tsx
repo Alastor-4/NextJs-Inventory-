@@ -1,15 +1,15 @@
 
-import { Button, Grid, IconButton, MenuItem, Stack, TextField, Typography } from '@mui/material'
-import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions'
-import { storeDetails } from '../../request/storeDetails'
-import { SwapVerticalCircle } from '@mui/icons-material'
-import { TransferUnitsProps } from '@/types/interfaces'
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import { Formik } from 'formik'
-import * as Yup from 'yup'
+import { Button, Grid, IconButton, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
+import { storeDetails } from '../../request/storeDetails';
+import { SwapVerticalCircle } from '@mui/icons-material';
+import { TransferUnitsProps } from '@/types/interfaces';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
-const TransferUnits = ({ nameStore, storeDepot, productId, setActiveTransferUnits, loadData }: TransferUnitsProps) => {
+const TransferUnits = ({ nameStore, storeDepot, productId, setActiveTransferUnits, loadData, userId }: TransferUnitsProps) => {
 
     const params = useParams()
 
@@ -58,7 +58,8 @@ const TransferUnits = ({ nameStore, storeDepot, productId, setActiveTransferUnit
         const data = {
             store_depot_id: storeDepot?.id,
             units_transferred_quantity: transferredUnits,
-            transfer_direction: direction ? transactionToWarehouse : transactionToStore
+            transfer_direction: direction ? transactionToWarehouse : transactionToStore.replace,
+            created_by_id: userId
         }
         const response = await storeDetails.createTransaction(params.storeDetailsId, data)
 

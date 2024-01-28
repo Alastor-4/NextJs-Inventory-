@@ -14,6 +14,7 @@ import ModalProductPrice from "@/app/inventory/owner/store-details/[storeDetails
 function StoreMoreDetails(props: any) {
     const {
         show,
+        userId,
         loadData,
         row,
         dataStore,
@@ -46,6 +47,7 @@ function StoreMoreDetails(props: any) {
                 setOpen={setActiveModalTransferUnits}
             >
                 <TransferUnits
+                    userId={userId}
                     nameStore={dataStore?.name!}
                     storeDepot={row.depots[0].store_depots[0]}
                     productId={row.id}

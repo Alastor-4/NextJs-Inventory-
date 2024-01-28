@@ -18,8 +18,9 @@ import {
 import { ShowProductsStoreProps, allProductsByDepartmentProps, productsProps } from '@/types/interfaces';
 import AddProductFromWarehouse from '../addProductFromWarehouse/components/AddProductFromWarehouse';
 import FilterProductsByDepartmentsModal from '@/components/modals/FilterProductsByDepartmentsModal';
-import {notifySuccess, transactionToStore, transactionToWarehouse} from '@/utils/generalFunctions';
+import { notifySuccess, transactionToStore, transactionToWarehouse } from '@/utils/generalFunctions';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import { characteristics, depots, images } from '@prisma/client';
 import ModalStoreAssign from './Modal/ModalStoreAssign';
 import { TableNoData } from "@/components/TableNoData";
@@ -30,7 +31,6 @@ import React, { useEffect, useState } from 'react'
 import { grey } from '@mui/material/colors';
 import { AxiosResponse } from 'axios';
 import { Formik } from 'formik';
-import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsStoreProps) => {
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
@@ -137,7 +137,8 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
         const data = {
             store_depot_id: product ? product!.depots![0].store_depots![0].id : selectedProduct!.depots![0].store_depots![0].id,
             units_transferred_quantity: transferredUnits,
-            transfer_direction: direction ? transactionToWarehouse : transactionToStore
+            transfer_direction: direction ? transactionToWarehouse : transactionToStore,
+            created_by_id: +userId!
         }
         const response = await storeAssign.createTransaction(data);
 
