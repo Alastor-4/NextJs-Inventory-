@@ -382,7 +382,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         )
     }
 
-    const KeeperModule = ({ ownerProductsCount }: { ownerProductsCount: number }) => {
+    const KeeperModule = ({ ownerProductsCount, ownerWarehouses }: { ownerProductsCount: number, ownerWarehouses: any[] }) => {
         const ProductButton = () => (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
@@ -404,10 +404,39 @@ export default function UserProfileMain({ userId }: { userId: number }) {
             </Card>
         )
 
+        const WarehouseButton = () => (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
+                    Almacenes
+                </Typography>
+
+                <Grid container rowSpacing={1} mt={"8px"}>
+                    {ownerWarehouses.map((item: any, index: number) => (
+                        <Grid container key={item.id}>
+                            <Link href={`/inventory/keeper/warehouse/${item.id}`} key={item.id}>
+                                <Grid container item xs={12} sx={index > 0 ? { mt: "10px" } : { mt: "0" }}>
+                                    <Grid container item xs={"auto"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                    </Grid>
+                                    <Grid item xs={"auto"}>
+                                        {item.name}
+                                    </Grid>
+                                </Grid>
+                            </Link>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Card>
+        )
+
         return (
             <Grid container item spacing={2}>
                 <Grid container item xs={6} justifyContent={"center"}>
                     <ProductButton />
+                </Grid>
+
+                <Grid container item xs={6} justifyContent={"center"}>
+                    <WarehouseButton />
                 </Grid>
             </Grid>
         )
@@ -605,7 +634,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                                 )}
 
                                 {activeTab === "keeper" && (
-                                    <KeeperModule ownerProductsCount={ownerProductsCount!} />
+                                    <KeeperModule ownerProductsCount={ownerProductsCount!} ownerWarehouses={ownerWarehouses!} />
                                 )}
 
                                 {activeTab === "seller" && (
