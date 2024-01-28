@@ -69,6 +69,7 @@ export interface ModalUpdateProductProps {
 }
 export interface ProductsFormProps {
     userId: number;
+    ownerId?: number;
     departments: departments[] | null;
     productId: number | null;
     handleForceRender: () => void;
@@ -130,6 +131,7 @@ export interface ModalCreateUpdateDepartmentProps {
 }
 export interface ProductsMainTableProps {
     userId: number;
+    ownerId?: number;
 }
 export interface DepartmentsMainTableProps {
     userId: number;
