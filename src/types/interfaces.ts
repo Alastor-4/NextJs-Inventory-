@@ -308,6 +308,19 @@ export interface SellsMoreDetailsProps {
     }[];
     show: boolean;
 }
+
+export interface StoresFormProps {
+    userId?: number;
+    ownerId?: number;
+    storeId?: number;
+    sellerUsers: any;
+}
+
+export interface StoresMainTableProps {
+    userId: number;
+    ownerId?: number;
+}
+
 export interface ModalSellsTodayProps {
     isOpen: boolean;
     setIsOpen: (bool: boolean) => void;
