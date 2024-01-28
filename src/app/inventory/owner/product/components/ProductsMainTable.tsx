@@ -5,7 +5,16 @@ import {
     Checkbox, Divider, Grid, IconButton, InputBase, Table, TableBody,
     TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography,
 } from "@mui/material";
-import {AddOutlined, ArrowLeft, DeleteOutline, Done, EditOutlined, FilterAlt, HelpOutline} from "@mui/icons-material";
+import {
+    AddOutlined,
+    ArrowLeft,
+    DeleteOutline,
+    Done,
+    EditOutlined,
+    FilterAlt,
+    HelpOutline,
+    InfoOutlined
+} from "@mui/icons-material";
 import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
@@ -17,11 +26,12 @@ import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import products from "../requests/products";
-import {grey, orange} from '@mui/material/colors';
+import {grey} from '@mui/material/colors';
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import {CustomTooltip} from "@/components/InfoTags";
 
 export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const router = useRouter();
@@ -168,6 +178,25 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
         } else notifyError("Error al eliminar el producto. Solo es posibe eliminar productos que no están siendo usados en el sistema", true);
     }
 
+    //handle approve product
+    const handleApprove = async () => {
+        const response = await products.approve(selectedProduct?.id!);
+        if (response) {
+            const newAllProductsByDepartment = [...allProductsByDepartment!];
+            allProductsByDepartment?.forEach((productsByDepartments, productsByDepartmentsIndex) => {
+                const productIndex = productsByDepartments.products?.findIndex(productItem => productItem.id === selectedProduct!.id)
+                if (productIndex! > -1) {
+                    newAllProductsByDepartment[productsByDepartmentsIndex].products![productIndex!] = response;
+                }
+            })
+            setAllProductsByDepartment(newAllProductsByDepartment);
+
+            setSelectedProduct(null);
+
+            notifySuccess("Se ha aprobado el producto. Ahora puede ser usado");
+        }
+    }
+
     const handleNavigateBack = () => { router.push(`/inventory`); }
 
     //Image handlers
@@ -203,6 +232,14 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                     {
                         selectedProduct && (
                             <Box sx={{ display: "flex" }}>
+                                {
+                                    !selectedProduct.is_approved && (
+                                        <IconButton color={"inherit"} onClick={handleApprove}>
+                                            <Done fontSize={"small"} />
+                                        </IconButton>
+                                    )
+                                }
+
                                 <IconButton color={"inherit"} onClick={toggleModalUpdate}>
                                     <EditOutlined fontSize={"small"} />
                                 </IconButton>
@@ -283,7 +320,11 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                             hover
                             tabIndex={-1}
                             selected={!!selectedProduct && (product.id === selectedProduct.id)}
-                            sx={{backgroundColor: product.is_approved ? "white": orange["600"]}}
+                            sx={
+                                product.is_approved
+                                    ? {}
+                                    : {fontStyle: "italic"}
+                                }
                         >
                             <TableCell>
                                 <Checkbox
@@ -292,6 +333,14 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                     onClick={() => handleSelectProduct(product)}
                                     sx={{ width: "5px" }}
                                 />
+
+                                {
+                                    !product.is_approved && (
+                                        <CustomTooltip tooltipText={"Los productos creados por los almaceneros deben ser aprobados por el dueño"}>
+                                            <InfoOutlined fontSize={"small"} color={"warning"}/>
+                                        </CustomTooltip>
+                                    )
+                                }
                             </TableCell>
                             <TableCell align="center">
                                 <Grid container >
