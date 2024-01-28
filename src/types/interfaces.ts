@@ -444,6 +444,7 @@ export interface UserWarehouseFormProps {
 }
 
 export interface UserWarehouseMainTableProps {
+    userId?: number;
     ownerId?: number;
     warehouseDetails?: warehouses | null;
 }
