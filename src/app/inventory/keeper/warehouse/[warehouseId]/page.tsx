@@ -3,6 +3,8 @@ import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import { prisma } from "db";
 
+export const dynamic = "force-dynamic";
+
 export default async function Page({ params }: { params: { warehouseId: string } }) {
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
