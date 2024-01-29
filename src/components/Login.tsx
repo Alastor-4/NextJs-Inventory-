@@ -75,7 +75,7 @@ export default function Login() {
                 if (responseNextAuth?.ok) {
                     router.push("/inventory")
                 } else {
-                    setFieldError("password", "Usuario y/o contraseña incorrecto(s)")
+                    setFieldError("password", responseNextAuth.error)
                 }
             }}
         >

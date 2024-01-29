@@ -16,9 +16,10 @@ export const nextAuthOptions: NextAuthOptions = {
                 username: { label: "User", type: "text", placeholder: "usuario" },
                 password: { label: "Contraseña", type: "password" }
             },
+            // @ts-ignore
             async authorize(credentials, req) {
 
-                if (!credentials?.username || !credentials?.password) return null;
+                if (!credentials?.username || !credentials?.password) throw new Error("usuario y contraseña requeridos")
 
                 const res = await axios.post(
                     `${process.env.NEXTAUTH_URL}/login`,
@@ -33,12 +34,12 @@ export const nextAuthOptions: NextAuthOptions = {
 
                 const user: users | null = await res.data;
 
-                if (!user) return null;
+                if (!user) throw new Error("usuario no encontrado")
 
-                const passwordMatch = await compare(credentials.password, user.password_hash!);
-                if (!passwordMatch) return null;
+                if (!user.is_verified) throw new Error("usuario no verificado")
 
-                if (!user.is_verified) return null;
+                const passwordMatch = await compare(credentials.password, user.password_hash!)
+                if (!passwordMatch) throw new Error("contraseña incorrecta")
 
                 return {
                     id: user.id,

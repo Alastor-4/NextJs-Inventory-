@@ -10,7 +10,8 @@ declare module "next-auth" {
         username: string,
         role_id: number | null,
         is_active: boolean | null,
-        is_verified: boolean
+        is_verified: boolean,
+        error?: string | null,
     }
     interface Session {
         user: User & DefaultSession;
