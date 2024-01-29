@@ -63,7 +63,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     //GET initial products data
     useEffect(() => {
         const getAllProductsByDepartment = async () => {
-            const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+            const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(+ownerId!, +warehouseDetails?.id!);
             if (newAllProductsByDepartment) {
                 setAllProductsByDepartment(newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => ({
                     ...productsByDepartments,
@@ -75,7 +75,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     }, [ownerId, warehouseDetails]);
 
     const reloadData = async () => {
-        let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+        let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(+ownerId!, +warehouseDetails?.id!);
         if (newAllProductsByDepartment) {
             newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => {
                 //search if current department was selected in previous data to keep selection
@@ -167,7 +167,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     }
 
     const refreshAfterAction = async () => {
-        const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(ownerId!, warehouseDetails?.id!);
+        const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(+ownerId!, +warehouseDetails?.id!);
         setSelectedDepartments(null);
         if (newAllProductsByDepartment) {
             setAllProductsByDepartment(newAllProductsByDepartment?.map((productsByDepartments: allProductsByDepartmentProps) => ({
@@ -246,10 +246,10 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         async function handleNewUnitsAdd() {
             const updatedDepot: AxiosResponse | boolean = await warehouseDepots.increaseUnitsDepot(
                 {
-                    ownerId,
-                    warehouseId: warehouseDetails?.id!,
-                    depotId: selectedProduct?.depots![0].id!,
-                    newUnits: formik.values.productNewUnitsQuantity
+                    ownerId: +ownerId!,
+                    warehouseId: +warehouseDetails?.id!,
+                    depotId: +selectedProduct?.depots![0].id!,
+                    newUnits: +formik.values.productNewUnitsQuantity
                 }
             )
 
@@ -298,11 +298,11 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         async function handleUpdateUnits() {
             const updatedDepot = await warehouseDepots.updateUnitsDepot(
                 {
-                    ownerId,
-                    warehouseId: warehouseDetails?.id!,
-                    depotId: selectedProduct?.depots![0].id,
-                    productTotalUnits: formik.values.updateTotalUnitsQuantity,
-                    productTotalRemainingUnits: formik.values.updateRemainingUnitsQuantity,
+                    ownerId: +ownerId!,
+                    warehouseId: +warehouseDetails?.id!,
+                    depotId: +selectedProduct?.depots![0].id!,
+                    productTotalUnits: +formik.values.updateTotalUnitsQuantity,
+                    productTotalRemainingUnits: +formik.values.updateRemainingUnitsQuantity,
                 }
             )
 
@@ -390,12 +390,12 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         async function handleMoveToStore() {
             const updateResponse = await warehouseDepots.sendDepotFromWarehouseToStore(
                 {
-                    userId: ownerId,
-                    warehouseId: warehouseDetails?.id,
-                    depotId: selectedProduct?.depots![0].id,
+                    ownerId: +ownerId!,
+                    warehouseId: +warehouseDetails?.id!,
+                    depotId: +selectedProduct?.depots![0].id!,
                     storeDepotId: selectedProduct?.storesDistribution![storeDepotUpdateIndex!]?.store_depots![0]?.id ?? null,
-                    storeId: selectedProduct?.storesDistribution![storeDepotUpdateIndex!].id,
-                    moveUnitQuantity: formik.values.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity,
+                    storeId: +selectedProduct?.storesDistribution![storeDepotUpdateIndex!].id!,
+                    moveUnitQuantity: +formik.values.productStoreDepotDistribution.moveFromWarehouseToStoreQuantity!,
                 }
             )
 
@@ -412,11 +412,11 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
         async function handleMoveToWarehouse() {
             const updateResponse = await warehouseDepots.sendDepotFromStoreToWarehouse(
                 {
-                    userId: ownerId,
-                    warehouseId: warehouseDetails?.id,
-                    depotId: selectedProduct?.depots![0].id,
-                    storeDepotId: selectedProduct?.storesDistribution![storeDepotUpdateIndex!].store_depots![0].id,
-                    moveUnitQuantity: formik.values.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity,
+                    userId: +ownerId!,
+                    warehouseId: +warehouseDetails?.id!,
+                    depotId: +selectedProduct?.depots![0].id!,
+                    storeDepotId: +selectedProduct?.storesDistribution![storeDepotUpdateIndex!].store_depots![0].id!,
+                    moveUnitQuantity: +formik.values.productStoreDepotDistribution.moveFromStoreToWarehouseQuantity,
                 }
             );
 
@@ -560,7 +560,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
     }
 
     async function handleLoadStoresDistribution(depot: depots) {
-        const response = await warehouseDepots.depotStoreDistribution(ownerId!, warehouseDetails?.id!, depot.id!)
+        const response = await warehouseDepots.depotStoreDistribution(+ownerId!, +warehouseDetails?.id!, +depot.id!)
         if (response) {
             const newAllProductsByDepartment = [...allProductsByDepartment!];
             allProductsByDepartment?.forEach((productsByDepartments, productsByDepartmentsIndex) => {
