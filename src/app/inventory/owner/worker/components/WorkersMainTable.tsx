@@ -81,7 +81,7 @@ export default function WorkersMainTable({ roles, userId }: WorkersMainTableProp
 
     const ChangeRoleDialog = () => {
 
-        const [selectedRole, setSelectedRole] = useState<{ roleCode: string, roleTranslation: string }>({ roleCode: `${selectedWorker?.role_id!}`, roleTranslation: getRoleTranslation(`${selectedWorker?.role_id!}`) });
+        const [selectedRole, setSelectedRole] = useState<{ roleCode: string, roleTranslation: string }>({ roleCode: `${selectedWorker?.role_id ?? ""}`, roleTranslation: getRoleTranslation(`${selectedWorker?.role_id!}`) });
 
         const handleChange = (event: SelectChangeEvent<typeof selectedRole.roleCode>) => {
             setSelectedRole({ roleCode: event.target.value!.toString(), roleTranslation: getRoleTranslation(event.target.value!.toString()) });
