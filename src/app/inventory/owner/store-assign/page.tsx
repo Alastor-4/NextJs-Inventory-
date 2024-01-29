@@ -5,7 +5,9 @@ import { getServerSession } from "next-auth";
 import { warehouses } from "@prisma/client";
 import { prisma } from "db";
 
-export default async function Page({ searchParams }: { searchParams: { storeId: string, warehouseId: string } }) {
+export const dynamic = "force-dynamic";
+
+const Page = async ({ searchParams }: { searchParams: { storeId: string, warehouseId: string } }) => {
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
 
@@ -26,3 +28,5 @@ export default async function Page({ searchParams }: { searchParams: { storeId: 
         </main>
     )
 }
+
+export default Page

@@ -6,14 +6,14 @@ import { prisma } from "db";
 export const dynamic = "force-dynamic";
 
 async function fetchSellers(userId: number) {
-    return prisma.users.findMany({where: {work_for_user_id: userId, roles: {name: "store_seller"}}});
+    return prisma.users.findMany({ where: { work_for_user_id: userId, roles: { name: "store_seller" } } });
 }
 
-export default async function Page({ params }: { params: { storeid: string } }) {
+const Page = async ({ params }: { params: { storeid: string } }) => {
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
-    const storeId: string = params.storeid;
-    const sellerUsers = await fetchSellers(userId!)
+    const storeId = +params.storeid;
+    const sellerUsers = await fetchSellers(userId!);
 
     return (
         <main>
@@ -21,4 +21,6 @@ export default async function Page({ params }: { params: { storeid: string } }) 
         </main>
     )
 }
+
+export default Page
 

@@ -4,12 +4,14 @@ import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import { prisma } from "db";
 
-export default async function Page() {
+export const dynamic = "force-dynamic";
+
+const Page = async () => {
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
 
-    const roles = await prisma.roles.findMany()
-    const ownerUsageRoles = roles.filter(item => item.name === "store_keeper" || item.name === "store_seller")
+    const roles = await prisma.roles.findMany();
+    const ownerUsageRoles = roles.filter(item => item.name === "store_keeper" || item.name === "store_seller");
 
     return (
         <main>
@@ -17,3 +19,5 @@ export default async function Page() {
         </main>
     )
 }
+
+export default Page

@@ -3,6 +3,8 @@ import ProductsMainTable from "./components/ProductsMainTable";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/db";
 
+export const dynamic = "force-dynamic";
+
 const Page = async () => {
     const session: any = await getServerSession(nextAuthOptions);
     const userId: number = session?.user.id;

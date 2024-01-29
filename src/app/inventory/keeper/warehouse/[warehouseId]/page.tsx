@@ -3,7 +3,9 @@ import { nextAuthOptions } from "@/app/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 import { prisma } from "db";
 
-export default async function Page({ params }: { params: { warehouseId: string } }) {
+export const dynamic = "force-dynamic";
+
+const Page = async ({ params }: { params: { warehouseId: string } }) => {
     const session = await getServerSession(nextAuthOptions);
     const userId = session?.user.id;
     const user = await prisma.users.findUnique({ where: { id: userId! } });
@@ -18,3 +20,4 @@ export default async function Page({ params }: { params: { warehouseId: string }
         </main>
     )
 }
+export default Page

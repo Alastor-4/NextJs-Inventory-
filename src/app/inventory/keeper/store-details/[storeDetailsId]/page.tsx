@@ -3,7 +3,9 @@ import StoreMainTable from "./components/StoreMainTable";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/db";
 
-export default async function page() {
+export const dynamic = "force-dynamic";
+
+const Page = async () => {
   const session = await getServerSession(nextAuthOptions);
   const userId: number | undefined = session?.user.id;
   const user = await prisma.users.findUnique({ where: { id: userId } });
@@ -14,3 +16,4 @@ export default async function page() {
     </ main>
   )
 }
+export default Page
