@@ -1,15 +1,15 @@
-import { EditOutlined, SwapVert } from '@mui/icons-material'
-import { Collapse, Grid, IconButton, Typography } from '@mui/material'
-import React, { useState } from 'react'
-import StoreListOffers from './offers/components/StoreListOffers'
-import StoreModalDefault from './Modal/StoreModalDefault'
-import StoreEditSellerProfit from './Modal/StoreEditSellerProfit'
+import { Collapse, Grid, IconButton, Typography } from '@mui/material';
+import StoreEditSellerProfit from './Modal/StoreEditSellerProfit';
+import StoreListOffers from './offers/components/StoreListOffers';
 import { InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import { EditOutlined, SwapVert } from '@mui/icons-material';
+import ModalProductPrice from './Modal/ModalProductPrice';
+import StoreModalDefault from './Modal/StoreModalDefault';
 import { numberFormat } from "@/utils/generalFunctions";
-import TransferUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/TransferUnits";
-import StoreEditUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/StoreEditUnits";
 import { storeDepotsWithAny } from "@/types/interfaces";
-import ModalProductPrice from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/ModalProductPrice";
+import StoreEditUnits from './Modal/StoreEditUnits';
+import TransferUnits from './Modal/TransferUnits';
+import React, { useState } from 'react'
 
 function StoreMoreDetails(props: any) {
     const {

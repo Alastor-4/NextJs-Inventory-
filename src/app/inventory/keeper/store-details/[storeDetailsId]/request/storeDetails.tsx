@@ -1,9 +1,9 @@
-import apiRequest from '@/api';
 import { notifyError } from '@/utils/generalFunctions';
+import apiRequest from '@/api';
 
-const url = (storeId: any) => `/inventory/owner/store-details/${storeId}/api`
-const urlTransferUnits = (storeId: any) => `/inventory/owner/store-details/${storeId}/apiTransferUnits`
-const urlOffers = (storeId: any) => `/inventory/owner/store-details/${storeId}/components/offers/api`
+const url = (storeId: any) => `/inventory/keeper/store-details/${storeId}/api`;
+const urlTransferUnits = (storeId: any) => `/inventory/keeper/store-details/${storeId}/apiTransferUnits`;
+const urlOffers = (storeId: any) => `/inventory/keeper/store-details/${storeId}/components/offers/api`;
 
 
 export const storeDetails = {
