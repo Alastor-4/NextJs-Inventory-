@@ -69,9 +69,9 @@ const warehouseDepots = {
         return false
     },
 
-    sendDepotFromWarehouseToStore: async function ({ userId, warehouseId, depotId, storeDepotId, storeId, moveUnitQuantity }) {
+    sendDepotFromWarehouseToStore: async function ({ ownerId, warehouseId, depotId, storeDepotId, storeId, moveUnitQuantity }) {
         try {
-            const response = await apiRequest.put(urlDepotAssign(warehouseId), { ownerId: userId, depotId, storeDepotId, storeId, moveUnitQuantity })
+            const response = await apiRequest.put(urlDepotAssign(warehouseId), { ownerId: ownerId, depotId, storeDepotId, storeId, moveUnitQuantity })
             return response.data
         } catch (e) {
             //ToDo: notify error here

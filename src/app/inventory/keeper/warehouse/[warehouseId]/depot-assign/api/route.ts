@@ -5,17 +5,17 @@ import { prisma } from "db";
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
 
-    const depotId = searchParams.get("depotId");
-    const ownerId = searchParams.get("userId");
+    const depotId = +searchParams.get("depotId")!;
+    const ownerId = +searchParams.get("ownerId")!;
 
     if (ownerId && depotId) {
         const storeDepots = await prisma.stores.findMany(
             {
                 where: {
-                    owner_id: +ownerId!
+                    owner_id: ownerId
                 },
                 include: {
-                    store_depots: { where: { depot_id: +depotId! } }
+                    store_depots: { where: { depot_id: depotId } }
                 }
             }
         )
@@ -35,13 +35,13 @@ export async function PUT(req: Request) {
         let updatedStoreDepot
 
         if (ownerId && depotId) {
-            const depot = await prisma.depots.findUnique({ where: { id: parseInt(depotId) } })
+            const depot = await prisma.depots.findUnique({ where: { id: depotId } })
 
-            if (depot?.product_total_remaining_units && (parseInt(moveUnitQuantity) <= depot.product_total_remaining_units)) {
+            if (depot?.product_total_remaining_units && (moveUnitQuantity <= depot.product_total_remaining_units)) {
                 updatedDepot = await prisma.depots.update(
                     {
-                        data: { product_total_remaining_units: { decrement: parseInt(moveUnitQuantity) } },
-                        where: { id: parseInt(depotId) }
+                        data: { product_total_remaining_units: { decrement: moveUnitQuantity } },
+                        where: { id: depotId }
                     }
                 )
 
@@ -50,18 +50,18 @@ export async function PUT(req: Request) {
                         {
                             data:
                             {
-                                product_units: { increment: parseInt(moveUnitQuantity) },
-                                product_remaining_units: { increment: parseInt(moveUnitQuantity) }
+                                product_units: { increment: moveUnitQuantity },
+                                product_remaining_units: { increment: moveUnitQuantity }
                             },
-                            where: { id: parseInt(storeDepotId) }
+                            where: { id: storeDepotId }
                         }
                     )
                 } else {
-                    const parentStore = await prisma.stores.findUnique({ where: { id: parseInt(storeId) } })
+                    const parentStore = await prisma.stores.findUnique({ where: { id: storeId } })
 
                     const data = {
-                        store_id: parseInt(storeId),
-                        depot_id: parseInt(depotId),
+                        store_id: storeId,
+                        depot_id: depotId,
                         product_units: moveUnitQuantity,
                         product_remaining_units: moveUnitQuantity,
                     }
@@ -96,20 +96,20 @@ export async function PATCH(req: Request) {
 
     try {
         if (ownerId && depotId && storeDepotId) {
-            const storeDepot = await prisma.store_depots.findUnique({ where: { id: parseInt(storeDepotId) } })
+            const storeDepot = await prisma.store_depots.findUnique({ where: { id: storeDepotId } })
 
-            if (storeDepot?.product_remaining_units && (parseInt(moveUnitQuantity) <= storeDepot.product_remaining_units)) {
+            if (storeDepot?.product_remaining_units && (moveUnitQuantity <= storeDepot.product_remaining_units)) {
                 const updatedStoreDepot = await prisma.store_depots.update(
                     {
-                        data: { product_remaining_units: { decrement: parseInt(moveUnitQuantity) } },
-                        where: { id: parseInt(storeDepotId) }
+                        data: { product_remaining_units: { decrement: moveUnitQuantity } },
+                        where: { id: storeDepotId }
                     }
                 )
 
                 const updatedDepot = await prisma.depots.update(
                     {
-                        data: { product_total_remaining_units: { increment: parseInt(moveUnitQuantity) } },
-                        where: { id: parseInt(depotId) }
+                        data: { product_total_remaining_units: { increment: moveUnitQuantity } },
+                        where: { id: depotId }
                     }
                 )
 
