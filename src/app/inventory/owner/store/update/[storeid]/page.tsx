@@ -6,7 +6,7 @@ import { prisma } from "db";
 export const dynamic = "force-dynamic";
 
 async function fetchSellers(userId: number) {
-    return prisma.users.findMany({where: {work_for_user_id: userId, roles: {name: "store_seller"}}});
+    return prisma.users.findMany({where: {work_for_user_id: userId, roles: {name: {in: ["store_seller", "store_keeper"]}}}});
 }
 
 export default async function Page({ params }: { params: { storeid: string } }) {

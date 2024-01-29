@@ -198,20 +198,16 @@ export default function WorkersForm({ ownerId }: WorkersFormProps) {
                                                     </Grid>
                                                     <Grid container item rowSpacing={2}>
                                                         <Grid container item rowSpacing={1}>
-                                                            <Grid item sx={workerSearchResultStyles.rightPart}>
+                                                            <Grid item xs={12}>
                                                                 {foundUserData.username}
                                                             </Grid>
-                                                            <Grid item sx={workerSearchResultStyles.leftPart}>
-                                                                Nombre:
+
+                                                            <Grid item xs={12}>
+                                                                Nombre: {foundUserData.name}
                                                             </Grid>
-                                                            <Grid item sx={workerSearchResultStyles.rightPart}>
-                                                                {foundUserData.name}
-                                                            </Grid>
-                                                            <Grid item sx={workerSearchResultStyles.leftPart}>
-                                                                Teléfono:
-                                                            </Grid>
-                                                            <Grid item sx={workerSearchResultStyles.rightPart}>
-                                                                {foundUserData.phone}
+
+                                                            <Grid item xs={12}>
+                                                                Teléfono: {foundUserData.phone}
                                                             </Grid>
                                                         </Grid>
                                                         <Grid item xs={12}>
