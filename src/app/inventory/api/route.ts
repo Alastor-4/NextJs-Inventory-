@@ -44,7 +44,8 @@ export async function GET(req: Request) {
             ownerStores = ownerQueries[1];
             ownerWarehouses = ownerQueries[2];
         }
-        if (userRole === "store_seller") {
+
+        if (userRole === "store_seller" || userRole === "store_keeper") {
             sellerStores = await prisma.stores.findMany({ where: { seller_user_id: +userId! } })
         }
 

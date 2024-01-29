@@ -636,7 +636,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                                 }
 
                                 {
-                                    (userRole === "store_owner" || userRole === "store_seller") && sellerStores && (
+                                    (userRole === "store_owner" || userRole === "store_keeper" || userRole === "store_seller") && sellerStores && (
                                         <Button
                                             color={activeTab === "seller" ? "primary" : "inherit"}
                                             onClick={() => handleChangeActiveTab("seller")}
