@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import {
     AddOutlined, ArrowLeft, DescriptionOutlined,
-    ExpandLessOutlined, ExpandMoreOutlined, FilterAlt, HelpOutline, ShareOutlined,
+    FilterAlt, HelpOutline, ShareOutlined,
 } from "@mui/icons-material";
 import { StoreMainTableProps, allProductsByDepartmentProps, productsProps, storeDepotsWithAny, storeWithStoreDepots } from "@/types/interfaces";
 import ModalAddProductFromWarehouse from "../../../store-assign/addProductFromWarehouse/components/ModalAddProductFromWarehouse";
@@ -15,7 +15,6 @@ import AddProductFromWarehouse from "../../../store-assign/addProductFromWarehou
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import ModalProductPrice from "./Modal/ModalProductPrice";
 import { useParams, useRouter } from "next/navigation";
 import { numberFormat } from "@/utils/generalFunctions";
 import { TableNoData } from "@/components/TableNoData";
@@ -24,7 +23,6 @@ import stores from "../../../store/requests/stores";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
-import StoreMoreDetails from "./StoreMoreDetails";
 import { grey } from "@mui/material/colors";
 import { images } from "@prisma/client";
 import { Formik } from "formik";

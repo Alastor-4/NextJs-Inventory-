@@ -450,19 +450,6 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                             </Link>
                         </Grid>
                     ))}
-
-                    <Grid container>
-                        <Link href={`/inventory/keeper/store`}>
-                            <Grid container columnSpacing={1} item xs={12} sx={{ mt: "15px" }}>
-                                <Grid container item xs={"auto"} alignItems={"center"}>
-                                    <ArrowCircleRightOutlined fontSize={"small"} />
-                                </Grid>
-                                <Grid item xs={true}>
-                                    Mis tiendas
-                                </Grid>
-                            </Grid>
-                        </Link>
-                    </Grid>
                 </Grid>
             </Card>
         )
