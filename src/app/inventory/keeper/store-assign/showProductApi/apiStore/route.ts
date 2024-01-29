@@ -35,7 +35,7 @@ export async function GET(req: Request) {
                                 }
                             }
                         }
-                    }, is_approved: true
+                    },
                 },
                 include: {
                     departments: true,
@@ -43,15 +43,8 @@ export async function GET(req: Request) {
                         include: {
                             store_depots: {
                                 where: {
-                                    OR: [
-                                        { store_id: { not: storeId } },
-                                        {
-                                            AND: [
-                                                { store_id: storeId },
-                                                { product_remaining_units: { not: -1 } }
-                                            ]
-                                        },
-                                    ]
+                                    store_id: storeId,
+                                    product_remaining_units: { not: -1 },
                                 }
                             }
                         }
