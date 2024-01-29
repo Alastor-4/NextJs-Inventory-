@@ -99,6 +99,7 @@ export interface storeDepotsStatsProps {
 }
 export interface StoreMainTableProps {
     userId?: number;
+    ownerId?: number;
 }
 
 export interface StoreActionsMainProps {
