@@ -5,7 +5,15 @@ import {
     Checkbox, Divider, Grid, IconButton, InputBase, Table, TableBody,
     TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography,
 } from "@mui/material";
-import { AddOutlined, ArrowLeft, DeleteOutline, EditOutlined, FilterAlt, HelpOutline } from "@mui/icons-material";
+import {
+    AddOutlined,
+    ArrowLeft,
+    DeleteOutline,
+    EditOutlined,
+    FilterAlt,
+    HelpOutline,
+    InfoOutlined
+} from "@mui/icons-material";
 import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
@@ -22,6 +30,7 @@ import products from "../requests/products";
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
+import {CustomTooltip} from "@/components/InfoTags";
 
 export const ProductsMainTable = ({ userId, ownerId }: ProductsMainTableProps) => {
     const router = useRouter();
@@ -269,7 +278,11 @@ export const ProductsMainTable = ({ userId, ownerId }: ProductsMainTableProps) =
                             hover
                             tabIndex={-1}
                             selected={!!selectedProduct && (product.id === selectedProduct.id)}
-                            sx={{ backgroundColor: product.is_approved ? "white" : orange["600"] }}
+                            sx={
+                                product.is_approved
+                                    ? {}
+                                    : {fontStyle: "italic"}
+                            }
                         >
                             <TableCell>
                                 <Checkbox
@@ -278,6 +291,14 @@ export const ProductsMainTable = ({ userId, ownerId }: ProductsMainTableProps) =
                                     onClick={() => handleSelectProduct(product)}
                                     sx={{ width: "5px" }}
                                 />
+
+                                {
+                                    !product.is_approved && (
+                                        <CustomTooltip tooltipText={"Producto pendiente a aprobación por el dueño"}>
+                                            <InfoOutlined fontSize={"small"} color={"warning"}/>
+                                        </CustomTooltip>
+                                    )
+                                }
                             </TableCell>
                             <TableCell align="center">
                                 <Grid container >
