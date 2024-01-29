@@ -10,11 +10,14 @@ export default withAuth(
         //Only Admins
         if (pathMatch('/inventory/admin') && role_id !== 1) return inventoryPath;
 
-        //Only Owners & Keepers
-        if (pathMatch('/inventory/owner') && ![2, 3].includes(role_id)) return inventoryPath;
+        //Only Owners
+        if (pathMatch('/inventory/owner') && role_id !== 2) return inventoryPath;
+
+        //Only Keepers
+        if (pathMatch('/inventory/keeper') && role_id !== 4) return inventoryPath;
 
         //Only Owners & Keepers & Sellers
-        if (pathMatch('/inventory/seller') && ![2, 3, 4].includes(role_id)) return inventoryPath;
+        if (pathMatch('/inventory/seller') && ![2, 4, 3].includes(role_id)) return inventoryPath;
     },
     {
         callbacks: {
