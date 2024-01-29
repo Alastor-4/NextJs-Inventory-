@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
+import {transactionToStore, transactionToWarehouse} from "@/utils/generalFunctions";
+import {store_depots} from "@prisma/client";
 
 // Get all stores and a specific depot info
 export async function GET(request: Request) {
@@ -51,7 +53,14 @@ export async function PUT(req: Request) {
                             data:
                             {
                                 product_units: { increment: moveUnitQuantity },
-                                product_remaining_units: { increment: moveUnitQuantity }
+                                product_remaining_units: { increment: moveUnitQuantity },
+                                store_depot_transfers: {
+                                    create: {
+                                        transfer_direction: transactionToStore,
+                                        units_transferred_quantity: +moveUnitQuantity,
+                                        created_by_id: +ownerId,
+                                    }
+                                }
                             },
                             where: { id: storeDepotId }
                         }
@@ -64,6 +73,13 @@ export async function PUT(req: Request) {
                         depot_id: depotId,
                         product_units: moveUnitQuantity,
                         product_remaining_units: moveUnitQuantity,
+                        store_depot_transfers: {
+                            create: {
+                                transfer_direction: transactionToStore,
+                                units_transferred_quantity: +moveUnitQuantity,
+                                created_by_id: +ownerId,
+                            }
+                        }
                     }
 
                     if (parentStore?.fixed_seller_profit_percentage) {
@@ -101,7 +117,16 @@ export async function PATCH(req: Request) {
             if (storeDepot?.product_remaining_units && (moveUnitQuantity <= storeDepot.product_remaining_units)) {
                 const updatedStoreDepot = await prisma.store_depots.update(
                     {
-                        data: { product_remaining_units: { decrement: moveUnitQuantity } },
+                        data: {
+                            product_remaining_units: { decrement: moveUnitQuantity },
+                            store_depot_transfers: {
+                                create: {
+                                    transfer_direction: transactionToWarehouse,
+                                    units_transferred_quantity: +moveUnitQuantity,
+                                    created_by_id: +ownerId,
+                                }
+                            }
+                        },
                         where: { id: storeDepotId }
                     }
                 )
