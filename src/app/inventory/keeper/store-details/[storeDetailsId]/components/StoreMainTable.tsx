@@ -154,7 +154,7 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
 
     const TableHeader = () => {
         const headCells = [
-            { id: "details", label: "", padding: "checkbox", },
+            // { id: "details", label: "", padding: "checkbox", },
             { id: "name", label: "Nombre", },
             { id: "departaments", label: "Departamento", },
             { id: "buy_Price", label: "Precio", },
@@ -212,9 +212,9 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
         setOpenImagesDialog(true)
     }
 
-    function productHasActiveOffer(offers: any[]) {
-        return offers.some((item: any) => item.is_active)
-    }
+    // function productHasActiveOffer(offers: any[]) {
+    //     return offers.some((item: any) => item.is_active)
+    // }
 
     const TableContent = ({ formik }: { formik: any }) => {
         return (
@@ -238,11 +238,11 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
                                     ? (parseFloat(String(baseProductPrice)) - priceDiscountQuantity)
                                     : baseProductPrice
 
-                                const sellerProfitQuantity = finalProductPrice
-                                    ? product?.depots![0].store_depots![0].seller_profit_percentage
-                                        ? product?.depots![0].store_depots![0].seller_profit_percentage * finalProductPrice / 100
-                                        : product?.depots![0].store_depots![0].seller_profit_quantity
-                                    : null
+                                // const sellerProfitQuantity = finalProductPrice
+                                //     ? product?.depots![0].store_depots![0].seller_profit_percentage
+                                //         ? product?.depots![0].store_depots![0].seller_profit_percentage * finalProductPrice / 100
+                                //         : product?.depots![0].store_depots![0].seller_profit_quantity
+                                //     : null
 
                                 const displayProductPrice = finalProductPrice
                                     ? `${numberFormat(`${finalProductPrice}`) + " " + product?.depots![0].store_depots![0].sell_price_unit}`
@@ -263,7 +263,7 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
                                             tabIndex={-1}
                                             onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
                                         >
-                                            <TableCell style={{ padding: 0 }}>
+                                            {/* <TableCell style={{ padding: 0 }}>
                                                 <IconButton
                                                     size={"small"}
                                                     onClick={() => setShowDetails((showDetails !== product.id) ? product.id : -1)}
@@ -274,8 +274,8 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
                                                             : <ExpandLessOutlined />
                                                     }
                                                 </IconButton>
-                                            </TableCell>
-                                            <TableCell>
+                                            </TableCell> */}
+                                            <TableCell align={"center"}>
                                                 {
                                                     product.images?.length! > 0 && (
                                                         <Box display={"flex"} justifyContent={"center"}>
@@ -300,15 +300,15 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
                                                         </Box>
                                                     )
                                                 }
-                                                <Box display={"flex"} >
+                                                <Box >
                                                     {product.name}
                                                 </Box>
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell align={"center"}>
                                                 {product.departments?.name}
                                             </TableCell>
-                                            <TableCell>
-                                                <Grid container rowSpacing={1}>
+                                            <TableCell align={"center"}>
+                                                <Grid item container rowSpacing={1}>
                                                     <Grid container item xs={12} flexWrap={"nowrap"} alignItems={"center"}>
                                                         <MoneyInfoTag
                                                             value={displayProductPrice}
@@ -339,7 +339,7 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
                                             <TableCell align={"center"}>
                                                 {product?.depots![0].store_depots![0].product_remaining_units}
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell align={"center"}>
                                                 <Grid container>
                                                     <Grid container item xs={12} justifyContent={"center"} flexWrap={"nowrap"} sx={{ whiteSpace: "nowrap" }}>
                                                         <Typography variant={"button"}>
@@ -364,7 +364,7 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
                                                 </Grid>
                                             </TableCell>
                                         </TableRow>
-                                        <TableRow >
+                                        {/* <TableRow >
                                             <TableCell style={{ padding: 0 }} colSpan={6}>
                                                 {showDetails === product.id && (
                                                     <StoreMoreDetails
@@ -382,7 +382,7 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
                                                     />
                                                 )}
                                             </TableCell>
-                                        </TableRow>
+                                        </TableRow> */}
                                     </React.Fragment>
                                 )
                             })}

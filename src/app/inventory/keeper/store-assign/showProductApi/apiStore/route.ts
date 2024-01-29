@@ -20,7 +20,6 @@ export async function GET(req: Request) {
                             }
                         }
                     },
-                    is_approved: true
                 }
             }
         },

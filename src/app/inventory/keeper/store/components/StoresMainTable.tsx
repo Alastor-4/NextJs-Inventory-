@@ -104,12 +104,12 @@ const StoresMainTable = ({ userId, ownerId }: StoresMainTableProps) => {
                                 >
                                     <ProductionQuantityLimits fontSize={"small"} />
                                 </IconButton>
-                                <IconButton
+                                {/* <IconButton
                                     color={"inherit"}
                                     onClick={() => router.push(`/inventory/seller/store/${selected.id}`)}
                                 >
                                     <StorefrontOutlined fontSize={"small"} />
-                                </IconButton>
+                                </IconButton> */}
                                 <Divider orientation="vertical" variant="middle" flexItem
                                     sx={{ borderRight: "2px solid white", mx: "5px" }} />
                                 <IconButton color={"inherit"} onClick={handleUpdate}>

@@ -10,6 +10,7 @@ const storeAssign = {
     allProductsByDepartmentStore: async function (storeId: any) {
         try {
             const response = await apiRequest.get(showProductStoreUrl, { params: { storeId: storeId } })
+
             return response.data
         } catch (e) {
             notifyError(`Ha ocurrido un error obteniendo los datos de los productos`)
@@ -50,6 +51,5 @@ const storeAssign = {
         return false
     }
 }
-
 
 export default storeAssign;

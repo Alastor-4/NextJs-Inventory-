@@ -16,9 +16,9 @@ const stores = {
         return false
     },
 
-    storeDetails: async function (userId: number, storeId: any) {
+    storeDetails: async function (ownerId: number, storeId: any) {
         try {
-            const response = await apiRequest.get(updateUrl, { params: { id: userId, storeId: storeId } })
+            const response = await apiRequest.get(updateUrl, { params: { id: ownerId, storeId: storeId } })
             return response.data
         } catch (e) {
             notifyError("Algo ha fallado mientras se obtenían los datos de la tienda")

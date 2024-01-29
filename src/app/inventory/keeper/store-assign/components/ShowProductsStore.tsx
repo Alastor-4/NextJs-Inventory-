@@ -64,6 +64,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
     useEffect(() => {
         const getAllProductsByDepartment = async () => {
             const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await storeAssign.allProductsByDepartmentStore(dataStore?.id);
+
             if (newAllProductsByDepartment) {
                 setAllProductsByDepartment(newAllProductsByDepartment?.map((productsByDepartments: allProductsByDepartmentProps) => ({
                     ...productsByDepartments,
@@ -101,6 +102,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
 
     const loadData = async () => {
         let newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await storeAssign.allProductsByDepartmentStore(dataStore?.id);
+
         if (newAllProductsByDepartment) {
             newAllProductsByDepartment = newAllProductsByDepartment.map((productsByDepartments: allProductsByDepartmentProps) => {
                 //search if current department was selected in previous data to keep selection
@@ -112,12 +114,10 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                     oldDepartmentSelected = true
                 }
 
-                return (
-                    {
-                        ...productsByDepartments,
-                        selected: oldDepartmentSelected
-                    }
-                )
+                return ({
+                    ...productsByDepartments,
+                    selected: oldDepartmentSelected
+                })
             })
 
             setAllProductsByDepartment(newAllProductsByDepartment);
@@ -180,23 +180,10 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
 
     const TableHeader = () => {
         const headCells = [
-            {
-                id: "more_details",
-                label: "",
-                padding: "checkbox"
-            },
-            {
-                id: "name",
-                label: "Nombre",
-            },
-            {
-                id: "store_units",
-                label: "Unidades",
-            },
-            {
-                id: "remove",
-                label: "Retirar",
-            },
+            { id: "more_details", label: "", padding: "checkbox" },
+            { id: "name", label: "Nombre", },
+            { id: "store_units", label: "Unidades", },
+            { id: "remove", label: "Retirar", },
         ];
 
         return (
@@ -243,8 +230,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                 }
                                             </IconButton>
                                         </TableCell>
-
-                                        <TableCell>
+                                        <TableCell align='center'>
                                             <Grid container>
                                                 {
                                                     product.images?.length! > 0 && (
@@ -277,8 +263,8 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                             </Grid>
                                         </TableCell>
 
-                                        <TableCell>
-                                            <Grid container columnSpacing={1}>
+                                        <TableCell align='center'>
+                                            <Grid item container columnSpacing={1}>
                                                 <Grid item >
                                                     {product.depots![0].store_depots![0].product_remaining_units}
                                                 </Grid>
@@ -299,7 +285,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                             </Grid>
                                         </TableCell>
 
-                                        <TableCell >
+                                        <TableCell align='center'>
                                             <IconButton color={"warning"} onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleOpenConfirmDialog(index);
