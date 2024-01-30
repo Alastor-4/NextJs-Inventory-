@@ -113,17 +113,17 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
-    const { id, product_id, warehouse_id, inserted_by_id, product_total_units, product_total_remaining_units } = await req.json();
+    const { id, product_id, warehouse_id, product_total_units, product_total_remaining_units } = await req.json();
 
-    const data = {
-        product_id: product_id,
-        warehouse_id: warehouse_id,
-        inserted_by_id: inserted_by_id,
-        product_total_units: product_total_units,
-        product_total_remaining_units: product_total_remaining_units
-    }
-
-    const result = await prisma.depots.update({ data, where: { id: id } })
+    const result = await prisma.depots.update({
+        data: {
+            product_id: product_id,
+            warehouse_id: warehouse_id,
+            product_total_units: product_total_units,
+            product_total_remaining_units: product_total_remaining_units
+        },
+        where: { id: id } }
+    )
 
     return NextResponse.json(result);
 }
