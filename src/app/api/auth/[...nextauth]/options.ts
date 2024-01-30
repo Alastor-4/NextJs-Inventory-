@@ -20,7 +20,7 @@ export const nextAuthOptions: NextAuthOptions = {
 
                 const res = await axios.post(
                     `${process.env.NEXTAUTH_URL}/login`,
-                    credentials,
+                    credentials!,
                     {
                         headers: {
                             Accept: 'application/json',
@@ -32,10 +32,10 @@ export const nextAuthOptions: NextAuthOptions = {
                 const user: users | null = await res.data;
 
                 if (!user) throw new Error("No existe este usuario en el sistema");
-                
+
                 if (!user.is_verified) throw new Error("El usuario no está verificado");
 
-                const passwordMatch = await compare(credentials.password, user.password_hash!);
+                const passwordMatch = await compare(credentials?.password!, user.password_hash!);
                 if (!passwordMatch) throw new Error("Contraseña incorrecta");
 
                 return {
