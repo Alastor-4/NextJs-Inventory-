@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import { prisma } from "db"
-import {transactionToStore} from "@/utils/generalFunctions";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -101,7 +100,7 @@ export async function POST(req: Request) {
             seller_profit_quantity: seller_profit_quantity,
             store_depot_transfers: {
                 create: {
-                    transfer_direction: transactionToStore,
+                    transfer_direction: "2",
                     units_transferred_quantity: product_remaining_units,
                     created_by_id: userId,
                 }

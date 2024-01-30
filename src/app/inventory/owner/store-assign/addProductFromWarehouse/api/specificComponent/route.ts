@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/db";
-import {transactionToStore} from "@/utils/generalFunctions";
 
 // obtener un warehouse especifico
 export async function GET(req: Request) {
@@ -95,7 +94,7 @@ export async function PUT(req: Request) {
             is_active: is_active,
             store_depot_transfers: {
                 create: {
-                    transfer_direction: transactionToStore,
+                    transfer_direction: "2",
                     units_transferred_quantity: product_remaining_units,
                     created_by_id: userId,
                 }
