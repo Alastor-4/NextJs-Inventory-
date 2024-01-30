@@ -1,8 +1,8 @@
+import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials"
 import { users } from "@prisma/client";
 import * as process from "process";
-import { compare } from "bcrypt"
+import { compare } from "bcrypt";
 import axios from "axios";
 
 export const nextAuthOptions: NextAuthOptions = {
@@ -16,10 +16,7 @@ export const nextAuthOptions: NextAuthOptions = {
                 username: { label: "User", type: "text", placeholder: "usuario" },
                 password: { label: "Contraseña", type: "password" }
             },
-            // @ts-ignore
             async authorize(credentials, req) {
-
-                if (!credentials?.username || !credentials?.password) throw new Error("usuario y contraseña requeridos")
 
                 const res = await axios.post(
                     `${process.env.NEXTAUTH_URL}/login`,
@@ -34,12 +31,12 @@ export const nextAuthOptions: NextAuthOptions = {
 
                 const user: users | null = await res.data;
 
-                if (!user) throw new Error("usuario no encontrado")
+                if (!user) throw new Error("No existe este usuario en el sistema");
+                
+                if (!user.is_verified) throw new Error("El usuario no está verificado");
 
-                if (!user.is_verified) throw new Error("usuario no verificado")
-
-                const passwordMatch = await compare(credentials.password, user.password_hash!)
-                if (!passwordMatch) throw new Error("contraseña incorrecta")
+                const passwordMatch = await compare(credentials.password, user.password_hash!);
+                if (!passwordMatch) throw new Error("Contraseña incorrecta");
 
                 return {
                     id: user.id,

@@ -1,11 +1,10 @@
-import jwt, { JwtPayload } from "jsonwebtoken"
-import { NextResponse } from 'next/server'
-import { prisma } from "db"
-//import logger from "@/utils/logger";
-import { withAxiom, AxiomRequest } from "next-axiom"
-import {sendVerifyMail} from "@/utils/serverActions";
+import { sendVerifyMail } from "@/utils/serverActions";
+import { withAxiom, AxiomRequest } from "next-axiom";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import { NextResponse } from 'next/server';
+import { prisma } from "db";
 
-export const GET = withAxiom(async (req: AxiomRequest)=> {
+export const GET = withAxiom(async (req: AxiomRequest) => {
     const { searchParams } = new URL(req.url)
     const token = searchParams.get("token")
 
@@ -46,24 +45,24 @@ export const GET = withAxiom(async (req: AxiomRequest)=> {
 export const POST = withAxiom(async (req: AxiomRequest) => {
     const log = req.log.with({ scope: 'auth/register' })
 
-    const { username, passwordHash, name, mail, phone } = await req.json()
+    const { username, passwordHash, name, email, phone } = await req.json()
 
-    const user = await prisma.users.findFirst({
-        where: {
-            OR: [
-                { username: username },
-                { mail: mail },
-                { phone: phone },
-            ]
-        }
-    })
+    // const user = await prisma.users.findFirst({
+    //     where: {
+    //         OR: [
+    //             { username: username },
+    //             { mail: email },
+    //             { phone: phone },
+    //         ]
+    //     }
+    // })
 
-    if (user) new NextResponse("Usuario, correo o teléfono ya se encuentra registrado en el sistema", { status: 202 });
+    // if (user) new NextResponse("Usuario, correo o teléfono ya se encuentra registrado en el sistema", { status: 202 });
 
     const newUser = await prisma.users.create({
         data: {
             username: username,
-            mail: mail,
+            mail: email,
             phone: phone,
             name: name,
             password_hash: passwordHash,
@@ -72,7 +71,7 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
 
     log.info("Nuevo usuario registrado")
 
-    sendVerifyMail(username, newUser.mail)
+    sendVerifyMail(username, newUser.mail);
 
     return NextResponse.json(
         {
