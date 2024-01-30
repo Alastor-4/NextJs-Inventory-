@@ -61,6 +61,8 @@ const TransferUnits = ({ nameStore, storeDepot, productId, setActiveTransferUnit
             transfer_direction: direction ? transactionToWarehouse : transactionToStore.replace,
             created_by_id: userId
         }
+
+        //FixMe create record with prisma nested create in previous transacation
         const response = await storeDetails.createTransaction(params.storeDetailsId, data)
 
         return response ? true : false
@@ -94,8 +96,8 @@ const TransferUnits = ({ nameStore, storeDepot, productId, setActiveTransferUnit
         const result = await storeDetails.updateDepotsAndStoreDepots(params.storeDetailsId, data)
 
         if (result === 200) {
-            recordTransaction(swap, valueUnits)
-            loadData()
+            await recordTransaction(swap, valueUnits)
+            await loadData()
         }
         setActiveTransferUnits(false);
     }
