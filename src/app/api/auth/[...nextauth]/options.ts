@@ -33,12 +33,12 @@ export const nextAuthOptions: NextAuthOptions = {
 
                 const user: users | null = await res.data;
 
-                if (!user) return null;
+                if (!user) throw new Error("No existe este usuario en el sistema");
 
                 const passwordMatch = await compare(credentials.password, user.password_hash!);
-                if (!passwordMatch) return null;
+                if (!passwordMatch) throw new Error("Contraseña incorrecta");
 
-                if (!user.is_verified) return null;
+                if (!user.is_verified) throw new Error("El usuario no está verificado");
 
                 return {
                     id: user.id,
