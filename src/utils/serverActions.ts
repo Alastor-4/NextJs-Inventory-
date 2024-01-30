@@ -1,8 +1,8 @@
 'use server'
 
-import { hashSync } from "bcrypt"
-import {Resend} from "resend"
-import {VerifyUserTemplate} from "@/components/email-templates/VerifyUserTemplate"
+import { VerifyUserTemplate } from "@/components/email-templates/VerifyUserTemplate";
+import { hashSync } from "bcrypt";
+import { Resend } from "resend";
 import jwt from "jsonwebtoken";
 
 const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
