@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
-import {transactionToStore, transactionToWarehouse} from "@/utils/generalFunctions";
-import {store_depots} from "@prisma/client";
 
 // Get all stores and a specific depot info
 export async function GET(request: Request) {
@@ -56,7 +54,7 @@ export async function PUT(req: Request) {
                                 product_remaining_units: { increment: moveUnitQuantity },
                                 store_depot_transfers: {
                                     create: {
-                                        transfer_direction: transactionToStore,
+                                        transfer_direction: "2",
                                         units_transferred_quantity: +moveUnitQuantity,
                                         created_by_id: +ownerId,
                                     }
@@ -75,7 +73,7 @@ export async function PUT(req: Request) {
                         product_remaining_units: moveUnitQuantity,
                         store_depot_transfers: {
                             create: {
-                                transfer_direction: transactionToStore,
+                                transfer_direction: "2",
                                 units_transferred_quantity: +moveUnitQuantity,
                                 created_by_id: +ownerId,
                             }
@@ -121,7 +119,7 @@ export async function PATCH(req: Request) {
                             product_remaining_units: { decrement: moveUnitQuantity },
                             store_depot_transfers: {
                                 create: {
-                                    transfer_direction: transactionToWarehouse,
+                                    transfer_direction: "1",
                                     units_transferred_quantity: +moveUnitQuantity,
                                     created_by_id: +ownerId,
                                 }
