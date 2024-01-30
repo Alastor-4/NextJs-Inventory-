@@ -82,17 +82,17 @@ export async function PUT(req: Request) {
 
     const result = await prisma.store_depots.update({
         data: {
-            store_id,
-            depot_id,
-            product_units,
-            product_remaining_units,
-            sell_price,
-            sell_price_unit,
-            price_discount_percentage,
-            price_discount_quantity,
-            seller_profit_percentage,
-            seller_profit_quantity,
-            is_active,
+            store_id: store_id,
+            depot_id: depot_id,
+            product_units: product_units,
+            product_remaining_units: product_remaining_units,
+            sell_price: sell_price,
+            sell_price_unit: sell_price_unit,
+            price_discount_percentage: price_discount_percentage,
+            price_discount_quantity: price_discount_quantity,
+            seller_profit_percentage: seller_profit_percentage,
+            seller_profit_quantity: seller_profit_quantity,
+            is_active: is_active,
             store_depot_transfers: {
                 create: {
                     transfer_direction: transactionToStore,

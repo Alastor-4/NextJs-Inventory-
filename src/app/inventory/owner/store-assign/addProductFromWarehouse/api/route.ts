@@ -93,12 +93,12 @@ export async function POST(req: Request) {
 
     const result = await prisma.store_depots.create({
         data: {
-            store_id,
-            depot_id,
-            product_units,
-            product_remaining_units,
-            seller_profit_percentage,
-            seller_profit_quantity,
+            store_id: store_id,
+            depot_id: depot_id,
+            product_units: product_units,
+            product_remaining_units: product_remaining_units,
+            seller_profit_percentage: seller_profit_percentage,
+            seller_profit_quantity: seller_profit_quantity,
             store_depot_transfers: {
                 create: {
                     transfer_direction: transactionToStore,
