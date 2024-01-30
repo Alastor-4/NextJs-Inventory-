@@ -4,7 +4,13 @@ import {
     IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Table, TableBody,
     TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography
 } from '@mui/material';
-import { notifyError, notifySuccess, notifyWarning } from "@/utils/generalFunctions";
+import {
+    notifyError,
+    notifySuccess,
+    notifyWarning,
+    transactionToStore,
+    transactionToWarehouse
+} from "@/utils/generalFunctions";
 import { ExpandLessOutlined, ExpandMoreOutlined, } from '@mui/icons-material';
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog';
 import { AddProductFromWarehouseProps } from '@/types/interfaces';
@@ -15,7 +21,7 @@ import { images } from '@prisma/client';
 import { Formik } from 'formik';
 import * as Yup from "yup"
 
-export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFromWarehouseProps) => {
+export const AddProductFromWarehouse = ({ dataStore, warehouseId, userId }: AddProductFromWarehouseProps) => {
     const [dataDepotsWarehouses, setDataDepotsWarehouse] = useState<any>([]);
     const [dataProductsByDepartment, setDataProductsByDepartment] = useState<any>([])
     const [data, setData] = useState<any>([]);
@@ -403,6 +409,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                 product_remaining_units: units,
                 seller_profit_percentage: dataStore?.fixed_seller_profit_percentage,
                 seller_profit_quantity: dataStore?.fixed_seller_profit_quantity,
+                userId,
             }
 
             request = await requestWarehouse.addProductsStoreDepots(dataRequest);
@@ -433,6 +440,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId }: AddProductFr
                 seller_profit_percentage,
                 seller_profit_quantity,
                 is_active: false,
+                userId,
             }
 
             request = await requestWarehouse.updateStoreDepots(dataRequest)

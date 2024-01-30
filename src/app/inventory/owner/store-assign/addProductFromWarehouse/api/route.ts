@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "db"
+import {transactionToStore} from "@/utils/generalFunctions";
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -88,7 +89,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { sell_price, sell_price_unit, is_active, store_id, depot_id, product_units, product_remaining_units, seller_profit_percentage, seller_profit_quantity } = await req.json();
+    const { store_id, depot_id, product_units, product_remaining_units, seller_profit_percentage, seller_profit_quantity, userId } = await req.json();
 
     const result = await prisma.store_depots.create({
         data: {
@@ -98,13 +99,22 @@ export async function POST(req: Request) {
             product_remaining_units,
             seller_profit_percentage,
             seller_profit_quantity,
+            store_depot_transfers: {
+                create: {
+                    transfer_direction: transactionToStore,
+                    units_transferred_quantity: product_remaining_units,
+                    created_by_id: userId,
+                }
+            }
         }
     })
+
     return NextResponse.json(result);
 }
 
 export async function PUT(req: Request) {
     const { id, product_id, warehouse_id, inserted_by_id, product_total_units, product_total_remaining_units } = await req.json();
+
     const data = {
         product_id,
         warehouse_id,
