@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/db";
+import {transactionToStore} from "@/utils/generalFunctions";
 
 // obtener un warehouse especifico
 export async function GET(req: Request) {
@@ -63,20 +64,44 @@ export async function GET(req: Request) {
 
 //Modidica un storeDepots especifico
 export async function PUT(req: Request) {
-    const { id, store_id, depot_id, product_units, product_remaining_units, sell_price, sell_price_units, price_discount_percentage, price_discount_quantity, seller_profit_percentage, seller_profit_quantity, is_active } = await req.json();
-    const data = {
+    const {
+        id,
         store_id,
         depot_id,
         product_units,
         product_remaining_units,
         sell_price,
-        sell_price_units,
+        sell_price_unit,
         price_discount_percentage,
         price_discount_quantity,
         seller_profit_percentage,
         seller_profit_quantity,
         is_active,
-    }
-    const result = await prisma.store_depots.update({ data, where: { id: id } })
+        userId,
+    } = await req.json();
+
+    const result = await prisma.store_depots.update({
+        data: {
+            store_id,
+            depot_id,
+            product_units,
+            product_remaining_units,
+            sell_price,
+            sell_price_unit,
+            price_discount_percentage,
+            price_discount_quantity,
+            seller_profit_percentage,
+            seller_profit_quantity,
+            is_active,
+            store_depot_transfers: {
+                create: {
+                    transfer_direction: transactionToStore,
+                    units_transferred_quantity: product_remaining_units,
+                    created_by_id: userId,
+                }
+            }
+        },
+        where: { id: id }
+    })
     return NextResponse.json(result)
 }

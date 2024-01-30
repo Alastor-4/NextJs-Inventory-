@@ -145,7 +145,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
         const result: boolean | AxiosResponse = await storeAssign.updateProductWarehouse(depot);
         if (!result) return;
         if (result.status === 200) {
-
+            //FixMe: make store_depot_transfers record at server using prisma nested create
             const correctTransaction = await recordTransaction(addUnits > 0 ? true : false, Math.abs(addUnits), product);
 
             if (correctTransaction) loadData();
@@ -442,7 +442,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                             setOpen={setActiveAddProductFromWarehouse}
                             loadData={loadData}
                         >
-                            <AddProductFromWarehouse dataStore={dataStore} warehouseId={dataWarehouse?.id} />
+                            <AddProductFromWarehouse dataStore={dataStore} warehouseId={dataWarehouse?.id} userId={userId}/>
                         </ModalAddProductFromWarehouse>
 
                         <ImagesDisplayDialog
