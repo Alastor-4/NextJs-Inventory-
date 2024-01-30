@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/db";
+import { prisma } from '../../../../../db';
 
 export const POST = async (req: Request) => {
     try {
@@ -14,7 +14,7 @@ export const POST = async (req: Request) => {
 
         const userUsername = await prisma.users.findUnique({ where: { username: username } });
 
-        if (userUsername) messages.push({ key: "username", message: "Ya existe un usuario registrado con este usuario" });
+        if (userUsername) messages.push({ key: "username", message: "Ya existe este nombre de usuario en el sistema" });
 
         const userPhone = await prisma.users.findUnique({ where: { phone: phone } });
 
