@@ -38,7 +38,6 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
     const [dataProducts, setDataProducts] = useState<productsProps[] | null>(null);
     const [allProductsByDepartment, setAllProductsByDepartment] = useState<allProductsByDepartmentProps[] | null>(null);
     const [filtersApplied, setFiltersApplied] = useState<boolean>(false);
-    const [selectedDepartments, setSelectedDepartments] = useState<allProductsByDepartmentProps[] | null>(null);
 
     const [activeModalAddProduct, setActiveModalAddProduct] = useState(false);
 
@@ -140,8 +139,6 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
     const validationSchema = Yup.object({
         searchBarValue: Yup.string(),
         productNewUnitsQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero"),
-        updateTotalUnitsQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero").nullable(),
-        updateRemainingUnitsQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero").nullable(),
         productStoreDepotDistribution: Yup.object({
             warehouseQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero"),
             storeQuantity: Yup.number().integer().typeError("Tiene que ser un número entero").min(0, "Tiene que ser mayor que cero").nullable(),
@@ -158,25 +155,6 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
 
     //SELECT product in table
     const [selectedProduct, setSelectedProduct] = useState<productsProps | null>(null);
-    const handleSelectProduct = (product: productsProps) => {
-        if (selectedProduct && (selectedProduct?.id === product.id)) {
-            setSelectedProduct(null);
-        } else {
-            setSelectedProduct(product);
-        }
-    }
-
-    const refreshAfterAction = async () => {
-        const newAllProductsByDepartment: allProductsByDepartmentProps[] | null = await warehouseDepots.allDepots(+ownerId!, +warehouseDetails?.id!);
-        setSelectedDepartments(null);
-        if (newAllProductsByDepartment) {
-            setAllProductsByDepartment(newAllProductsByDepartment?.map((productsByDepartments: allProductsByDepartmentProps) => ({
-                ...productsByDepartments,
-                selected: false
-            })));
-            setSelectedProduct(null);
-        }
-    }
 
     const handleNavigateBack = () => router.push('/inventory');
 
@@ -205,15 +183,13 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
                 </Box>
 
                 <Box sx={{ display: "flex" }}>
-                    <>
-                        <IconButton color={"inherit"} onClick={handleStoreAssign}>
-                            <ShareOutlined fontSize={"small"} />
-                        </IconButton>
+                    <IconButton color={"inherit"} onClick={handleStoreAssign}>
+                        <ShareOutlined fontSize={"small"} />
+                    </IconButton>
 
-                        <IconButton color={"inherit"} sx={{ color: 'white' }} onClick={() => setActiveModalAddProduct(true)} >
-                            <AddOutlined />
-                        </IconButton>
-                    </>
+                    <IconButton color={"inherit"} sx={{ color: 'white' }} onClick={() => setActiveModalAddProduct(true)} >
+                        <AddOutlined />
+                    </IconButton>
                 </Box>
             </Toolbar>
         </AppBar >
@@ -221,9 +197,7 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
 
     const [displayUpdateDepotQuantityForm, setDisplayUpdateDepotQuantityForm] = useState<boolean>(false);
     const [storeDepotUpdateIndex, setStoreDepotUpdateIndex] = useState<number | null>(null);
-    const [displayUpdateUnitsForm, setDisplayUpdateUnitsForm] = useState<boolean>(false);
     const [displayNewUnitsForm, setDisplayNewUnitsForm] = useState<boolean>(false);
-    const [storeDepotUpdateName, setStoreDepotUpdateName] = useState<string>("");
 
     const afterUpdateDepot = (updatedDepot: AxiosResponse) => {
         const newDepots = [...allProductsByDepartment!];
@@ -294,71 +268,6 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
         )
     }
 
-    const UpdateUnitsQuantityForm = ({ formik }: any) => {
-        async function handleUpdateUnits() {
-            const updatedDepot = await warehouseDepots.updateUnitsDepot(
-                {
-                    ownerId: +ownerId!,
-                    warehouseId: +warehouseDetails?.id!,
-                    depotId: +selectedProduct?.depots![0].id!,
-                    productTotalUnits: +formik.values.updateTotalUnitsQuantity,
-                    productTotalRemainingUnits: +formik.values.updateRemainingUnitsQuantity,
-                }
-            )
-
-            if (!updatedDepot) return;
-
-            if (updatedDepot?.data?.id) {
-                afterUpdateDepot(updatedDepot);
-                setDisplayUpdateUnitsForm(false);
-            }
-        }
-        const handleClose = () => {
-            setDisplayUpdateUnitsForm(false);
-        };
-
-        return (
-            <Grid container item spacing={2} marginTop={"5px"} >
-                <Grid item xs={6}>
-                    <TextField
-                        name={"updateTotalUnitsQuantity"}
-                        label="Total de unidades"
-                        size={"small"}
-                        inputMode="numeric"
-                        onKeyDown={handleKeyDown}
-                        {...formik.getFieldProps("updateTotalUnitsQuantity")}
-                        error={formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity}
-                        helperText={(formik.errors.updateTotalUnitsQuantity && formik.touched.updateTotalUnitsQuantity) && formik.errors.updateTotalUnitsQuantity}
-                    />
-                </Grid>
-
-                <Grid item xs={6}>
-                    <TextField
-                        name={"updateRemainingUnitsQuantity"}
-                        label="Unidades restantes"
-                        size={"small"}
-                        inputMode="numeric"
-                        onKeyDown={handleKeyDown}
-                        {...formik.getFieldProps("updateRemainingUnitsQuantity")}
-                        error={formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity}
-                        helperText={(formik.errors.updateRemainingUnitsQuantity && formik.touched.updateRemainingUnitsQuantity) && formik.errors.updateRemainingUnitsQuantity}
-                    />
-                </Grid>
-                <Grid container item justifyContent={"flex-end"}>
-                    <DialogActions >
-                        <Button color="error" variant="outlined" onClick={handleClose}>Cerrar</Button>
-                        <Button
-                            onClick={handleUpdateUnits}
-                            color="primary"
-                            disabled={!formik.values.updateTotalUnitsQuantity || !formik.values.updateRemainingUnitsQuantity}
-                            variant="outlined">Aceptar
-                        </Button>
-                    </DialogActions>
-                </Grid>
-            </Grid>
-        )
-    }
-
     const UpdateStoreDepotQuantityForm = ({ formik }: any) => {
         const { warehouseQuantity, storeQuantity, moveQuantity } = formik.values.productStoreDepotDistribution;
 
@@ -390,7 +299,7 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
         async function handleMoveToStore() {
             const updateResponse = await warehouseDepots.sendDepotFromWarehouseToStore(
                 {
-                    ownerId: +ownerId!,
+                    userId: +userId!,
                     warehouseId: +warehouseDetails?.id!,
                     depotId: +selectedProduct?.depots![0].id!,
                     storeDepotId: +selectedProduct?.storesDistribution![storeDepotUpdateIndex!]?.store_depots![0]?.id! ?? null,
@@ -411,7 +320,7 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
         async function handleMoveToWarehouse() {
             const updateResponse = await warehouseDepots.sendDepotFromStoreToWarehouse(
                 {
-                    ownerId: +ownerId!,
+                    userId: +userId!,
                     warehouseId: +warehouseDetails?.id!,
                     depotId: +selectedProduct?.depots![0].id!,
                     storeDepotId: +selectedProduct?.storesDistribution![storeDepotUpdateIndex!].store_depots![0].id!,
@@ -589,19 +498,6 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
             setDisplayNewUnitsForm(true);
         }
 
-        function handleOpenUpdateUnitsForm(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: productsProps) {
-            event.stopPropagation();
-
-            if (!selectedProduct || (selectedProduct?.id !== product.id)) {
-                setSelectedProduct(product);
-            }
-
-            formik.setFieldValue("updateTotalUnitsQuantity", product.depots![0].product_total_units)
-            formik.setFieldValue("updateRemainingUnitsQuantity", product.depots![0].product_total_remaining_units)
-
-            setDisplayUpdateUnitsForm(true)
-        }
-
         function handleOpenUpdateStoreDepotForm(event: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: productsProps, storeIndex: number, storeName: string) {
             event.stopPropagation();
 
@@ -619,7 +515,6 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
             )
 
             setStoreDepotUpdateIndex(storeIndex)
-            setStoreDepotUpdateName(storeName)
             setDisplayUpdateDepotQuantityForm(true)
         }
 
@@ -645,7 +540,7 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
                                 onClick={() => handleExpand(index)}
                                 sx={tableStyles.row}
                             >
-                                <TableCell>
+                                <TableCell padding={"none"}>
                                     <IconButton
                                         size={"small"}
                                         onClick={() => handleExpand(index)}
@@ -693,22 +588,16 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
                                     </Box>
                                 </TableCell>
                                 <TableCell>
-                                    <Grid container direction="column" alignItems="flex-start">
-                                        <Grid item sx={{ marginLeft: "10px", width: "100%" }}>
+                                    <Grid container>
+                                        <Grid item xs={12}>
                                             {product.depots![0].product_total_remaining_units ?? "-"} de {product.depots![0].product_total_units ?? "-"}
                                         </Grid>
-                                        <Grid item display="flex" alignItems="flex-start">
+                                        <Grid item xs={12} display="flex">
                                             <IconButton
                                                 color={"inherit"}
                                                 onClick={(event) => handleOpenNewUnitsForm(event, product)}
                                             >
                                                 <Add fontSize={"small"} />
-                                            </IconButton>
-                                            <IconButton
-                                                color={"inherit"}
-                                                onClick={(event) => handleOpenUpdateUnitsForm(event, product)}
-                                            >
-                                                <EditOutlined fontSize={"small"} />
                                             </IconButton>
                                         </Grid>
                                     </Grid>
@@ -899,14 +788,6 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
                             formik={formik}
                         >
                             <NewUnitsQuantityForm formik={formik} />
-                        </UpdateValueDialog>
-
-                        <UpdateValueDialog
-                            dialogTitle={"Establecer cantidades"}
-                            open={displayUpdateUnitsForm}
-                            setOpen={setDisplayUpdateUnitsForm}
-                        >
-                            <UpdateUnitsQuantityForm formik={formik} />
                         </UpdateValueDialog>
 
                         <UpdateValueDialog

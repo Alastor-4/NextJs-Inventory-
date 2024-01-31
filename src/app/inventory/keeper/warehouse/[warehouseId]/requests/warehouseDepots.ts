@@ -68,9 +68,9 @@ const warehouseDepots = {
         return false
     },
 
-    sendDepotFromWarehouseToStore: async function ({ ownerId, warehouseId, depotId, storeDepotId, storeId, moveUnitQuantity }: any) {
+    sendDepotFromWarehouseToStore: async function ({ userId, warehouseId, depotId, storeDepotId, storeId, moveUnitQuantity }: any) {
         try {
-            const response = await apiRequest.put(urlDepotAssign(warehouseId), { ownerId: ownerId, depotId, storeDepotId, storeId, moveUnitQuantity })
+            const response = await apiRequest.put(urlDepotAssign(warehouseId), { userId, depotId, storeDepotId, storeId, moveUnitQuantity })
             return response.data
         } catch (e) {
             //ToDo: notify error here
@@ -79,9 +79,9 @@ const warehouseDepots = {
         return false
     },
 
-    sendDepotFromStoreToWarehouse: async function ({ ownerId, warehouseId, depotId, storeDepotId, moveUnitQuantity }: any) {
+    sendDepotFromStoreToWarehouse: async function ({ userId, warehouseId, depotId, storeDepotId, moveUnitQuantity }: any) {
         try {
-            const response = await apiRequest.patch(urlDepotAssign(warehouseId), { ownerId: ownerId, depotId, storeDepotId, moveUnitQuantity })
+            const response = await apiRequest.patch(urlDepotAssign(warehouseId), { userId, depotId, storeDepotId, moveUnitQuantity })
             return response.data
         } catch (e) {
             //ToDo: notify error here

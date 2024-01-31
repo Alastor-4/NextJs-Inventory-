@@ -47,18 +47,6 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
 
     const { username, passwordHash, name, email, phone } = await req.json()
 
-    // const user = await prisma.users.findFirst({
-    //     where: {
-    //         OR: [
-    //             { username: username },
-    //             { mail: email },
-    //             { phone: phone },
-    //         ]
-    //     }
-    // })
-
-    // if (user) new NextResponse("Usuario, correo o teléfono ya se encuentra registrado en el sistema", { status: 202 });
-
     const newUser = await prisma.users.create({
         data: {
             username: username,
