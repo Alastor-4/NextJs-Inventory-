@@ -426,7 +426,7 @@ export const StoreMainTable = ({ userId, ownerId }: StoreMainTableProps) => {
                 setOpen={setActiveAddProductFromWarehouse}
                 loadData={loadData}
             >
-                <AddProductFromWarehouse dataStore={dataStore!} warehouseId={null} />
+                <AddProductFromWarehouse dataStore={dataStore!} warehouseId={null} userId={userId}/>
             </ModalAddProductFromWarehouse>
             <Formik
                 initialValues={{ searchBarValue: "" }}

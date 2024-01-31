@@ -427,7 +427,7 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                             setOpen={setActiveAddProductFromWarehouse}
                             loadData={loadData}
                         >
-                            <AddProductFromWarehouse dataStore={dataStore} warehouseId={dataWarehouse?.id} />
+                            <AddProductFromWarehouse dataStore={dataStore} warehouseId={dataWarehouse?.id} userId={userId}/>
                         </ModalAddProductFromWarehouse>
 
                         <ImagesDisplayDialog

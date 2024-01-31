@@ -87,16 +87,23 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-    const { sell_price, sell_price_unit, is_active, store_id, depot_id, product_units, product_remaining_units, seller_profit_percentage, seller_profit_quantity } = await req.json();
+    const { store_id, depot_id, product_units, product_remaining_units, seller_profit_percentage, seller_profit_quantity, userId } = await req.json();
 
     const result = await prisma.store_depots.create({
         data: {
-            store_id,
-            depot_id,
-            product_units,
-            product_remaining_units,
-            seller_profit_percentage,
-            seller_profit_quantity,
+            store_id: store_id,
+            depot_id: depot_id,
+            product_units: product_units,
+            product_remaining_units: product_remaining_units,
+            seller_profit_percentage: seller_profit_percentage,
+            seller_profit_quantity: seller_profit_quantity,
+            store_depot_transfers: {
+                create: {
+                    transfer_direction: "2",
+                    units_transferred_quantity: product_remaining_units,
+                    created_by_id: userId,
+                }
+            }
         }
     })
     return NextResponse.json(result);
