@@ -6,6 +6,15 @@ const url = "/api/auth/register";
 const verifyRegisterDataUrl = "/api/auth/register/verify-register-data";
 
 const auth = {
+    verifyRegisterData: async function (username: string, phone: string, email: string) {
+        try {
+            const response = await apiRequest.post(verifyRegisterDataUrl, { username, phone, email });
+            return response.data;
+        } catch (e) {
+            notifyError("Ha ocurrido un error comprobando los datos de registro del usuario");
+        }
+    },
+
     register: async function ({ username, password, name, email, phone }: any) {
         try {
             const passwordHash = await hashPassword(password);
@@ -19,14 +28,6 @@ const auth = {
 
         return false;
     },
-    verifyRegisterData: async function (username: string, phone: string, email: string) {
-        try {
-            const response = await apiRequest.post(verifyRegisterDataUrl, { username, phone, email });
-            return response.data;
-        } catch (e) {
-            notifyError("Ha ocurrido un error comprobando los datos de registro del usuario");
-        }
-    }
 }
 
 export default auth;

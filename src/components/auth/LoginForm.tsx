@@ -37,10 +37,14 @@ const SignInForm = () => {
                 password,
                 redirect: false,
             });
+
             if (responseNextAuth?.ok) router.push("/inventory");
+
             if (responseNextAuth?.error === "Contraseña incorrecta") {
                 setFieldError("password", responseNextAuth.error);
-            } else { setFieldError("username", responseNextAuth?.error!) }
+            } else {
+                setFieldError("username", responseNextAuth?.error!)
+            }
         }}
     >
         {

@@ -56,7 +56,7 @@ const RegisterForm = ({ setShowRegisterForm }: { setShowRegisterForm: (bool: boo
         onSubmit={async (data, { setFieldError }) => {
             const messages: { "key": string, "message": string }[] = await auth.verifyRegisterData(data.username, data.phone, data.email);
             if (messages.length === 0) {
-                auth.register(data);
+                await auth.register(data);
                 setShowRegisterForm(false);
             } else {
                 messages.forEach((({ key, message }) => setFieldError(key, message)));
