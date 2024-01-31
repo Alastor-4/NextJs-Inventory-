@@ -28,13 +28,13 @@ export async function GET(request: Request) {
 
 // Send depot units from warehouse to store
 export async function PUT(req: Request) {
-    const { ownerId, depotId, storeDepotId, storeId, moveUnitQuantity } = await req.json()
+    const { userId, depotId, storeDepotId, storeId, moveUnitQuantity } = await req.json()
 
     try {
         let updatedDepot
         let updatedStoreDepot
 
-        if (ownerId && depotId) {
+        if (userId && depotId) {
             const depot = await prisma.depots.findUnique({ where: { id: depotId } })
 
             if (depot?.product_total_remaining_units && (moveUnitQuantity <= depot.product_total_remaining_units)) {
@@ -51,7 +51,14 @@ export async function PUT(req: Request) {
                             data:
                             {
                                 product_units: { increment: moveUnitQuantity },
-                                product_remaining_units: { increment: moveUnitQuantity }
+                                product_remaining_units: { increment: moveUnitQuantity },
+                                store_depot_transfers: {
+                                    create: {
+                                        created_by_id: userId,
+                                        units_transferred_quantity: moveUnitQuantity,
+                                        transfer_direction: "2",
+                                    }
+                                }
                             },
                             where: { id: storeDepotId }
                         }
@@ -64,6 +71,13 @@ export async function PUT(req: Request) {
                         depot_id: depotId,
                         product_units: moveUnitQuantity,
                         product_remaining_units: moveUnitQuantity,
+                        store_depot_transfers: {
+                            create: {
+                                created_by_id: userId,
+                                units_transferred_quantity: moveUnitQuantity,
+                                transfer_direction: "2",
+                            }
+                        }
                     }
 
                     if (parentStore?.fixed_seller_profit_percentage) {
@@ -92,16 +106,25 @@ export async function PUT(req: Request) {
 
 // Send depot units from store to warehouse
 export async function PATCH(req: Request) {
-    const { ownerId, depotId, storeDepotId, moveUnitQuantity } = await req.json()
+    const { userId, depotId, storeDepotId, moveUnitQuantity } = await req.json()
 
     try {
-        if (ownerId && depotId && storeDepotId) {
+        if (userId && depotId && storeDepotId) {
             const storeDepot = await prisma.store_depots.findUnique({ where: { id: storeDepotId } })
 
             if (storeDepot?.product_remaining_units && (moveUnitQuantity <= storeDepot.product_remaining_units)) {
                 const updatedStoreDepot = await prisma.store_depots.update(
                     {
-                        data: { product_remaining_units: { decrement: moveUnitQuantity } },
+                        data: {
+                            product_remaining_units: { decrement: moveUnitQuantity },
+                            store_depot_transfers: {
+                                create: {
+                                    created_by_id: userId,
+                                    units_transferred_quantity: moveUnitQuantity,
+                                    transfer_direction: "1",
+                                }
+                            }
+                        },
                         where: { id: storeDepotId }
                     }
                 )
