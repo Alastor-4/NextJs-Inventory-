@@ -12,12 +12,12 @@ import {
 } from "@mui/icons-material";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import { UsersMainTableProps, userWithRole } from "@/types/interfaces";
+import { getRoleTranslation } from "@/utils/getRoleTranslation";
 import { getColorByRole } from "@/utils/getColorbyRole";
 import { TableNoData } from "@/components/TableNoData";
+import ChangeRoleModal from "./Modal/ChangeRoleModal";
 import { useRouter } from "next/navigation";
 import users from "../requests/users";
-import ChangeRoleDialog from "./Modal/ChangeRoleDialog";
-import { getRoleTranslation } from "@/utils/getRoleTranslation";
 
 const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
 
@@ -34,7 +34,7 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
         if (!dataUsers) getAllUser();
     }, [dataUsers, userId]);
 
-    //table selected item
+    //SELECT user in table
     const [selectedUser, setSelectedUser] = useState<userWithRole | null>(null);
     const handleSelectUser = (user: userWithRole) => {
         if (selectedUser && (selectedUser.id === user.id)) {
@@ -57,9 +57,9 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
     }
 
     //CHANGE role dialog
-    const [openDialog, setOpenDialog] = useState<boolean>(false);
+    const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
 
-    const handleClickOpenDialog = () => setOpenDialog(true);
+    const handleClickOpenDialog = () => setIsOpenDialog(true);
 
     const handleVerify = async () => {
         const response = await users.verifyUser(selectedUser?.id);
@@ -118,7 +118,6 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
                                         </IconButton>
                                     )
                                 }
-
                                 <IconButton color={"inherit"} onClick={handleToggleActive}>
                                     {
                                         selectedUser?.is_active
@@ -126,17 +125,13 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
                                             : <StartOutlined fontSize={"small"} />
                                     }
                                 </IconButton>
-
                                 <Divider orientation="vertical" variant="middle" flexItem
                                     sx={{ borderRight: "2px solid white", mx: "5px" }} />
-
                                 <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
                                     <ChangeCircleOutlined fontSize={"small"} />
                                 </IconButton>
-
                                 <Divider orientation="vertical" variant="middle" flexItem
                                     sx={{ borderRight: "2px solid white", mx: "5px" }} />
-
                                 <IconButton color={"inherit"} onClick={handleCreateWarehouse}>
                                     <CreateNewFolderOutlined fontSize={"small"} />
                                 </IconButton>
@@ -190,11 +185,11 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
                         hover
                         tabIndex={-1}
                         selected={!!selectedUser && (user.id === selectedUser?.id)}
+                        onClick={() => handleSelectUser(user)}
                     >
                         <TableCell>
                             <Checkbox
                                 size={"small"} checked={!!selectedUser && (user.id === selectedUser?.id)}
-                                onClick={() => handleSelectUser(user)}
                             />
                         </TableCell>
                         <TableCell>
@@ -243,16 +238,6 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
                                         sx={{ border: "1px solid lightGreen" }}
                                     />) : "-"
                             }
-                            {/* {
-                                user.roles ? (
-                                    <Chip
-                                        size={"small"}
-                                        label={user.roles.name}
-                                        color={getColorByRole(user.roles.name!)}
-                                        sx={{ border: "1px solid lightGreen" }}
-                                    />
-                                ) : "-"
-                            } */}
                         </TableCell>
                     </TableRow>
                 ))}
@@ -262,9 +247,9 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
 
     return (
         <>
-            {openDialog && <ChangeRoleDialog
-                open={openDialog}
-                setOpen={setOpenDialog}
+            {isOpenDialog && <ChangeRoleModal
+                open={isOpenDialog}
+                setOpen={setIsOpenDialog}
                 dataUsers={dataUsers}
                 setDataUsers={setDataUsers}
                 roles={roles}
