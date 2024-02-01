@@ -1,6 +1,7 @@
 'use server'
 
 import { VerifyUserTemplate } from "@/components/email-templates/VerifyUserTemplate";
+import { RecoverPasswordTemplate } from "@/components/email-templates/RecoverPasswordTemplate";
 import { hashSync } from "bcrypt";
 import { Resend } from "resend";
 import jwt from "jsonwebtoken";
@@ -25,15 +26,15 @@ export async function sendVerifyMail(username: string, toMail: string) {
     })
 }
 
-export async function sendChangePasswordEmail(email: string) {
+export async function sendRecoverPasswordEmail(email: string) {
     const verificationToken = jwt.sign({ email }, jwtPrivateKey, { expiresIn: "24h" });
-    const link = `${process.env.NEXTAUTH_URL}/change-password/${verificationToken}`
+    const link = `${process.env.NEXTAUTH_URL}/recover-password/${verificationToken}`
 
     return resend.emails.send({
         from: 'InventarioPlus <onboarding@inventarioplus.online>',
         to: email,
         subject: "Cambio de contraseña",
-        react: VerifyUserTemplate({ link }),
+        react: RecoverPasswordTemplate({ link }),
         text: "Visite el siguiente link para cambiar su contraseña " + link
     })
 }

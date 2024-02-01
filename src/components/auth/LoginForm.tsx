@@ -95,7 +95,7 @@ const SignInForm = () => {
                                 />
                             </Grid>
                             <Grid item xs={12} display={"flex"} justifyContent={"flex-end"} mx={"10px"} >
-                                <Link style={{ textDecoration: "none", color: "blue" }} href={"/api/auth/change-password/send-email"}>¿Ha olvidado su contraseña?</Link>
+                                <Link style={{ textDecoration: "none", color: "blue" }} href={"/api/auth/recover-password/send-email"}>¿Ha olvidado su contraseña?</Link>
                             </Grid>
                             <Grid item xs={12}>
                                 <Button
