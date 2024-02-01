@@ -14,6 +14,16 @@ export const GET = withAxiom(async (req: AxiomRequest) => {
         try {
             const tokenPayload: string | JwtPayload = jwt.verify(token, jwtPrivateKey);
 
+            if (typeof tokenPayload !== 'string' && tokenPayload.email) {
+                const userByEmail = await prisma.users.findUnique({ where: { mail: tokenPayload.email } });
+                if (userByEmail) {
+                    return NextResponse.json({
+                        status: "ok",
+                        message: `Token verificado correctamente`,
+                        email: `${userByEmail?.mail}`
+                    });
+                }
+            }
             if (typeof tokenPayload !== 'string' && tokenPayload.username) {
                 const user = await prisma.users.findUnique({ where: { username: tokenPayload.username } });
 

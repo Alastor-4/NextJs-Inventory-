@@ -5,8 +5,8 @@ import { hashSync } from "bcrypt";
 import { Resend } from "resend";
 import jwt from "jsonwebtoken";
 
-const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey"
-const resend = new Resend(process.env.RESEND_API_KEY)
+const jwtPrivateKey = process.env.JWT_PRIVATE_KEY ?? "fakePrivateKey";
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function hashPassword(password: string) {
     return hashSync(password, 10);
@@ -22,5 +22,18 @@ export async function sendVerifyMail(username: string, toMail: string) {
         subject: "Verificación de usuario",
         react: VerifyUserTemplate({ link }),
         text: "Visite el siguiente link para verificar su correo " + link
+    })
+}
+
+export async function sendChangePasswordEmail(email: string) {
+    const verificationToken = jwt.sign({ email }, jwtPrivateKey, { expiresIn: "24h" });
+    const link = `${process.env.NEXTAUTH_URL}/change-password/${verificationToken}`
+
+    return resend.emails.send({
+        from: 'InventarioPlus <onboarding@inventarioplus.online>',
+        to: email,
+        subject: "Cambio de contraseña",
+        react: VerifyUserTemplate({ link }),
+        text: "Visite el siguiente link para cambiar su contraseña " + link
     })
 }
