@@ -1,12 +1,13 @@
 "use client"
 
 import { PersonOutlined, VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
-import { Button, Grid, IconButton, InputAdornment, TextField } from "@mui/material";
+import { Button, Grid, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from 'yup';
+import Link from "next/link";
 
 const SignInForm = () => {
     const router = useRouter();
@@ -88,6 +89,9 @@ const SignInForm = () => {
                                             </InputAdornment>
                                     }}
                                 />
+                            </Grid>
+                            <Grid item xs={12} display={"flex"} justifyContent={"flex-end"} mx={"10px"} >
+                                <Link style={{ textDecoration: "none", color: "blue" }} href={"/api/auth/change-password/send-email"}>¿Ha olvidado su contraseña?</Link>
                             </Grid>
                             <Grid item xs={12}>
                                 <Button
