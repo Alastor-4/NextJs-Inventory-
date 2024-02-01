@@ -1,7 +1,7 @@
 "use client"
 
 import { PersonOutlined, VisibilityOffOutlined, VisibilityOutlined } from "@mui/icons-material";
-import { Button, Grid, IconButton, InputAdornment, TextField, Typography } from "@mui/material";
+import { Button, Grid, IconButton, InputAdornment, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
@@ -11,6 +11,8 @@ import Link from "next/link";
 
 const SignInForm = () => {
     const router = useRouter();
+
+    const [loginTrysFailed, setLoginTrysFailed] = useState<number>(0);
 
     const initialValues = { username: "", password: "" };
 
@@ -43,6 +45,7 @@ const SignInForm = () => {
 
             if (responseNextAuth?.error === "Contraseña incorrecta") {
                 setFieldError("password", responseNextAuth.error);
+                setLoginTrysFailed(loginTrysFailed + 1);
             } else {
                 setFieldError("username", responseNextAuth?.error!)
             }
@@ -94,9 +97,11 @@ const SignInForm = () => {
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} display={"flex"} justifyContent={"flex-end"} mx={"10px"} >
-                                <Link style={{ textDecoration: "none", color: "blue" }} href={"/api/auth/recover-password/send-email"}>¿Ha olvidado su contraseña?</Link>
-                            </Grid>
+                            {loginTrysFailed >= 2 &&
+                                <Grid item xs={12} display={"flex"} justifyContent={"flex-end"} mx={"10px"} >
+                                    <Link style={{ textDecoration: "none", color: "blue" }} href={"/api/auth/recover-password/send-email"}>¿Ha olvidado su contraseña?</Link>
+                                </Grid>
+                            }
                             <Grid item xs={12}>
                                 <Button
                                     color={"primary"}
