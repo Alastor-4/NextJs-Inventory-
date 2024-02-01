@@ -1,10 +1,10 @@
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import { hashPassword } from "@/utils/serverActions";
-import apiRequest from "@/api"
+import apiRequest from "@/api";
 
 const url = "/api/auth/register";
 const verifyRegisterDataUrl = "/api/auth/register/verify-register-data";
-const urlChangePassword = "/api/auth/change-password";
+const urlRecoverPassword = "/api/auth/recover-password";
 
 const auth = {
     register: async function ({ username, password, name, email, phone }: any) {
@@ -29,7 +29,7 @@ const auth = {
     },
     sendEmailToFindUser: async function (email: string) {
         try {
-            const response = await apiRequest.post(urlChangePassword, { email });
+            const response = await apiRequest.post(urlRecoverPassword, { email });
             if (response.status === 200) notifySuccess(response.data);
             return response.data;
         } catch (e) {
@@ -40,7 +40,7 @@ const auth = {
         try {
             const passwordHash = await hashPassword(password);
 
-            const response = await apiRequest.patch(urlChangePassword, { email, passwordHash });
+            const response = await apiRequest.patch(urlRecoverPassword, { email, passwordHash });
 
             if (response.status === 200) {
                 notifySuccess(response.data);
