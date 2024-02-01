@@ -469,7 +469,7 @@ export interface userWithRole {
     }
 }
 
-export interface ChangeRolesDialogProps {
+export interface ChangeRoleModalProps {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     dataUsers: userWithRole[] | null;
@@ -477,6 +477,15 @@ export interface ChangeRolesDialogProps {
     roles: roles[] | null;
     selectedUser: userWithRole | null;
     setSelectedUser: React.Dispatch<React.SetStateAction<userWithRole | null>>;
+}
+export interface ChangeRoleWorkerModalProps {
+    open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    dataWorkers: userWithRole[] | null;
+    setDataWorkers: React.Dispatch<React.SetStateAction<userWithRole[] | null>>;
+    roles: roles[] | null;
+    selectedWorker: userWithRole | null;
+    setSelectedWorker: React.Dispatch<React.SetStateAction<userWithRole | null>>;
 }
 export interface StoreDepotsAssignProps {
     userId?: number;
