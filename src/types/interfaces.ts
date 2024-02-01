@@ -1,4 +1,4 @@
-import { characteristics, departments, depots, images, product_offers, products, sell_products, sells, users, warehouses, store_depots, reservations, reservation_products, Prisma, stores, store_open_days, store_reservation_days } from '@prisma/client';
+import { characteristics, departments, depots, images, product_offers, products, sell_products, sells, users, warehouses, store_depots, reservations, reservation_products, Prisma, stores, store_open_days, store_reservation_days, roles } from '@prisma/client';
 import { ReactNode } from "react";
 
 export interface ShowProductsStoreProps {
@@ -318,6 +318,11 @@ export interface StoresFormProps {
     sellerUsers: any;
 }
 
+export interface UsersMainTableProps {
+    roles: roles[] | null;
+    userId?: number;
+}
+
 export interface StoresMainTableProps {
     userId: number;
     ownerId?: number;
@@ -444,6 +449,35 @@ export interface departmentWithoutDepots {
     products?: products | null
 }
 
+export interface userWithRole {
+    id: number;
+    username: string;
+    password_hash: string | null;
+    role_id: number | null;
+    name: string | null;
+    mail: string;
+    phone: string | null;
+    is_active: boolean | null;
+    is_verified: boolean | null;
+    work_for_user_id: number | null;
+    created_at: Date;
+    roles: {
+        id: number;
+        name: string | null;
+        description: string | null;
+        created_at: Date;
+    }
+}
+
+export interface ChangeRolesDialogProps {
+    open: boolean;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    dataUsers: userWithRole[] | null;
+    setDataUsers: React.Dispatch<React.SetStateAction<userWithRole[] | null>>;
+    roles: roles[] | null;
+    selectedUser: userWithRole | null;
+    setSelectedUser: React.Dispatch<React.SetStateAction<userWithRole | null>>;
+}
 export interface StoreDepotsAssignProps {
     userId?: number;
     selectedWarehouseId?: number;

@@ -2,42 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import {
-    AppBar,
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Checkbox,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Divider,
-    FormControl,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    OutlinedInput,
-    Select,
-    SelectChangeEvent,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Toolbar,
-    Typography
+    AppBar, Box, Button, Card, CardContent, Checkbox, Chip, Dialog, DialogActions, DialogContent,
+    DialogTitle, Divider, FormControl, IconButton, InputLabel, MenuItem, OutlinedInput, Select,
+    SelectChangeEvent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography
 } from "@mui/material";
 import { AddOutlined, ArrowLeft, ChangeCircleOutlined, Close, DeleteOutline } from "@mui/icons-material";
+import { getRoleTranslation } from '@/utils/getRoleTranslation';
+import { getColorByRole } from "@/utils/getColorbyRole";
 import { TableNoData } from "@/components/TableNoData";
 import ownerUsers from "../requests/ownerUsers";
 import { roles, users } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getRoleTranslation } from '@/utils/getRoleTranslation';
-import { getColorByRole } from "@/utils/getColorbyRole";
 
 interface WorkersMainTableProps {
     roles: roles[];
@@ -266,7 +242,6 @@ export default function WorkersMainTable({ roles, userId }: WorkersMainTableProp
 
     return (
         <>
-            {/* Dialog */}
             <ChangeRoleDialog />
 
             <Card variant={"outlined"}>
