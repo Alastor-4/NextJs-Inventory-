@@ -73,7 +73,6 @@ const RegisterForm = ({ setShowRegisterForm }: { setShowRegisterForm: (bool: boo
                                     label="Usuario*"
                                     size={"small"}
                                     fullWidth
-                                    autoComplete='off'
                                     variant="outlined"
                                     {...getFieldProps("username")}
                                     error={!!errors.username && touched.username}
@@ -85,7 +84,6 @@ const RegisterForm = ({ setShowRegisterForm }: { setShowRegisterForm: (bool: boo
                                     label="Nombre*"
                                     size={"small"}
                                     fullWidth
-                                    autoComplete='off'
                                     variant="outlined"
                                     {...getFieldProps("name")}
                                     error={!!errors.name && touched.name}
@@ -96,7 +94,6 @@ const RegisterForm = ({ setShowRegisterForm }: { setShowRegisterForm: (bool: boo
                                 <TextField
                                     label="Teléfono*"
                                     size={"small"}
-                                    autoComplete='off'
                                     onKeyDown={handleKeyDown}
                                     inputMode="tel"
                                     fullWidth
@@ -111,7 +108,6 @@ const RegisterForm = ({ setShowRegisterForm }: { setShowRegisterForm: (bool: boo
                                     label="Correo*"
                                     size={"small"}
                                     fullWidth
-                                    autoComplete='off'
                                     variant="outlined"
                                     inputMode="email"
                                     {...getFieldProps("email")}
@@ -125,7 +121,6 @@ const RegisterForm = ({ setShowRegisterForm }: { setShowRegisterForm: (bool: boo
                                     size={"small"}
                                     type={showPassword ? "text" : "password"}
                                     fullWidth
-                                    autoComplete='off'
                                     variant="outlined"
                                     {...getFieldProps("password")}
                                     error={!!errors.password && touched.password}
@@ -149,7 +144,6 @@ const RegisterForm = ({ setShowRegisterForm }: { setShowRegisterForm: (bool: boo
                                     size={"small"}
                                     type={showConfirmPassword ? "text" : "password"}
                                     fullWidth
-                                    autoComplete='off'
                                     variant="outlined"
                                     {...getFieldProps("confirmPassword")}
                                     error={!!errors.confirmPassword && touched.confirmPassword}
