@@ -1,14 +1,14 @@
-import apiRequest from "@/api"
-import {notifyError} from "@/utils/generalFunctions";
+import { notifyError } from "@/utils/generalFunctions";
+import apiRequest from "@/api";
 
-const url = `/inventory/admin/user/api`
-const updateUrl = `/inventory/admin/user/update/api`
+const url = `/inventory/admin/user/api`;
+const updateUrl = `/inventory/admin/user/update/api`;
 
 const users = {
-    allUsers: async function (userId: any) {
+    allUsers: async function () {
         try {
-            const response = await apiRequest.get(url)
-            return response.data
+            const response = await apiRequest.get(url);
+            return response.data;
         } catch (e) {
             notifyError("Ha fallado la acción de obtener los detalles de los usuarios")
         }
@@ -49,23 +49,22 @@ const users = {
         return false
     },
 
-    changeRol: async function (id: any, roleId: any) {
+    changeRol: async function (id?: number, roleId?: number) {
         try {
-            const response = await apiRequest.patch(updateUrl, { roleId: roleId }, { params: { userId: id } })
+            const response = await apiRequest.patch(updateUrl, { roleId: roleId! }, { params: { userId: id } })
             return response.data
         } catch (e) {
             notifyError("Ha fallado la acción de cambiar el rol")
         }
-
         return false
     },
 
     createMainWarehouse: async function (ownerId: number) {
         try {
             const response = await apiRequest.post(updateUrl, { ownerId })
-            return response.data
+            return response.data;
         } catch (e) {
-            notifyError("Ha fallado la creación del almacén para el owner")
+            notifyError("Ha fallado la creación del almacén para el owner");
         }
 
         return false

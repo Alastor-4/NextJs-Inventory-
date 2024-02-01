@@ -1,185 +1,90 @@
-// @ts-nocheck
-"use client"
+"use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-    AppBar,
-    Badge,
-    Box, Button,
-    Card,
-    CardContent,
-    Checkbox,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Divider,
-    FormControl,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    OutlinedInput,
-    Select,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Toolbar,
-    Tooltip,
-    Typography
+    AppBar, Badge, Box, Card, CardContent, Checkbox, Chip, Divider,
+    IconButton, Table, TableBody, TableCell, TableContainer, TableHead,
+    TableRow, Toolbar, Tooltip, Typography
 } from "@mui/material";
-import { TableNoData } from "@/components/TableNoData";
 import {
-    ArrowLeft,
-    ChangeCircleOutlined,
-    CreateNewFolderOutlined,
-    Done,
-    PauseOutlined,
-    PersonOutlined,
-    StartOutlined,
+    ArrowLeft, ChangeCircleOutlined, CreateNewFolderOutlined,
+    Done, PauseOutlined, PersonOutlined, StartOutlined,
 } from "@mui/icons-material";
-import users from "../requests/users"
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import { UsersMainTableProps, userWithRole } from "@/types/interfaces";
+import { getRoleTranslation } from "@/utils/getRoleTranslation";
+import { getColorByRole } from "@/utils/getColorbyRole";
+import { TableNoData } from "@/components/TableNoData";
+import ChangeRoleModal from "./Modal/ChangeRoleModal";
 import { useRouter } from "next/navigation";
-import {notifyError, notifySuccess} from "@/utils/generalFunctions";
+import users from "../requests/users";
 
-export default function UsersMainTable(props) {
-    const { roles, userId } = props
+const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
 
-    const router = useRouter()
+    const router = useRouter();
 
-    const [data, setData] = React.useState(null)
+    const [dataUsers, setDataUsers] = useState<userWithRole[] | null>(null);
 
-    //get initial data
-    React.useEffect(() => {
+    //GET initial data
+    useEffect(() => {
         const getAllUser = async () => {
-            const newData = await users.allUsers(userId)
-            setData(newData)
+            const newUsersData: userWithRole[] = await users.allUsers();
+            setDataUsers(newUsersData);
         }
-        if (data === null) {
-            getAllUser();
-        }
-    }, [data, userId])
+        if (!dataUsers) getAllUser();
+    }, [dataUsers, userId]);
 
-    //table selected item
-    const [selected, setSelected] = React.useState(null)
-    const handleSelectItem = (item) => {
-        if (selected && (selected.id === item.id)) {
-            setSelected(null)
+    //SELECT user in table
+    const [selectedUser, setSelectedUser] = useState<userWithRole | null>(null);
+    const handleSelectUser = (user: userWithRole) => {
+        if (selectedUser && (selectedUser.id === user.id)) {
+            setSelectedUser(null);
         } else {
-            setSelected(item)
+            setSelectedUser(user);
         }
     }
 
-    async function handleCreateWarehouse() {
-        if (selected.roles.name === "store_owner") {
-            const response = await users.createMainWarehouse(selected.id)
+    const handleCreateWarehouse = async () => {
+        if (selectedUser?.roles && selectedUser?.roles.name === "store_owner") {
+            const response = await users.createMainWarehouse(selectedUser.id);
 
             if (response) {
-                notifySuccess("Almacén principal creado para el usuario")
+                notifySuccess("Almacén principal creado para el usuario");
             }
         } else {
-            notifyError("El usuario seleccionado no tiene rol owner")
+            notifyError("El usuario seleccionado no tiene rol owner");
         }
     }
 
-    //change role dialog
-    const [openDialog, setOpenDialog] = React.useState(false);
+    //CHANGE role dialog
+    const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
 
-    const handleClickOpenDialog = () => {
-        setOpenDialog(true);
-    };
+    const handleClickOpenDialog = () => setIsOpenDialog(true);
 
-    function ChangeRoleDialog(props) {
-        const { open, setOpen, selected, setData, setSelected } = props
-
-        const [selectedRole, setSelectedRole] = React.useState<number | string>('');
-
-        const handleChange = (event: SelectChangeEvent<typeof selectedRole>) => {
-            setSelectedRole(event.target.value || '');
-        };
-
-        const handleClose = () => {
-            setOpen(false);
-        };
-
-        const handleApplyRole = async () => {
-            const response = await users.changeRol(selected.id, selectedRole.id);
-
-            if (response) {
-                const updatedUser = await users.userDetails(response.id);
-                if (updatedUser) {
-                    let newData = [...data]
-                    const updatedItemIndex = newData.findIndex(item => item.id === updatedUser.id)
-                    newData.splice(updatedItemIndex, 1, updatedUser)
-                    setData(newData)
-                    setSelected(null)
-                    setOpen(false)
-                }
-            }
-        }
-
-        return (
-            <Dialog open={open} onClose={handleClose}>
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                <DialogTitle>Cambiar role a "{selected ? selected.username : ""}"</DialogTitle>
-                <DialogContent>
-                    <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap' }}>
-                        <FormControl sx={{ m: 1, minWidth: 120 }} fullWidth>
-                            <InputLabel id="dialog-select-label">Rol</InputLabel>
-                            <Select
-                                labelId="dialog-select-label"
-                                id="dialog-select-label"
-                                value={selectedRole}
-                                onChange={handleChange}
-                                input={<OutlinedInput label="Rol" fullWidth />}
-                                fullWidth
-                            >
-                                {
-                                    roles.map(item => (
-                                        <MenuItem key={item.id} value={item}>{item.name}</MenuItem>
-                                    ))
-                                }
-                            </Select>
-                        </FormControl>
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancelar</Button>
-                    <Button color={"primary"} disabled={!selectedRole} onClick={handleApplyRole}>Cambiar</Button>
-                </DialogActions>
-            </Dialog>
-        );
-    }
-
-    async function handleVerify() {
-        const response = await users.verifyUser(selected.id);
+    const handleVerify = async () => {
+        const response = await users.verifyUser(selectedUser?.id);
         if (response) {
-            let newData = [...data]
-            const updatedItemIndex = newData.findIndex(item => item.id === response.id)
-            newData[updatedItemIndex].is_verified = !newData[updatedItemIndex].is_verified
-            setData(newData)
-            setSelected(null)
+            let newDataUsers = [...dataUsers!];
+            const updatedItemIndex = newDataUsers.findIndex(user => user.id === response.id);
+            newDataUsers[updatedItemIndex].is_verified = !newDataUsers[updatedItemIndex].is_verified;
+            setDataUsers(newDataUsers);
+            setSelectedUser(null);
         }
     }
 
-    async function handleToggleActive() {
-        const isActive = !selected.is_active
-        const response = await users.toggleActivateUser(selected.id, isActive)
+    const handleToggleActive = async () => {
+        const isActive = !selectedUser?.is_active
+        const response = await users.toggleActivateUser(selectedUser?.id, isActive);
         if (response) {
-            let newData = [...data]
-            const updatedItemIndex = newData.findIndex(item => item.id === response.id)
-            newData[updatedItemIndex].is_active = !newData[updatedItemIndex].is_active
-            setData(newData)
-            setSelected(null)
+            let newDataUsers = [...dataUsers!];
+            const updatedItemIndex = newDataUsers.findIndex(user => user.id === response.id)
+            newDataUsers[updatedItemIndex].is_active = !newDataUsers[updatedItemIndex].is_active;
+            setDataUsers(newDataUsers);
+            setSelectedUser(null);
         }
     }
 
-    function handleNavigateBack() {
-        router.back()
-    }
+    const handleNavigateBack = () => router.back();
 
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -203,35 +108,30 @@ export default function UsersMainTable(props) {
 
                 <Box sx={{ display: "flex" }}>
                     {
-                        selected && (
+                        selectedUser && (
                             <Box sx={{ display: "flex" }}>
                                 {
-                                    !selected.is_verified
+                                    !selectedUser?.is_verified
                                     && (
                                         <IconButton color={"inherit"} onClick={handleVerify}>
                                             <Done fontSize={"small"} />
                                         </IconButton>
                                     )
                                 }
-
                                 <IconButton color={"inherit"} onClick={handleToggleActive}>
                                     {
-                                        selected.is_active
+                                        selectedUser?.is_active
                                             ? <PauseOutlined fontSize={"small"} />
                                             : <StartOutlined fontSize={"small"} />
                                     }
                                 </IconButton>
-
                                 <Divider orientation="vertical" variant="middle" flexItem
                                     sx={{ borderRight: "2px solid white", mx: "5px" }} />
-
                                 <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
                                     <ChangeCircleOutlined fontSize={"small"} />
                                 </IconButton>
-
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                         sx={{ borderRight: "2px solid white", mx: "5px" }} />
-
+                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
                                 <IconButton color={"inherit"} onClick={handleCreateWarehouse}>
                                     <CreateNewFolderOutlined fontSize={"small"} />
                                 </IconButton>
@@ -245,31 +145,11 @@ export default function UsersMainTable(props) {
 
     const TableHeader = () => {
         const headCells = [
-            {
-                id: "username",
-                label: "Usuario",
-                align: "left"
-            },
-            {
-                id: "name",
-                label: "Nombre",
-                align: "left"
-            },
-            {
-                id: "mail",
-                label: "Correo",
-                align: "left"
-            },
-            {
-                id: "phone",
-                label: "Teléfono",
-                align: "left"
-            },
-            {
-                id: "role_id",
-                label: "Role",
-                align: "left"
-            },
+            { id: "username", label: "Usuario", },
+            { id: "name", label: "Nombre", },
+            { id: "mail", label: "Correo", },
+            { id: "phone", label: "Teléfono", },
+            { id: "role_id", label: "Role", },
         ]
 
         return (
@@ -280,12 +160,11 @@ export default function UsersMainTable(props) {
                         align={"left"}
                         padding={'checkbox'}
                     >
-
                     </TableCell>
                     {headCells.map(headCell => (
                         <TableCell
                             key={headCell.id}
-                            align={"left"}
+                            align={"center"}
                             padding={'normal'}
                         >
                             {headCell.label}
@@ -297,45 +176,26 @@ export default function UsersMainTable(props) {
     }
 
     const TableContent = () => {
-        function getColorByRole(roleName) {
-            switch (roleName) {
-                case "admin":
-                    return "primary"
-
-                case "store_owner":
-                    return "secondary"
-
-                case "store_keeper":
-                    return "error"
-
-                case "store_seller":
-                    return "success"
-
-                default:
-                    return "info"
-            }
-        }
-
 
         return (
             <TableBody>
-                {data.map(row => (
+                {dataUsers?.map((user: userWithRole) => (
                     <TableRow
-                        key={row.id}
+                        key={user.id}
                         hover
                         tabIndex={-1}
-                        selected={selected && (row.id === selected.id)}
+                        selected={!!selectedUser && (user.id === selectedUser?.id)}
+                        onClick={() => handleSelectUser(user)}
                     >
                         <TableCell>
                             <Checkbox
-                                size={"small"} checked={selected && (row.id === selected.id)}
-                                onClick={() => handleSelectItem(row)}
+                                size={"small"} checked={!!selectedUser && (user.id === selectedUser?.id)}
                             />
                         </TableCell>
                         <TableCell>
-                            <Tooltip title={`Usuario ${row.is_active ? 'activo' : 'inactivo'} (${row.roles?.name ?? "user"})`}>
+                            <Tooltip title={`Usuario ${user.is_active ? 'activo' : 'inactivo'} (${user.roles?.name ?? "user"})`}>
                                 <Badge
-                                    color={row.is_active === true ? "success" : "error"}
+                                    color={user.is_active === true ? "success" : "error"}
                                     variant={"dot"}
                                     anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                                 >
@@ -343,13 +203,13 @@ export default function UsersMainTable(props) {
                                 </Badge>
                             </Tooltip>
                             {
-                                row.is_verified
+                                user.is_verified
                                     ? (<Box sx={{
                                         display: "inline-flex",
                                         p: "3px",
                                         my: "8px"
                                     }}>
-                                        {row.username}
+                                        {user.username}
                                     </Box>)
                                     : (<Tooltip title={"Usuario no verificado"}>
                                         <Box sx={{
@@ -360,30 +220,23 @@ export default function UsersMainTable(props) {
                                             color: "white",
                                             borderRadius: "3px"
                                         }}>
-                                            {row.username}
+                                            {user.username}
                                         </Box>
                                     </Tooltip>)
                             }
                         </TableCell>
-                        <TableCell>
-                            {row.name}
-                        </TableCell>
-                        <TableCell>
-                            {row.mail}
-                        </TableCell>
-                        <TableCell>
-                            {row.phone}
-                        </TableCell>
+                        <TableCell>{user.name}</TableCell>
+                        <TableCell>{user.mail}</TableCell>
+                        <TableCell>{user.phone}</TableCell>
                         <TableCell>
                             {
-                                row.roles ? (
+                                user.roles ? (
                                     <Chip
                                         size={"small"}
-                                        label={row.roles.name}
-                                        color={getColorByRole(row.roles.name)}
+                                        label={getRoleTranslation(user.roles.name!)}
+                                        color={getColorByRole(user.roles.name!)}
                                         sx={{ border: "1px solid lightGreen" }}
-                                    />
-                                ) : "-"
+                                    />) : "-"
                             }
                         </TableCell>
                     </TableRow>
@@ -394,24 +247,25 @@ export default function UsersMainTable(props) {
 
     return (
         <>
-            <ChangeRoleDialog
-                open={openDialog}
-                setOpen={setOpenDialog}
-                setData={setData}
-                selected={selected}
-                setSelected={setSelected}
-            />
+            {isOpenDialog && <ChangeRoleModal
+                open={isOpenDialog}
+                setOpen={setIsOpenDialog}
+                dataUsers={dataUsers}
+                setDataUsers={setDataUsers}
+                roles={roles}
+                selectedUser={selectedUser}
+                setSelectedUser={setSelectedUser}
+            />}
             <Card variant={"outlined"}>
                 <CustomToolbar />
 
                 <CardContent>
                     {
-                        data?.length > 0
+                        dataUsers?.length! > 0
                             ? (
                                 <TableContainer sx={{ width: "100%", overflowX: "auto" }}>
                                     <Table sx={{ width: "100%" }} size={"small"}>
                                         <TableHeader />
-
                                         <TableContent />
                                     </Table>
                                 </TableContainer>
@@ -424,3 +278,5 @@ export default function UsersMainTable(props) {
         </>
     )
 }
+
+export default UsersMainTable
