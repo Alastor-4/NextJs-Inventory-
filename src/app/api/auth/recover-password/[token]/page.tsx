@@ -98,7 +98,6 @@ const ChangePassword = () => {
                                             size={"small"}
                                             type={showPassword ? "text" : "password"}
                                             fullWidth
-                                            autoComplete='off'
                                             variant="outlined"
                                             {...getFieldProps("password")}
                                             error={!!errors.password && touched.password}
@@ -118,11 +117,10 @@ const ChangePassword = () => {
                                     </Grid>}
                                 {!passwordChanged && <Grid item xs={12}>
                                     <TextField
-                                        label="Confirmar Contraseña*"
+                                        label="Confirmar contraseña*"
                                         size={"small"}
                                         type={showConfirmPassword ? "text" : "password"}
                                         fullWidth
-                                        autoComplete='off'
                                         variant="outlined"
                                         {...getFieldProps("confirmPassword")}
                                         error={!!errors.confirmPassword && touched.confirmPassword}

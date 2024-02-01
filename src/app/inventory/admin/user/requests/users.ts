@@ -1,5 +1,6 @@
-import { notifyError } from "@/utils/generalFunctions";
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import apiRequest from "@/api";
+import { hashPassword } from "@/utils/serverActions";
 
 const url = `/inventory/admin/user/api`;
 const updateUrl = `/inventory/admin/user/update/api`;
@@ -49,9 +50,20 @@ const users = {
         return false
     },
 
+    changePassword: async function (userId: number, password: string) {
+        try {
+            const passwordHash = await hashPassword(password);
+            const response = await apiRequest.put(updateUrl, { passwordHash: passwordHash }, { params: { userId: userId } });
+            if (response.status === 201) notifySuccess(response.data);
+            return response.data
+        } catch (error) {
+            notifyError("Ha fallado la acción de cambiar la contraseña");
+        }
+    },
+
     changeRol: async function (id?: number, roleId?: number) {
         try {
-            const response = await apiRequest.patch(updateUrl, { roleId: roleId! }, { params: { userId: id } })
+            const response = await apiRequest.patch(updateUrl, { roleId: roleId! }, { params: { userId: id } });
             return response.data
         } catch (e) {
             notifyError("Ha fallado la acción de cambiar el rol")
