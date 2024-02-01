@@ -7,15 +7,6 @@ const verifyRegisterDataUrl = "/api/auth/register/verify-register-data";
 const urlChangePassword = "/api/auth/change-password";
 
 const auth = {
-    verifyRegisterData: async function (username: string, phone: string, email: string) {
-        try {
-            const response = await apiRequest.post(verifyRegisterDataUrl, { username, phone, email });
-            return response.data;
-        } catch (e) {
-            notifyError("Ha ocurrido un error comprobando los datos de registro del usuario");
-        }
-    },
-
     register: async function ({ username, password, name, email, phone }: any) {
         try {
             const passwordHash = await hashPassword(password);
