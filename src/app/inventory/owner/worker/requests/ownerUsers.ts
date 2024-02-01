@@ -3,6 +3,7 @@ import apiRequest from "@/api";
 
 const url = "/inventory/owner/worker/api";
 const urlCreate = "/inventory/owner/worker/create/api";
+const urlUpdate = "/inventory/owner/worker/update/api";
 
 const ownerUsers = {
     allWorkers: async function (userId: any) {
@@ -18,10 +19,21 @@ const ownerUsers = {
 
     changeRol: async function (workerId?: number, roleId?: number) {
         try {
-            const response = await apiRequest.patch(url, { roleId: roleId }, { params: { userId: workerId } })
+            const response = await apiRequest.patch(urlUpdate, { roleId: roleId }, { params: { userId: workerId } })
             return response.data
         } catch (e) {
             notifyError("Error al cambiar el rol del usuario")
+        }
+
+        return false
+    },
+
+    workerDetails: async function (workerId: number) {
+        try {
+            const response = await apiRequest.get(urlUpdate, { params: { userId: workerId } })
+            return response.data
+        } catch (e) {
+            notifyError("Ha fallado la acción de obtener los detalles del trabajador")
         }
 
         return false

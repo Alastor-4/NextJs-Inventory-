@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
 
-// Get all owner's user workers
+// GET all owner's user workers
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const ownerId = +searchParams.get("ownerId")!;
@@ -15,22 +15,7 @@ export async function GET(req: Request) {
     return new Response('La acción de obtener los usuarios ha fallado', { status: 500 })
 }
 
-// Change owner's user role
-export async function PATCH(req: Request) {
-    const { searchParams } = new URL(req.url);
-    const userId = +searchParams.get("userId")!;
-    const { roleId } = await req.json();
-
-    if (userId) {
-        const updatedRole = await prisma.users.update({ data: { role_id: roleId }, where: { id: userId } });
-
-        return NextResponse.json(updatedRole);
-    }
-
-    return new Response('La acción de modificar rol ha fallado', { status: 500 })
-}
-
-// Delete owner's user
+// DELETE owner's user
 export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const userId = +searchParams.get("userId")!;
