@@ -61,6 +61,7 @@ const SignInForm = () => {
                                     label="Usuario"
                                     size={"small"}
                                     fullWidth
+                                    autoComplete="off"
                                     variant="outlined"
                                     {...getFieldProps("username")}
                                     error={!!errors.username && touched.username}
@@ -80,6 +81,7 @@ const SignInForm = () => {
                                     size={"small"}
                                     type={showPassword ? "text" : "password"}
                                     fullWidth
+                                    autoComplete="off"
                                     variant="outlined"
                                     {...getFieldProps("password")}
                                     error={!!errors.password && touched.password}
