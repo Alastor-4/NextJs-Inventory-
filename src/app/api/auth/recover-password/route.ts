@@ -1,4 +1,4 @@
-import { sendChangePasswordEmail } from '@/utils/serverActions';
+import { sendRecoverPasswordEmail } from '@/utils/serverActions';
 import { withAxiom, AxiomRequest } from "next-axiom";
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
@@ -10,7 +10,7 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
     const user = await prisma.users.findUnique({ where: { mail: email } });
 
     if (user) {
-        sendChangePasswordEmail(email);
+        sendRecoverPasswordEmail(email);
 
         return new NextResponse(`Verifique el correo enviado a ${email} para terminar el proceso`, { status: 200 })
     }

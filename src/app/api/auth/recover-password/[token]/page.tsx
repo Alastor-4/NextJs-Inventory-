@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { Button, Card, Grid, Typography, AppBar, Box, TextField, InputAdornment, IconButton } from '@mui/material';
 import { VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';

@@ -20,9 +20,7 @@ const SendEmailPage = () => {
     return <Formik
         initialValues={sendEmailInitialValues}
         validationSchema={sendEmailValidationSchema}
-        onSubmit={async ({ email }) => {
-            await auth.sendEmailToFindUser(email);
-        }}
+        onSubmit={async ({ email }) => { await auth.sendEmailToFindUser(email) }}
     >
         {
             ({ handleSubmit, getFieldProps, touched, errors }) => (
