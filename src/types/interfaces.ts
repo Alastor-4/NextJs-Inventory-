@@ -487,6 +487,14 @@ export interface ChangeRoleWorkerModalProps {
     selectedWorker: userWithRole | null;
     setSelectedWorker: React.Dispatch<React.SetStateAction<userWithRole | null>>;
 }
+
+export interface ChangePasswordModalProps {
+    open: boolean;
+    setOpen: (bool: boolean) => void;
+    selectedUser: userWithRole | null;
+    setSelectedUser: React.Dispatch<React.SetStateAction<userWithRole | null>>;
+}
+
 export interface StoreDepotsAssignProps {
     userId?: number;
     selectedWarehouseId?: number;

@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import {
     ArrowLeft, ChangeCircleOutlined, CreateNewFolderOutlined,
-    Done, PauseOutlined, PersonOutlined, StartOutlined,
+    Done, PauseOutlined, PersonOutlined, StartOutlined, VpnKey,
 } from "@mui/icons-material";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import { UsersMainTableProps, userWithRole } from "@/types/interfaces";
@@ -18,6 +18,7 @@ import { TableNoData } from "@/components/TableNoData";
 import ChangeRoleModal from "./Modal/ChangeRoleModal";
 import { useRouter } from "next/navigation";
 import users from "../requests/users";
+import ChangePasswordModal from "./Modal/ChangePasswordModal";
 
 const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
 
@@ -71,6 +72,10 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
             setSelectedUser(null);
         }
     }
+
+    const [isOpenChangePasswordModal, setIsOpenChangePasswordModal] = useState<boolean>(false);
+
+    const handleIsOpenChangePasswordModal = () => setIsOpenChangePasswordModal(true);
 
     const handleToggleActive = async () => {
         const isActive = !selectedUser?.is_active
@@ -126,12 +131,17 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
                                     }
                                 </IconButton>
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                    sx={{ borderRight: "2px solid white", mx: "2px" }} />
+                                <IconButton color={"inherit"} onClick={handleIsOpenChangePasswordModal}>
+                                    <VpnKey fontSize={"small"} />
+                                </IconButton>
+                                <Divider orientation="vertical" variant="middle" flexItem
+                                    sx={{ borderRight: "2px solid white", mx: "2px" }} />
                                 <IconButton color={"inherit"} onClick={handleClickOpenDialog}>
                                     <ChangeCircleOutlined fontSize={"small"} />
                                 </IconButton>
                                 <Divider orientation="vertical" variant="middle" flexItem
-                                    sx={{ borderRight: "2px solid white", mx: "5px" }} />
+                                    sx={{ borderRight: "2px solid white", mx: "2px" }} />
                                 <IconButton color={"inherit"} onClick={handleCreateWarehouse}>
                                     <CreateNewFolderOutlined fontSize={"small"} />
                                 </IconButton>
@@ -256,6 +266,14 @@ const UsersMainTable = ({ roles, userId }: UsersMainTableProps) => {
                 selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}
             />}
+
+            {isOpenChangePasswordModal && <ChangePasswordModal
+                open={isOpenChangePasswordModal}
+                setOpen={setIsOpenChangePasswordModal}
+                selectedUser={selectedUser}
+                setSelectedUser={setSelectedUser}
+            />}
+
             <Card variant={"outlined"}>
                 <CustomToolbar />
 

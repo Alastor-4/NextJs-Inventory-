@@ -140,7 +140,7 @@ const RegisterForm = ({ setShowRegisterForm }: { setShowRegisterForm: (bool: boo
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
-                                    label="Confirmar Contraseña*"
+                                    label="Confirmar contraseña*"
                                     size={"small"}
                                     type={showConfirmPassword ? "text" : "password"}
                                     fullWidth
