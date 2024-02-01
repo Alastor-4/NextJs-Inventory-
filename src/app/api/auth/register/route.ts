@@ -14,6 +14,16 @@ export const GET = withAxiom(async (req: AxiomRequest) => {
         try {
             const tokenPayload: string | JwtPayload = jwt.verify(token, jwtPrivateKey);
 
+            if (typeof tokenPayload !== 'string' && tokenPayload.email) {
+                const userByEmail = await prisma.users.findUnique({ where: { mail: tokenPayload.email } });
+                if (userByEmail) {
+                    return NextResponse.json({
+                        status: "ok",
+                        message: `Token verificado correctamente`,
+                        email: `${userByEmail?.mail}`
+                    });
+                }
+            }
             if (typeof tokenPayload !== 'string' && tokenPayload.username) {
                 const user = await prisma.users.findUnique({ where: { username: tokenPayload.username } });
 
@@ -46,18 +56,6 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
     const log = req.log.with({ scope: 'auth/register' })
 
     const { username, passwordHash, name, email, phone } = await req.json()
-
-    // const user = await prisma.users.findFirst({
-    //     where: {
-    //         OR: [
-    //             { username: username },
-    //             { mail: email },
-    //             { phone: phone },
-    //         ]
-    //     }
-    // })
-
-    // if (user) new NextResponse("Usuario, correo o teléfono ya se encuentra registrado en el sistema", { status: 202 });
 
     const newUser = await prisma.users.create({
         data: {
