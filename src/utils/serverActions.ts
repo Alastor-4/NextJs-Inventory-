@@ -28,13 +28,13 @@ export async function sendVerifyMail(username: string, toMail: string) {
 
 export async function sendRecoverPasswordEmail(email: string) {
     const verificationToken = jwt.sign({ email }, jwtPrivateKey, { expiresIn: "24h" });
-    const link = `${process.env.NEXTAUTH_URL}/recover-password/${verificationToken}`
+    const link = `${process.env.NEXTAUTH_URL}/recover-password/reset/${verificationToken}`
 
     return resend.emails.send({
         from: 'InventarioPlus <onboarding@inventarioplus.online>',
         to: email,
-        subject: "Cambio de contraseña",
+        subject: "Restablecer contraseña",
         react: RecoverPasswordTemplate({ link }),
-        text: "Visite el siguiente link para cambiar su contraseña " + link
+        text: "Visite el siguiente link para restablecer su contraseña " + link
     })
 }

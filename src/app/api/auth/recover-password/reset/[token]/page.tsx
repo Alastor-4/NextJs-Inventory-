@@ -4,7 +4,7 @@ import { Button, Card, Grid, Typography, AppBar, Box, TextField, InputAdornment,
 import { VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import auth from '../../requests/auth';
+import auth from '../../../requests/auth';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
@@ -73,22 +73,21 @@ const ChangePassword = () => {
         {
             ({ handleSubmit, getFieldProps, touched, errors, isValid }) => (
                 <form onSubmit={handleSubmit}>
-                    <Grid display={"flex"} justifyContent={"center"} height={'100vh'} mx={"auto"} width={'80vw'} alignItems={"center"}>
-                        <Card >
-                            <AppBar position={"static"} variant={"elevation"} color={"primary"} sx={{ paddingX: "40px" }}>
-                                <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", m: "10px" }}>
-                                    <Typography
-                                        variant="h6"
-                                        noWrap
-                                        sx={{
-                                            fontWeight: 700,
-                                            letterSpacing: ".1rem",
-                                            color: "white",
-                                        }}
-                                    >
-                                        {!passwordChanged ? "Cambiar contraseña" : "Contraseña cambiada"}
-                                    </Typography>
-                                </Box>
+                    <Grid display={"flex"} justifyContent={"center"} alignItems={"center"} height={'100vh'}>
+                        <Card sx={{width: {xs: "80vw", sm: "70vw", md: "40vw", lg: "30vw"}}}>
+                            <AppBar position={"static"} variant={"elevation"} color={"primary"}>
+                                <Typography
+                                    variant="h6"
+                                    noWrap
+                                    sx={{
+                                        fontWeight: 700,
+                                        letterSpacing: ".1rem",
+                                        color: "white",
+                                        padding: "10px"
+                                    }}
+                                >
+                                    {!passwordChanged ? "Establecer contraseña" : "Contraseña establecida"}
+                                </Typography>
                             </AppBar>
                             <Grid container item xs={12} spacing={2} paddingY={"20px"} paddingX={"30px"} mb={"10px"}>
                                 {!passwordChanged &&
@@ -139,21 +138,22 @@ const ChangePassword = () => {
                                     />
                                 </Grid>}
                             </Grid>
+
                             {!passwordChanged &&
                                 <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} mb={"10px"} >
                                     <Typography variant='subtitle1' color={message.color} align='center' >
                                         {message.message}
                                     </Typography>
                                 </Grid>}
-                            <Grid item display={"flex"} mb={"20px"} px={"40px"} justifyContent={"center"} alignItems={"center"}>
+
+                            <Grid item display={"flex"} mb={"20px"} px={"20px"} justifyContent={"flex-end"}>
                                 <Button
                                     type={"submit"}
                                     color={"primary"}
                                     disabled={!isValid || !!errors.password && touched.password && !!errors.confirmPassword && touched.confirmPassword || !verified}
-                                    variant={"contained"}
-                                    size={"large"}
+                                    variant={"outlined"}
                                 >
-                                    {passwordChanged ? "Ir a iniciar sesión" : "Cambiar contraseña"}
+                                    {passwordChanged ? "Iniciar sesión" : "Establecer"}
                                 </Button>
                             </Grid>
                         </Card>
