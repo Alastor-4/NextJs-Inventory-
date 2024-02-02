@@ -14,6 +14,7 @@ export const POST = withAxiom(async (req: AxiomRequest) => {
 
         return new NextResponse(`Verifique el correo enviado a ${email} para terminar el proceso`, { status: 200 })
     }
+
     return new NextResponse("No se encontró usuario con este correo");
 });
 
@@ -27,8 +28,10 @@ export const PATCH = withAxiom(async (req: AxiomRequest) => {
             if (user) {
                 return new NextResponse("Contraseña cambiada satisfactoriamente", { status: 200 });
             }
+
             return new NextResponse("No se encontró usuario con este correo", { status: 404 });
         }
+
         return new NextResponse("Correo es obligatorio", { status: 400 });
     } catch (error) {
         return new NextResponse("Internal Error", { status: 500 });

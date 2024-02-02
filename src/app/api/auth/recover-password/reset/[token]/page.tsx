@@ -1,13 +1,13 @@
 'use client';
 
-import { Button, Card, Grid, Typography, AppBar, Box, TextField, InputAdornment, IconButton } from '@mui/material';
+import { Button, Card, Grid, Typography, AppBar, TextField, InputAdornment, IconButton } from '@mui/material';
 import { VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import auth from '../../../requests/auth';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
+import apiRequest from "@/api";
 
 const ChangePassword = () => {
     const router = useRouter();
@@ -28,7 +28,7 @@ const ChangePassword = () => {
     useEffect(() => {
         const verifyToken = async () => {
             try {
-                const axiosResponse = await axios.get("/api/auth/register", { params: { token: token } })
+                const axiosResponse = await apiRequest.get("/api/auth/register", { params: { token: token } })
                 if (axiosResponse.status === 200) {
                     setMessage({ message: axiosResponse.data.message, color: "green" });
                     setVerified(true);
@@ -45,6 +45,7 @@ const ChangePassword = () => {
         password: '',
         confirmPassword: ''
     };
+
     const changePasswordValidationSchema = Yup.object({
         password: Yup.string()
             .required('Este campo es requerido')
@@ -55,6 +56,7 @@ const ChangePassword = () => {
             .oneOf([Yup.ref("password"), null],
                 "Las contraseñas no coinciden")
     });
+
     return <Formik
         initialValues={changePasswordInitialValues}
         validationSchema={changePasswordValidationSchema}
