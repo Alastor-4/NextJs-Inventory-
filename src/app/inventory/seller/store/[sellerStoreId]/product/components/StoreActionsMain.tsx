@@ -8,7 +8,7 @@ import {
 import {
     ArrowLeft, DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
     FilterAlt, FilterAltOff, ForwardToInbox, HelpOutline, KeyboardArrowRight,
-    SellOutlined,
+    SellOutlined, SellRounded,
 } from "@mui/icons-material";
 import { computeDepotPricePerUnit, notifyError, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
@@ -1075,35 +1075,63 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                 <>
                                                     {
                                                         selectedProducts.length > 0 && (
-                                                            <Grid container justifyContent={"space-between"} mt={"15px"}>
-                                                                <Button
-                                                                    size={"small"}
-                                                                    color={"primary"}
-                                                                    variant={"outlined"}
-                                                                    onClick={() => handleOpenSellProduct(formik)}
-                                                                    startIcon={<SellOutlined fontSize={"small"} />}
-                                                                >
-                                                                    Vender {selectedProducts.length}
-                                                                </Button>
-                                                                {
-                                                                    selectedProducts.length === 1 && (
-                                                                        <Button
+                                                            <Grid container rowSpacing={1} sx={{mb: "5px", px: "5px"}}>
+                                                                <Grid item xs={12}>
+                                                                    {selectedProducts.length > 1 ? "Seleccionados" : "Seleccionado"}: {selectedProducts.length}
+                                                                </Grid>
+
+                                                                <Grid container item xs={12} columnSpacing={1} flexWrap={"nowrap"}>
+                                                                    <Grid container item columnSpacing={1} flexWrap={"nowrap"} sx={{overflowX: "auto"}}>
+                                                                        <Grid item xs={"auto"}>
+                                                                            <Button
+                                                                                size={"small"}
+                                                                                color={"primary"}
+                                                                                variant={"outlined"}
+                                                                                onClick={() => handleOpenSellProduct(formik)}
+                                                                                startIcon={<SellOutlined fontSize={"small"} />}
+                                                                            >
+                                                                                Vender
+                                                                            </Button>
+                                                                        </Grid>
+
+                                                                        {
+                                                                            selectedProducts.length === 1 && (
+                                                                                <Grid item xs={"auto"}>
+                                                                                    <Button
+                                                                                        size={"small"}
+                                                                                        variant={"outlined"}
+                                                                                        startIcon={<ForwardToInbox color="secondary" />}
+                                                                                        onClick={() => handleClickTransfer(selectedProducts[0])}
+                                                                                    >
+                                                                                        Transferir
+                                                                                    </Button>
+                                                                                </Grid>
+                                                                            )
+                                                                        }
+
+                                                                        <Grid item xs={"auto"}>
+                                                                            <Button
+                                                                                size={"small"}
+                                                                                color={"primary"}
+                                                                                variant={"outlined"}
+                                                                                onClick={() => handleOpenSellProduct(formik)}
+                                                                                startIcon={<SellRounded fontSize={"small"} />}
+                                                                            >
+                                                                                Venta por cobrar
+                                                                            </Button>
+                                                                        </Grid>
+                                                                    </Grid>
+
+                                                                    <Grid item xs={true}>
+                                                                        <IconButton
                                                                             size={"small"}
-                                                                            variant={"outlined"}
-                                                                            startIcon={<ForwardToInbox color="secondary" />}
-                                                                            onClick={() => handleClickTransfer(selectedProducts[0])}
+                                                                            color="error"
+                                                                            onClick={() => setSelectedProducts([])}
                                                                         >
-                                                                            Transferir
-                                                                        </Button>
-                                                                    )
-                                                                }
-                                                                <IconButton
-                                                                    size={"small"}
-                                                                    color="error"
-                                                                    onClick={() => setSelectedProducts([])}
-                                                                >
-                                                                    <FilterAltOff fontSize={"small"} />
-                                                                </IconButton>
+                                                                            <FilterAltOff fontSize={"small"} />
+                                                                        </IconButton>
+                                                                    </Grid>
+                                                                </Grid>
                                                             </Grid>
                                                         )
                                                     }
