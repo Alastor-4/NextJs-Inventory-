@@ -2,6 +2,7 @@ import apiRequest from "@/api"
 import { notifyError } from "@/utils/generalFunctions";
 
 const url = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/product/api`
+const urlSellReceivable = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/product/sellReceivableApi`
 
 const sellerStoreProduct = {
     allProductByDepartments: async function (sellerStoreId: number) {
@@ -48,6 +49,16 @@ const sellerStoreProduct = {
         return false
     },
 
+    createSellReceivable: async function ({ sellerStoreId, sellData, sellProductsData }: any) {
+        try {
+            const response = await apiRequest.post(urlSellReceivable(sellerStoreId), { sellData, sellProductsData })
+            return response.data
+        } catch (e) {
+            notifyError("Ha ocurrido un error creando la venta de los productos. Inténtelo nuevamente")
+        }
+
+        return false
+    },
 }
 
 export default sellerStoreProduct;

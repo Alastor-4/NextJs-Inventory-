@@ -727,8 +727,9 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     })
 
     const [displayProductSellForm, setDisplayProductSellForm] = useState<boolean>(false);
+    const [displaySaleReceivableForm, setDisplaySaleReceivableForm] = useState<boolean>(false);
 
-    const handleOpenSellProduct = (formik: any) => {
+    const handleOpenSellProduct = (formik: any, isSaleReceivable?: boolean) => {
         let productsData: any = [];
         selectedProducts.forEach((productSelected: productsProps) => {
             const storeDepot = productSelected.depots![0].store_depots![0];
@@ -742,10 +743,14 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
         formik.setFieldValue("productSell.products", productsData);
         formik.setFieldValue("productSell.paymentMethod", paymentMethods[0]);
 
-        setDisplayProductSellForm(true);
+        if (isSaleReceivable) {
+            setDisplaySaleReceivableForm(true)
+        } else {
+            setDisplayProductSellForm(true)
+        }
     }
 
-    const ProductSellForm = ({ formik, closeForm }: { formik: any, closeForm: any }) => {
+    const ProductSellForm = ({ formik, closeForm, isSaleReceivable }: { formik: any, closeForm: any, isSaleReceivable?: boolean }) => {
         async function productsSell() {
             let sellProduct: any[] = []
 
@@ -763,13 +768,15 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
 
             const sell = { paymentMethod: formik.values.productSell.paymentMethod, totalPrice: totalPrice }
 
-            const sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(
-                {
-                    sellerStoreId: storeId,
-                    sellData: sell,
-                    sellProductsData: sellProduct,
-                }
-            )
+            const data = {
+                sellerStoreId: storeId,
+                sellData: sell,
+                sellProductsData: sellProduct,
+            }
+
+            const sellItemResponse = isSaleReceivable
+                ? await sellerStoreProduct.createSellReceivable(data)
+                : await sellerStoreProduct.sellStoreDepotManual(data)
 
             if (sellItemResponse) {
                 const newDepartments = [...allProductsByDepartment!];
@@ -788,7 +795,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
 
                 setAllProductsByDepartment(newDepartments);
 
-                notifySuccess("La venta ha sido registrada");
+                notifySuccess(isSaleReceivable ? "Venta por cobrar registrada" : "La venta ha sido registrada");
             }
             formik.resetForm();
             closeForm();
@@ -960,22 +967,38 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                 images={dialogImages}
                             />
 
-                            <UpdateValueDialog
-                                dialogTitle={"Vender productos"}
-                                open={displayProductSellForm}
-                                setOpen={setDisplayProductSellForm}
-                                fullScreen
-                            >
-                                {
-                                    displayProductSellForm && (
+                            {
+                                displayProductSellForm && (
+                                    <UpdateValueDialog
+                                        dialogTitle={"Vender productos"}
+                                        open={displayProductSellForm}
+                                        setOpen={setDisplayProductSellForm}
+                                        fullScreen
+                                    >
                                         <ProductSellForm
                                             formik={formik}
                                             closeForm={() => setDisplayProductSellForm(false)}
                                         />
-                                    )
-                                }
+                                    </UpdateValueDialog>
+                                )
+                            }
 
-                            </UpdateValueDialog>
+                            {
+                                displaySaleReceivableForm && (
+                                    <UpdateValueDialog
+                                        dialogTitle={"Venta por cobrar"}
+                                        open={displaySaleReceivableForm}
+                                        setOpen={setDisplaySaleReceivableForm}
+                                        fullScreen
+                                    >
+                                        <ProductSellForm
+                                            formik={formik}
+                                            closeForm={() => setDisplaySaleReceivableForm(false)}
+                                            isSaleReceivable
+                                        />
+                                    </UpdateValueDialog>
+                                )
+                            }
 
                             <ModalTransfer
                                 open={activeModalTransfer}
@@ -1114,7 +1137,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                                                 size={"small"}
                                                                                 color={"primary"}
                                                                                 variant={"outlined"}
-                                                                                onClick={() => handleOpenSellProduct(formik)}
+                                                                                onClick={() => handleOpenSellProduct(formik, true)}
                                                                                 startIcon={<SellRounded fontSize={"small"} />}
                                                                             >
                                                                                 Venta por cobrar
