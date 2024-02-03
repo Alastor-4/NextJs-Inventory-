@@ -636,7 +636,9 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                             {
                                                                 product?.depots![0].store_depots![0].seller_profit_percentage
                                                                     ? `${product?.depots![0].store_depots![0].seller_profit_percentage} %`
-                                                                    : `${product?.depots![0].store_depots![0].seller_profit_quantity} CUP`
+                                                                    : product?.depots![0].store_depots![0].seller_profit_quantity
+                                                                        ? `${product?.depots![0].store_depots![0].seller_profit_quantity} CUP`
+                                                                        : "-"
                                                             }
                                                         </Grid>
                                                     </Grid>
