@@ -70,8 +70,8 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                             <Box >
                                 {userDetails ? <Chip
                                     size={"small"}
-                                    label={getRoleTranslation(userDetails?.roles.name!)}
-                                    color={getColorByRole(userDetails?.roles.name!)}
+                                    label={getRoleTranslation(userDetails?.roles?.name!)}
+                                    color={getColorByRole(userDetails?.roles?.name!)}
                                     sx={{ border: "1px solid", height: "1.2rem" }}
                                 /> : ""}</Box>
                         </Box>

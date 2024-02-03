@@ -466,7 +466,7 @@ export interface userWithRole {
         name: string | null;
         description: string | null;
         created_at: Date;
-    }
+    } | null
 }
 
 export interface ChangeRoleModalProps {
@@ -486,6 +486,16 @@ export interface ChangeRoleWorkerModalProps {
     roles: roles[] | null;
     selectedWorker: userWithRole | null;
     setSelectedWorker: React.Dispatch<React.SetStateAction<userWithRole | null>>;
+}
+
+export interface MyAccountProps {
+    user: userWithRole | null;
+}
+
+export interface ChangeMyAccountPasswordModalProps {
+    isOpen: boolean;
+    setIsOpen: (bool: boolean) => void;
+    user: userWithRole | null;
 }
 
 export interface ChangePasswordModalProps {
