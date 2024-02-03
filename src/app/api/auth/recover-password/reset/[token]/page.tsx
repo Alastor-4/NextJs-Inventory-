@@ -3,11 +3,11 @@
 import { Button, Card, Grid, Typography, AppBar, TextField, InputAdornment, IconButton } from '@mui/material';
 import { VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import auth from '../../../requests/auth';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import apiRequest from "@/api";
+import {notifySuccess} from "@/utils/generalFunctions";
 
 const ChangePassword = () => {
     const router = useRouter();
@@ -16,30 +16,11 @@ const ChangePassword = () => {
 
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
-    const [passwordChanged, setPasswordChanged] = useState<boolean>(false);
 
     const toggleVisibilityPassword = () => setShowPassword(!showPassword);
     const toggleVisibilityConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
-    const [verified, setVerified] = useState<boolean | null>(false);
-    const [userEmail, setUserEmail] = useState<string | null>(null);
-    const [message, setMessage] = useState<{ message: string, color: string }>({ message: 'Validando token...', color: "black" });
-
-    useEffect(() => {
-        const verifyToken = async () => {
-            try {
-                const axiosResponse = await apiRequest.get("/api/auth/register", { params: { token: token } })
-                if (axiosResponse.status === 200) {
-                    setMessage({ message: axiosResponse.data.message, color: "green" });
-                    setVerified(true);
-                    setUserEmail(axiosResponse.data.email);
-                }
-            } catch (error) {
-                setMessage({ message: "Token de verificación incorrecto", color: "red" });
-            }
-        }
-        !verified && verifyToken();
-    }, [token, verified]);
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     const changePasswordInitialValues = {
         password: '',
@@ -61,14 +42,16 @@ const ChangePassword = () => {
         initialValues={changePasswordInitialValues}
         validationSchema={changePasswordValidationSchema}
         onSubmit={async ({ password }) => {
-            if (verified && !passwordChanged) {
-                const response = await auth.changePassword(userEmail!, password);
-                if (response?.status === 200) {
-                    setPasswordChanged(true);
+            const response = await auth.changePassword(token.toString(), password);
+
+            if (response) {
+                if (response.status === 200) {
+                    notifySuccess("Nueva contraseña establecida. Ahora puede iniciar sesión")
+
+                    router.push('/');
+                } else {
+                    setErrorMessage(response)
                 }
-            }
-            if (passwordChanged) {
-                router.push('/');
             }
         }}
     >
@@ -88,37 +71,37 @@ const ChangePassword = () => {
                                         padding: "10px"
                                     }}
                                 >
-                                    {!passwordChanged ? "Establecer contraseña" : "Contraseña establecida"}
+                                    Establecer contraseña
                                 </Typography>
                             </AppBar>
                             <Grid container item xs={12} spacing={2} paddingY={"20px"} paddingX={"30px"} mb={"10px"}>
-                                {!passwordChanged &&
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            label="Contraseña*"
-                                            size={"small"}
-                                            type={showPassword ? "text" : "password"}
-                                            fullWidth
-                                            variant="outlined"
-                                            {...getFieldProps("password")}
-                                            error={!!errors.password && touched.password}
-                                            helperText={(errors.password && touched.password) && errors.password}
-                                            InputProps={{
-                                                endAdornment:
-                                                    <InputAdornment
-                                                        position="end"
-                                                        onClick={toggleVisibilityPassword}
-                                                    >
-                                                        <IconButton size={"small"}>
-                                                            {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
-                                                        </IconButton>
-                                                    </InputAdornment>,
-                                            }}
-                                        />
-                                    </Grid>}
-                                {!passwordChanged && <Grid item xs={12}>
+                                <Grid item xs={12}>
                                     <TextField
-                                        label="Confirmar contraseña*"
+                                        label="Contraseña"
+                                        size={"small"}
+                                        type={showPassword ? "text" : "password"}
+                                        fullWidth
+                                        variant="outlined"
+                                        {...getFieldProps("password")}
+                                        error={!!errors.password && touched.password}
+                                        helperText={(errors.password && touched.password) && errors.password}
+                                        InputProps={{
+                                            endAdornment:
+                                                <InputAdornment
+                                                    position="end"
+                                                    onClick={toggleVisibilityPassword}
+                                                >
+                                                    <IconButton size={"small"}>
+                                                        {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
+                                                    </IconButton>
+                                                </InputAdornment>,
+                                        }}
+                                    />
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <TextField
+                                        label="Confirmar contraseña"
                                         size={"small"}
                                         type={showConfirmPassword ? "text" : "password"}
                                         fullWidth
@@ -138,24 +121,35 @@ const ChangePassword = () => {
                                                 </InputAdornment>
                                         }}
                                     />
-                                </Grid>}
+                                </Grid>
                             </Grid>
 
-                            {!passwordChanged &&
+                            {errorMessage &&
                                 <Grid item display={"flex"} justifyContent={"center"} alignItems={"center"} mb={"10px"} >
-                                    <Typography variant='subtitle1' color={message.color} align='center' >
-                                        {message.message}
+                                    <Typography variant='subtitle1' color={"red"} align='center'>
+                                        {errorMessage}
                                     </Typography>
                                 </Grid>}
 
                             <Grid item display={"flex"} mb={"20px"} px={"20px"} justifyContent={"flex-end"}>
                                 <Button
+                                    color={"inherit"}
+                                    variant={"outlined"}
+                                    onClick={() => router.replace("/")}
+                                    size={"small"}
+                                >
+                                    Cancelar
+                                </Button>
+
+                                <Button
                                     type={"submit"}
                                     color={"primary"}
-                                    disabled={!isValid || !!errors.password && touched.password && !!errors.confirmPassword && touched.confirmPassword || !verified}
+                                    disabled={!isValid}
                                     variant={"outlined"}
+                                    size={"small"}
+                                    sx={{ml: "10px"}}
                                 >
-                                    {passwordChanged ? "Iniciar sesión" : "Establecer"}
+                                    Restablecer
                                 </Button>
                             </Grid>
                         </Card>
