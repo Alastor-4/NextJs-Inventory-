@@ -2,15 +2,15 @@
 
 import {
     Button, Dialog, DialogActions, DialogContent, DialogTitle,
-    Grid, IconButton, InputAdornment, TextField, Typography
+    Grid, IconButton, InputAdornment, TextField
 } from '@mui/material';
 import { Close, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
-import { ChangeMyAccountPasswordModalProps } from '@/types/interfaces';
+import { ChangeAccountPasswordModalProps } from '@/types/interfaces';
 import React, { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-const ChangeMyAccountPasswordModal = ({ isOpen, setIsOpen }: ChangeMyAccountPasswordModalProps) => {
+const ChangeAccountPasswordModal = ({ isOpen, setIsOpen }: ChangeAccountPasswordModalProps) => {
 
     const handleClose = () => setIsOpen(false);
 
@@ -43,7 +43,10 @@ const ChangeMyAccountPasswordModal = ({ isOpen, setIsOpen }: ChangeMyAccountPass
     return <Formik
         initialValues={changePasswordInitialValues}
         validationSchema={changePasswordValidationSchema}
-        onSubmit={async ({ password }) => {
+        onSubmit={async ({ oldPassword, password }) => {
+            console.log(oldPassword);
+            console.log(password);
+
             // const response = await users.changePassword(selectedUser?.id!, password);
 
             // if (response === "Contraseña cambiada correctamente") {
@@ -167,4 +170,4 @@ const ChangeMyAccountPasswordModal = ({ isOpen, setIsOpen }: ChangeMyAccountPass
     </Formik >
 }
 
-export default ChangeMyAccountPasswordModal
+export default ChangeAccountPasswordModal
