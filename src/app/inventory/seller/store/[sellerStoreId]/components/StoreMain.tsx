@@ -298,7 +298,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             color: "white",
                         }}
                     >
-                        Mi Tienda
+                        {storeDetails?.name}
                     </Typography>
                 </Box>
             </Toolbar>
@@ -941,12 +941,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                 storeDetails && (
                     <CardContent>
                         <Grid container item spacing={2}>
-                            <Grid container item xs={12} justifyContent={"center"}>
-                                <Typography variant={"h5"}>
-                                    {storeDetails?.name ?? "-"}
-                                </Typography>
-                            </Grid>
-
                             <Grid container item xs={12} rowSpacing={1}>
                                 <Grid container item xs={12} justifyContent={"center"}>
                                     Ahora mismo:
@@ -995,18 +989,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                         )
                                     }
                                 </Grid>
-                            </Grid>
-
-                            <Grid container item xs={12} justifyContent={"center"}>
-                                {storeDetails?.slogan ?? "-"}
-                            </Grid>
-
-                            <Grid container item xs={12} justifyContent={"center"}>
-                                {storeDetails?.description ?? "-"}
-                            </Grid>
-
-                            <Grid container item xs={12} justifyContent={"center"}>
-                                {storeDetails?.address ?? "-"}
                             </Grid>
 
                             <Grid item xs={12} md={6}>

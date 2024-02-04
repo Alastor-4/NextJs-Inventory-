@@ -186,7 +186,9 @@ function StoreMoreDetails(props: any) {
                                 {
                                     row?.depots![0].store_depots![0].seller_profit_percentage
                                         ? `${row?.depots![0].store_depots![0].seller_profit_percentage} %`
-                                        : `${row?.depots![0].store_depots![0].seller_profit_quantity} CUP`
+                                        : row?.depots![0].store_depots![0].seller_profit_quantity
+                                            ? `${row?.depots![0].store_depots![0].seller_profit_quantity} CUP`
+                                            : "-"
                                 }
                             </Grid>
 

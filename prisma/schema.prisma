@@ -114,29 +114,30 @@ model roles {
 }
 
 model store_depots {
-  id                        Int                       @id @default(autoincrement())
+  id                        Int                        @id @default(autoincrement())
   store_id                  Int?
   depot_id                  Int?
   product_units             Int?
   product_remaining_units   Int?
-  seller_profit_percentage  Float?                    @db.Real
-  created_at                DateTime                  @default(now()) @db.Timestamp(0)
-  is_active                 Boolean?                  @default(false)
-  sell_price                Decimal?                  @default(0.00) @db.Decimal(10, 2)
-  sell_price_unit           String?                   @default("CUP") @db.VarChar(100)
-  seller_profit_quantity    Float?                    @db.Real
-  price_discount_percentage Float?                    @db.Real
-  price_discount_quantity   Float?                    @db.Real
+  seller_profit_percentage  Float?                     @db.Real
+  created_at                DateTime                   @default(now()) @db.Timestamp(0)
+  is_active                 Boolean?                   @default(false)
+  sell_price                Decimal?                   @default(0.00) @db.Decimal(10, 2)
+  sell_price_unit           String?                    @default("CUP") @db.VarChar(100)
+  seller_profit_quantity    Float?                     @db.Real
+  price_discount_percentage Float?                     @db.Real
+  price_discount_quantity   Float?                     @db.Real
   discount_description      String?
-  seller_profit_unit        String?                   @db.VarChar(255)
+  seller_profit_unit        String?                    @db.VarChar(255)
   product_offers            product_offers[]
   product_store_transfers   product_store_transfers[]
   reservation_products      reservation_products[]
   sell_products             sell_products[]
   store_collection_depots   store_collection_depots[]
   store_depot_transfers     store_depot_transfers[]
-  stores                    stores?                   @relation(fields: [store_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_1")
-  depots                    depots?                   @relation(fields: [depot_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_2")
+  stores                    stores?                    @relation(fields: [store_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_1")
+  depots                    depots?                    @relation(fields: [depot_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_2")
+  sell_receivable_products  sell_receivable_products[]
 
   @@unique([store_id, depot_id])
   @@index([depot_id], map: "depot_id")
@@ -370,4 +371,33 @@ model sells {
 
   @@index([from_reservation_id], map: "products_sell_FK")
   @@index([requesting_user_id], map: "sells_FK")
+}
+
+enum sell_receivable_status {
+  PENDIENTE
+  CANCELADA
+  EXTENDIDA
+  COBRADA
+}
+
+model sells_receivable {
+  id                       Int                        @id @default(autoincrement())
+  total_price              Float
+  payment_method           String?                    @db.VarChar(255)
+  pay_before_date          DateTime?                  @db.Timestamp(0)
+  payed_at                 DateTime?                  @db.Timestamp(0)
+  status                   sell_receivable_status     @default(PENDIENTE)
+  created_at               DateTime                   @default(now()) @db.Timestamp(0)
+  sell_receivable_products sell_receivable_products[]
+}
+
+model sell_receivable_products {
+  id                 Int              @id @default(autoincrement())
+  sell_receivable_id Int
+  store_depot_id     Int
+  units_quantity     Int
+  price              Float
+  created_at         DateTime         @default(now()) @db.Timestamp(0)
+  sells_receivable   sells_receivable @relation(fields: [sell_receivable_id], references: [id], onUpdate: Restrict, map: "sell_receivable_product_FK")
+  store_depots       store_depots     @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "sell_receivable_store_depot_FK")
 }

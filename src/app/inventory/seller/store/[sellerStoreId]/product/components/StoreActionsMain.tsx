@@ -8,7 +8,7 @@ import {
 import {
     ArrowLeft, DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
     FilterAlt, FilterAltOff, ForwardToInbox, HelpOutline, KeyboardArrowRight,
-    SellOutlined,
+    SellOutlined, SellRounded,
 } from "@mui/icons-material";
 import { computeDepotPricePerUnit, notifyError, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
@@ -636,7 +636,9 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                             {
                                                                 product?.depots![0].store_depots![0].seller_profit_percentage
                                                                     ? `${product?.depots![0].store_depots![0].seller_profit_percentage} %`
-                                                                    : `${product?.depots![0].store_depots![0].seller_profit_quantity} CUP`
+                                                                    : product?.depots![0].store_depots![0].seller_profit_quantity
+                                                                        ? `${product?.depots![0].store_depots![0].seller_profit_quantity} CUP`
+                                                                        : "-"
                                                             }
                                                         </Grid>
                                                     </Grid>
@@ -725,8 +727,9 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     })
 
     const [displayProductSellForm, setDisplayProductSellForm] = useState<boolean>(false);
+    const [displaySaleReceivableForm, setDisplaySaleReceivableForm] = useState<boolean>(false);
 
-    const handleOpenSellProduct = (formik: any) => {
+    const handleOpenSellProduct = (formik: any, isSaleReceivable?: boolean) => {
         let productsData: any = [];
         selectedProducts.forEach((productSelected: productsProps) => {
             const storeDepot = productSelected.depots![0].store_depots![0];
@@ -740,10 +743,14 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
         formik.setFieldValue("productSell.products", productsData);
         formik.setFieldValue("productSell.paymentMethod", paymentMethods[0]);
 
-        setDisplayProductSellForm(true);
+        if (isSaleReceivable) {
+            setDisplaySaleReceivableForm(true)
+        } else {
+            setDisplayProductSellForm(true)
+        }
     }
 
-    const ProductSellForm = ({ formik, closeForm }: { formik: any, closeForm: any }) => {
+    const ProductSellForm = ({ formik, closeForm, isSaleReceivable }: { formik: any, closeForm: any, isSaleReceivable?: boolean }) => {
         async function productsSell() {
             let sellProduct: any[] = []
 
@@ -761,13 +768,15 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
 
             const sell = { paymentMethod: formik.values.productSell.paymentMethod, totalPrice: totalPrice }
 
-            const sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(
-                {
-                    sellerStoreId: storeId,
-                    sellData: sell,
-                    sellProductsData: sellProduct,
-                }
-            )
+            const data = {
+                sellerStoreId: storeId,
+                sellData: sell,
+                sellProductsData: sellProduct,
+            }
+
+            const sellItemResponse = isSaleReceivable
+                ? await sellerStoreProduct.createSellReceivable(data)
+                : await sellerStoreProduct.sellStoreDepotManual(data)
 
             if (sellItemResponse) {
                 const newDepartments = [...allProductsByDepartment!];
@@ -786,7 +795,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
 
                 setAllProductsByDepartment(newDepartments);
 
-                notifySuccess("La venta ha sido registrada");
+                notifySuccess(isSaleReceivable ? "Venta por cobrar registrada" : "La venta ha sido registrada");
             }
             formik.resetForm();
             closeForm();
@@ -958,22 +967,38 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                 images={dialogImages}
                             />
 
-                            <UpdateValueDialog
-                                dialogTitle={"Vender productos"}
-                                open={displayProductSellForm}
-                                setOpen={setDisplayProductSellForm}
-                                fullScreen
-                            >
-                                {
-                                    displayProductSellForm && (
+                            {
+                                displayProductSellForm && (
+                                    <UpdateValueDialog
+                                        dialogTitle={"Vender productos"}
+                                        open={displayProductSellForm}
+                                        setOpen={setDisplayProductSellForm}
+                                        fullScreen
+                                    >
                                         <ProductSellForm
                                             formik={formik}
                                             closeForm={() => setDisplayProductSellForm(false)}
                                         />
-                                    )
-                                }
+                                    </UpdateValueDialog>
+                                )
+                            }
 
-                            </UpdateValueDialog>
+                            {
+                                displaySaleReceivableForm && (
+                                    <UpdateValueDialog
+                                        dialogTitle={"Venta por cobrar"}
+                                        open={displaySaleReceivableForm}
+                                        setOpen={setDisplaySaleReceivableForm}
+                                        fullScreen
+                                    >
+                                        <ProductSellForm
+                                            formik={formik}
+                                            closeForm={() => setDisplaySaleReceivableForm(false)}
+                                            isSaleReceivable
+                                        />
+                                    </UpdateValueDialog>
+                                )
+                            }
 
                             <ModalTransfer
                                 open={activeModalTransfer}
@@ -1073,35 +1098,63 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                 <>
                                                     {
                                                         selectedProducts.length > 0 && (
-                                                            <Grid container justifyContent={"space-between"} mt={"15px"}>
-                                                                <Button
-                                                                    size={"small"}
-                                                                    color={"primary"}
-                                                                    variant={"outlined"}
-                                                                    onClick={() => handleOpenSellProduct(formik)}
-                                                                    startIcon={<SellOutlined fontSize={"small"} />}
-                                                                >
-                                                                    Vender {selectedProducts.length}
-                                                                </Button>
-                                                                {
-                                                                    selectedProducts.length === 1 && (
-                                                                        <Button
+                                                            <Grid container rowSpacing={1} sx={{mb: "5px", px: "5px"}}>
+                                                                <Grid item xs={12}>
+                                                                    {selectedProducts.length > 1 ? "Seleccionados" : "Seleccionado"}: {selectedProducts.length}
+                                                                </Grid>
+
+                                                                <Grid container item xs={12} columnSpacing={1} flexWrap={"nowrap"}>
+                                                                    <Grid container item columnSpacing={1} flexWrap={"nowrap"} sx={{overflowX: "auto"}}>
+                                                                        <Grid item xs={"auto"}>
+                                                                            <Button
+                                                                                size={"small"}
+                                                                                color={"primary"}
+                                                                                variant={"outlined"}
+                                                                                onClick={() => handleOpenSellProduct(formik)}
+                                                                                startIcon={<SellOutlined fontSize={"small"} />}
+                                                                            >
+                                                                                Vender
+                                                                            </Button>
+                                                                        </Grid>
+
+                                                                        {
+                                                                            selectedProducts.length === 1 && (
+                                                                                <Grid item xs={"auto"}>
+                                                                                    <Button
+                                                                                        size={"small"}
+                                                                                        variant={"outlined"}
+                                                                                        startIcon={<ForwardToInbox color="secondary" />}
+                                                                                        onClick={() => handleClickTransfer(selectedProducts[0])}
+                                                                                    >
+                                                                                        Transferir
+                                                                                    </Button>
+                                                                                </Grid>
+                                                                            )
+                                                                        }
+
+                                                                        <Grid item xs={"auto"}>
+                                                                            <Button
+                                                                                size={"small"}
+                                                                                color={"primary"}
+                                                                                variant={"outlined"}
+                                                                                onClick={() => handleOpenSellProduct(formik, true)}
+                                                                                startIcon={<SellRounded fontSize={"small"} />}
+                                                                            >
+                                                                                Venta por cobrar
+                                                                            </Button>
+                                                                        </Grid>
+                                                                    </Grid>
+
+                                                                    <Grid item xs={true}>
+                                                                        <IconButton
                                                                             size={"small"}
-                                                                            variant={"outlined"}
-                                                                            startIcon={<ForwardToInbox color="secondary" />}
-                                                                            onClick={() => handleClickTransfer(selectedProducts[0])}
+                                                                            color="error"
+                                                                            onClick={() => setSelectedProducts([])}
                                                                         >
-                                                                            Transferir
-                                                                        </Button>
-                                                                    )
-                                                                }
-                                                                <IconButton
-                                                                    size={"small"}
-                                                                    color="error"
-                                                                    onClick={() => setSelectedProducts([])}
-                                                                >
-                                                                    <FilterAltOff fontSize={"small"} />
-                                                                </IconButton>
+                                                                            <FilterAltOff fontSize={"small"} />
+                                                                        </IconButton>
+                                                                    </Grid>
+                                                                </Grid>
                                                             </Grid>
                                                         )
                                                     }
