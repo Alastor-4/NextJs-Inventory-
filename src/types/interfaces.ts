@@ -1,4 +1,4 @@
-import { characteristics, departments, depots, images, product_offers, products, sell_products, sells, users, warehouses, store_depots, reservations, reservation_products, Prisma, stores, store_open_days, store_reservation_days, roles } from '@prisma/client';
+import { characteristics, departments, depots, images, product_offers, products, users, warehouses, Prisma, roles } from '@prisma/client';
 import { ReactNode } from "react";
 
 export interface ShowProductsStoreProps {
@@ -466,7 +466,7 @@ export interface userWithRole {
         name: string | null;
         description: string | null;
         created_at: Date;
-    }
+    } | null
 }
 
 export interface ChangeRoleModalProps {
@@ -486,6 +486,22 @@ export interface ChangeRoleWorkerModalProps {
     roles: roles[] | null;
     selectedWorker: userWithRole | null;
     setSelectedWorker: React.Dispatch<React.SetStateAction<userWithRole | null>>;
+}
+
+export interface AccountProps {
+    user: userWithRole | null;
+}
+
+export interface ChangeDataFormProps {
+    initialValues: { [key: string]: string | null | undefined; };
+    setEdit: (bool: boolean) => void;
+    onSubmit: any;
+}
+
+export interface ChangeAccountPasswordModalProps {
+    isOpen: boolean;
+    setIsOpen: (bool: boolean) => void;
+    user: userWithRole | null;
 }
 
 export interface ChangePasswordModalProps {

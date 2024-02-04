@@ -1,25 +1,27 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
-    AppBar, Box, Button, Card, CardContent, Chip,
-    Divider, Grid, IconButton, Toolbar, Typography
+    AppBar, Avatar, Box, Button, Card, CardContent, Chip,
+    Divider, Grid, IconButton, ListItemIcon, Menu, MenuItem, Toolbar, Typography
 } from "@mui/material";
 import {
     ArrowCircleRightOutlined, ChevronRightOutlined, HomeOutlined,
-    LogoutOutlined, RocketLaunchOutlined
+    Logout, MoreVert, Person, PriceCheck, RocketLaunchOutlined, Settings
 } from "@mui/icons-material";
 import { userStatsRequest } from "@/app/inventory/request/userStats";
 import userProfileStyles from "@/assets/styles/userProfileStyles";
 import { getRoleTranslation } from "@/utils/getRoleTranslation";
 import { getColorByRole } from "@/utils/getColorbyRole";
+import { userWithRole } from "@/types/interfaces";
+import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import dayjs from "dayjs";
 
 export default function UserProfileMain({ userId }: { userId: number }) {
-    const [userDetails, setUserDetails] = useState<null | any>(null);
-    const [userRole, setUserRole] = useState<null | any>(null);
+    const [userDetails, setUserDetails] = useState<userWithRole | null>(null);
+    const [userRole, setUserRole] = useState<string | null>(null);
 
     const [ownerWarehouses, setOwnerWarehouses] = useState<null | any[]>(null);
     const [ownerStores, setOwnerStores] = useState<null | any[]>(null);
@@ -28,6 +30,8 @@ export default function UserProfileMain({ userId }: { userId: number }) {
     const [ownerWorkersCount, setOwnerWorkersCount] = useState<null | number>(null);
 
     const [sellerStores, setSellerStores] = useState<null | any[]>(null);
+
+    const router = useRouter();
 
     useEffect(() => {
         async function fetchData() {
@@ -49,36 +53,110 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         fetchData();
     }, [userId]);
 
-    const CustomToolbar = () => (
-        <AppBar position={"static"} variant={"elevation"} color={"primary"}>
-            <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        sx={{
-                            fontWeight: 700,
-                            letterSpacing: ".2rem",
-                            color: "white",
-                        }}
-                    >
-                        Mi usuario
-                    </Typography>
-                </Box>
-                <Box sx={{ display: "flex", color: "white" }}>
-                    <IconButton
-                        color={"inherit"}
-                        onClick={() => signOut({
-                            redirect: true,
-                            callbackUrl: '/'
-                        })}
-                    >
-                        <LogoutOutlined />
-                    </IconButton>
-                </Box>
-            </Toolbar>
-        </AppBar>
-    )
+    const CustomToolbar = () => {
+        const [isOpenMenu, setIsOpenMenu] = useState<boolean>(false);
+        const handleToggleMenu = () => setIsOpenMenu(!isOpenMenu);
+        const anchorRef = useRef(null);
+
+        const goToAccount = () => router.push("inventory/account/");
+
+        return (
+            <AppBar position={"static"} variant={"elevation"} color={"primary"}>
+                <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                        <Avatar sx={{ width: 38, height: 38 }} />
+                        <Box sx={{ ml: 1 }}>
+                            <Typography variant="subtitle1">{userDetails?.username ?? ""}</Typography>
+                            <Box >
+                                {userDetails ? <Chip
+                                    size={"small"}
+                                    label={getRoleTranslation(userDetails?.roles?.name!)}
+                                    color={getColorByRole(userDetails?.roles?.name!)}
+                                    sx={{ border: "1px solid", height: "1.2rem" }}
+                                /> : ""}</Box>
+                        </Box>
+                    </Box>
+                    <Box sx={{ display: "flex", color: "white" }}>
+                        <IconButton
+                            ref={anchorRef}
+                            onClick={handleToggleMenu}
+                            size="small"
+                            sx={{ ml: 2 }}
+                            aria-controls={isOpenMenu ? 'account-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={isOpenMenu ? 'true' : undefined}
+                        >
+                            <MoreVert sx={{ color: "white" }} />
+                        </IconButton>
+                    </Box>
+                </Toolbar>
+                <Menu
+                    anchorEl={anchorRef.current}
+                    id="account-menu"
+                    open={isOpenMenu}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    onClose={handleToggleMenu}
+                    onClick={handleToggleMenu}
+                    slotProps={{
+                        paper: {
+                            elevation: 0,
+                            sx: {
+                                overflow: 'visible',
+                                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                                mt: 1.5,
+                                '& .MuiAvatar-root': {
+                                    width: 32,
+                                    height: 32,
+                                    ml: -0.5,
+                                    mr: 1,
+                                },
+                                '&::before': {
+                                    content: '""',
+                                    display: 'block',
+                                    position: 'absolute',
+                                    top: 0,
+                                    right: 14,
+                                    width: 10,
+                                    height: 10,
+                                    bgcolor: 'background.paper',
+                                    transform: 'translateY(-50%) rotate(45deg)',
+                                    zIndex: 0,
+                                },
+                            },
+                        }
+                    }}
+                >
+                    <MenuItem onClick={goToAccount}>
+                        <ListItemIcon >
+                            <Person />
+                        </ListItemIcon>
+                        Mi Perfil
+                    </MenuItem>
+                    {/* TODO: Opciones extras, sobre tema, no se, tal vez algo mas se pueda poner */}
+                    <MenuItem onClick={handleToggleMenu}>
+                        <ListItemIcon >
+                            <Settings />
+                        </ListItemIcon>
+                        Opciones
+                    </MenuItem>
+                    {/* TODO: Crear pagina con planes e informacion */}
+                    {/* {userRole === "store_owner" && <MenuItem onClick={() => { }}>
+                        <ListItemIcon>
+                            <PriceCheck />
+                        </ListItemIcon>
+                        Ver Planes
+                    </MenuItem>} */}
+                    <Divider />
+                    <MenuItem onClick={() => signOut({ redirect: true, callbackUrl: '/' })}>
+                        <ListItemIcon >
+                            <Logout sx={{ color: "#1976d3" }} />
+                        </ListItemIcon>
+                        Cerrar Sesión
+                    </MenuItem>
+                </Menu>
+            </AppBar >)
+    }
 
     const WelcomeModule = () => (
         <Grid container rowSpacing={1}>
@@ -165,34 +243,18 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                 <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
                     Administrar
                 </Typography>
-
                 <Grid container rowSpacing={1} mt={"8px"}>
                     <Grid item xs={12}>
-                        <LinksTemplate
-                            pageAddress={`/inventory/admin/role`}
-                            title={"Roles"}
-                        />
+                        <LinksTemplate pageAddress={`/inventory/admin/role`} title={"Roles"} />
                     </Grid>
-
                     <Grid item xs={12}>
-                        <LinksTemplate
-                            pageAddress={`/inventory/admin/user`}
-                            title={"Usuarios"}
-                        />
+                        <LinksTemplate pageAddress={`/inventory/admin/user`} title={"Usuarios"} />
                     </Grid>
-
                     <Grid item xs={12}>
-                        <LinksTemplate
-                            pageAddress={`/inventory/admin/warehouse`}
-                            title={"Almacenes"}
-                        />
+                        <LinksTemplate pageAddress={`/inventory/admin/warehouse`} title={"Almacenes"} />
                     </Grid>
-
                     <Grid item xs={12}>
-                        <LinksTemplate
-                            pageAddress={`/inventory/admin/departments`}
-                            title={"Departamentos"}
-                        />
+                        <LinksTemplate pageAddress={`/inventory/admin/departments`} title={"Departamentos"} />
                     </Grid>
                 </Grid>
             </Card>

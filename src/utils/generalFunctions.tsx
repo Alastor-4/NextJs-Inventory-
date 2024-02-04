@@ -1,6 +1,6 @@
-import dayjs from "dayjs";
 import { enqueueSnackbar, closeSnackbar } from "notistack";
 import { Button } from "@mui/material";
+import dayjs from "dayjs";
 import React from "react";
 
 export const numberFormat = (number: string) => parseFloat((Math.round(parseFloat(number.toString()) * 100) / 100).toFixed(2))
@@ -28,8 +28,8 @@ export const notifyError = (message: string, requireUserConfirm?: boolean) => re
 
 export const notifyWarning = (message: string, requireUserConfirm?: boolean) => requireUserConfirm
     // @ts-ignore
-    ? enqueueSnackbar(message, {variant: "warning", persist: true, action: actionClose})
-    : enqueueSnackbar(message, {variant: "warning", autoHideDuration: 6000})
+    ? enqueueSnackbar(message, { variant: "warning", persist: true, action: actionClose })
+    : enqueueSnackbar(message, { variant: "warning", autoHideDuration: 6000 })
 
 //return offer price per unit from first applicable offer found. return false if no applicable offer found
 function evaluateOffers(offerItems: any[], itemsQuantity: number): number | false {

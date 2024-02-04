@@ -6,32 +6,26 @@ import {
     TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography,
 } from "@mui/material";
 import {
-    AddOutlined,
-    ArrowLeft,
-    DeleteOutline,
-    Done,
-    EditOutlined,
-    FilterAlt,
-    HelpOutline,
-    InfoOutlined
+    AddOutlined, ArrowLeft, DeleteOutline, Done,
+    EditOutlined, FilterAlt, HelpOutline, InfoOutlined
 } from "@mui/icons-material";
 import { ProductsMainTableProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import { images, characteristics, departments } from '@prisma/client';
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { TableNoData } from "@/components/TableNoData";
+import { CustomTooltip } from "@/components/InfoTags";
 import ModalUpdateProduct from "./ModalUpdateProduct";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import products from "../requests/products";
-import {grey} from '@mui/material/colors';
+import { grey } from '@mui/material/colors';
 import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
-import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
-import {CustomTooltip} from "@/components/InfoTags";
 
 export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
     const router = useRouter();
@@ -324,8 +318,8 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                             sx={
                                 product.is_approved
                                     ? {}
-                                    : {fontStyle: "italic"}
-                                }
+                                    : { fontStyle: "italic" }
+                            }
                         >
                             <TableCell>
                                 <Checkbox
@@ -338,7 +332,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                                 {
                                     !product.is_approved && (
                                         <CustomTooltip tooltipText={"Los productos creados por los almaceneros deben ser aprobados por el dueño"}>
-                                            <InfoOutlined fontSize={"small"} color={"warning"}/>
+                                            <InfoOutlined fontSize={"small"} color={"warning"} />
                                         </CustomTooltip>
                                     )
                                 }

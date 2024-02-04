@@ -1,6 +1,6 @@
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
-import apiRequest from "@/api";
 import { hashPassword } from "@/utils/serverActions";
+import apiRequest from "@/api";
 
 const url = `/inventory/admin/user/api`;
 const updateUrl = `/inventory/admin/user/update/api`;

@@ -1,6 +1,6 @@
+import { AxiomRequest, withAxiom } from "next-axiom";
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
-import { AxiomRequest, withAxiom } from "next-axiom";
 
 // GET user details
 export const GET = withAxiom(async (req: AxiomRequest) => {

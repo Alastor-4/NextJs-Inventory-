@@ -2,28 +2,35 @@
 
 import {
     Button, Dialog, DialogActions, DialogContent, DialogTitle,
-    Grid, IconButton, InputAdornment, TextField, Typography
+    Grid, IconButton, InputAdornment, TextField
 } from '@mui/material';
-import { ChangePasswordModalProps } from '@/types/interfaces';
 import { Close, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
-import users from '../../requests/users';
+import { ChangeAccountPasswordModalProps } from '@/types/interfaces';
+import account from '../../requests/account';
 import React, { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: ChangePasswordModalProps) => {
+const ChangeAccountPasswordModal = ({ user, isOpen, setIsOpen }: ChangeAccountPasswordModalProps) => {
 
+    const handleClose = () => setIsOpen(false);
+
+    const [showOldPassword, setShowOldPassword] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
 
+    const toggleVisibilityOldPassword = () => setShowOldPassword(!showOldPassword);
     const toggleVisibilityPassword = () => setShowPassword(!showPassword);
     const toggleVisibilityConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
     const changePasswordInitialValues = {
+        oldPassword: '',
         password: '',
         confirmPassword: ''
     };
     const changePasswordValidationSchema = Yup.object({
+        oldPassword: Yup.string()
+            .required('Este campo es requerido'),
         password: Yup.string()
             .required('Este campo es requerido')
             .min(8, 'Debe contener al menos 8 caracteres'),
@@ -33,24 +40,18 @@ const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: C
             .oneOf([Yup.ref("password"), null],
                 "Las contraseñas no coinciden")
     });
-
-    const handleClose = () => setOpen(false);
-
     return <Formik
         initialValues={changePasswordInitialValues}
         validationSchema={changePasswordValidationSchema}
-        onSubmit={async ({ password }) => {
-            const response = await users.changePassword(selectedUser?.id!, password);
-
-            if (response === "Contraseña cambiada correctamente") {
-                setSelectedUser(null);
-                handleClose();
-            }
+        onSubmit={async ({ oldPassword, password }, { setFieldError }) => {
+            const response = await account.changeAccountPassword(user?.id!, oldPassword, password);
+            if (response === "Contraseña antigua incorrecta") setFieldError("oldPassword", response);
+            if (response === "Contraseña cambiada correctamente") handleClose();
         }}
     >
         {
-            ({ handleSubmit, getFieldProps, touched, errors, isValid }) => (
-                <Dialog open={open} onClose={handleClose}>
+            ({ handleSubmit, getFieldProps, touched, errors, isValid, resetForm }) => (
+                <Dialog open={isOpen} onClose={handleClose}>
                     <DialogTitle
                         display={"flex"}
                         justifyContent={"space-between"}
@@ -59,11 +60,11 @@ const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: C
                         fontWeight={"400"}
                         sx={{ bgcolor: '#1976d3' }}
                     >
-                        {`Cambiar contraseña a "${selectedUser ? selectedUser.username : ""}"`}
+                        Cambiar contraseña
                         <IconButton
                             edge="start"
                             color="inherit"
-                            onClick={handleClose}
+                            onClick={() => { handleClose(); resetForm(); }}
                             aria-label="close"
                             sx={{ marginLeft: "10px" }}
                         >
@@ -73,6 +74,29 @@ const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: C
                     <DialogContent>
                         <form onSubmit={handleSubmit}>
                             <Grid container item xs={12} spacing={2} paddingY={"20px"} paddingX={"30px"} mb={"10px"}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        label="Contraseña antigua"
+                                        size={"small"}
+                                        type={showOldPassword ? "text" : "password"}
+                                        fullWidth
+                                        variant="outlined"
+                                        {...getFieldProps("oldPassword")}
+                                        error={!!errors.oldPassword && touched.oldPassword}
+                                        helperText={(errors.oldPassword && touched.oldPassword) && errors.oldPassword}
+                                        InputProps={{
+                                            endAdornment:
+                                                <InputAdornment
+                                                    position="end"
+                                                    onClick={toggleVisibilityOldPassword}
+                                                >
+                                                    <IconButton size={"small"}>
+                                                        {showOldPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                        }}
+                                    />
+                                </Grid>
                                 <Grid item xs={12}>
                                     <TextField
                                         label="Contraseña*"
@@ -121,7 +145,7 @@ const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: C
                                 </Grid>
                             </Grid>
                             <DialogActions>
-                                <Button color="error" variant="outlined" onClick={handleClose}>Cancelar</Button>
+                                <Button color="error" type='reset' variant="outlined" onClick={() => { handleClose(); resetForm() }}>Cancelar</Button>
                                 <Button
                                     color="primary"
                                     variant="outlined"
@@ -139,4 +163,4 @@ const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: C
     </Formik >
 }
 
-export default ChangePasswordModal
+export default ChangeAccountPasswordModal

@@ -182,6 +182,7 @@ model users {
   phone                 String?                 @unique(map: "phone") @db.VarChar(255)
   is_active             Boolean?                @default(true)
   is_verified           Boolean?                @default(false)
+  picture               String?                 @db.VarChar(255)
   work_for_user_id      Int?
   created_at            DateTime                @default(now()) @db.Timestamp(0)
   reservations          reservations[]
