@@ -709,43 +709,48 @@ export default function StoreMain({ userId }: { userId?: number }) {
                 </Grid>
 
                 <Grid container rowSpacing={2} mt={"8px"}>
-
                     <Grid container item xs={12} alignItems={"center"}>
                         <ChevronRightOutlined fontSize={"small"} />
                         Total de transferencias: {todayTransfers?.totalTransfers}
                     </Grid>
 
-                    <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                            Recibidas
-                        </Grid>
+                    {
+                        todayTransfers?.totalTransfers > 0 && (
+                            <>
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                        Recibidas
+                                    </Grid>
 
-                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"} />
-                            Desde almacén: {todayTransfers?.fromWarehouse.transfers}
-                        </Grid>
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        Desde almacén: {todayTransfers?.fromWarehouse.transfers}
+                                    </Grid>
 
-                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"} />
-                            Desde tienda: {todayTransfers?.fromStore.transfers}
-                        </Grid>
-                    </Grid>
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        Desde tienda: {todayTransfers?.fromStore.transfers}
+                                    </Grid>
+                                </Grid>
 
-                    <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
-                            Enviadas
-                        </Grid>
+                                <Grid container item spacing={1} xs={12}>
+                                    <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                                        Enviadas
+                                    </Grid>
 
-                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"} />
-                            Hacia almacén: {todayTransfers?.toWarehouse.transfers}
-                        </Grid>
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        Hacia almacén: {todayTransfers?.toWarehouse.transfers}
+                                    </Grid>
 
-                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
-                            <ChevronRightOutlined fontSize={"small"} />
-                            Hacia tienda: {todayTransfers?.toStore.transfers}
-                        </Grid>
-                    </Grid>
+                                    <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                                        <ChevronRightOutlined fontSize={"small"} />
+                                        Hacia tienda: {todayTransfers?.toStore.transfers}
+                                    </Grid>
+                                </Grid>
+                            </>
+                        )
+                    }
                 </Grid>
             </Card>
         )
