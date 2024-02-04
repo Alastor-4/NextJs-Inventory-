@@ -64,7 +64,7 @@ const Account = ({ user }: AccountProps) => {
             <Grid item container justifyContent={"center"} marginBottom={"2rem"}>
                 <Grid item container width={"auto"} sx={{ marginTop: "-3rem", position: "relative" }}>
                     <Grid item>
-                        <Avatar sx={{ height: "8rem", width: "8rem", border: "3px solid white" }} />
+                        <Avatar sx={{ height: "8rem", width: "8rem", border: "2px solid gray" }} />
                     </Grid>
                     <Grid item>
                         <IconButton
@@ -81,7 +81,7 @@ const Account = ({ user }: AccountProps) => {
                         </IconButton>
                     </Grid>
                 </Grid>
-                <Grid item container justifyContent={"center"} sx={{ padding: "1rem", marginX: "1rem" }}>
+                <Grid item container justifyContent={"center"} sx={{ padding: "1rem", marginX: "0.5rem" }}>
                     <Grid item xs={12}>
                         {edit ? edit && <ChangeDataForm
                             setEdit={setEdit}
