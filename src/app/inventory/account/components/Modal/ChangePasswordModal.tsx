@@ -6,11 +6,12 @@ import {
 } from '@mui/material';
 import { Close, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { ChangeAccountPasswordModalProps } from '@/types/interfaces';
+import account from '../../requests/account';
 import React, { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
-const ChangeAccountPasswordModal = ({ isOpen, setIsOpen }: ChangeAccountPasswordModalProps) => {
+const ChangeAccountPasswordModal = ({ user, isOpen, setIsOpen }: ChangeAccountPasswordModalProps) => {
 
     const handleClose = () => setIsOpen(false);
 
@@ -29,8 +30,7 @@ const ChangeAccountPasswordModal = ({ isOpen, setIsOpen }: ChangeAccountPassword
     };
     const changePasswordValidationSchema = Yup.object({
         oldPassword: Yup.string()
-            .required('Este campo es requerido')
-            .min(8, 'Debe contener al menos 8 caracteres'),
+            .required('Este campo es requerido'),
         password: Yup.string()
             .required('Este campo es requerido')
             .min(8, 'Debe contener al menos 8 caracteres'),
@@ -43,17 +43,10 @@ const ChangeAccountPasswordModal = ({ isOpen, setIsOpen }: ChangeAccountPassword
     return <Formik
         initialValues={changePasswordInitialValues}
         validationSchema={changePasswordValidationSchema}
-        onSubmit={async ({ oldPassword, password }) => {
-            console.log(oldPassword);
-            console.log(password);
-
-            // const response = await users.changePassword(selectedUser?.id!, password);
-
-            // if (response === "Contraseña cambiada correctamente") {
-            //     setSelectedUser(null);
-            //     handleClose();
-            // }
-            // TODO: change password
+        onSubmit={async ({ oldPassword, password }, { setFieldError }) => {
+            const response = await account.changeAccountPassword(user?.id!, oldPassword, password);
+            if (response === "Contraseña antigua incorrecta") setFieldError("oldPassword", response);
+            if (response === "Contraseña cambiada correctamente") handleClose();
         }}
     >
         {
@@ -71,7 +64,7 @@ const ChangeAccountPasswordModal = ({ isOpen, setIsOpen }: ChangeAccountPassword
                         <IconButton
                             edge="start"
                             color="inherit"
-                            onClick={handleClose}
+                            onClick={() => { handleClose(); resetForm(); }}
                             aria-label="close"
                             sx={{ marginLeft: "10px" }}
                         >

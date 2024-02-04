@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { Formik } from "formik";
-import * as Yup from 'yup';
 import Link from "next/link";
+import * as Yup from 'yup';
 
 const SignInForm = () => {
     const router = useRouter();

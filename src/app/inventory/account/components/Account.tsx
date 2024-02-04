@@ -57,7 +57,9 @@ const Account = ({ user }: AccountProps) => {
 
     return (<Card variant='outlined'>
         <CustomToolbar />
-        <ChangeAccountPasswordModal isOpen={isOpenChangePasswordModal} setIsOpen={setIsOpenChangePasswordModal} user={user} />
+        {isOpenChangePasswordModal && <ChangeAccountPasswordModal
+            isOpen={isOpenChangePasswordModal}
+            setIsOpen={setIsOpenChangePasswordModal} user={user} />}
         <Card variant='outlined' sx={{ marginX: "1.5rem", marginTop: "4rem", overflow: "visible", marginBottom: "2rem" }}>
             <Grid item container justifyContent={"center"} marginBottom={"2rem"}>
                 <Grid item container width={"auto"} sx={{ marginTop: "-3rem", position: "relative" }}>

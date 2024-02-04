@@ -10,9 +10,9 @@ const account = {
             const response = await apiRequest.get(url, { params: { userId } });
             return response.data;
         } catch (e) {
-            notifyError("Error obteniendo los datos")
+            notifyError("Error obteniendo los datos");
         }
-        return false
+        return false;
     },
 
     changeAccountData: async function ({ userId, name, username, phone, email }: any) {
@@ -21,18 +21,17 @@ const account = {
             if (response.status === 200) notifySuccess("Datos actualizados correctamente");
             return response.status;
         } catch (e) {
-            notifyError("Error actualizando los datos")
+            notifyError("Error actualizando los datos");
         }
-
-        return false
+        return false;
     },
 
-    changeAccountPassword: async function (userId: number, password: string) {
+    changeAccountPassword: async function (userId: number, oldPassword: string, password: string) {
         try {
             const passwordHash = await hashPassword(password);
-            const response = await apiRequest.patch(url, { passwordHash: passwordHash }, { params: { userId: userId } });
+            const response = await apiRequest.patch(url, { oldPassword: oldPassword, passwordHash: passwordHash }, { params: { userId: userId } });
             if (response.status === 201) notifySuccess(response.data);
-            return response.data
+            return response.data;
         } catch (error) {
             notifyError("Ha fallado la acción de cambiar la contraseña");
         }
