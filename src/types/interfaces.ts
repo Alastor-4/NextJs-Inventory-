@@ -1,4 +1,4 @@
-import { characteristics, departments, depots, images, product_offers, products, sell_products, sells, users, warehouses, store_depots, reservations, reservation_products, Prisma, stores, store_open_days, store_reservation_days, roles } from '@prisma/client';
+import { characteristics, departments, depots, images, product_offers, products, users, warehouses, Prisma, roles } from '@prisma/client';
 import { ReactNode } from "react";
 
 export interface ShowProductsStoreProps {
@@ -490,6 +490,11 @@ export interface ChangeRoleWorkerModalProps {
 
 export interface AccountProps {
     user: userWithRole | null;
+}
+
+export interface ChangeDataFormProps {
+    initialValues: { [key: string]: string | null | undefined; };
+    onSubmit: any;
 }
 
 export interface ChangeAccountPasswordModalProps {

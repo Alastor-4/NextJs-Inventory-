@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import {
     ArrowCircleRightOutlined, ChevronRightOutlined, HomeOutlined,
-    Logout, MoreVert, PriceCheck, RocketLaunchOutlined, Settings
+    Logout, MoreVert, Person, PriceCheck, RocketLaunchOutlined, Settings
 } from "@mui/icons-material";
 import { userStatsRequest } from "@/app/inventory/request/userStats";
 import userProfileStyles from "@/assets/styles/userProfileStyles";
@@ -128,7 +128,10 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                     }}
                 >
                     <MenuItem onClick={goToAccount}>
-                        <Avatar /> Mi Perfil
+                        <ListItemIcon >
+                            <Person />
+                        </ListItemIcon>
+                        Mi Perfil
                     </MenuItem>
                     {/* TODO: Opciones extras, sobre tema, no se, tal vez algo mas se pueda poner */}
                     <MenuItem onClick={handleToggleMenu}>
