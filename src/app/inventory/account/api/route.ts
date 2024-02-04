@@ -1,24 +1,37 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
 
+// GET account data
+export async function GET(req: Request) {
+    try {
+        const { searchParams } = new URL(req.url);
+        const userId = +searchParams.get("userId")!;
+
+        const accountData = await prisma.users.findUnique({ where: { id: userId } });
+
+        if (accountData) {
+            const { mail: email, username, name, phone } = accountData;
+            return NextResponse.json({ email, username, name, phone });
+        }
+
+        return new NextResponse("Error obteniendo los datos de la cuenta", { status: 406 });
+
+    } catch (error) {
+        return new NextResponse("Internal Error", { status: 500 });
+    }
+}
+
 // CHANGE account data
 export async function PUT(req: Request) {
     try {
-        const { userId, username, name, email, phone } = await req.json()
+        const { userId, username, name, email, phone } = await req.json();
 
         const updatedAccount = await prisma.users.update({
             where: { id: +userId! },
-            data: {
-                name: name,
-                username: username,
-                mail: email,
-                phone: phone
-            }
+            data: { name: name, username: username, mail: email, phone: phone }
         });
 
-        if (updatedAccount) return new NextResponse("Datos actualizados correctamente", { status: 200 });
-
-        return new NextResponse("Error actualizando los datos", { status: 406 });
+        return NextResponse.json(updatedAccount);
     } catch (error) {
         return new NextResponse("Internal Error", { status: 500 });
     }
