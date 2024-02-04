@@ -58,7 +58,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
         const handleToggleMenu = () => setIsOpenMenu(!isOpenMenu);
         const anchorRef = useRef(null);
 
-        const goToMyAccount = () => router.push("inventory/my-account/");
+        const goToAccount = () => router.push("inventory/account/");
 
         return (
             <AppBar position={"static"} variant={"elevation"} color={"primary"}>
@@ -127,7 +127,7 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                         }
                     }}
                 >
-                    <MenuItem onClick={goToMyAccount}>
+                    <MenuItem onClick={goToAccount}>
                         <Avatar /> Mi Perfil
                     </MenuItem>
                     {/* TODO: Opciones extras, sobre tema, no se, tal vez algo mas se pueda poner */}

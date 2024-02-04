@@ -488,11 +488,11 @@ export interface ChangeRoleWorkerModalProps {
     setSelectedWorker: React.Dispatch<React.SetStateAction<userWithRole | null>>;
 }
 
-export interface MyAccountProps {
+export interface AccountProps {
     user: userWithRole | null;
 }
 
-export interface ChangeMyAccountPasswordModalProps {
+export interface ChangeAccountPasswordModalProps {
     isOpen: boolean;
     setIsOpen: (bool: boolean) => void;
     user: userWithRole | null;
