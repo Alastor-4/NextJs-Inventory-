@@ -1,15 +1,16 @@
 "use client"
-import {ArrowLeft, ArrowLeftOutlined, Cancel, Done, Money, VisibilityOutlined} from '@mui/icons-material'
-import {AppBar, Box, Button, Card, CardContent, Chip, Grid, IconButton, Toolbar, Typography} from '@mui/material'
-import {useRouter} from 'next/navigation'
-import React, {useEffect, useState} from 'react'
+import { ArrowLeft, ArrowLeftOutlined, Cancel, Done, FilterAlt, Money, VisibilityOutlined } from '@mui/icons-material'
+import { AppBar, Box, Button, Card, CardContent, Chip, Grid, IconButton, Toolbar, Typography } from '@mui/material'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
 import transfer from '../request/transfer'
 import dayjs from 'dayjs'
-import {images} from '@prisma/client'
+import { images, stores } from '@prisma/client'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
-import {DataTransferReceived, TransferStoreDepots} from './TypeTransfers'
+import { DataTransferReceived, TransferStoreDepots } from './TypeTransfers'
 import ModalSellProducts from './ModalSellProducts'
-import {notifyError, notifySuccess} from "@/utils/generalFunctions";
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import ModalFilter from './ModalFilter'
 
 interface SellerTransferMailboxProps {
     userId?: number
@@ -22,7 +23,9 @@ interface DataStatus {
     2: { name: string, color: 'warning' | "success" | "error" }
     3: { name: string, color: 'warning' | "success" | "error" }
 }
-
+interface AllOwnerStores extends stores {
+    selected: boolean
+}
 
 function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxProps) {
 
@@ -32,6 +35,19 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
     const [data, setData] = useState<DataTransferReceived[][]>([])
 
     const [forceRender, setForceRender] = useState(true)
+
+    //data for filter
+    const [allOwnerStores, setAllOwnerStores] = useState<AllOwnerStores[]>([])
+
+    //Filters
+    const [showModalFilter, setShowModalFilter] = useState(true)
+
+    //selectedFilters
+    const [selectedStatus, setSelectedStatus] = useState<number[]>([])
+    const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined)
+    const [selectedStores, setSelectedStore] = useState<number[]>([])
+
+
     //get initial data
     useEffect(() => {
         const checkStatus = (item: DataTransferReceived) => {
@@ -82,6 +98,25 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
     }, [storeId, userId, sent, forceRender])
 
     useEffect(() => {
+
+        const getAllStores = async () => {
+            const dataUser = await transfer.getDataUser(storeId!, userId!)
+            if (dataUser) {
+                const stores: stores[] = await transfer.getAllOwnerStores(storeId!, userId!)
+                setAllOwnerStores(
+                    stores.map((element) => (
+                        { ...element, selected: false }
+                    ))
+                )
+            }
+        }
+
+        getAllStores()
+
+    }, [storeId, userId,])
+
+
+    useEffect(() => {
         if (dataTransfer.length) {
 
             let newData: DataTransferReceived[][] = [];
@@ -110,25 +145,40 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
         router.push(`/inventory/seller/store/${storeId}`)
     }
 
+    const handleClickFilter = () => {
+        setShowModalFilter(true)
+    }
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
-                        <ArrowLeft fontSize={"large"} />
-                    </IconButton>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        sx={{
-                            fontWeight: 700,
-                            letterSpacing: ".2rem",
-                            color: "white",
-                        }}
-                    >
-                        Transferencias
-                    </Typography>
-                </Box>
+                <Grid container>
+
+                    <Grid item>
+                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
+                                <ArrowLeft fontSize={"large"} />
+                            </IconButton>
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                sx={{
+                                    fontWeight: 700,
+                                    letterSpacing: ".2rem",
+                                    color: "white",
+                                }}
+                            >
+                                Transferencias
+                            </Typography>
+                        </Box>
+                    </Grid>
+
+                    <Grid item marginLeft={'auto'}>
+                        <IconButton onClick={handleClickFilter}>
+                            <FilterAlt />
+                        </IconButton>
+                    </Grid>
+
+                </Grid>
             </Toolbar>
         </AppBar>
     )
@@ -558,8 +608,87 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
         )
     }
 
+    const cleanFilters = () => {
+        setSelectedStatus([])
+        setSelectedDate(undefined)
+        setSelectedStore([])
+
+        setShowModalFilter(false)
+    }
+    const updateFilters = (status: number[], date: string | undefined, stores: number[]) => {
+        setSelectedStatus(status)
+        setSelectedDate(date)
+        setSelectedStore(stores)
+
+        setShowModalFilter(false)
+    }
+
+    const applyFilter = () => {
+        let dataFilter = [...data]
+
+        const appliedFilterDate = () => {
+            const getMonth = (month: number) => { if (month < 9) return `0${month + 1}`; return month + 1 }
+            const getDate = (date: number) => { if (date < 10) return `0${date}`; return date }
+
+            dataFilter = dataFilter.filter((element) => {
+                const date = dayjs(element[0].created_at)
+                const dateToCompare: string = `${date.get("year")}-${getMonth(date.get('month'))}-${getDate(date.get('date'))}`;
+                return dateToCompare === selectedDate
+            })
+
+        }
+
+        const appliedFilterStatus = () => {
+            const newDataFilter: DataTransferReceived[][] = []
+
+            let indexBy: { [key: number]: true } = {}
+            selectedStatus.forEach((element) => indexBy[element] = true)
+
+            dataFilter.forEach((element) => {
+                const aux = element.filter((item) => indexBy[item.transferStatus] === true)
+                if (aux.length) newDataFilter.push(aux)
+            })
+
+            dataFilter = newDataFilter
+        }
+
+        const appliedFilterStore = () => {
+            const newDataFilter: DataTransferReceived[][] = []
+
+            let indexBy: { [key: number]: true } = {}
+            selectedStores.forEach((element) => indexBy[element] = true)
+
+            dataFilter.forEach((element) => {
+                const aux = element.filter((item) => indexBy[item.store_depots.stores.id] === true)
+                if (aux.length) newDataFilter.push(aux)
+            })
+
+            dataFilter = newDataFilter
+        }
+
+        if (selectedDate) appliedFilterDate()
+        if (selectedStatus.length) appliedFilterStatus()
+        if (selectedStores.length) appliedFilterStore()
+
+        return dataFilter
+
+    }
     return (
         <>
+            <ModalFilter
+                open={showModalFilter}
+                setOpen={setShowModalFilter}
+                dialogTitle='Filtrar por:'
+                filterByStatus={selectedStatus}
+                filterByDate={selectedDate}
+                filterByStores={selectedStores}
+                allStores={allOwnerStores}
+                data={data}
+                cleanFilters={cleanFilters}
+                updateFilters={updateFilters}
+            >
+            </ModalFilter>
+
             <Card variant={'outlined'}>
 
                 <CustomToolbar />
@@ -567,7 +696,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                 <CardContent>
                     <Grid container rowSpacing={2}>
                         {
-                            data.map((item: DataTransferReceived[], index: number) => (
+                            applyFilter().map((item: DataTransferReceived[], index: number) => (
                                 <ShowTransfer key={index} transfers={item} />
                             ))
                         }
