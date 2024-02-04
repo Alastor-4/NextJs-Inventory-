@@ -11,7 +11,14 @@ import {
 } from "@mui/icons-material"
 import { daysMap, notifySuccess, notifyWarning, numberFormat, transactionToWarehouse } from "@/utils/generalFunctions";
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
-import { productSellsStatsProps, storeDepotsStatsProps, storeDepotsWithAny, storeSellsDetailsProps, storeWithStoreDepots } from "@/types/interfaces";
+import {
+    productSellsStatsProps,
+    storeDepotsStatsProps,
+    storeDepotsWithAny,
+    storeSalesReceivableProps,
+    storeSellsDetailsProps,
+    storeWithStoreDepots
+} from "@/types/interfaces";
 import { useParams, useRouter } from "next/navigation";
 import ModalSellsToday from "./Modal/ModalSellsToday";
 import React, { useEffect, useState } from "react";
@@ -19,7 +26,7 @@ import isBetween from "dayjs/plugin/isBetween";
 import Link from "next/link";
 import dayjs from "dayjs";
 import userProfileStyles from "@/assets/styles/userProfileStyles";
-import { product_store_transfers, store_depot_transfers } from "@prisma/client";
+import {product_store_transfers, sells_receivable, store_depot_transfers} from "@prisma/client";
 import ModalTransfersToday from "@/app/inventory/seller/store/[sellerStoreId]/components/Modal/ModalTransfersToday";
 
 dayjs.extend(isBetween);
@@ -57,6 +64,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const [todaySellsStats, setTodaySellsStats] = useState<productSellsStatsProps | null>(null);
     const [todaySells, setTodaySells] = useState<storeSellsDetailsProps[] | null>(null);
     const [todayTransfers, setTodayTransfers] = useState<todayTransferProps | null>(null)
+    const [allSalesReceivable, setAllSalesReceivable] = useState<storeSalesReceivableProps | null>(null)
 
     //GET initial store and sellsStats details
     useEffect(() => {
@@ -115,12 +123,13 @@ export default function StoreMain({ userId }: { userId?: number }) {
         }
 
         async function loadStatsData() {
-            const storeDetailsPromise: storeWithStoreDepots = await stores.storeDetails(userId, sellerStoreId);
-            const storeTodaySellsDetailsPromise: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId);
-            const storeTodayTransferDetailsPromise = await stores.getTodayTransfersStats(sellerStoreId)
+            const storeDetailsPromise = stores.storeDetails(userId, sellerStoreId);
+            const storeTodaySellsDetailsPromise = stores.storeSellsDetails(sellerStoreId);
+            const storeTodayTransferDetailsPromise = stores.getTodayTransfersStats(sellerStoreId)
+            const storeSalesReceivablePromise = stores.getTodaySalesReceivable(sellerStoreId)
 
-            const [storeDetails, storeTodaySellsDetails, storeTodayTransferDetails] =
-                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeTodayTransferDetailsPromise]);
+            const [storeDetails, storeTodaySellsDetails, storeTodayTransferDetails, storeSalesReceivable] =
+                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeTodayTransferDetailsPromise, storeSalesReceivablePromise]);
 
             if (storeDetails) {
                 setStoreDetails(storeDetails);
@@ -245,6 +254,10 @@ export default function StoreMain({ userId }: { userId?: number }) {
                 }
 
                 setTodayTransfers(newTodayTransfers)
+            }
+
+            if (storeSalesReceivable) {
+                setAllSalesReceivable(storeSalesReceivable)
             }
         }
 
@@ -756,6 +769,51 @@ export default function StoreMain({ userId }: { userId?: number }) {
         )
     }
 
+    const SalesReceivable = () => {
+
+        return (
+            <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
+                <Grid container columnSpacing={2} justifyContent={"space-between"}>
+                    <Grid item xs={'auto'}>
+                        <Typography variant="h6" sx={{ color: "blue", cursor: "pointer", fontSize: "18px" }}>
+                            Ventas por cobrar
+                        </Typography>
+                    </Grid>
+                </Grid>
+
+                <Grid container rowSpacing={2} mt={"8px"}>
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                            Hoy
+                        </Grid>
+
+                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            Creadas: {allSalesReceivable?.storeTodaySalesReceivableCreated?.length}
+                        </Grid>
+
+                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            Pagadas: {allSalesReceivable?.storeTodaySalesReceivablePayed?.length}
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={12} sx={{ fontWeight: 600 }}>
+                            General
+                        </Grid>
+
+                        <Grid item xs={12} display={"flex"} alignItems={"center"}>
+                            <ChevronRightOutlined fontSize={"small"} />
+                            Total pendientes: {allSalesReceivable?.storeAllSalesReceivablePending?.length}
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Card>
+        )
+    }
+
+
     const StoreCollections = () => {
 
         return (
@@ -1014,6 +1072,10 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
                             <Grid item xs={12} md={6}>
                                 <TodayTransfers />
+                            </Grid>
+
+                            <Grid item xs={12} md={6}>
+                                <SalesReceivable />
                             </Grid>
 
                             {/*<Grid item xs={12} md={6}>
