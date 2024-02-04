@@ -47,7 +47,9 @@ const urlSells = (storeId: number) => `/inventory/seller/store/${storeId}/transf
 
 const urlSent = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiSent`
 
+const urlUser = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiUser`
 
+const urlStore = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiStore`
 
 
 export const transfer = {
@@ -131,6 +133,27 @@ export const transfer = {
             return result.data
         } catch (e) {
             notifyError("Error al cargar las transferencias")
+        }
+        return false
+    },
+    //get Data Filter
+    getDataUser: async function (storeId: number, userId: number) {
+        try {
+            const result = await apiRequest.get(urlUser(storeId), { params: { userId: userId } })
+
+            return result.data
+        } catch (e) {
+            notifyError("Error al obtener datos para filtrar(datos de usuario)")
+        }
+        return false
+    },
+    getAllOwnerStores: async function (storeId: number, userId: number) {
+        try {
+            const result = await apiRequest.get(urlStore(storeId), { params: { userId: userId } })
+
+            return result.data
+        } catch (e) {
+            notifyError("Error al obtener datos para filtrar(tiendas)")
         }
         return false
     },
