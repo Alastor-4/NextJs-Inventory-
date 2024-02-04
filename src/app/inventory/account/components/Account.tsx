@@ -84,16 +84,11 @@ const Account = ({ user }: AccountProps) => {
                 <Grid item container justifyContent={"center"} sx={{ padding: "1rem", marginX: "1rem" }}>
                     <Grid item xs={12}>
                         {edit ? edit && <ChangeDataForm
+                            setEdit={setEdit}
                             initialValues={initialValues}
                             onSubmit={onSubmit}
                         />
                             : <Grid item container spacing={2} marginTop={"10px"}>
-                                <Grid container item xs={12} spacing={1}>
-                                    <Grid item sx={userProfileStyles.leftFlex}>Nombre:</Grid>
-                                    <Grid item sx={userProfileStyles.rightFlex}>
-                                        {initialValues?.name}
-                                    </Grid>
-                                </Grid>
                                 <Grid container item xs={12} spacing={1}>
                                     <Grid item sx={userProfileStyles.leftFlex}>Usuario:</Grid>
                                     <Grid item sx={userProfileStyles.rightFlex}>
@@ -101,15 +96,21 @@ const Account = ({ user }: AccountProps) => {
                                     </Grid>
                                 </Grid>
                                 <Grid container item xs={12} spacing={1}>
-                                    <Grid item sx={userProfileStyles.leftFlex}>Correo:</Grid>
+                                    <Grid item sx={userProfileStyles.leftFlex}>Nombre:</Grid>
                                     <Grid item sx={userProfileStyles.rightFlex}>
-                                        {initialValues?.email}
+                                        {initialValues?.name}
                                     </Grid>
                                 </Grid>
                                 <Grid container item xs={12} spacing={1}>
                                     <Grid item sx={userProfileStyles.leftFlex}>Teléfono:</Grid>
                                     <Grid item sx={userProfileStyles.rightFlex}>
                                         {initialValues?.phone}
+                                    </Grid>
+                                </Grid>
+                                <Grid container item xs={12} spacing={1}>
+                                    <Grid item sx={userProfileStyles.leftFlex}>Correo:</Grid>
+                                    <Grid item sx={userProfileStyles.rightFlex}>
+                                        {initialValues?.email}
                                     </Grid>
                                 </Grid>
                                 <Grid container item xs={12} spacing={1}>

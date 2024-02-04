@@ -494,6 +494,7 @@ export interface AccountProps {
 
 export interface ChangeDataFormProps {
     initialValues: { [key: string]: string | null | undefined; };
+    setEdit: (bool: boolean) => void;
     onSubmit: any;
 }
 

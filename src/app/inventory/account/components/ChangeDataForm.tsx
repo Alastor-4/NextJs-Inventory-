@@ -3,9 +3,9 @@ import { Grid, TextField, Button } from '@mui/material';
 import { handleKeyDown } from '@/utils/handleKeyDown';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import React from 'react'
 
-const ChangeDataForm = ({ initialValues, onSubmit }: ChangeDataFormProps) => {
+const ChangeDataForm = ({ initialValues, onSubmit, setEdit }: ChangeDataFormProps) => {
+
     const signUpValidationSchema = Yup.object({
         username: Yup.string()
             .required('Este campo es requerido')
@@ -82,20 +82,35 @@ const ChangeDataForm = ({ initialValues, onSubmit }: ChangeDataFormProps) => {
                         <Grid item container marginTop={"1rem"} justifyContent={"space-between"}>
                             <Button
                                 type="reset"
-                                color='secondary'
+                                color='error'
                                 variant="outlined"
-                                onClick={() => { resetForm() }}
+                                onClick={() => { resetForm(); setEdit(false); }}
                             >
-                                Reestablecer
+                                Cancelar
                             </Button>
                             <Button
                                 type="submit"
                                 color='primary'
                                 variant="outlined"
-                                disabled={!isValid}
+                                disabled={
+                                    touched.username && !!errors.username
+                                    || touched.email && !!errors.email ||
+                                    touched.phone && !!errors.phone ||
+                                    touched.name && !!errors.name || !isValid
+                                }
                             >
                                 Guardar
                             </Button>
+                            <Grid item container marginTop={"1rem"} justifyContent={"center"}>
+                                <Button
+                                    type="reset"
+                                    color='secondary'
+                                    variant="outlined"
+                                    onClick={() => { resetForm(); }}
+                                >
+                                    Reestablecer
+                                </Button>
+                            </Grid>
                         </Grid>
                     </Grid>
                 </form>)}
