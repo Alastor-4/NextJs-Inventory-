@@ -12,7 +12,6 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 const ChangeAccountPasswordModal = ({ user, isOpen, setIsOpen }: ChangeAccountPasswordModalProps) => {
-
     const handleClose = () => setIsOpen(false);
 
     const [showOldPassword, setShowOldPassword] = useState<boolean>(false);
@@ -71,9 +70,10 @@ const ChangeAccountPasswordModal = ({ user, isOpen, setIsOpen }: ChangeAccountPa
                             <Close />
                         </IconButton>
                     </DialogTitle>
-                    <DialogContent>
+
+                    <DialogContent dividers>
                         <form onSubmit={handleSubmit}>
-                            <Grid container item xs={12} spacing={2} paddingY={"20px"} paddingX={"30px"} mb={"10px"}>
+                            <Grid container item xs={12} spacing={2}>
                                 <Grid item xs={12}>
                                     <TextField
                                         label="Contraseña antigua"
@@ -144,19 +144,20 @@ const ChangeAccountPasswordModal = ({ user, isOpen, setIsOpen }: ChangeAccountPa
                                     />
                                 </Grid>
                             </Grid>
-                            <DialogActions>
-                                <Button color="error" type='reset' variant="outlined" onClick={() => { handleClose(); resetForm() }}>Cancelar</Button>
-                                <Button
-                                    color="primary"
-                                    variant="outlined"
-                                    type='submit'
-                                    disabled={!isValid || !!errors.password && touched.password && !!errors.confirmPassword && touched.confirmPassword}
-                                >
-                                    Cambiar
-                                </Button>
-                            </DialogActions>
                         </form >
                     </DialogContent>
+
+                    <DialogActions>
+                        <Button color="error" type='reset' variant="outlined" onClick={() => { handleClose(); resetForm() }}>Cancelar</Button>
+                        <Button
+                            color="primary"
+                            variant="outlined"
+                            type='submit'
+                            disabled={!isValid}
+                        >
+                            Cambiar
+                        </Button>
+                    </DialogActions>
                 </Dialog>
             )
         }

@@ -134,12 +134,12 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                         Mi Perfil
                     </MenuItem>
                     {/* TODO: Opciones extras, sobre tema, no se, tal vez algo mas se pueda poner */}
-                    <MenuItem onClick={handleToggleMenu}>
+                    {/*<MenuItem onClick={handleToggleMenu}>
                         <ListItemIcon >
                             <Settings />
                         </ListItemIcon>
                         Opciones
-                    </MenuItem>
+                    </MenuItem>*/}
                     {/* TODO: Crear pagina con planes e informacion */}
                     {/* {userRole === "store_owner" && <MenuItem onClick={() => { }}>
                         <ListItemIcon>
@@ -594,144 +594,88 @@ export default function UserProfileMain({ userId }: { userId: number }) {
                 <CustomToolbar />
 
                 <CardContent>
-                    <Grid container rowSpacing={3}>
-                        <Grid container item rowSpacing={2}>
-                            <Grid container item xs={12} justifyContent={"flex-end"}>
-                                {
-                                    userDetails?.roles?.name && (
-                                        <Chip
-                                            size={"small"}
-                                            label={getRoleTranslation(userDetails.roles.name)}
-                                            color={getColorByRole(userDetails.roles.name)}
-                                            sx={{ border: "1px solid lightGreen", ml: "5px" }}
-                                        />
-                                    )
-                                }
-                            </Grid>
+                    <Grid container item xs={12} rowSpacing={1}>
+                        <Grid item xs={12}>
+                            <IconButton
+                                size={"small"}
+                                onClick={() => handleChangeActiveTab("welcome")}
+                                color={activeTab === "welcome" ? "primary" : "inherit"}
+                            >
+                                <HomeOutlined />
+                            </IconButton>
 
-                            <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={userProfileStyles.leftFlex}>Nombre:</Grid>
-                                <Grid item sx={userProfileStyles.rightFlex}>
-                                    {userDetails?.name ?? "-"}
-                                </Grid>
-                            </Grid>
+                            {
+                                userRole === 'admin' && (
+                                    <Button
+                                        color={activeTab === "admin" ? "primary" : "inherit"}
+                                        onClick={() => handleChangeActiveTab("admin")}
+                                    >
+                                        Admin
+                                    </Button>
+                                )
+                            }
 
-                            <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={userProfileStyles.leftFlex}>Usuario:</Grid>
-                                <Grid item sx={userProfileStyles.rightFlex}>
-                                    {userDetails?.username ?? "-"}
-                                </Grid>
-                            </Grid>
+                            {
+                                userRole === "store_owner" &&
+                                globalAndOwnerDepartments &&
+                                ownerWarehouses &&
+                                ownerStores &&
+                                ownerProductsCount !== null &&
+                                ownerWorkersCount !== null && (
+                                    <Button
+                                        color={activeTab === "owner" ? "primary" : "inherit"}
+                                        onClick={() => handleChangeActiveTab("owner")}
+                                    >
+                                        Dueño
+                                    </Button>
+                                )
+                            }
+                            {
+                                userRole === "store_keeper" &&
+                                ownerProductsCount !== null && (
+                                    <Button
+                                        color={activeTab === "keeper" ? "primary" : "inherit"}
+                                        onClick={() => handleChangeActiveTab("keeper")}
+                                    >
+                                        Almacenero
+                                    </Button>
+                                )
+                            }
 
-                            <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={userProfileStyles.leftFlex}>Correo:</Grid>
-                                <Grid item sx={userProfileStyles.rightFlex}>
-                                    {userDetails?.mail ?? "-"}
-                                </Grid>
-                            </Grid>
-
-                            <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={userProfileStyles.leftFlex}>Teléfono:</Grid>
-                                <Grid item sx={userProfileStyles.rightFlex}>
-                                    {userDetails?.phone ?? "-"}
-                                </Grid>
-                            </Grid>
-
-                            <Grid container item xs={12} spacing={1}>
-                                <Grid item sx={userProfileStyles.leftFlex}>Unido en:</Grid>
-                                <Grid item sx={userProfileStyles.rightFlex}>
-                                    {userDetails?.created_at ? dayjs(userDetails.created_at).format("DD/MM/YYYY") : "-"}
-                                </Grid>
-                            </Grid>
+                            {
+                                (userRole === "store_owner" || userRole === "store_keeper" || userRole === "store_seller") && sellerStores && (
+                                    <Button
+                                        color={activeTab === "seller" ? "primary" : "inherit"}
+                                        onClick={() => handleChangeActiveTab("seller")}
+                                    >
+                                        Vendedor
+                                    </Button>
+                                )
+                            }
                         </Grid>
 
                         <Grid item xs={12}>
-                            <Divider flexItem color={"primary"} variant={"fullWidth"} orientation={"horizontal"} />
-                        </Grid>
+                            {activeTab === "welcome" && <WelcomeModule />}
 
-                        <Grid container item xs={12} rowSpacing={1}>
-                            <Grid item xs={12}>
-                                <IconButton
-                                    size={"small"}
-                                    onClick={() => handleChangeActiveTab("welcome")}
-                                    color={activeTab === "welcome" ? "primary" : "inherit"}
-                                >
-                                    <HomeOutlined />
-                                </IconButton>
+                            {activeTab === "admin" && <AdminModule />}
 
-                                {
-                                    userRole === 'admin' && (
-                                        <Button
-                                            color={activeTab === "admin" ? "primary" : "inherit"}
-                                            onClick={() => handleChangeActiveTab("admin")}
-                                        >
-                                            Admin
-                                        </Button>
-                                    )
-                                }
+                            {activeTab === "owner" && (
+                                <OwnerModule
+                                    globalAndOwnerDepartments={globalAndOwnerDepartments!}
+                                    ownerProductsCount={ownerProductsCount!}
+                                    ownerWarehouses={ownerWarehouses!}
+                                    ownerStores={ownerStores!}
+                                    ownerWorkersCount={ownerWorkersCount!}
+                                />
+                            )}
 
-                                {
-                                    userRole === "store_owner" &&
-                                    globalAndOwnerDepartments &&
-                                    ownerWarehouses &&
-                                    ownerStores &&
-                                    ownerProductsCount !== null &&
-                                    ownerWorkersCount !== null && (
-                                        <Button
-                                            color={activeTab === "owner" ? "primary" : "inherit"}
-                                            onClick={() => handleChangeActiveTab("owner")}
-                                        >
-                                            Dueño
-                                        </Button>
-                                    )
-                                }
-                                {
-                                    userRole === "store_keeper" &&
-                                    ownerProductsCount !== null && (
-                                        <Button
-                                            color={activeTab === "keeper" ? "primary" : "inherit"}
-                                            onClick={() => handleChangeActiveTab("keeper")}
-                                        >
-                                            Almacenero
-                                        </Button>
-                                    )
-                                }
+                            {activeTab === "keeper" && (
+                                <KeeperModule ownerProductsCount={ownerProductsCount!} ownerWarehouses={ownerWarehouses!} ownerStores={ownerStores!} />
+                            )}
 
-                                {
-                                    (userRole === "store_owner" || userRole === "store_keeper" || userRole === "store_seller") && sellerStores && (
-                                        <Button
-                                            color={activeTab === "seller" ? "primary" : "inherit"}
-                                            onClick={() => handleChangeActiveTab("seller")}
-                                        >
-                                            Vendedor
-                                        </Button>
-                                    )
-                                }
-                            </Grid>
-
-                            <Grid item xs={12}>
-                                {activeTab === "welcome" && <WelcomeModule />}
-
-                                {activeTab === "admin" && <AdminModule />}
-
-                                {activeTab === "owner" && (
-                                    <OwnerModule
-                                        globalAndOwnerDepartments={globalAndOwnerDepartments!}
-                                        ownerProductsCount={ownerProductsCount!}
-                                        ownerWarehouses={ownerWarehouses!}
-                                        ownerStores={ownerStores!}
-                                        ownerWorkersCount={ownerWorkersCount!}
-                                    />
-                                )}
-
-                                {activeTab === "keeper" && (
-                                    <KeeperModule ownerProductsCount={ownerProductsCount!} ownerWarehouses={ownerWarehouses!} ownerStores={ownerStores!} />
-                                )}
-
-                                {activeTab === "seller" && (
-                                    <SellerModule sellerStores={sellerStores!} />
-                                )}
-                            </Grid>
+                            {activeTab === "seller" && (
+                                <SellerModule sellerStores={sellerStores!} />
+                            )}
                         </Grid>
                     </Grid>
                 </CardContent>

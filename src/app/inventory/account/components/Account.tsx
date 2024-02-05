@@ -119,18 +119,21 @@ const Account = ({ user }: AccountProps) => {
                                         {user?.created_at ? dayjs(user.created_at).format("DD/MM/YYYY") : "-"}
                                     </Grid>
                                 </Grid>
-                                <Grid item container marginTop={"1rem"} justifyContent={"space-between"}>
-                                    <Grid item mx={"auto"} justifyContent={"center"}>
+                                <Grid item container rowSpacing={1} marginTop={"1rem"} justifyContent={"space-between"}>
+                                   {/* <Grid container item xs={12} justifyContent={"center"}>
+                                        <Button
+                                            type="reset"
+                                            color='primary'
+                                            variant="outlined"
+                                            onClick={() => { setEdit(true) }}
+                                        >
+                                            Editar
+                                        </Button>
+                                    </Grid>*/}
+
+                                    <Grid container item xs={12} justifyContent={"center"}>
                                         <Button variant='outlined' color='secondary' onClick={() => { setIsOpenChangePasswordModal(true) }}>Cambiar Contraseña</Button>
                                     </Grid>
-                                    <Button
-                                        type="reset"
-                                        color='primary'
-                                        variant="outlined"
-                                        onClick={() => { setEdit(true) }}
-                                    >
-                                        Editar
-                                    </Button>
                                 </Grid>
                             </Grid>
                         }
