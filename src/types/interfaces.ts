@@ -1,5 +1,6 @@
-import { characteristics, departments, depots, images, product_offers, products, sell_products, sells, users, warehouses, store_depots, reservations, reservation_products, Prisma, stores, store_open_days, store_reservation_days, roles } from '@prisma/client';
+import { characteristics, departments, depots, images, product_offers, products, sell_products, sells, users, warehouses, store_depots, reservations, reservation_products, Prisma, stores, store_open_days, store_reservation_days, roles, sell_receivable_products } from '@prisma/client';
 import { ReactNode } from "react";
+import {date} from "yup";
 
 export interface ShowProductsStoreProps {
     userId?: number;
@@ -98,6 +99,23 @@ export interface storeDepotsStatsProps {
     depotsWithoutPriceTotal: number;
     depotsWithDiscountTotal: number;
 }
+
+interface saleReceivable {
+    total_price: number;
+    payment_method?: string;
+    pay_before_date?: string;
+    payed_at?: string;
+    status: string;
+    created_at: string;
+    sell_receivable_products: sell_receivable_products[];
+}
+
+export interface storeSalesReceivableProps {
+    todaySalesReceivableCreated: saleReceivable[],
+    todaySalesReceivablePayed: saleReceivable[],
+    allSalesReceivablePending: saleReceivable[],
+}
+
 export interface StoreMainTableProps {
     userId?: number;
     ownerId?: number;

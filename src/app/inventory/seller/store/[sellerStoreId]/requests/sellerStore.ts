@@ -5,6 +5,7 @@ import { notifyError } from "@/utils/generalFunctions";
 const url = (sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/api`
 const sellsUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/sellsApi`
 const transferUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/transferApi`
+const saleReceivableUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/saleReceivableApi`
 
 const sellerStore = {
     storeDetails: async function (userId, sellerStoreId) {
@@ -67,6 +68,17 @@ const sellerStore = {
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error al obtener los detalles de la transferencias. Inténtelo nuevamente")
+        }
+
+        return false
+    },
+
+    getTodaySalesReceivable: async function (sellerStoreId) {
+        try {
+            const response = await apiRequest.get(saleReceivableUrl(sellerStoreId))
+            return response.data
+        } catch (e) {
+            notifyError("Ha ocurrido un error al obtener los detalles de las ventas. Inténtelo nuevamente")
         }
 
         return false
