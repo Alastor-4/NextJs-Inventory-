@@ -1,6 +1,18 @@
 "use client"
 
-import { Avatar, Badge, Box, Button, FormControlLabel, Grid, IconButton, MenuItem, TextField, Typography } from "@mui/material";
+import {
+    Avatar,
+    Badge,
+    Box,
+    Button,
+    FormControlLabel,
+    Grid,
+    IconButton,
+    InputAdornment,
+    MenuItem,
+    TextField,
+    Typography
+} from "@mui/material";
 import { AddOutlined, Cancel, Close, DeleteOutline, Done } from "@mui/icons-material";
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import { departments, characteristics, images } from '@prisma/client';
@@ -44,6 +56,8 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
         name: updateItem ? updateItem.name : "",
         description: updateItem?.description ? updateItem.description : "",
         buyPrice: updateItem?.buy_price ? updateItem.buy_price : "",
+        fixedSellPrice: updateItem?.fixed_sell_price ? updateItem.fixed_sell_price : "",
+        fixedSellPriceUnit: "CUP",
         imagesMaxErrorField: "",
         department: department,
         characteristics: updateItem?.characteristics?.length ? updateItem.characteristics : [],
@@ -59,6 +73,8 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
         name: Yup.string().required("Este campo es requerido"),
         description: Yup.string(),
         buyPrice: Yup.number().typeError('Debe ser un número').min(0, "No puedes ser un número negativo").nullable(),
+        fixedSellPrice: Yup.number().typeError('Debe ser un número').min(0, "No puedes ser un número negativo").nullable(),
+        fixedSellPriceUnit: Yup.string(),
         images: Yup.array(),
         imagesMaxErrorField: Yup.string(),
         department: Yup.number().required("Debes seleccionar un departamento"),
@@ -73,6 +89,8 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
             name: values.name,
             description: values.description,
             buyPrice: values.buyPrice,
+            fixedSellPrice: values.fixedSellPrice,
+            fixedSellPriceUnit: values.fixedSellPrice ? values.fixedSellPriceUnit : null,
             departmentId: values.department,
             userId: userId,
             characteristics: null,
@@ -282,7 +300,7 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        label="Precio de compra"
+                                        label="Precio de costo"
                                         size={"small"}
                                         onKeyDown={handleKeyDownWithDot}
                                         inputMode="numeric"
@@ -290,6 +308,26 @@ export const ProductsForm = ({ userId, departments, productId, setOpen, handleFo
                                         {...formik.getFieldProps("buyPrice")}
                                         error={!!formik.errors.buyPrice && formik.touched.buyPrice}
                                         helperText={(formik.errors.buyPrice && formik.touched.buyPrice) && formik.errors.buyPrice}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment
+                                                position='end'>CUP</InputAdornment>
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid container item xs={12}>
+                                    <TextField
+                                        label="Precio de venta"
+                                        size={"small"}
+                                        onKeyDown={handleKeyDownWithDot}
+                                        inputMode="numeric"
+                                        fullWidth
+                                        {...formik.getFieldProps("fixedSellPrice")}
+                                        error={!!formik.errors.fixedSellPrice && formik.touched.fixedSellPrice}
+                                        helperText={(formik.errors.fixedSellPrice && formik.touched.fixedSellPrice) && formik.errors.fixedSellPrice}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment
+                                                position='end'>CUP</InputAdornment>
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>

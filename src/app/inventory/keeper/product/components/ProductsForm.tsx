@@ -43,7 +43,6 @@ export const ProductsForm = ({ userId, ownerId, departments, productId, setOpen,
     const initialValues = {
         name: updateItem ? updateItem.name : "",
         description: updateItem?.description ? updateItem.description : "",
-        buyPrice: updateItem?.buy_price ? updateItem.buy_price : "",
         imagesMaxErrorField: "",
         department: department,
         characteristics: updateItem?.characteristics?.length ? updateItem.characteristics : [],
@@ -58,7 +57,6 @@ export const ProductsForm = ({ userId, ownerId, departments, productId, setOpen,
     const validationSchema = Yup.object({
         name: Yup.string().required("Este campo es requerido"),
         description: Yup.string(),
-        buyPrice: Yup.number().typeError('Debe ser un número').min(0, "No puedes ser un número negativo").nullable(),
         images: Yup.array(),
         imagesMaxErrorField: Yup.string(),
         department: Yup.number().required("Debes seleccionar un departamento"),
@@ -72,7 +70,6 @@ export const ProductsForm = ({ userId, ownerId, departments, productId, setOpen,
             id: -1,
             name: values.name,
             description: values.description,
-            buyPrice: values.buyPrice,
             departmentId: values.department,
             userId: userId,
             ownerId: ownerId ? ownerId : userId,
@@ -279,18 +276,6 @@ export const ProductsForm = ({ userId, ownerId, departments, productId, setOpen,
                                         {...formik.getFieldProps("description")}
                                         error={!!formik.errors.description && formik.touched.description}
                                         helperText={(formik.errors.description && formik.touched.description) && formik.errors.description}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        label="Precio de compra"
-                                        size={"small"}
-                                        onKeyDown={handleKeyDownWithDot}
-                                        inputMode="numeric"
-                                        fullWidth
-                                        {...formik.getFieldProps("buyPrice")}
-                                        error={!!formik.errors.buyPrice && formik.touched.buyPrice}
-                                        helperText={(formik.errors.buyPrice && formik.touched.buyPrice) && formik.errors.buyPrice}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>

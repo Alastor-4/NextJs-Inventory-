@@ -1,6 +1,7 @@
 import { utapi } from "@/server/uploadthing";
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
+import { Prisma } from "@prisma/client";
 
 // GET all user products
 export async function GET(req: Request) {
@@ -31,7 +32,7 @@ export async function GET(req: Request) {
 // CREATE new user product
 export async function POST(req: Request) {
     try {
-        const { userId, name, description, departmentId, buyPrice, characteristics } = await req.json();
+        const { userId, name, description, departmentId, buyPrice, fixedSellPrice, fixedSellPriceUnit, characteristics } = await req.json();
 
         let createObj = {
             data: {
@@ -40,6 +41,8 @@ export async function POST(req: Request) {
                 description,
                 department_id: +departmentId!,
                 buy_price: +buyPrice!,
+                fixed_sell_price: new Prisma.Decimal(fixedSellPrice),
+                fixed_sell_price_unit: fixedSellPriceUnit,
                 is_approved: true,
                 created_by_id: +userId!,
             },
@@ -69,16 +72,20 @@ export async function PUT(req: Request) {
             description,
             departmentId,
             buyPrice,
+            fixedSellPrice,
+            fixedSellPriceUnit,
             characteristics,
             deletedCharacteristics,
             deletedImages
         } = await req.json()
 
-        let updateObj: { name: string; description: string; department_id: number; buy_price: number } = {
+        let updateObj: { name: string; description: string; department_id: number; buy_price: number, fixed_sell_price: any, fixed_sell_price_unit: string } = {
             name,
             description,
             department_id: +departmentId!,
             buy_price: +buyPrice!,
+            fixed_sell_price: new Prisma.Decimal(fixedSellPrice),
+            fixed_sell_price_unit: fixedSellPriceUnit,
         }
 
         if (deletedCharacteristics) {

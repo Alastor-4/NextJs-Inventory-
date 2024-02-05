@@ -341,6 +341,27 @@ const ShowProductsStore = ({ dataStore, dataWarehouse, userId }: ShowProductsSto
                                                         </Grid>
 
                                                         <Grid container item spacing={1} xs={12}>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precios producto:</Grid>
+                                                            <Grid item xs={true}>
+                                                                <Grid container item xs={true}>
+                                                                    <Grid item xs={12}>
+                                                                        Costo: {product.buy_price} {product.buy_price ? "CUP" : "-"}
+                                                                    </Grid>
+                                                                    <Grid item xs={12}>
+                                                                        Venta: {product.fixed_sell_price} {product.fixed_sell_price ? product.fixed_sell_price_unit : "-"}
+                                                                    </Grid>
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Grid>
+
+                                                        <Grid container item spacing={1} xs={12}>
+                                                            <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio base en tienda:</Grid>
+                                                            <Grid item xs={true}>
+                                                                {product.depots![0].store_depots![0].sell_price !== "0" ? `${product.depots![0].store_depots![0].sell_price} ${product.depots![0].store_depots![0].sell_price_unit}` : "sin precio"}
+                                                            </Grid>
+                                                        </Grid>
+
+                                                        <Grid container item spacing={1} xs={12}>
                                                             <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
                                                             <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                                 {product.characteristics?.length! > 0

@@ -150,6 +150,7 @@ export interface ModalCreateUpdateDepartmentProps {
 }
 export interface ProductsMainTableProps {
     userId: number;
+    userRoleId?: number;
     ownerId?: number;
 }
 export interface DepartmentsMainTableProps {
@@ -204,6 +205,8 @@ export interface productsProps {
     name: string | null;
     description: string | null;
     buy_price: number | null;
+    fixed_sell_price: number,
+    fixed_sell_price_unit: string,
     is_approved: boolean,
     created_by_id: number,
     created_at: Date;

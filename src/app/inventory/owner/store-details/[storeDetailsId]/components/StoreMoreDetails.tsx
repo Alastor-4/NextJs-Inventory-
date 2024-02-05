@@ -141,8 +141,14 @@ function StoreMoreDetails(props: any) {
                     </Grid>
 
                     <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio
-                            base:</Grid>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precios del producto:</Grid>
+                        <Grid item xs={true}>
+                            Costo: {row.buy_price} {row.buy_price ? "CUP" : "-"} | Venta: {row.fixed_sell_price} {row.fixed_sell_price ? row.fixed_sell_price_unit : "-"}
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio base en tienda:</Grid>
                         <Grid item xs={true}>
                             {
                                 baseProductPrice
@@ -153,7 +159,7 @@ function StoreMoreDetails(props: any) {
                     </Grid>
 
                     <Grid container item spacing={1} xs={12}>
-                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio:</Grid>
+                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio final en tienda:</Grid>
                         <Grid item xs={true}>
                             <MoneyInfoTag
                                 value={displayProductPrice}

@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
 
-export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
+export const ProductsMainTable = ({ userId, userRoleId }: ProductsMainTableProps) => {
     const router = useRouter();
 
     //Products data
@@ -271,6 +271,10 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                 label: "Departamento",
             },
             {
+                id: "price",
+                label: "Precio",
+            },
+            {
                 id: "characteristics",
                 label: "Características",
             },
@@ -370,6 +374,17 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
                             </TableCell>
                             <TableCell align="center">
                                 {product?.departments?.name ?? "-"}
+                            </TableCell>
+                            <TableCell align="center">
+                                <Grid container>
+                                    <Grid container item xs={12} sx={{wordBreak: "keep-all", whiteSpace: "nowrap"}}>
+                                        Costo: {product.buy_price} {product.buy_price ? "CUP" : "-"}
+                                    </Grid>
+
+                                    <Grid item xs={12} sx={{wordBreak: "keep-all", whiteSpace: "nowrap"}}>
+                                        Venta: {product.fixed_sell_price} {product.fixed_sell_price_unit ? product.fixed_sell_price_unit : "-"}
+                                    </Grid>
+                                </Grid>
                             </TableCell>
                             <TableCell align="center">
                                 {product.characteristics?.length! > 0
