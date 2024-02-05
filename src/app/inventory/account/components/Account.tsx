@@ -131,9 +131,9 @@ const Account = ({ user }: AccountProps) => {
                                         </Button>
                                     </Grid>*/}
 
-                                    <Grid container item xs={12} justifyContent={"center"}>
+                                    {/*<Grid container item xs={12} justifyContent={"center"}>
                                         <Button variant='outlined' color='secondary' onClick={() => { setIsOpenChangePasswordModal(true) }}>Cambiar Contraseña</Button>
-                                    </Grid>
+                                    </Grid>*/}
                                 </Grid>
                             </Grid>
                         }
