@@ -156,6 +156,10 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                 label: "Departamento",
             },
             {
+                id: "price",
+                label: "Precio",
+            },
+            {
                 id: "characteristics",
                 label: "Características",
             },
@@ -240,6 +244,17 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                             </TableCell>
                             <TableCell>
                                 {product?.departments?.name ?? "-"}
+                            </TableCell>
+                            <TableCell>
+                                <Grid container>
+                                    <Grid container item xs={12} sx={{wordBreak: "keep-all", whiteSpace: "nowrap"}}>
+                                        Costo: {product.buy_price} {product.buy_price ? "CUP" : "-"}
+                                    </Grid>
+
+                                    <Grid item xs={12} sx={{wordBreak: "keep-all", whiteSpace: "nowrap"}}>
+                                        Venta: {product.fixed_sell_price} {product.fixed_sell_price_unit ? product.fixed_sell_price_unit : "-"}
+                                    </Grid>
+                                </Grid>
                             </TableCell>
                             <TableCell>
                                 {product.characteristics?.length! > 0
