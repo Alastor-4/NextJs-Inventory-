@@ -156,6 +156,10 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                 label: "Departamento",
             },
             {
+                id: "price",
+                label: "Precio",
+            },
+            {
                 id: "characteristics",
                 label: "Características",
             },
@@ -240,6 +244,9 @@ export const UserWarehouseForm = ({ ownerId, warehouseId }: UserWarehouseFormPro
                             </TableCell>
                             <TableCell>
                                 {product?.departments?.name ?? "-"}
+                            </TableCell>
+                            <TableCell>
+                                {product?.fixed_sell_price} {product?.fixed_sell_price_unit ? product.fixed_sell_price_unit : "-"}
                             </TableCell>
                             <TableCell>
                                 {product.characteristics?.length! > 0

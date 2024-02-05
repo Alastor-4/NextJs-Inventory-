@@ -669,8 +669,8 @@ const UserWarehouseMainTable = ({ userId, ownerId, warehouseDetails }: UserWareh
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio de compra:</Grid>
-                                                <Grid item xs={true}>{product.buy_price ?? "-"}</Grid>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio de venta:</Grid>
+                                                <Grid item xs={true}>{product.fixed_sell_price} {product.fixed_sell_price ? product.fixed_sell_price_unit : "-"}</Grid>
                                             </Grid>
 
                                             <Grid container item spacing={1} xs={12}>

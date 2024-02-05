@@ -303,6 +303,13 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId, userId }: AddP
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio:</Grid>
+                                                    <Grid item xs={true}>
+                                                        {row.products.fixed_sell_price} {row.products.fixed_sell_price ? row.products.fixed_sell_price_unit : "-"}
+                                                    </Grid>
+                                                </Grid>
+
+                                                <Grid container item spacing={1} xs={12}>
                                                     <Grid item xs={"auto"} sx={{
                                                         fontWeight: 600,
                                                         display: "flex",
