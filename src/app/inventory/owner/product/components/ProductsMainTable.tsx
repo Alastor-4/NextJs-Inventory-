@@ -27,7 +27,7 @@ import { useRouter } from "next/navigation";
 import ProductsForm from "./ProductsForm";
 import { Formik } from "formik";
 
-export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
+export const ProductsMainTable = ({ userId, userRoleId }: ProductsMainTableProps) => {
     const router = useRouter();
 
     //Products data
@@ -435,6 +435,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
             >
                 <ProductsForm
                     userId={userId}
+                    userRoleId={userRoleId}
                     departments={departments}
                     productId={null}
                     setOpen={setIsCreateModalOpen}
@@ -449,6 +450,7 @@ export const ProductsMainTable = ({ userId }: ProductsMainTableProps) => {
             >
                 <ProductsForm
                     userId={userId}
+                    userRoleId={userRoleId}
                     departments={departments}
                     productId={selectedProduct?.id!}
                     setOpen={setIsUpdateModalOpen}
