@@ -1,6 +1,5 @@
-import { characteristics, departments, depots, images, product_offers, products, users, warehouses, Prisma, roles } from '@prisma/client';
+import { characteristics, departments, depots, images, product_offers, products, users, warehouses, Prisma, roles, sell_receivable_products } from '@prisma/client';
 import { ReactNode } from "react";
-import {date} from "yup";
 
 export interface ShowProductsStoreProps {
     userId?: number;
