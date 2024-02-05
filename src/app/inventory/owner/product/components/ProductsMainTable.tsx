@@ -377,15 +377,12 @@ export const ProductsMainTable = ({ userId, userRoleId }: ProductsMainTableProps
                             </TableCell>
                             <TableCell align="center">
                                 <Grid container>
-                                    {
-                                        userRoleId === 2 && product?.buy_price && (
-                                            <Grid container item xs={12} sx={{wordBreak: "keep-all", whiteSpace: "nowrap"}}>
-                                                Costo: {product.buy_price} {product.buy_price ? "CUP" : ""}
-                                            </Grid>
-                                        )
-                                    }
+                                    <Grid container item xs={12} sx={{wordBreak: "keep-all", whiteSpace: "nowrap"}}>
+                                        Costo: {product.buy_price} {product.buy_price ? "CUP" : "-"}
+                                    </Grid>
+
                                     <Grid item xs={12} sx={{wordBreak: "keep-all", whiteSpace: "nowrap"}}>
-                                        Venta: {product.fixed_sell_price} {product.fixed_sell_price_unit ? product.fixed_sell_price_unit : ""}
+                                        Venta: {product.fixed_sell_price} {product.fixed_sell_price_unit ? product.fixed_sell_price_unit : "-"}
                                     </Grid>
                                 </Grid>
                             </TableCell>
@@ -453,7 +450,6 @@ export const ProductsMainTable = ({ userId, userRoleId }: ProductsMainTableProps
             >
                 <ProductsForm
                     userId={userId}
-                    userRoleId={userRoleId!}
                     departments={departments}
                     productId={null}
                     setOpen={setIsCreateModalOpen}
@@ -468,7 +464,6 @@ export const ProductsMainTable = ({ userId, userRoleId }: ProductsMainTableProps
             >
                 <ProductsForm
                     userId={userId}
-                    userRoleId={userRoleId!}
                     departments={departments}
                     productId={selectedProduct?.id!}
                     setOpen={setIsUpdateModalOpen}

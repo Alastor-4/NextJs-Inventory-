@@ -69,7 +69,6 @@ export interface ModalUpdateProductProps {
 }
 export interface ProductsFormProps {
     userId: number;
-    userRoleId: number;
     ownerId?: number;
     departments: departments[] | null;
     productId: number | null;

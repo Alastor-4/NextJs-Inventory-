@@ -26,7 +26,7 @@ import { AxiosResponse } from 'axios';
 import { Formik } from "formik";
 import * as Yup from "yup"
 
-export const ProductsForm = ({ userId, userRoleId, departments, productId, setOpen, handleForceRender }: ProductsFormProps) => {
+export const ProductsForm = ({ userId, departments, productId, setOpen, handleForceRender }: ProductsFormProps) => {
 
     const [updateItem, setUpdateItem] = useState<productsProps | null>(null);
 
@@ -298,46 +298,38 @@ export const ProductsForm = ({ userId, userRoleId, departments, productId, setOp
                                         helperText={(formik.errors.description && formik.touched.description) && formik.errors.description}
                                     />
                                 </Grid>
-                                {
-                                    userRoleId === 2 && (
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                label="Precio de costo"
-                                                size={"small"}
-                                                onKeyDown={handleKeyDownWithDot}
-                                                inputMode="numeric"
-                                                fullWidth
-                                                {...formik.getFieldProps("buyPrice")}
-                                                error={!!formik.errors.buyPrice && formik.touched.buyPrice}
-                                                helperText={(formik.errors.buyPrice && formik.touched.buyPrice) && formik.errors.buyPrice}
-                                                InputProps={{
-                                                    endAdornment: <InputAdornment
-                                                        position='end'>CUP</InputAdornment>
-                                                }}
-                                            />
-                                        </Grid>
-                                    )
-                                }
-                                {
-                                    userRoleId === 2 && (
-                                        <Grid container item xs={12}>
-                                            <TextField
-                                                label="Precio de venta"
-                                                size={"small"}
-                                                onKeyDown={handleKeyDownWithDot}
-                                                inputMode="numeric"
-                                                fullWidth
-                                                {...formik.getFieldProps("fixedSellPrice")}
-                                                error={!!formik.errors.fixedSellPrice && formik.touched.fixedSellPrice}
-                                                helperText={(formik.errors.fixedSellPrice && formik.touched.fixedSellPrice) && formik.errors.fixedSellPrice}
-                                                InputProps={{
-                                                    endAdornment: <InputAdornment
-                                                        position='end'>CUP</InputAdornment>
-                                                }}
-                                            />
-                                        </Grid>
-                                    )
-                                }
+                                <Grid item xs={12}>
+                                    <TextField
+                                        label="Precio de costo"
+                                        size={"small"}
+                                        onKeyDown={handleKeyDownWithDot}
+                                        inputMode="numeric"
+                                        fullWidth
+                                        {...formik.getFieldProps("buyPrice")}
+                                        error={!!formik.errors.buyPrice && formik.touched.buyPrice}
+                                        helperText={(formik.errors.buyPrice && formik.touched.buyPrice) && formik.errors.buyPrice}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment
+                                                position='end'>CUP</InputAdornment>
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid container item xs={12}>
+                                    <TextField
+                                        label="Precio de venta"
+                                        size={"small"}
+                                        onKeyDown={handleKeyDownWithDot}
+                                        inputMode="numeric"
+                                        fullWidth
+                                        {...formik.getFieldProps("fixedSellPrice")}
+                                        error={!!formik.errors.fixedSellPrice && formik.touched.fixedSellPrice}
+                                        helperText={(formik.errors.fixedSellPrice && formik.touched.fixedSellPrice) && formik.errors.fixedSellPrice}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment
+                                                position='end'>CUP</InputAdornment>
+                                        }}
+                                    />
+                                </Grid>
                                 <Grid item xs={12}>
                                     <TextField
                                         label="Departamento"
