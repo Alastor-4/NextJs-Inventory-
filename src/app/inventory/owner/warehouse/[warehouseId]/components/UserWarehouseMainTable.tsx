@@ -469,7 +469,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                     </Grid>
                 </Grid>
                 {
-                    !!storeQuantity && (
+                    storeQuantity > 0 && (
                         <>
                             <Grid item xs={12}>
                                 <Divider flexItem sx={{ width: 1 }} />
@@ -831,7 +831,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                                                             </Grid>
                                                             <Grid item xs={true}>
                                                                 {
-                                                                    store.store_depots?.length! > 0
+                                                                    store.store_depots?.length! > 0 && store.store_depots![0].product_remaining_units !== -1
                                                                         ? `Total ${store.store_depots![0].product_units} | ${store.store_depots![0].product_remaining_units} Restantes`
                                                                         : "no asignado"
                                                                 }

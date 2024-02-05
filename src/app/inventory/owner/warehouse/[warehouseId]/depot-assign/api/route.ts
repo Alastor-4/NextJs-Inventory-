@@ -46,12 +46,17 @@ export async function PUT(req: Request) {
                 )
 
                 if (storeDepotId) {
+                    let addUnits = moveUnitQuantity
+                    const currentDepot = await prisma.store_depots.findUnique({where: {id: storeDepotId}})
+                    if (currentDepot!.product_remaining_units === -1)
+                     addUnits++
+
                     updatedStoreDepot = await prisma.store_depots.update(
                         {
                             data:
                             {
                                 product_units: { increment: moveUnitQuantity },
-                                product_remaining_units: { increment: moveUnitQuantity },
+                                product_remaining_units: { increment: addUnits },
                                 store_depot_transfers: {
                                     create: {
                                         transfer_direction: "2",
