@@ -271,6 +271,10 @@ export const ProductsMainTable = ({ userId, userRoleId }: ProductsMainTableProps
                 label: "Departamento",
             },
             {
+                id: "price",
+                label: "Precio",
+            },
+            {
                 id: "characteristics",
                 label: "Características",
             },
@@ -372,6 +376,20 @@ export const ProductsMainTable = ({ userId, userRoleId }: ProductsMainTableProps
                                 {product?.departments?.name ?? "-"}
                             </TableCell>
                             <TableCell align="center">
+                                <Grid container>
+                                    {
+                                        userRoleId === 2 && product?.buy_price && (
+                                            <Grid container item xs={12} sx={{wordBreak: "keep-all", whiteSpace: "nowrap"}}>
+                                                Costo: {product.buy_price} {product.buy_price ? "CUP" : ""}
+                                            </Grid>
+                                        )
+                                    }
+                                    <Grid item xs={12} sx={{wordBreak: "keep-all", whiteSpace: "nowrap"}}>
+                                        Venta: {product.fixed_sell_price} {product.fixed_sell_price_unit ? product.fixed_sell_price_unit : ""}
+                                    </Grid>
+                                </Grid>
+                            </TableCell>
+                            <TableCell align="center">
                                 {product.characteristics?.length! > 0
                                     ? product.characteristics?.map((characteristics: characteristics) => (
                                         <Grid
@@ -435,7 +453,7 @@ export const ProductsMainTable = ({ userId, userRoleId }: ProductsMainTableProps
             >
                 <ProductsForm
                     userId={userId}
-                    userRoleId={userRoleId}
+                    userRoleId={userRoleId!}
                     departments={departments}
                     productId={null}
                     setOpen={setIsCreateModalOpen}
@@ -450,7 +468,7 @@ export const ProductsMainTable = ({ userId, userRoleId }: ProductsMainTableProps
             >
                 <ProductsForm
                     userId={userId}
-                    userRoleId={userRoleId}
+                    userRoleId={userRoleId!}
                     departments={departments}
                     productId={selectedProduct?.id!}
                     setOpen={setIsUpdateModalOpen}
