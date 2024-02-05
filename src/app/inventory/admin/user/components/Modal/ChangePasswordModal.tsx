@@ -1,43 +1,22 @@
-"use client"
-
-import {
-    Button, Dialog, DialogActions, DialogContent, DialogTitle,
-    Grid, IconButton, InputAdornment, TextField, Typography
-} from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
 import { ChangePasswordModalProps } from '@/types/interfaces';
-import { Close, VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
 import users from '../../requests/users';
-import React, { useState } from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: ChangePasswordModalProps) => {
 
-    const [showPassword, setShowPassword] = useState<boolean>(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
-
-    const toggleVisibilityPassword = () => setShowPassword(!showPassword);
-    const toggleVisibilityConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
-
-    const changePasswordInitialValues = {
-        password: '',
-        confirmPassword: ''
-    };
     const changePasswordValidationSchema = Yup.object({
         password: Yup.string()
             .required('Este campo es requerido')
-            .min(8, 'Debe contener al menos 8 caracteres'),
-        confirmPassword: Yup.string()
-            .required('Este campo es requerido')
-            .nullable()
-            .oneOf([Yup.ref("password"), null],
-                "Las contraseñas no coinciden")
+            .min(8, 'Debe contener al menos 8 caracteres')
     });
 
     const handleClose = () => setOpen(false);
 
     return <Formik
-        initialValues={changePasswordInitialValues}
+        initialValues={{ password: '' }}
         validationSchema={changePasswordValidationSchema}
         onSubmit={async ({ password }) => {
             const response = await users.changePassword(selectedUser?.id!, password);
@@ -59,7 +38,7 @@ const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: C
                         fontWeight={"400"}
                         sx={{ bgcolor: '#1976d3' }}
                     >
-                        {`Cambiar contraseña a "${selectedUser ? selectedUser.username : ""}"`}
+                        {`Cambiar contraseña a "${selectedUser?.username}"`}
                         <IconButton
                             edge="start"
                             color="inherit"
@@ -77,46 +56,11 @@ const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: C
                                     <TextField
                                         label="Contraseña*"
                                         size={"small"}
-                                        type={showPassword ? "text" : "password"}
                                         fullWidth
                                         variant="outlined"
                                         {...getFieldProps("password")}
                                         error={!!errors.password && touched.password}
                                         helperText={(errors.password && touched.password) && errors.password}
-                                        InputProps={{
-                                            endAdornment:
-                                                <InputAdornment
-                                                    position="end"
-                                                    onClick={toggleVisibilityPassword}
-                                                >
-                                                    <IconButton size={"small"}>
-                                                        {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
-                                                    </IconButton>
-                                                </InputAdornment>,
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField
-                                        label="Confirmar Contraseña*"
-                                        size={"small"}
-                                        type={showConfirmPassword ? "text" : "password"}
-                                        fullWidth
-                                        variant="outlined"
-                                        {...getFieldProps("confirmPassword")}
-                                        error={!!errors.confirmPassword && touched.confirmPassword}
-                                        helperText={(errors.confirmPassword && touched.confirmPassword) && errors.confirmPassword}
-                                        InputProps={{
-                                            endAdornment:
-                                                <InputAdornment
-                                                    position="end"
-                                                    onClick={toggleVisibilityConfirmPassword}
-                                                >
-                                                    <IconButton size={"small"}>
-                                                        {showConfirmPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
-                                                    </IconButton>
-                                                </InputAdornment>
-                                        }}
                                     />
                                 </Grid>
                             </Grid>
@@ -126,7 +70,7 @@ const ChangePasswordModal = ({ open, setOpen, selectedUser, setSelectedUser }: C
                                     color="primary"
                                     variant="outlined"
                                     type='submit'
-                                    disabled={!isValid || !!errors.password && touched.password && !!errors.confirmPassword && touched.confirmPassword}
+                                    disabled={!isValid || !!errors.password && touched.password}
                                 >
                                     Cambiar
                                 </Button>
