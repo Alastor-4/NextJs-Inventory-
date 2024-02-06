@@ -38,8 +38,8 @@ const StoresForm = ({ userId, storeId, sellerUsers }: { userId?: number, storeId
     const [activeCollection, setActiveCollection] = useState<boolean>(false);
     const [activeReservations, setActiveReservations] = useState<boolean>(false);
 
-    const defaultStartTime = dayjs();
-    const defaultEndTime = dayjs();
+    const defaultStartTime = dayjs().set("h", 9).set("m", 0).set("s", 0);
+    const defaultEndTime = dayjs().set("h", 16).set("m", 0).set("s", 0);
 
     const [storeOpeningDays] = useState([
         {
