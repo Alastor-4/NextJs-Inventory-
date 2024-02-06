@@ -40,7 +40,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId, userId }: AddP
     //                      -> products -> departments
     useEffect(() => {
         const getData = async () => {
-            const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(dataStore?.id!)
+            const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(userId!, dataStore?.id!)
 
             newDataDepotsWarehouses.length === 0
                 ? notifyWarning("Esta tienda posee todos los productos disponibles en sus almacenes", true)

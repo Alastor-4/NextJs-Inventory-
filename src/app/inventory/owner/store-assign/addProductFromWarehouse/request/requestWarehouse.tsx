@@ -5,9 +5,9 @@ const url = "/inventory/owner/store-assign/addProductFromWarehouse/api";
 const urlSpecificComponent = "/inventory/owner/store-assign/addProductFromWarehouse/api/specificComponent";
 
 const requestWarehouse = {
-    getAllWarehousesWithTheirDepots: async function (storeId: number) {
+    getAllWarehousesWithTheirDepots: async function (ownerId: number, storeId: number) {
         try {
-            const request = await apiRequest.get(url, { params: { storeId: storeId } })
+            const request = await apiRequest.get(url, { params: { ownerId: ownerId, storeId: storeId } })
 
             return request.data
 

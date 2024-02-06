@@ -78,6 +78,7 @@ export interface ProductsFormProps {
 export interface AddProductFromWarehouseProps {
     dataStore?: storeWithStoreDepots;
     warehouseId?: number | null;
+    ownerId?: number | null,
     userId?: number | null,
 }
 

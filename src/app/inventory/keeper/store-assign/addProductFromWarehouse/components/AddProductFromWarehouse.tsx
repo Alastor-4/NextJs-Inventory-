@@ -15,7 +15,7 @@ import { images } from '@prisma/client';
 import { Formik } from 'formik';
 import * as Yup from "yup"
 
-export const AddProductFromWarehouse = ({ dataStore, warehouseId, userId }: AddProductFromWarehouseProps) => {
+export const AddProductFromWarehouse = ({ dataStore, warehouseId, userId, ownerId }: AddProductFromWarehouseProps) => {
     const [dataDepotsWarehouses, setDataDepotsWarehouse] = useState<any>([]);
     const [dataProductsByDepartment, setDataProductsByDepartment] = useState<any>([])
     const [data, setData] = useState<any>([]);
@@ -34,7 +34,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId, userId }: AddP
     //                      -> products -> departments
     useEffect(() => {
         const getData = async () => {
-            const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(dataStore?.id!);
+            const newDataDepotsWarehouses = await requestWarehouse.getAllWarehousesWithTheirDepots(ownerId!, dataStore?.id!);
 
             newDataDepotsWarehouses.length === 0
                 ? notifyWarning("Esta tienda posee todos los productos disponibles en sus almacenes", true)
