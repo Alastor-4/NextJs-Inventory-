@@ -41,11 +41,15 @@ export async function POST(req: Request) {
                 description,
                 department_id: +departmentId!,
                 buy_price: +buyPrice!,
-                fixed_sell_price: new Prisma.Decimal(fixedSellPrice),
                 fixed_sell_price_unit: fixedSellPriceUnit,
                 is_approved: true,
                 created_by_id: +userId!,
             },
+        }
+
+        if (fixedSellPrice) {
+            // @ts-ignore
+            createObj.data.fixed_sell_price = new Prisma.Decimal(fixedSellPrice)
         }
 
         if (characteristics) {
