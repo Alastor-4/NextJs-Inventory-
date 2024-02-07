@@ -83,6 +83,16 @@ const sellerStore = {
 
         return false
     },
+
+    addReturnToSellProducts: async function (sellerStoreId: number, sellProductsId: number, returnedQuantity: number, returnedReason: string) {
+        try {
+            const response = await apiRequest.put(sellsUrl(sellerStoreId), { sell_product_id: sellProductsId, returned_quantity: returnedQuantity, returned_reason: returnedReason });
+            return response.status
+        } catch (e) {
+            notifyError("Ha ocurrido un añadiendo una devolución")
+        }
+        return false
+    }
 }
 
 export default sellerStore;
