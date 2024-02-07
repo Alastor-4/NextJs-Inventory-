@@ -41,7 +41,8 @@ export async function PUT(req: Request) {
                 updatedDepot = await prisma.depots.update(
                     {
                         data: { product_total_remaining_units: { decrement: moveUnitQuantity } },
-                        where: { id: depotId }
+                        where: { id: depotId },
+                        include: {products: true}
                     }
                 )
 
@@ -71,11 +72,13 @@ export async function PUT(req: Request) {
                 } else {
                     const parentStore = await prisma.stores.findUnique({ where: { id: storeId } })
 
-                    const data = {
+                    let data = {
                         store_id: storeId,
                         depot_id: depotId,
                         product_units: moveUnitQuantity,
                         product_remaining_units: moveUnitQuantity,
+                        sell_price: updatedDepot!.products!.fixed_sell_price,
+                        sell_price_unit: updatedDepot!.products!.fixed_sell_price_unit,
                         store_depot_transfers: {
                             create: {
                                 transfer_direction: "2",

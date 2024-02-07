@@ -92,6 +92,11 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     const { store_id, depot_id, product_units, product_remaining_units, seller_profit_percentage, seller_profit_quantity, userId } = await req.json();
 
+    const depotItem = await prisma.depots.findUnique({
+        where: {id: depot_id},
+        include: {products: true}
+    })
+
     const result = await prisma.store_depots.create({
         data: {
             store_id: store_id,
@@ -100,6 +105,8 @@ export async function POST(req: Request) {
             product_remaining_units: product_remaining_units,
             seller_profit_percentage: seller_profit_percentage,
             seller_profit_quantity: seller_profit_quantity,
+            sell_price: depotItem!.products!.fixed_sell_price,
+            sell_price_unit: depotItem!.products!.fixed_sell_price_unit,
             store_depot_transfers: {
                 create: {
                     transfer_direction: "2",
