@@ -349,7 +349,7 @@ model sell_products {
   sell_id                 Int
   store_depot_id          Int
   units_quantity          Int
-  units_returned_quantity Int?
+  units_returned_quantity Int?         @default(0)
   returned_at             DateTime?    @db.Timestamp(0)
   returned_reason         String?      @db.Text
   price                   Float
