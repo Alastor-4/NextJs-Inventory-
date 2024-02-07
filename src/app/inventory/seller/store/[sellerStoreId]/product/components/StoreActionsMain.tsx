@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { grey } from "@mui/material/colors";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 
 const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     const router = useRouter();
@@ -225,17 +226,28 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
         }
     }
 
-    const handleSellProduct = async (e: any, storeDepotIndex: number, badItemIndex: number) => {
-        e.stopPropagation();
+    //confirm sell product
+    const [sellProductItem, setSellProductItem] = React.useState<any | null>(null)
+    const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false)
 
-        const updatedDepot = await sellerStoreProduct.sellStoreDepotDefault(storeId!, storeDepotIndex);
+    const handleCloseConfirmDialog = () => setOpenConfirmDialog(false)
+    const handleOpenConfirmDialog = (e: any, productItem: any) => {
+        e.stopPropagation()
+
+        setSellProductItem(productItem)
+
+        setOpenConfirmDialog(true)
+    }
+
+    const handleSellProduct = async () => {
+        const updatedDepot = await sellerStoreProduct.sellStoreDepotDefault(storeId!, sellProductItem.depots[0].store_depots[0].id);
 
         if (updatedDepot) {
             const newDepartments = [...allProductsByDepartment!]
             for (const productsByDepartments of allProductsByDepartment!) {
                 const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
 
-                const productIndex = productsByDepartments!.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === storeDepotIndex);
+                const productIndex = productsByDepartments!.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === sellProductItem.depots![0].store_depots![0].id);
                 if (productIndex > -1) {
                     newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units = updatedDepot.product_remaining_units;
                 }
@@ -243,7 +255,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
 
             setAllProductsByDepartment(newDepartments)
 
-            if (updatedDepot.product_remaining_units === 0) cancelChecked(badItemIndex);
+            if (updatedDepot.product_remaining_units === 0) cancelChecked(sellProductItem.id);
 
             notifySuccess("Vendida una unidad del producto");
         }
@@ -520,7 +532,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                     <Grid container>
                                                         <IconButton
                                                             color={"primary"}
-                                                            onClick={(e) => handleSellProduct(e, product.depots![0].store_depots![0].id, product.id)}
+                                                            onClick={(e) => handleOpenConfirmDialog(e, product)}
                                                         >
                                                             <SellOutlined fontSize={"small"} />
                                                         </IconButton>
@@ -965,6 +977,14 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                 open={openImageDialog}
                                 setOpen={setOpenImagesDialog}
                                 images={dialogImages}
+                            />
+
+                            <ConfirmDeleteDialog
+                                open={openConfirmDialog}
+                                handleClose={handleCloseConfirmDialog}
+                                title={"Confirmar acción"}
+                                message={`Confirma vender "${sellProductItem?.name}" con precio ${sellProductItem?.depots[0]?.store_depots[0]?.sell_price} ${sellProductItem?.depots[0]?.store_depots[0]?.sell_price_unit}`}
+                                confirmAction={handleSellProduct}
                             />
 
                             {

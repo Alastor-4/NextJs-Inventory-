@@ -23,13 +23,15 @@ import { useParams, useRouter } from "next/navigation";
 import ModalSellsToday from "./Modal/ModalSellsToday";
 import React, { useEffect, useState } from "react";
 import isBetween from "dayjs/plugin/isBetween";
+import utc from "dayjs/plugin/utc";
 import Link from "next/link";
 import dayjs from "dayjs";
 import userProfileStyles from "@/assets/styles/userProfileStyles";
-import {product_store_transfers, sells_receivable, store_depot_transfers} from "@prisma/client";
+import {product_store_transfers, store_depot_transfers} from "@prisma/client";
 import ModalTransfersToday from "@/app/inventory/seller/store/[sellerStoreId]/components/Modal/ModalTransfersToday";
 
 dayjs.extend(isBetween);
+dayjs.extend(utc);
 
 interface DetailsTodayTransfer {
     places: number,
@@ -374,12 +376,12 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
         if (!todayIsWorkDay) return false
 
-        const openTime = dayjs(openDays[todayWorkIndex].day_start_time, "HH:mm:ss")
-        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time, "HH:mm:ss")
-        const now = dayjs(Date(), "HH:mm:ss")
+        const openTime = dayjs(openDays[todayWorkIndex].day_start_time)
+        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time)
+        const now = dayjs()
 
         if (openTime.hour() <= now.hour() && now.hour() <= closeTime.hour()) {
-            if (openTime.hour() === now.hour() && openTime.minute() < now.minute()) return false
+            if (openTime.hour() === now.hour() && openTime.minute() > now.minute()) return false
 
             return !(closeTime.hour() === now.hour() && closeTime.minute() < now.minute())
         }
@@ -397,12 +399,12 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
         if (!todayIsWorkDay) return false
 
-        const openTime = dayjs(openDays[todayWorkIndex].day_start_time, "HH:mm:ss")
-        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time, "HH:mm:ss")
-        const now = dayjs(Date(), "HH:mm:ss")
+        const openTime = dayjs(openDays[todayWorkIndex].day_start_time)
+        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time)
+        const now = dayjs()
 
         if (openTime.hour() <= now.hour() && now.hour() <= closeTime.hour()) {
-            if (openTime.hour() === now.hour() && openTime.minute() < now.minute()) return false
+            if (openTime.hour() === now.hour() && openTime.minute() > now.minute()) return false
 
             return !(closeTime.hour() === now.hour() && closeTime.minute() < now.minute())
         }

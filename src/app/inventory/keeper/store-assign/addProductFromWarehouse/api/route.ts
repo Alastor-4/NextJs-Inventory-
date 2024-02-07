@@ -4,9 +4,11 @@ import { prisma } from "db";
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const storeId = +searchParams.get("storeId")!;
+    const ownerId = +searchParams.get("ownerId")!;
 
     const result = await prisma.warehouses.findMany({
         where: {
+            owner_id: ownerId,
             depots: {
                 some: {
                     OR: [
