@@ -140,10 +140,20 @@ model store_depots {
   stores                    stores?                    @relation(fields: [store_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_1")
   depots                    depots?                    @relation(fields: [depot_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_depots_ibfk_2")
   sell_receivable_products  sell_receivable_products[]
+  store_depot_notes         store_depot_notes[]
 
   @@unique([store_id, depot_id])
   @@index([depot_id], map: "depot_id")
   @@index([store_id], map: "store_id")
+}
+
+model store_depot_notes {
+  id             Int          @id @default(autoincrement())
+  store_depot_id Int
+  name           String       @db.VarChar(255)
+  value          String       @db.VarChar(255)
+  created_at     DateTime     @default(now()) @db.Timestamp(0)
+  store_depots   store_depots @relation(fields: [store_depot_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "store_depot_note_store_depot_fk")
 }
 
 model stores {
