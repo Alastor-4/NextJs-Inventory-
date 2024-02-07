@@ -61,3 +61,22 @@ export async function GET(req: Request) {
 
     return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
 }
+
+export async function PUT(req: Request) {
+    const { sell_product_id, returned_quantity, returned_reason } = await req.json();
+
+    const price = await prisma.sell_products.findUnique({ where: { id: sell_product_id }, include: { store_depots: true } });
+
+    const sellProduct = await prisma.sell_products.update({
+        where: { id: +sell_product_id! }, data: {
+            returned_reason: returned_reason,
+            units_returned_quantity: { increment: returned_quantity },
+            units_quantity: { decrement: returned_quantity },
+            store_depots: { update: { product_remaining_units: { increment: returned_quantity } } },
+            price: { decrement: (returned_quantity * +price?.store_depots?.sell_price!) },
+            sells: { update: { total_price: { decrement: (returned_quantity * +price?.store_depots?.sell_price!) } } }
+        }
+    });
+
+    return new NextResponse('Se ha realizado la devolución con éxito', { status: 200 })
+}
