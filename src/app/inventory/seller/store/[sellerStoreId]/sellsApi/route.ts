@@ -62,6 +62,7 @@ export async function GET(req: Request) {
     return new Response('La acción de obtener los datos de la tienda ha fallado', { status: 500 })
 }
 
+//ADD returned quantity, reason and date
 export async function PUT(req: Request) {
     const { sell_product_id, returned_quantity, returned_reason, returned_at } = await req.json();
 

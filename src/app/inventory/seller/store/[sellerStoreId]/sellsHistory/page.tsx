@@ -10,6 +10,7 @@ import { ArrowLeft, ExpandLessOutlined, ExpandMoreOutlined, HelpOutline } from '
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import calcReturnedQuantity from '@/utils/calcReturnedQuantity';
 import SellsMoreDetails from '../components/SellsMoreDetails';
 import { storeSellsDetailsProps } from '@/types/interfaces';
 import { TableNoData } from '@/components/TableNoData';
@@ -20,7 +21,7 @@ import { useParams } from 'next/navigation';
 import { useRouter } from "next/navigation";
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/es';
-import calcReturnedQuantity from '@/utils/calcReturnedQuantity';
+import calcSellProductsUnits from '@/utils/calcSellProductsUnits';
 
 dayjs.locale("es");
 
@@ -117,10 +118,10 @@ const SellsHistory = () => {
                 <TableRow>
                     <TableCell id='details' />
                     <TableCell align='center' id='total_price_payment_method'>Importe total</TableCell>
-                    <TableCell id='sell_products_quantity'>Productos</TableCell>
-                    <TableCell align='center' id='sell_type'>Tipo de venta</TableCell>
-                    <TableCell id='created_at'>Registrado</TableCell>
-                    <TableCell id='units_returned_quantity'>Devoluciones</TableCell>
+                    <TableCell align='center' id='sell_products_quantity'>Productos</TableCell>
+                    <TableCell align='center' id='units'>Unidades</TableCell>
+                    <TableCell align='center' id='sell_units_returned_quantity'>Devoluciones</TableCell>
+                    <TableCell align='center' id='created_at'>Registrado</TableCell>
                 </TableRow>
             </TableHead>
         )
@@ -173,10 +174,10 @@ const SellsHistory = () => {
                                     </Tooltip>
                                 </TableCell>
                                 <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
-                                <TableCell align='center'>{sell.sell_products.length!}</TableCell>
-                                <TableCell align='center'>{sell.reservations !== null ? "Reservación" : "Presencial"}</TableCell>
-                                <TableCell align='center'>{dayjs(sell.created_at).format('MMM D, YYYY')} <br /> {dayjs(sell.created_at).format('h:mm A')}</TableCell>
+                                <TableCell align='center'>{sell.sell_products.length! !== 1 ? sell.sell_products.length! : sell.sell_products[0].store_depots.depots?.products?.name}</TableCell>
+                                <TableCell align='center'>{`${calcSellProductsUnits(sell)}`}</TableCell>
                                 <TableCell align='center'>{`${calcReturnedQuantity(sell)}`}</TableCell>
+                                <TableCell align='center'>{dayjs(sell.created_at).format('MMM D, YYYY')} <br /> {dayjs(sell.created_at).format('h:mm A')}</TableCell>
                             </TableRow>
                             <TableRow >
                                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
@@ -235,7 +236,6 @@ const SellsHistory = () => {
                     <Grid container rowSpacing={2}>
                         {
                             allSells?.length! > 0 && selectedDate ?
-                                // selectedDate ?
                                 (allSells?.filter(
                                     (sell: storeSellsDetailsProps) => {
                                         const splitDate = (date: Date | string) => {
