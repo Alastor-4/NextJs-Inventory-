@@ -20,6 +20,7 @@ import { useParams } from 'next/navigation';
 import { useRouter } from "next/navigation";
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/es';
+import calcReturnedQuantity from '@/utils/calcReturnedQuantity';
 
 dayjs.locale("es");
 
@@ -66,6 +67,11 @@ const SellsHistory = () => {
         }
         loadData();
     }, [sellerStoreId]);
+
+    const refreshData = async () => {
+        const storeAllSellsDetails: storeSellsDetailsProps[] = await stores.storeSellsDetails(sellerStoreId, true);
+        setAllSells(storeAllSellsDetails);
+    }
 
     const handleNavigateBack = () => router.back();
 
@@ -170,7 +176,7 @@ const SellsHistory = () => {
                                 <TableCell align='center'>{sell.sell_products.length!}</TableCell>
                                 <TableCell align='center'>{sell.reservations !== null ? "Reservación" : "Presencial"}</TableCell>
                                 <TableCell align='center'>{dayjs(sell.created_at).format('MMM D, YYYY')} <br /> {dayjs(sell.created_at).format('h:mm A')}</TableCell>
-                                <TableCell align='center'>{sell.units_returned_quantity ? sell.units_returned_quantity : "-"}</TableCell>
+                                <TableCell align='center'>{`${calcReturnedQuantity(sell)}`}</TableCell>
                             </TableRow>
                             <TableRow >
                                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
@@ -178,6 +184,8 @@ const SellsHistory = () => {
                                         <SellsMoreDetails
                                             show={(showDetails === sell.id)}
                                             sell_products={sell.sell_products}
+                                            history
+                                            refreshData={refreshData}
                                         />
                                     )}
                                 </TableCell>

@@ -27,7 +27,7 @@ import utc from "dayjs/plugin/utc";
 import Link from "next/link";
 import dayjs from "dayjs";
 import userProfileStyles from "@/assets/styles/userProfileStyles";
-import {product_store_transfers, store_depot_transfers} from "@prisma/client";
+import { product_store_transfers, sells_receivable, store_depot_transfers } from "@prisma/client";
 import ModalTransfersToday from "@/app/inventory/seller/store/[sellerStoreId]/components/Modal/ModalTransfersToday";
 
 dayjs.extend(isBetween);
@@ -197,7 +197,9 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                 : reservationProductItem.store_depots.seller_profit_percentage! * reservationProductItem.price / 100;
                         });
                         reservationSellsAmountTotal += sells.total_price!;
-                        reservationSellsUnitsReturnedTotal += sells.units_returned_quantity!;
+                        for (const sell_product of sells.sell_products) {
+                            reservationSellsUnitsReturnedTotal += sell_product.units_returned_quantity;
+                        }
                         reservationSellerProfitTotal += sellProfitQuantity;
                     } else {
                         normalSellsTotal++;
@@ -213,7 +215,9 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                 : sellProductItem.store_depots.seller_profit_percentage! * sellProductItem.price / 100;
                         });
                         normalSellsAmountTotal += sells.total_price!;
-                        normalSellsUnitsReturnedTotal += sells.units_returned_quantity!;
+                        for (const sell_product of sells.sell_products) {
+                            reservationSellsUnitsReturnedTotal += sell_product.units_returned_quantity;
+                        }
                         normalSellerProfitTotal += sellProfitQuantity;
                     }
                 })
@@ -285,7 +289,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const openModalTransfersDetails = async () => {
 
 
-        if(todayTransfers?.totalTransfers) {
+        if (todayTransfers?.totalTransfers) {
             if (!todayTransfersDetails) {
                 const data = await stores.getTodayTransfersDetails(sellerStoreId)
                 if (data) setTodayTransfersDetails(data)
@@ -603,21 +607,21 @@ export default function StoreMain({ userId }: { userId?: number }) {
                     <Grid container rowSpacing={1} marginTop={"2px"}>
                         {storeDetails?.online_reservation &&
                             <>
-                                <Grid item xs={12}><Divider orientation="horizontal" variant="fullWidth"/></Grid>
+                                <Grid item xs={12}><Divider orientation="horizontal" variant="fullWidth" /></Grid>
 
-                                <Grid sx={{fontWeight: 600, mb: "5px", mt: "10px"}}>Presenciales:</Grid>
+                                <Grid sx={{ fontWeight: 600, mb: "5px", mt: "10px" }}>Presenciales:</Grid>
 
                                 <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                    <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Total:
                                     </Grid>
                                     <Grid item xs={true}>{todaySellsStats?.normalSellsTotal}</Grid>
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                    <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Productos:
                                     </Grid>
                                     <Grid item xs={true}>
@@ -626,8 +630,8 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                 </Grid>
 
                                 <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                    <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
-                                        <ChevronRightOutlined fontSize={"small"}/>
+                                    <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                        <ChevronRightOutlined fontSize={"small"} />
                                         Recaudado
                                     </Grid>
                                     <Grid container item xs={true}>
@@ -647,8 +651,8 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
                                 {todaySellsStats?.normalSellsUnitsReturnedTotal! > 0 &&
                                     <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                        <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
-                                            <ChevronRightOutlined fontSize={"small"}/>
+                                        <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                            <ChevronRightOutlined fontSize={"small"} />
                                             Productos devueltos:
                                         </Grid>
                                         <Grid item xs={true}>{todaySellsStats?.normalSellsUnitsReturnedTotal}</Grid>
@@ -674,8 +678,8 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             </Grid>
 
                             <Grid container item spacing={1} xs={12} alignItems={"center"}>
-                                <Grid item xs={"auto"} sx={{display: "flex", alignItems: "center"}}>
-                                    <ChevronRightOutlined fontSize={"small"}/>
+                                <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
+                                    <ChevronRightOutlined fontSize={"small"} />
                                     Recaudado
                                 </Grid>
                                 <Grid container item xs={true}>

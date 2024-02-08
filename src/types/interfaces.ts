@@ -325,11 +325,29 @@ export interface SellsMoreDetailsProps {
         sell_id: number;
         store_depot_id: number;
         units_quantity: number;
-        price: number;
+        units_returned_quantity: number | null;
+        returned_at: Date | null;
+        returned_reason: string | null;
         created_at: Date;
+        price: number;
         store_depots: storeDepotsWithAny;
     }[];
     show: boolean;
+    history?: boolean;
+    refreshData?: () => Promise<void>
+}
+
+export interface sellProducts {
+    id: number;
+    sell_id: number;
+    store_depot_id: number;
+    units_quantity: number;
+    units_returned_quantity: number | null;
+    returned_at: Date | null;
+    returned_reason: string | null;
+    created_at: Date;
+    price: number;
+    store_depots: storeDepotsWithAny;
 }
 
 export interface StoresFormProps {
@@ -355,6 +373,27 @@ export interface ModalSellsTodayProps {
     dialogTitle: string;
     todaySellsData: storeSellsDetailsProps[];
 }
+export interface sellsWithSellProducts {
+    id: number;
+    total_price: number | null;
+    payment_method: string | null;
+    created_at: Date;
+    from_reservation_id: number | null;
+    requesting_user_id: number | null;
+    sell_products: {
+        id: number;
+        sell_id: number;
+        store_depot_id: number;
+        units_quantity: number;
+        units_returned_quantity: number | null;
+        returned_at: Date | null;
+        returned_reason: string | null;
+        created_at: Date;
+        price: number;
+        store_depots: storeDepotsWithAny;
+    }[];
+}
+
 export interface StoreModalDefaultProps {
     open: boolean;
     setOpen: (bool: boolean) => void;
@@ -366,10 +405,7 @@ export interface storeSellsDetailsProps {
     id: number;
     total_price: number | null;
     payment_method: string | null;
-    units_returned_quantity: number | null;
     created_at: Date;
-    returned_at: Date | null;
-    returned_reason: string | null;
     from_reservation_id: number | null;
     requesting_user_id: number | null;
     reservations?: {
@@ -399,8 +435,11 @@ export interface storeSellsDetailsProps {
         sell_id: number;
         store_depot_id: number;
         units_quantity: number;
-        price: number;
+        units_returned_quantity: number | null;
+        returned_at: Date | null;
+        returned_reason: string | null;
         created_at: Date;
+        price: number;
         store_depots: storeDepotsWithAny;
     }[];
 }

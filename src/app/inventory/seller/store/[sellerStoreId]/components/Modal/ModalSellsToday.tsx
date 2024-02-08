@@ -11,6 +11,7 @@ import { TableNoData } from '@/components/TableNoData';
 import SellsMoreDetails from '../SellsMoreDetails';
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
+import calcReturnedQuantity from '@/utils/calcReturnedQuantity';
 
 dayjs.locale("es");
 
@@ -36,7 +37,7 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
                     <TableCell id='sell_products_quantity'>Productos</TableCell>
                     <TableCell align='center' id='sell_type'>Tipo de venta</TableCell>
                     <TableCell id='created_at'>Registrado</TableCell>
-                    <TableCell id='units_returned_quantity'>Devoluciones</TableCell>
+                    <TableCell id='sell_units_returned_quantity'>Devoluciones</TableCell>
                 </TableRow>
             </TableHead>
         )
@@ -71,7 +72,7 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
                                 <TableCell align='center'>{sell.sell_products.length!}</TableCell>
                                 <TableCell align='center'>{sell.reservations !== null ? "Reservación" : "Presencial"}</TableCell>
                                 <TableCell align='center'>{dayjs(sell.created_at).format('h:mm A')}</TableCell>
-                                <TableCell align='center'>{sell.units_returned_quantity ? sell.units_returned_quantity : "-"}</TableCell>
+                                <TableCell align='center'>{`${calcReturnedQuantity(sell)}`}</TableCell>
                             </TableRow>
                             <TableRow >
                                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>

@@ -345,32 +345,32 @@ model reservations {
 }
 
 model sell_products {
-  id             Int          @id @default(autoincrement())
-  sell_id        Int
-  store_depot_id Int
-  units_quantity Int
-  price          Float
-  created_at     DateTime     @default(now()) @db.Timestamp(0)
-  sells          sells        @relation(fields: [sell_id], references: [id], onUpdate: Restrict, map: "sell_products_FK")
-  store_depots   store_depots @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "sell_products_FK_1")
+  id                      Int          @id @default(autoincrement())
+  sell_id                 Int
+  store_depot_id          Int
+  units_quantity          Int
+  units_returned_quantity Int?         @default(0)
+  returned_at             DateTime?    @db.Timestamp(0)
+  returned_reason         String?      @db.Text
+  price                   Float
+  created_at              DateTime     @default(now()) @db.Timestamp(0)
+  sells                   sells        @relation(fields: [sell_id], references: [id], onUpdate: Restrict, map: "sell_products_FK")
+  store_depots            store_depots @relation(fields: [store_depot_id], references: [id], onUpdate: Restrict, map: "sell_products_FK_1")
 
   @@index([sell_id], map: "reservation_products_FK")
   @@index([store_depot_id], map: "reservation_products_FK_1")
 }
 
 model sells {
-  id                      Int             @id @default(autoincrement())
-  total_price             Float?
-  payment_method          String?         @db.VarChar(255)
-  units_returned_quantity Int?
-  created_at              DateTime        @default(now()) @db.Timestamp(0)
-  returned_at             DateTime?       @db.Timestamp(0)
-  returned_reason         String?         @db.Text
-  from_reservation_id     Int?
-  requesting_user_id      Int?
-  sell_products           sell_products[]
-  reservations            reservations?   @relation(fields: [from_reservation_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_reservations_FK")
-  users                   users?          @relation(fields: [requesting_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_users_FK")
+  id                  Int             @id @default(autoincrement())
+  total_price         Float?
+  payment_method      String?         @db.VarChar(255)
+  created_at          DateTime        @default(now()) @db.Timestamp(0)
+  from_reservation_id Int?
+  requesting_user_id  Int?
+  sell_products       sell_products[]
+  reservations        reservations?   @relation(fields: [from_reservation_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_reservations_FK")
+  users               users?          @relation(fields: [requesting_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_users_FK")
 
   @@index([from_reservation_id], map: "products_sell_FK")
   @@index([requesting_user_id], map: "sells_FK")
