@@ -9,6 +9,13 @@ import { AddOutlined, Close } from '@mui/icons-material';
 import React, { useState } from 'react';
 import { Form, Formik } from 'formik';
 import * as Yup from "yup";
+import { DateTimeField, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { esES } from '@mui/x-date-pickers/locales'
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/es';
+dayjs.locale("es");
 
 const SellsMoreDetails = ({ show, sell_products, history, refreshData }: SellsMoreDetailsProps) => {
 
@@ -28,18 +35,23 @@ const SellsMoreDetails = ({ show, sell_products, history, refreshData }: SellsMo
     const initialValues = {
         soldUnitsQuantity: selectedSellProduct?.units_quantity,
         returnedQuantity: 0,
-        returnedReason: ""
+        returnedReason: "",
+        returned_at: dayjs()
     }
 
     const validationSchema = Yup.object({
         soldUnitsQuantity: Yup.number(),
         returnedQuantity: Yup.number().integer().required("Es requerido").typeError("Debe ser un número").min(0, "Debe ser mayor a 0")
             .max(Yup.ref("soldUnitsQuantity"), "Cantidad superior a lo vendido"),
-        returnedReason: Yup.string()
+        returnedReason: Yup.string(),
+        returned_at: Yup.date().required('La fecha es requerida')
+            .test('future-date', 'La fecha no puede ser posterior a la actual', function (value) {
+                return dayjs(value).isBefore(dayjs());
+            }),
     })
 
     const onSubmit = async (values: any) => {
-        const response = await sellerStore.addReturnToSellProducts(selectedSellProduct?.store_depots.store_id!, selectedSellProduct?.id!, values.returnedQuantity, values.returnedReason);
+        const response = await sellerStore.addReturnToSellProducts(selectedSellProduct?.store_depots.store_id!, selectedSellProduct?.id!, values.returnedQuantity, values.returnedReason, values.returned_at);
         if (response === 200 && refreshData) await refreshData();
         handleCloseModal();
     }
@@ -94,7 +106,7 @@ const SellsMoreDetails = ({ show, sell_products, history, refreshData }: SellsMo
                                         initialValues={initialValues}
                                         validationSchema={validationSchema}
                                         onSubmit={() => { }}
-                                    >{({ getFieldProps, isValid, errors, touched, values, resetForm }) => (
+                                    >{({ getFieldProps, isValid, errors, touched, values, resetForm, setFieldValue }) => (
                                         <Dialog open={modalOpen} fullWidth onClose={() => { handleCloseModal(); resetForm() }}>
                                             <DialogTitle
                                                 display={"flex"}
@@ -121,27 +133,50 @@ const SellsMoreDetails = ({ show, sell_products, history, refreshData }: SellsMo
                                                         <Grid item>Cantidad vendida: {`${selectedSellProduct?.units_quantity ?? 0}`}</Grid>
                                                         <Grid item>Cantidad devuelta: {`${selectedSellProduct?.units_returned_quantity ?? 0}`}</Grid>
                                                         <Grid item container spacing={2} justifyContent={"center"} marginTop={"5px"}>
-                                                            <Grid item>
-                                                                {selectedSellProduct.units_quantity !== 0 ? <TextField
-                                                                    label="A devolver"
-                                                                    size={"small"}
-                                                                    type={"number"}
-                                                                    sx={{ width: "90px" }}
-                                                                    {...getFieldProps("returnedQuantity")}
-                                                                    error={!!errors.returnedQuantity && touched?.returnedQuantity}
-                                                                    helperText={(errors.returnedQuantity && touched.returnedQuantity) && errors.returnedQuantity}
-                                                                /> : <Grid>Ya se devolvieron todos los productos</Grid>}
-                                                            </Grid>
-                                                            <Grid item>
-                                                                {selectedSellProduct.units_quantity !== 0 ?
+                                                            {selectedSellProduct.units_quantity !== 0 ?
+                                                                <Grid item>
+                                                                    <TextField
+                                                                        label="A devolver"
+                                                                        size={"small"}
+                                                                        type={"number"}
+                                                                        sx={{ width: "90px" }}
+                                                                        {...getFieldProps("returnedQuantity")}
+                                                                        error={!!errors.returnedQuantity && touched?.returnedQuantity}
+                                                                        helperText={(errors.returnedQuantity && touched.returnedQuantity) && errors.returnedQuantity}
+                                                                    />
+                                                                </Grid>
+                                                                : <Grid>Ya se devolvieron todos los productos</Grid>}
+                                                            {selectedSellProduct.units_quantity !== 0 ?
+                                                                <Grid item>
                                                                     <TextField
                                                                         label="Razón de la devolución"
                                                                         size={"small"}
                                                                         {...getFieldProps("returnedReason")}
                                                                         error={!!errors.returnedReason && touched.returnedReason}
                                                                         helperText={(errors.returnedReason && touched.returnedReason) && errors.returnedReason}
-                                                                    /> : <Grid>Razón de las devoluciones: {selectedSellProduct.returned_reason}</Grid>}
-                                                            </Grid>
+                                                                    />
+                                                                </Grid>
+                                                                : <Grid>Razón de las devoluciones: {selectedSellProduct.returned_reason}</Grid>}
+                                                            {selectedSellProduct.units_quantity !== 0 ?
+                                                                <Grid item>
+                                                                    <LocalizationProvider
+                                                                        dateAdapter={AdapterDayjs}
+                                                                        localeText={esES.components.MuiLocalizationProvider.defaultProps.localeText}
+                                                                        adapterLocale='es'>
+                                                                        <DemoContainer components={['DateTimeField']}>
+                                                                            <DateTimeField
+                                                                                label="Fecha de la devolución"
+                                                                                value={values.returned_at}
+                                                                                onChange={(value) => { setFieldValue("returned_at", value) }}
+                                                                                format="L hh:mm a"
+                                                                            />
+                                                                            {!!errors.returned_at && !touched.returned_at ? (
+                                                                                <Typography color={"red"}>{`${errors?.returned_at!}`}</Typography>
+                                                                            ) : null}
+                                                                        </DemoContainer>
+                                                                    </LocalizationProvider>
+                                                                </Grid>
+                                                                : <Grid>Devueltos en: {dayjs(selectedSellProduct.returned_at!).format('MMM D, YYYY h:mm A')}</Grid>}
                                                         </Grid>
                                                     </Grid>
                                                 </DialogContent>
@@ -150,7 +185,7 @@ const SellsMoreDetails = ({ show, sell_products, history, refreshData }: SellsMo
                                                     {selectedSellProduct.units_quantity !== 0 && <Button
                                                         type='submit'
                                                         color="primary"
-                                                        disabled={!isValid || !!errors.returnedQuantity && touched.returnedQuantity}
+                                                        disabled={!isValid || !!errors.returnedQuantity && touched.returnedQuantity || !!errors.returned_at && !!touched.returned_at}
                                                         variant="outlined"
                                                         onClick={() => { onSubmit(values) }}
                                                     >Agregar</Button>}
