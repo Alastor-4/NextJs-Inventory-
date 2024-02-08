@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
 import { compare } from 'bcrypt';
-import { hashPassword } from '@/utils/serverActions';
 
 // GET account data
 export async function GET(req: Request) {
@@ -26,14 +25,18 @@ export async function GET(req: Request) {
 // CHANGE account data
 export async function PUT(req: Request) {
     try {
-        const { userId, username, name, email, phone } = await req.json();
+        const { userId, name, picture, file } = await req.json();
+        console.log(picture);
+        console.log(file);
 
-        const updatedAccount = await prisma.users.update({
-            where: { id: +userId! },
-            data: { name: name, username: username, mail: email, phone: phone }
-        });
+        // const updatedAccount = await prisma.users.update({
+        //     where: { id: +userId! },
+        //     data: { name: name }
+        // });
+        // TODO: terminar
 
-        return NextResponse.json(updatedAccount);
+        // return NextResponse.json(updatedAccount);
+        return NextResponse.json("Por hacer");
     } catch (error) {
         return new NextResponse("Internal Error", { status: 500 });
     }
