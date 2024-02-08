@@ -1,21 +1,15 @@
-import { SellsMoreDetailsProps, sellProducts } from '@/types/interfaces';
 import {
     Box, Button, Collapse, Dialog, DialogActions, DialogContent,
     DialogTitle, Grid, IconButton, Table, TableBody, TableCell,
     TableHead, TableRow, TextField, Typography
 } from '@mui/material';
-import sellerStore from '../requests/sellerStore';
+import { SellsMoreDetailsProps, sellProducts } from '@/types/interfaces';
 import { AddOutlined, Close } from '@mui/icons-material';
+import sellerStore from '../requests/sellerStore';
 import React, { useState } from 'react';
 import { Form, Formik } from 'formik';
 import * as Yup from "yup";
-import { DateTimeField, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { esES } from '@mui/x-date-pickers/locales'
-import dayjs, { Dayjs } from 'dayjs';
-import 'dayjs/locale/es';
-dayjs.locale("es");
+import dayjs from 'dayjs';
 
 const SellsMoreDetails = ({ show, sell_products, history, refreshData }: SellsMoreDetailsProps) => {
 
@@ -36,22 +30,17 @@ const SellsMoreDetails = ({ show, sell_products, history, refreshData }: SellsMo
         soldUnitsQuantity: selectedSellProduct?.units_quantity,
         returnedQuantity: 0,
         returnedReason: "",
-        returned_at: dayjs()
     }
 
     const validationSchema = Yup.object({
         soldUnitsQuantity: Yup.number(),
         returnedQuantity: Yup.number().integer().required("Es requerido").typeError("Debe ser un número").min(0, "Debe ser mayor a 0")
             .max(Yup.ref("soldUnitsQuantity"), "Cantidad superior a lo vendido"),
-        returnedReason: Yup.string(),
-        returned_at: Yup.date().required('La fecha es requerida')
-            .test('future-date', 'La fecha no puede ser posterior a la actual', function (value) {
-                return dayjs(value).isBefore(dayjs());
-            }),
+        returnedReason: Yup.string()
     })
 
     const onSubmit = async (values: any) => {
-        const response = await sellerStore.addReturnToSellProducts(selectedSellProduct?.store_depots.store_id!, selectedSellProduct?.id!, values.returnedQuantity, values.returnedReason, values.returned_at);
+        const response = await sellerStore.addReturnToSellProducts(selectedSellProduct?.store_depots.store_id!, selectedSellProduct?.id!, values.returnedQuantity, values.returnedReason);
         if (response === 200 && refreshData) await refreshData();
         handleCloseModal();
     }
@@ -157,26 +146,7 @@ const SellsMoreDetails = ({ show, sell_products, history, refreshData }: SellsMo
                                                                     />
                                                                 </Grid>
                                                                 : <Grid>Razón de las devoluciones: {selectedSellProduct.returned_reason}</Grid>}
-                                                            {selectedSellProduct.units_quantity !== 0 ?
-                                                                <Grid item>
-                                                                    <LocalizationProvider
-                                                                        dateAdapter={AdapterDayjs}
-                                                                        localeText={esES.components.MuiLocalizationProvider.defaultProps.localeText}
-                                                                        adapterLocale='es'>
-                                                                        <DemoContainer components={['DateTimeField']}>
-                                                                            <DateTimeField
-                                                                                label="Fecha de la devolución"
-                                                                                value={values.returned_at}
-                                                                                onChange={(value) => { setFieldValue("returned_at", value) }}
-                                                                                format="L hh:mm a"
-                                                                            />
-                                                                            {!!errors.returned_at && !touched.returned_at ? (
-                                                                                <Typography color={"red"}>{`${errors?.returned_at!}`}</Typography>
-                                                                            ) : null}
-                                                                        </DemoContainer>
-                                                                    </LocalizationProvider>
-                                                                </Grid>
-                                                                : <Grid>Devueltos en: {dayjs(selectedSellProduct.returned_at!).format('MMM D, YYYY h:mm A')}</Grid>}
+                                                            {selectedSellProduct.units_quantity === 0 && <Grid>Devueltos en: {dayjs(selectedSellProduct.returned_at!).format('MMM D, YYYY h:mm A')}</Grid>}
                                                         </Grid>
                                                     </Grid>
                                                 </DialogContent>
@@ -185,7 +155,7 @@ const SellsMoreDetails = ({ show, sell_products, history, refreshData }: SellsMo
                                                     {selectedSellProduct.units_quantity !== 0 && <Button
                                                         type='submit'
                                                         color="primary"
-                                                        disabled={!isValid || !!errors.returnedQuantity && touched.returnedQuantity || !!errors.returned_at && !!touched.returned_at}
+                                                        disabled={!isValid || !!errors.returnedQuantity && touched.returnedQuantity}
                                                         variant="outlined"
                                                         onClick={() => { onSubmit(values) }}
                                                     >Agregar</Button>}
