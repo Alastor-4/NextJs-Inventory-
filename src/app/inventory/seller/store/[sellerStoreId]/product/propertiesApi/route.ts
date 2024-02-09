@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/db";
+import { prisma } from "db";
 
 interface Params {
     params: { storeDepotId: string, propertyId: string }
@@ -23,14 +23,15 @@ export async function POST(req: Request, { params }: Params) {
 }
 
 // disable/enable a property for a store_depot
-export async function PUT(req: Request, { params }: Params) {
-    const propertyId = parseInt(<string>params.propertyId)
+export async function PUT(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const propertyId = parseInt(searchParams.get("propertyId")!)
 
     const body = await req.json()
-    const {value} = body
+    const {isActive} = body
 
     const newProperty = await prisma.store_depot_properties.update({
-        data: {is_active: value},
+        data: {is_active: isActive},
         where: {
             id: propertyId,
         }
