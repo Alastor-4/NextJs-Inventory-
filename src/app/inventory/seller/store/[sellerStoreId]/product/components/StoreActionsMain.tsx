@@ -18,7 +18,7 @@ import FilterProductsByDepartmentsModal from "@/components/modals/FilterProducts
 import FilterProductsByConditionsModal from "@/components/modals/FilterProductsByConditionsModal";
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
 import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
-import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import {CharacteristicInfoTag, CustomTooltip, InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import { images, product_offers } from "@prisma/client";
@@ -577,29 +577,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                         <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                             {product.characteristics?.length! > 0
                                                                 ? product.characteristics?.map((item: any) => (
-                                                                    <Grid
-                                                                        key={item.id}
-                                                                        sx={{
-                                                                            display: "inline-flex",
-                                                                            margin: "3px",
-                                                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                                            padding: "2px 4px",
-                                                                            borderRadius: "5px 2px 2px 2px",
-                                                                            border: "1px solid rgba(130, 130, 130)",
-                                                                            fontSize: 14,
-                                                                        }}
-                                                                    >
-                                                                        <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
-                                                                            <Typography variant={"caption"}
-                                                                                sx={{ color: "white", fontWeight: "600" }}>
-                                                                                {item.name.toUpperCase()}
-                                                                            </Typography>
-                                                                        </Grid>
-                                                                        <Grid container item alignItems={"center"}
-                                                                            sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                                            {item.value}
-                                                                        </Grid>
-                                                                    </Grid>
+                                                                    <CharacteristicInfoTag key={item.id} name={item.name} value={item.value}/>
                                                                 )) : "-"
                                                             }
                                                         </Grid>

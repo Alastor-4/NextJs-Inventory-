@@ -1,4 +1,4 @@
-import { ClickAwayListener, Grid, Tooltip } from "@mui/material";
+import {ClickAwayListener, Grid, Tooltip, Typography} from "@mui/material";
 import { CreditCardOutlined, ErrorOutlined, InfoOutlined } from "@mui/icons-material";
 import React, { useState } from "react";
 
@@ -166,5 +166,32 @@ export const CustomTooltip = ({ tooltipText, children }: CustomTooltipProps) => 
                 </div>
             </Tooltip>
         </ClickAwayListener>
+    )
+}
+
+export const CharacteristicInfoTag = ({ name, value, disabled }: {name: string, value: string, disabled?: boolean}) => {
+    return (
+        <Grid
+            sx={{
+                display: "inline-flex",
+                margin: "3px",
+                backgroundColor: "rgba(170, 170, 170, 0.8)",
+                padding: "2px 4px",
+                borderRadius: "5px 2px 2px 2px",
+                border: "1px solid rgba(130, 130, 130)",
+                fontSize: 14,
+                textDecoration: disabled ? "line-through" : "none",
+            }}
+        >
+            <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
+                <Typography variant={"caption"} sx={{ color: "black", fontWeight: "600" }}>
+                    {name.toUpperCase()}
+                </Typography>
+            </Grid>
+
+            <Grid container item alignItems={"center"} sx={{ color: "rgba(16,27,44,0.8)", fontWeight: "600" }}>
+                {value}
+            </Grid>
+        </Grid>
     )
 }
