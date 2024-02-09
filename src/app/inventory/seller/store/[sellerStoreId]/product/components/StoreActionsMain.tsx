@@ -15,17 +15,18 @@ import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/pro
 import { storeDetails } from "@/app/inventory/owner/store-details/[storeDetailsId]/request/storeDetails";
 import { StoreActionsMainProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
+import { CharacteristicInfoTag, CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import FilterProductsByConditionsModal from "@/components/modals/FilterProductsByConditionsModal";
+import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPropertiesManage";
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
+import { images, product_offers, store_depot_properties } from "@prisma/client";
 import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
-import {CharacteristicInfoTag, CustomTooltip, InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import UpdateValueDialog from "@/components/UpdateValueDialog";
-import {images, product_offers, store_depot_properties} from "@prisma/client";
 import { TableNoData } from "@/components/TableNoData";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
@@ -35,11 +36,8 @@ import { useRouter } from "next/navigation";
 import { grey } from "@mui/material/colors";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
-import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPropertiesManage";
-import 'dayjs/locale/es';
 import dayjs from "dayjs";
-
+import 'dayjs/locale/es';
 
 const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     const router = useRouter();
@@ -599,7 +597,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                         <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                             {product.characteristics?.length! > 0
                                                                 ? product.characteristics?.map((item: any) => (
-                                                                    <CharacteristicInfoTag key={item.id} name={item.name} value={item.value}/>
+                                                                    <CharacteristicInfoTag key={item.id} name={item.name} value={item.value} />
                                                                 )) : "-"
                                                             }
                                                         </Grid>

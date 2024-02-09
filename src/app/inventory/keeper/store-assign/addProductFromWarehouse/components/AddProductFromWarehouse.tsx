@@ -78,7 +78,7 @@ export const AddProductFromWarehouse = ({ dataStore, warehouseId, userId, ownerI
         } else {
             getData() //FixMe: Only search over owner' warehouses
         }
-    }, [dataStore?.id, warehouseId])
+    }, [ownerId, dataStore?.id, warehouseId])
 
     // Puede pasar que q se oculte el último depósito
     // existente de un departamento seleccionado,por lo
