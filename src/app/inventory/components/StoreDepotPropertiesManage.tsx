@@ -70,7 +70,7 @@ const StoreDepotPropertiesManage = (
             let newProperties = localPropertiesData?.filter(item => item.id !== response.id)
 
             setLocalPropertiesData(newProperties!)
-            notifySuccess("Propiedad modificada")
+            notifySuccess("Propiedad eliminada")
         }
     }
 
