@@ -7,7 +7,9 @@ interface Params {
 
 // create a property for a store_depot
 export async function POST(req: Request, { params }: Params) {
-    const storeDepotId = parseInt(<string>params.storeDepotId)
+    const { searchParams } = new URL(req.url);
+    const storeDepotId = parseInt(searchParams.get("storeDepotId")!)
+
     const body = await req.json()
     const {name, value} = body
 

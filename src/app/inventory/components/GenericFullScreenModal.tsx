@@ -5,13 +5,12 @@ import React from "react";
 interface GenericFullScreenModalProps {
     dialogTitle: string,
     open: boolean,
-    setOpen: (val: boolean) => void,
+    handleClose: () => void,
     fullScreen: boolean,
     children: React.ReactElement
 }
 
-const GenericFullScreenModal = ({ dialogTitle, open, setOpen, fullScreen, children }: GenericFullScreenModalProps) => {
-    const handleClose = () => setOpen(false)
+const GenericFullScreenModal = ({ dialogTitle, open, handleClose, fullScreen, children }: GenericFullScreenModalProps) => {
 
     return (
         <Dialog open={open} onClose={handleClose} fullWidth fullScreen={fullScreen}>

@@ -21,7 +21,7 @@ import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
 import {CharacteristicInfoTag, CustomTooltip, InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
-import { images, product_offers } from "@prisma/client";
+import {images, product_offers, store_depot_properties} from "@prisma/client";
 import { TableNoData } from "@/components/TableNoData";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
@@ -225,6 +225,20 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                 notifyWarning("Producto quitado de la venta");
             }
         }
+    }
+
+    const updateStoreDepotProperties = async (storeDepotIndex: number, newStoreDepotProperties: store_depot_properties[]) => {
+        const newDepartments = [...allProductsByDepartment!];
+        for (const productsByDepartments of allProductsByDepartment!) {
+            const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
+
+            const productIndex = productsByDepartments!.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === storeDepotIndex);
+            if (productIndex > -1) {
+                newDepartments![departmentIndex].products![productIndex].depots![0].store_depots![0].store_depot_properties = newStoreDepotProperties
+            }
+        }
+
+        setAllProductsByDepartment(newDepartments)
     }
 
     //confirm sell product
@@ -586,7 +600,10 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Propiedades:</Grid>
                                                         <Grid item xs={true}>
-                                                            <StoreDepotPropertiesManage data={product}/>
+                                                            <StoreDepotPropertiesManage
+                                                                data={product}
+                                                                updateFunction={updateStoreDepotProperties}
+                                                            />
                                                         </Grid>
                                                     </Grid>
 
