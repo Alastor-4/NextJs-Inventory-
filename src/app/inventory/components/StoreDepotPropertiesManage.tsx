@@ -4,7 +4,7 @@ import {Button, Checkbox, Grid, IconButton, TextField, Typography} from "@mui/ma
 import {store_depot_properties} from "@prisma/client";
 import React from "react";
 import GenericFullScreenModal from "@/app/inventory/components/GenericFullScreenModal";
-import {Formik, useFormik} from "formik";
+import {Formik} from "formik";
 import * as Yup from "yup"
 import {CharacteristicInfoTag} from "@/components/InfoTags";
 import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
@@ -61,6 +61,19 @@ const StoreDepotPropertiesManage = (
         }
     }
 
+    const handleDelete = async (propertyItem: store_depot_properties) => {
+        const response = await sellerStoreProduct.deleteStoreDepotProperty(data.depots![0].store_depots![0].id, propertyItem.id)
+
+        if (response) {
+            setUpdateNeeded(true)
+
+            let newProperties = localPropertiesData?.filter(item => item.id !== response.id)
+
+            setLocalPropertiesData(newProperties!)
+            notifySuccess("Propiedad modificada")
+        }
+    }
+
     const PropertiesList = ({properties}: {properties: store_depot_properties[]}) => (
         <Grid container rowSpacing={2}>
             <Grid container item rowSpacing={1} xs={12}>
@@ -76,15 +89,9 @@ const StoreDepotPropertiesManage = (
 
                                 {
                                     displayEditForm && (
-                                        <>
-                                            <IconButton size={"small"}>
-                                                <EditOutlined/>
-                                            </IconButton>
-
-                                            <IconButton size={"small"}>
-                                                <DeleteOutline/>
-                                            </IconButton>
-                                        </>
+                                        <IconButton size={"small"} color={"error"} onClick={() => handleDelete(item)}>
+                                            <DeleteOutline fontSize={"small"}/>
+                                        </IconButton>
                                     )
                                 }
                             </Grid>

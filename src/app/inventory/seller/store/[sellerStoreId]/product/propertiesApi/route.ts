@@ -44,7 +44,8 @@ export async function PUT(req: Request) {
 
 // delete a property for a store_depot
 export async function DELETE(req: Request, { params }: Params) {
-    const propertyId = parseInt(<string>params.propertyId)
+    const { searchParams } = new URL(req.url);
+    const propertyId = parseInt(searchParams.get("propertyId")!)
 
     const deletedProperty = await prisma.store_depot_properties.delete({
         where: {

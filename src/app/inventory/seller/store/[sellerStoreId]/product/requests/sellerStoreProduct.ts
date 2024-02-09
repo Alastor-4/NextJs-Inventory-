@@ -82,6 +82,17 @@ const sellerStoreProduct = {
 
         return false
     },
+
+    deleteStoreDepotProperty: async function (sellerStoreId: number, propertyId: number) {
+        try {
+            const response = await apiRequest.delete(urlProperty(sellerStoreId), { params : {propertyId: propertyId} })
+            return response.data
+        } catch (e) {
+            notifyError("Ha ocurrido un error eliminando la propiedad. Inténtelo nuevamente")
+        }
+
+        return false
+    },
 }
 
 export default sellerStoreProduct;
