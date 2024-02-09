@@ -59,8 +59,14 @@ const sellerStore = {
     },
 
     getTodayTransfersStats: async function (sellerStoreId) {
+        let todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
+        let todayEnd = todayStart.add(24, "hours")
+
+        todayStart = todayStart.format()
+        todayEnd = todayEnd.format()
+
         try {
-            const response = await apiRequest.get(transferUrl(sellerStoreId))
+            const response = await apiRequest.get(transferUrl(sellerStoreId), { params: { todayStart: todayStart,  todayEnd: todayEnd} })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error al obtener los detalles de las transferencia. Inténtelo nuevamente")
@@ -70,8 +76,14 @@ const sellerStore = {
     },
 
     getTodayTransfersDetails: async function (sellerStoreId) {
+        let todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
+        let todayEnd = todayStart.add(24, "hours")
+
+        todayStart = todayStart.format()
+        todayEnd = todayEnd.format()
+
         try {
-            const response = await apiRequest.post(transferUrl(sellerStoreId))
+            const response = await apiRequest.post(transferUrl(sellerStoreId), null, { params: { todayStart: todayStart,  todayEnd: todayEnd} })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error al obtener los detalles de la transferencias. Inténtelo nuevamente")
@@ -81,8 +93,14 @@ const sellerStore = {
     },
 
     getTodaySalesReceivable: async function (sellerStoreId) {
+        let todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
+        let todayEnd = todayStart.add(24, "hours")
+
+        todayStart = todayStart.format()
+        todayEnd = todayEnd.format()
+
         try {
-            const response = await apiRequest.get(saleReceivableUrl(sellerStoreId))
+            const response = await apiRequest.get(saleReceivableUrl(sellerStoreId), { params: { todayStart: todayStart,  todayEnd: todayEnd} })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error al obtener los detalles de las ventas. Inténtelo nuevamente")

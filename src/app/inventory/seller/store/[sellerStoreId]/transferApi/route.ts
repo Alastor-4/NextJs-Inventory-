@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/db";
-import dayjs from "dayjs";
 
 interface Params {
     params: { sellerStoreId: string }
@@ -8,17 +7,18 @@ interface Params {
 
 // today transfer stats info
 export async function GET(req: Request, { params }: Params) {
+    const { searchParams } = new URL(req.url);
     const storeId = parseInt(<string>params.sellerStoreId)
 
-    const todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
-    const todayEnd = todayStart.add(24, "hours")
+    const todayStart = searchParams.get("todayStart");
+    const todayEnd = searchParams.get("todayEnd");
 
     try {
         const p1 = prisma.store_depot_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format()),
-                    lt: new Date(todayEnd.format()),
+                    gte: new Date(todayStart!),
+                    lt: new Date(todayEnd!),
                 },
                 store_depots: {
                     store_id: storeId
@@ -29,8 +29,8 @@ export async function GET(req: Request, { params }: Params) {
         const p2 = prisma.product_store_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format()),
-                    lt: new Date(todayEnd.format()),
+                    gte: new Date(todayStart!),
+                    lt: new Date(todayEnd!),
                 },
                 OR: [
                     {
@@ -59,17 +59,18 @@ export async function GET(req: Request, { params }: Params) {
 
 // today transfers details. using POST here instead of GET to avoid create a new route file
 export async function POST(req: Request, { params }: Params) {
+    const { searchParams } = new URL(req.url);
     const storeId = parseInt(<string>params.sellerStoreId)
 
-    const todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
-    const todayEnd = todayStart.add(24, "hours")
+    const todayStart = searchParams.get("todayStart");
+    const todayEnd = searchParams.get("todayEnd");
 
     try {
         const p1 = prisma.store_depot_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format()),
-                    lt: new Date(todayEnd.format()),
+                    gte: new Date(todayStart!),
+                    lt: new Date(todayEnd!),
                 },
                 store_depots: { store_id: storeId }
             },
@@ -96,8 +97,8 @@ export async function POST(req: Request, { params }: Params) {
         const p2 = prisma.product_store_transfers.findMany({
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format()),
-                    lt: new Date(todayEnd.format()),
+                    gte: new Date(todayStart!),
+                    lt: new Date(todayEnd!),
                 },
                 OR: [
                     { store_depots: { store_id: storeId }},
