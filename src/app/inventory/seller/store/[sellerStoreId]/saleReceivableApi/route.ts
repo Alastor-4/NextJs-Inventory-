@@ -16,7 +16,7 @@ export async function GET(req: Request) {
                     gte: new Date(todayStart!),
                     lt: new Date(todayEnd!),
                 },
-                sell_receivable_products: {some: {store_depots: {store_id: storeId}}},
+                sell_receivable_products: { some: { store_depots: { store_id: storeId } } },
             },
             include: {
                 sell_receivable_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
                     gte: new Date(todayStart!),
                     lt: new Date(todayEnd!),
                 },
-                sell_receivable_products: {some: {store_depots: {store_id: storeId}}},
+                sell_receivable_products: { some: { store_depots: { store_id: storeId } } },
             },
             include: {
                 sell_receivable_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
@@ -43,7 +43,7 @@ export async function GET(req: Request) {
         {
             where: {
                 status: "PENDIENTE",
-                sell_receivable_products: {some: {store_depots: {store_id: storeId}}},
+                sell_receivable_products: { some: { store_depots: { store_id: storeId } } },
             },
             include: {
                 sell_receivable_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
@@ -51,5 +51,5 @@ export async function GET(req: Request) {
         }
     )
 
-    return NextResponse.json({storeTodaySalesReceivableCreated, storeTodaySalesReceivablePayed, storeAllSalesReceivablePending})
+    return NextResponse.json({ storeTodaySalesReceivableCreated, storeTodaySalesReceivablePayed, storeAllSalesReceivablePending })
 }

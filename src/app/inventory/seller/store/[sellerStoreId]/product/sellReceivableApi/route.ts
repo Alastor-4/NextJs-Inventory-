@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server'
-import { prisma } from "db";
+import { NextResponse } from 'next/server';
+import { prisma } from "db";;
 
-// create sell unreceived
+//CREATE sell unreceived
 export async function POST(req: Request) {
-    const { sellData, sellProductsData } = await req.json()
+    const { sellData, sellProductsData, sellReceivableData } = await req.json();
 
-    let productSellItem
+    let productSellItem;
 
     try {
         productSellItem = await prisma.$transaction(async (tx) => {
@@ -13,15 +13,15 @@ export async function POST(req: Request) {
                 data: {
                     payment_method: sellData.paymentMethod,
                     total_price: sellData.totalPrice,
+                    pay_before_date: sellReceivableData.payBefore,
+                    description: sellReceivableData.description
                 }
             })
 
             for (const sellProductsDatum of sellProductsData) {
                 const updatedDepot = await tx.store_depots.update({
-                    where: { id: parseInt(sellProductsDatum.storeDepotId) },
-                    data: {
-                        product_remaining_units: { decrement: parseInt(sellProductsDatum.unitsQuantity) },
-                    },
+                    where: { id: +sellProductsDatum.storeDepotId },
+                    data: { product_remaining_units: { decrement: +sellProductsDatum.unitsQuantity }, },
                 })
 
                 if (updatedDepot.product_remaining_units !== null && updatedDepot.product_remaining_units < 0) {
@@ -31,20 +31,18 @@ export async function POST(req: Request) {
                 await tx.sell_receivable_products.create(
                     {
                         data: {
-                            units_quantity: parseInt(sellProductsDatum.unitsQuantity),
-                            price: parseFloat(sellProductsDatum.price),
+                            units_quantity: +sellProductsDatum.unitsQuantity,
+                            price: +sellProductsDatum.price,
                             sell_receivable_id: sellItem.id,
                             store_depot_id: updatedDepot.id
                         }
                     }
                 )
             }
-
-            return sellItem
+            return sellItem;
         })
     } catch (e) {
-        return new Response(String(e), { status: 400 })
+        return new Response(String(e), { status: 400 });
     }
-
-    return NextResponse.json(productSellItem)
+    return NextResponse.json(productSellItem);
 }

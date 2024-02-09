@@ -398,6 +398,7 @@ model sells_receivable {
   id                       Int                        @id @default(autoincrement())
   total_price              Float
   payment_method           String?                    @db.VarChar(255)
+  description              String?                    @db.VarChar(255)
   pay_before_date          DateTime?                  @db.Timestamp(0)
   payed_at                 DateTime?                  @db.Timestamp(0)
   status                   sell_receivable_status     @default(PENDIENTE)
