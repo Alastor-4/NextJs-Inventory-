@@ -484,6 +484,23 @@ export interface StoreEditPriceProps {
     setActiveModalPrice: ({ active, storeDepot }: { active: boolean, storeDepot: storeDepotsWithAny | null }) => void;
 }
 
+export interface createSellReceivableProps {
+    sellerStoreId: number | undefined;
+    sellData: {
+        paymentMethod: string;
+        totalPrice: number;
+    };
+    sellProductsData: {
+        storeDepotId: number;
+        unitsQuantity: number;
+        price: number;
+    }[];
+    sellReceivableData: {
+        description: string,
+        payBefore: Date
+    }
+}
+
 export interface StoreModalPriceProps {
     open: boolean;
     setOpen: ({ active, storeDepot }: { active: boolean, storeDepot: storeDepotsWithAny | null }) => void;

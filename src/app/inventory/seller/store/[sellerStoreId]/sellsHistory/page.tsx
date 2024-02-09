@@ -9,6 +9,7 @@ import { DatePicker, DateValidationError, LocalizationProvider, PickerChangeHand
 import { ArrowLeft, ExpandLessOutlined, ExpandMoreOutlined, HelpOutline } from '@mui/icons-material';
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import calcSellProductsUnits from '@/utils/calcSellProductsUnits';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import calcReturnedQuantity from '@/utils/calcReturnedQuantity';
 import SellsMoreDetails from '../components/SellsMoreDetails';
@@ -21,7 +22,6 @@ import { useParams } from 'next/navigation';
 import { useRouter } from "next/navigation";
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/es';
-import calcSellProductsUnits from '@/utils/calcSellProductsUnits';
 
 dayjs.locale("es");
 
