@@ -31,6 +31,7 @@ import { grey } from "@mui/material/colors";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPropertiesManage";
 
 const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     const router = useRouter();
@@ -601,6 +602,13 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                                     </Grid>
                                                                 )) : "-"
                                                             }
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Propiedades:</Grid>
+                                                        <Grid item xs={true}>
+                                                            <StoreDepotPropertiesManage data={product}/>
                                                         </Grid>
                                                     </Grid>
 

@@ -10,7 +10,7 @@ import {
     Prisma,
     roles,
     sell_receivable_products,
-    store_depot_characteristics
+    store_depot_properties,
 } from '@prisma/client';
 import { ReactNode } from "react";
 
@@ -248,7 +248,7 @@ export interface productsProps {
             price_discount_quantity: number | null;
             seller_profit_unit: string | null;
             product_offers?: product_offers[] | null;
-            store_depot_characteristics: store_depot_characteristics[] | null;
+            store_depot_properties: store_depot_properties[] | null;
             _count?: {
                 product_offers: number
             }

@@ -6,14 +6,15 @@ interface GenericFullScreenModalProps {
     dialogTitle: string,
     open: boolean,
     setOpen: (val: boolean) => void,
+    fullScreen: boolean,
     children: React.ReactElement
 }
 
-const GenericFullScreenModal = ({ dialogTitle, open, setOpen, children }: GenericFullScreenModalProps) => {
+const GenericFullScreenModal = ({ dialogTitle, open, setOpen, fullScreen, children }: GenericFullScreenModalProps) => {
     const handleClose = () => setOpen(false)
 
     return (
-        <Dialog open={open} onClose={handleClose} fullScreen>
+        <Dialog open={open} onClose={handleClose} fullWidth fullScreen={fullScreen}>
             <AppBar sx={{ position: 'relative' }}>
                 <Toolbar>
                     <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
