@@ -17,20 +17,27 @@ import { StoreActionsMainProps, allProductsByDepartmentProps, productsProps } fr
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import FilterProductsByConditionsModal from "@/components/modals/FilterProductsByConditionsModal";
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
-import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
 import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import { images, product_offers } from "@prisma/client";
 import { TableNoData } from "@/components/TableNoData";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
+import { esES } from '@mui/x-date-pickers/locales'
 import { useRouter } from "next/navigation";
 import { grey } from "@mui/material/colors";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import 'dayjs/locale/es';
+import dayjs from "dayjs";
+
 
 const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     const router = useRouter();
@@ -721,6 +728,8 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
             ],
             totalPrice: "",
             paymentMethod: "",
+            description: "",
+            payBefore: dayjs()
         }
     }
 
@@ -734,7 +743,9 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                     .min(1, "Al menos 1")
                     .max(Yup.ref("maxUnitsQuantity"), "Cantidad superior a la cantidad disponible"),
             })).required(),
-            paymentMethod: Yup.string().required("especifíque método"),
+            paymentMethod: Yup.string().required("Especifique método"),
+            description: Yup.string().required("Especifique datos de la venta a pagar"),
+            payBefore: Yup.date().required("Este dato es requerido")
         })
     })
 
@@ -786,9 +797,14 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                 sellProductsData: sellProduct,
             }
 
-            const sellItemResponse = isSaleReceivable
-                ? await sellerStoreProduct.createSellReceivable(data)
-                : await sellerStoreProduct.sellStoreDepotManual(data)
+            let sellItemResponse;
+            if (isSaleReceivable) {
+                const sellReceivableData = { description: formik.values.productSell.description, payBefore: formik.values.productSell.payBefore }
+                const newData = { ...data, sellReceivableData }
+                sellItemResponse = await sellerStoreProduct.createSellReceivable(newData)
+            } else {
+                sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(data)
+            }
 
             if (sellItemResponse) {
                 const newDepartments = [...allProductsByDepartment!];
@@ -858,7 +874,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                 type={"number"}
                                                 sx={{ width: "60px" }}
                                                 {...formik.getFieldProps(`productSell.products.${index}.unitsQuantity`)}
-                                                error={formik.errors.productSell?.products[index]?.unitsQuantity && formik.touched.productSell?.products[index]?.unitsQuantity}
+                                                error={!!formik.errors.productSell?.products && !!formik.errors.productSell?.products[index]?.unitsQuantity}
                                             />
                                         </Grid>
 
@@ -871,8 +887,8 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                         </Grid>
                                     </Grid>
 
-                                    {
-                                        formik.errors.productSell?.products[index]?.unitsQuantity && formik.touched.productSell?.products[index]?.unitsQuantity && (
+                                    {!!formik.errors.productSell?.products &&
+                                        formik.errors.productSell?.products[index]?.unitsQuantity && (
                                             <Grid item xs={12}>
                                                 <FormHelperText sx={{ color: "#d32f2f" }}>
                                                     {formik.errors.productSell?.products[index]?.unitsQuantity}
@@ -908,21 +924,54 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                         fullWidth
                         select
                         {...formik.getFieldProps("productSell.paymentMethod")}
-                        error={formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod}
-                        helperText={(formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod) && formik.errors.productSell.paymentMethod}
+                        error={!!formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod}
+                        helperText={(!!formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod) && formik.errors.productSell?.paymentMethod}
                     >
                         {
                             paymentMethods.map(item => (<MenuItem value={item} key={item}>{item}</MenuItem>))
                         }
                     </TextField>
                 </Grid>
+                {isSaleReceivable &&
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Descripción"
+                            size={"small"}
+                            fullWidth
+                            {...formik.getFieldProps("productSell.description")}
+                            error={!!formik.errors.productSell?.description && formik.touched.productSell?.description}
+                            helperText={(!!formik.errors.productSell?.description && formik.touched.productSell?.description) && !!formik.errors.productSell?.description}
+                        />
+                    </Grid>
+                }
+
+                {isSaleReceivable &&
+                    <Grid item xs={12} mx={"40px"}>
+                        <LocalizationProvider
+                            dateAdapter={AdapterDayjs}
+                            localeText={esES.components.MuiLocalizationProvider.defaultProps.localeText}
+                            adapterLocale='es'>
+                            <DemoContainer components={['DatePicker']}>
+                                <DatePicker
+                                    slotProps={{ field: { clearable: true }, toolbar: { hidden: true } }}
+                                    label="Pagar antes de:" disablePast onChange={(value) => {
+                                        formik.setFieldValue("productSell.payBefore", value)
+                                    }} />
+                            </DemoContainer>
+                        </LocalizationProvider>
+                    </Grid>
+                }
 
                 <Grid container item justifyContent={"flex-end"}>
-                    <Button color={"primary"} disabled={!!formik.errors.productSell} onClick={productsSell}>
+                    <Button color={"primary"} disabled={isSaleReceivable ?
+                        !!formik.errors.productSell :
+                        !!formik.errors.productSell?.products ||
+                        !!formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod
+                    } onClick={productsSell}>
                         Vender
                     </Button>
                 </Grid>
-            </Grid>
+            </Grid >
         )
     }
 
@@ -1118,13 +1167,13 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                 <>
                                                     {
                                                         selectedProducts.length > 0 && (
-                                                            <Grid container rowSpacing={1} sx={{mb: "5px", px: "5px"}}>
+                                                            <Grid container rowSpacing={1} sx={{ mb: "5px", px: "5px" }}>
                                                                 <Grid item xs={12}>
                                                                     {selectedProducts.length > 1 ? "Seleccionados" : "Seleccionado"}: {selectedProducts.length}
                                                                 </Grid>
 
                                                                 <Grid container item xs={12} columnSpacing={1} flexWrap={"nowrap"}>
-                                                                    <Grid container item columnSpacing={1} flexWrap={"nowrap"} sx={{overflowX: "auto"}}>
+                                                                    <Grid container item columnSpacing={1} flexWrap={"nowrap"} sx={{ overflowX: "auto" }}>
                                                                         <Grid item xs={"auto"}>
                                                                             <Button
                                                                                 size={"small"}

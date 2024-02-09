@@ -27,7 +27,7 @@ import utc from "dayjs/plugin/utc";
 import Link from "next/link";
 import dayjs from "dayjs";
 import userProfileStyles from "@/assets/styles/userProfileStyles";
-import { product_store_transfers, sells_receivable, store_depot_transfers } from "@prisma/client";
+import { product_store_transfers, store_depot_transfers } from "@prisma/client";
 import ModalTransfersToday from "@/app/inventory/seller/store/[sellerStoreId]/components/Modal/ModalTransfersToday";
 
 dayjs.extend(isBetween);
