@@ -1,17 +1,17 @@
-import { storeSellsDetailsProps } from '@/types/interfaces';
 import { NextResponse } from 'next/server'
 import logger from '@/utils/logger';
 import { prisma } from "db";
-import dayjs from "dayjs";
 
 // GET store products sells
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const storeId = +searchParams.get("storeId")!;
     const allSells = searchParams.get("loadAllSells");
+    const todayStart = searchParams.get("todayStart");
+    const todayEnd = searchParams.get("todayEnd");
 
     if (storeId && (allSells === 'true')) {
-        const storeAllSells: storeSellsDetailsProps[] | null = await prisma.sells.findMany(
+        const storeAllSells = await prisma.sells.findMany(
             {
                 where: {
                     OR: [
@@ -30,15 +30,12 @@ export async function GET(req: Request) {
         )
         return NextResponse.json(storeAllSells);
     } else if (storeId) {
-        const todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
-        const todayEnd = todayStart.add(24, "hours")
-
-        const storeTodaySells: storeSellsDetailsProps[] | null = await prisma.sells.findMany(
+        const storeTodaySells = await prisma.sells.findMany(
             {
                 where: {
                     created_at: {
-                        gte: new Date(todayStart.format()),
-                        lt: new Date(todayEnd.format()),
+                        gte: new Date(todayStart!),
+                        lt: new Date(todayEnd!),
                     },
                     OR: [
                         { sell_products: { some: { store_depots: { store_id: storeId } } } },
@@ -68,8 +65,9 @@ export async function PUT(req: Request) {
 
     const price = await prisma.sell_products.findUnique({ where: { id: sell_product_id }, include: { store_depots: true } });
 
-    const sellProduct = await prisma.sell_products.update({
-        where: { id: +sell_product_id! }, data: {
+    await prisma.sell_products.update({
+        where: { id: +sell_product_id! },
+        data: {
             returned_reason: returned_reason,
             units_returned_quantity: { increment: returned_quantity },
             units_quantity: { decrement: returned_quantity },

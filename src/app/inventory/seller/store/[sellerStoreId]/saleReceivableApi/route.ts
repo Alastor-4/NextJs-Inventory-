@@ -1,21 +1,20 @@
 import { NextResponse } from 'next/server'
 import { prisma } from "db";
-import dayjs from "dayjs";
 
 // GET store products sells
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const storeId = +searchParams.get("storeId")!;
 
-    const todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
-    const todayEnd = todayStart.add(24, "hours")
+    const todayStart = searchParams.get("todayStart");
+    const todayEnd = searchParams.get("todayEnd");
 
     const storeTodaySalesReceivableCreated = await prisma.sells_receivable.findMany(
         {
             where: {
                 created_at: {
-                    gte: new Date(todayStart.format()),
-                    lt: new Date(todayEnd.format()),
+                    gte: new Date(todayStart!),
+                    lt: new Date(todayEnd!),
                 },
                 sell_receivable_products: {some: {store_depots: {store_id: storeId}}},
             },
@@ -29,8 +28,8 @@ export async function GET(req: Request) {
         {
             where: {
                 payed_at: {
-                    gte: new Date(todayStart.format()),
-                    lt: new Date(todayEnd.format()),
+                    gte: new Date(todayStart!),
+                    lt: new Date(todayEnd!),
                 },
                 sell_receivable_products: {some: {store_depots: {store_id: storeId}}},
             },
