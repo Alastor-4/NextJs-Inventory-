@@ -1,6 +1,7 @@
 //@ts-nocheck
 import apiRequest from "@/api"
 import { notifyError } from "@/utils/generalFunctions";
+import dayjs from "dayjs";
 
 const url = (sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/api`
 const sellsUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/sellsApi`
@@ -20,8 +21,14 @@ const sellerStore = {
     },
 
     storeSellsDetails: async function (sellerStoreId: number, allSells?: boolean) {
+        let todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
+        let todayEnd = todayStart.add(24, "hours")
+
+        todayStart = todayStart.format()
+        todayEnd = todayEnd.format()
+
         try {
-            const response = await apiRequest.get(sellsUrl(sellerStoreId), { params: { storeId: sellerStoreId, loadAllSells: allSells } });
+            const response = await apiRequest.get(sellsUrl(sellerStoreId), { params: { storeId: sellerStoreId, loadAllSells: allSells, todayStart: todayStart,  todayEnd: todayEnd} });
             return response.data;
         } catch (e) {
             notifyError(`Ha ocurrido un error obteniendo los datos de las ventas de la tienda. Inténtelo nuevamente`)
