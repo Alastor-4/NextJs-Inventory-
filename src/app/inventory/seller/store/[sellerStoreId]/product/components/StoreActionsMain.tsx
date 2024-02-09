@@ -18,10 +18,10 @@ import FilterProductsByDepartmentsModal from "@/components/modals/FilterProducts
 import FilterProductsByConditionsModal from "@/components/modals/FilterProductsByConditionsModal";
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
 import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
-import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import {CharacteristicInfoTag, CustomTooltip, InfoTag, MoneyInfoTag} from "@/components/InfoTags";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import UpdateValueDialog from "@/components/UpdateValueDialog";
-import { images, product_offers } from "@prisma/client";
+import {images, product_offers, store_depot_properties} from "@prisma/client";
 import { TableNoData } from "@/components/TableNoData";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
@@ -31,6 +31,7 @@ import { grey } from "@mui/material/colors";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
+import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPropertiesManage";
 
 const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     const router = useRouter();
@@ -224,6 +225,20 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                 notifyWarning("Producto quitado de la venta");
             }
         }
+    }
+
+    const updateStoreDepotProperties = async (storeDepotIndex: number, newStoreDepotProperties: store_depot_properties[]) => {
+        const newDepartments = [...allProductsByDepartment!];
+        for (const productsByDepartments of allProductsByDepartment!) {
+            const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
+
+            const productIndex = productsByDepartments!.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === storeDepotIndex);
+            if (productIndex > -1) {
+                newDepartments![departmentIndex].products![productIndex].depots![0].store_depots![0].store_depot_properties = newStoreDepotProperties
+            }
+        }
+
+        setAllProductsByDepartment(newDepartments)
     }
 
     //confirm sell product
@@ -576,31 +591,19 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                         <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                             {product.characteristics?.length! > 0
                                                                 ? product.characteristics?.map((item: any) => (
-                                                                    <Grid
-                                                                        key={item.id}
-                                                                        sx={{
-                                                                            display: "inline-flex",
-                                                                            margin: "3px",
-                                                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                                            padding: "2px 4px",
-                                                                            borderRadius: "5px 2px 2px 2px",
-                                                                            border: "1px solid rgba(130, 130, 130)",
-                                                                            fontSize: 14,
-                                                                        }}
-                                                                    >
-                                                                        <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
-                                                                            <Typography variant={"caption"}
-                                                                                sx={{ color: "white", fontWeight: "600" }}>
-                                                                                {item.name.toUpperCase()}
-                                                                            </Typography>
-                                                                        </Grid>
-                                                                        <Grid container item alignItems={"center"}
-                                                                            sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                                            {item.value}
-                                                                        </Grid>
-                                                                    </Grid>
+                                                                    <CharacteristicInfoTag key={item.id} name={item.name} value={item.value}/>
                                                                 )) : "-"
                                                             }
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Propiedades:</Grid>
+                                                        <Grid item xs={true}>
+                                                            <StoreDepotPropertiesManage
+                                                                data={product}
+                                                                updateFunction={updateStoreDepotProperties}
+                                                            />
                                                         </Grid>
                                                     </Grid>
 

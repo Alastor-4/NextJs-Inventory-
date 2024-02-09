@@ -45,7 +45,7 @@ export async function GET(request: Request, { params }: { params: { sellerStoreI
                                     store_id: storeId,
                                     product_remaining_units: {not: -1},
                                 },
-                                include: { product_offers: true }
+                                include: { product_offers: true, store_depot_properties: {orderBy: {is_active: "desc"}} }
                             }
                         }
                     },
