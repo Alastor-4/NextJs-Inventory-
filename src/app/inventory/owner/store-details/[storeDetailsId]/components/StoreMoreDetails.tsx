@@ -10,6 +10,7 @@ import TransferUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/
 import StoreEditUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/StoreEditUnits";
 import { storeDepotsWithAny } from "@/types/interfaces";
 import ModalProductPrice from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/ModalProductPrice";
+import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPropertiesManage";
 
 function StoreMoreDetails(props: any) {
     const {
@@ -24,6 +25,7 @@ function StoreMoreDetails(props: any) {
         displayPriceDiscount,
         sellerProfitQuantity,
         finalProductPrice,
+        updateStoreDepotProperties
     } = props
 
     const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: storeDepotsWithAny | null }>({ active: false, storeDepot: null });
@@ -99,6 +101,16 @@ function StoreMoreDetails(props: any) {
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Descripción:</Grid>
                         <Grid item xs={true}>
                             {row.description ? row.description : "-"}
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
+                        <Grid container item xs={"auto"} alignItems={"center"} sx={{ fontWeight: 600 }}>Propiedades:</Grid>
+                        <Grid container item xs={true} alignItems={"center"}>
+                            <StoreDepotPropertiesManage
+                                data={row}
+                                updateFunction={updateStoreDepotProperties}
+                            />
                         </Grid>
                     </Grid>
 

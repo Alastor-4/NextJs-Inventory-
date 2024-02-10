@@ -53,7 +53,10 @@ export async function GET(req: Request, { params }: Params) {
                                     store_id: storeId,
                                     product_remaining_units: { not: -1 },
                                 },
-                                include: { _count: { select: { product_offers: {where: {is_active: true}} } } }
+                                include: {
+                                    _count: { select: { product_offers: {where: {is_active: true}} } },
+                                    store_depot_properties: {orderBy: {is_active: "desc"}}
+                                }
                             }
                         }
                     },

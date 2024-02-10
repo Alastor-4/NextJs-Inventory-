@@ -24,7 +24,7 @@ import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import StoreMoreDetails from "./StoreMoreDetails";
 import { useParams, useRouter } from "next/navigation";
-import { images } from "@prisma/client";
+import {images, store_depot_properties} from "@prisma/client";
 import { Formik } from "formik";
 import ModalProductPrice from "./Modal/ModalProductPrice";
 import { grey } from "@mui/material/colors";
@@ -211,6 +211,20 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
         setOpenImagesDialog(true)
     }
 
+    const updateStoreDepotProperties = async (storeDepotIndex: number, newStoreDepotProperties: store_depot_properties[]) => {
+        const newDepartments = [...allProductsByDepartment!];
+        for (const productsByDepartments of allProductsByDepartment!) {
+            const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
+
+            const productIndex = productsByDepartments!.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === storeDepotIndex);
+            if (productIndex > -1) {
+                newDepartments![departmentIndex].products![productIndex].depots![0].store_depots![0].store_depot_properties = newStoreDepotProperties
+            }
+        }
+
+        setAllProductsByDepartment(newDepartments)
+    }
+
     const TableContent = ({ formik }: { formik: any }) => {
         return (
             <TableBody>
@@ -371,6 +385,7 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                                                         displayPriceDiscount={displayPriceDiscount}
                                                         sellerProfitQuantity={sellerProfitQuantity}
                                                         finalProductPrice={finalProductPrice}
+                                                        updateStoreDepotProperties={updateStoreDepotProperties}
                                                     />
                                                 )}
                                             </TableCell>
