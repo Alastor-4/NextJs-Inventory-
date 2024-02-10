@@ -478,7 +478,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                         </TableCell>
 
                                         <TableCell align="center" padding={"none"}>
-                                            <Circle color={product.depots![0].store_depots![0].is_active ? "success" : "secondary"}/>
+                                            <Circle color={product.depots![0].store_depots![0].is_active ? "success" : "warning"}/>
                                         </TableCell>
 
                                         <TableCell>

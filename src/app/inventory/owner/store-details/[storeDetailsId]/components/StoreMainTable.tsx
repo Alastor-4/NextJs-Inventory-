@@ -156,9 +156,8 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
         const headCells = [
             { id: "details", label: "", padding: "checkbox", },
             { id: "name", label: "Nombre", },
-            { id: "departaments", label: "Departamento", },
-            { id: "buy_Price", label: "Precio", },
-            { id: "units", label: "Unidades", },
+            { id: "price", label: "Precio", },
+            { id: "units", label: "Cantidad", },
             { id: "Active", label: "Estado", },
         ]
 
@@ -212,17 +211,13 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
         setOpenImagesDialog(true)
     }
 
-    function productHasActiveOffer(offers: any[]) {
-        return offers.some((item: any) => item.is_active)
-    }
-
     const TableContent = ({ formik }: { formik: any }) => {
         return (
             <TableBody>
                 {dataProducts?.filter(
                     (product: productsProps) =>
                         product?.name!.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                            (product: productsProps, index: number) => {
+                            (product: productsProps) => {
 
                                 const baseProductPrice = product?.depots![0].store_depots![0].sell_price! === 0
                                     ? null
@@ -303,9 +298,6 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                                                 <Box display={"flex"} >
                                                     {product.name}
                                                 </Box>
-                                            </TableCell>
-                                            <TableCell>
-                                                {product.departments?.name}
                                             </TableCell>
                                             <TableCell>
                                                 <Grid container rowSpacing={1}>
