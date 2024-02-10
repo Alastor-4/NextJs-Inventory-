@@ -6,7 +6,7 @@ import {
     TableCell, TableContainer, TableHead, TableRow, TextField, Toolbar, Typography
 } from "@mui/material";
 import {
-    ArrowLeft, DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
+    ArrowLeft, Circle, DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
     FilterAlt, FilterAltOff, ForwardToInbox, HelpOutline, KeyboardArrowRight,
     SellOutlined, SellRounded,
 } from "@mui/icons-material";
@@ -15,7 +15,7 @@ import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/pro
 import { storeDetails } from "@/app/inventory/owner/store-details/[storeDetailsId]/request/storeDetails";
 import { StoreActionsMainProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
-import { CharacteristicInfoTag, CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import FilterProductsByConditionsModal from "@/components/modals/FilterProductsByConditionsModal";
 import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPropertiesManage";
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
@@ -158,10 +158,9 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     const TableHeader = () => {
         const headCells = [
             { id: "name", label: "Nombre", },
-            { id: "department", label: "Departamento", },
+            { id: "status", label: "", },
             { id: "price", label: "Precio", },
-            { id: "status", label: "Disponibles", },
-            { id: "activate_sale", label: "Estado", },
+            { id: "quantity", label: "Cantidad", },
             { id: "sale_of_a_product", label: "", },
         ]
 
@@ -477,7 +476,11 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                             }
                                             <Box display={"flex"} justifyContent={"center"}>{product.name}</Box>
                                         </TableCell>
-                                        <TableCell align="center">{product?.departments?.name ?? "-"}</TableCell>
+
+                                        <TableCell align="center" padding={"none"}>
+                                            <Circle color={product.depots![0].store_depots![0].is_active ? "success" : "secondary"}/>
+                                        </TableCell>
+
                                         <TableCell>
                                             <Grid container rowSpacing={1}>
                                                 <Grid container item xs={12} flexWrap={"nowrap"} alignItems={"center"}>
@@ -524,28 +527,6 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                 {product.depots![0].store_depots![0].product_remaining_units}
                                             </Box>
                                         </TableCell>
-                                        <TableCell sx={{ whiteSpace: "nowrap" }}>
-                                            <Grid container >
-                                                <Grid container item xs={12} justifyContent={"center"}>
-                                                    <Typography variant={"button"}>
-                                                        {product.depots![0].store_depots![0].is_active
-                                                            ? "en venta"
-                                                            : "inactivo"
-                                                        }
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid container item xs={12} justifyContent={"center"}>
-                                                    <Switch
-                                                        size={"small"}
-                                                        color={"success"}
-                                                        disabled={!baseProductPrice}
-                                                        checked={product.depots![0].store_depots![0].is_active!}
-                                                        onClick={(e) => handleToggleIsActive(e, product.id, product.depots![0].store_depots![0].id)}
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                        </TableCell>
-
                                         <TableCell>
                                             {
                                                 product.depots![0].store_depots![0].is_active &&
@@ -588,6 +569,36 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                     </Grid>
 
                                                     <Grid container item spacing={1} xs={12}>
+                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Estado:</Grid>
+                                                        <Grid container item xs={true}>
+                                                            <Typography variant={"button"}>
+                                                                {product.depots![0].store_depots![0].is_active
+                                                                    ? "en venta"
+                                                                    : "inactivo"
+                                                                }
+                                                            </Typography>
+
+                                                            <Switch
+                                                                size={"small"}
+                                                                color={"success"}
+                                                                disabled={!baseProductPrice}
+                                                                checked={product.depots![0].store_depots![0].is_active!}
+                                                                onClick={(e) => handleToggleIsActive(e, product.id, product.depots![0].store_depots![0].id)}
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
+                                                        <Grid container item xs={"auto"} alignItems={"center"} sx={{ fontWeight: 600 }}>Propiedades:</Grid>
+                                                        <Grid container item xs={true} alignItems={"center"}>
+                                                            <StoreDepotPropertiesManage
+                                                                data={product}
+                                                                updateFunction={updateStoreDepotProperties}
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
+
+                                                    <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
                                                         <Grid item xs={true}>{product.departments?.name ?? "-"}</Grid>
                                                     </Grid>
@@ -597,19 +608,11 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                         <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                             {product.characteristics?.length! > 0
                                                                 ? product.characteristics?.map((item: any) => (
-                                                                    <CharacteristicInfoTag key={item.id} name={item.name} value={item.value} />
+                                                                    <Box key={item.id} display={"inline-flex"} mr={"5px"}>
+                                                                        {`${item.name.toUpperCase()} = ${item.value}`}
+                                                                    </Box>
                                                                 )) : "-"
                                                             }
-                                                        </Grid>
-                                                    </Grid>
-
-                                                    <Grid container item spacing={1} xs={12}>
-                                                        <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Propiedades:</Grid>
-                                                        <Grid item xs={true}>
-                                                            <StoreDepotPropertiesManage
-                                                                data={product}
-                                                                updateFunction={updateStoreDepotProperties}
-                                                            />
                                                         </Grid>
                                                     </Grid>
 
@@ -628,13 +631,10 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                     <Grid container item spacing={1} xs={12}>
                                                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precio:</Grid>
                                                         <Grid item xs={true}>
-                                                            <MoneyInfoTag
-                                                                value={displayProductPrice}
-                                                                errorColor={!baseProductPrice}
-                                                            />
+                                                            {displayProductPrice}
                                                             {
                                                                 priceDiscountQuantity && (
-                                                                    <InfoTag value={`- ${displayPriceDiscount} descuento`} />
+                                                                    <span>{`- ${displayPriceDiscount} descuento`}</span>
                                                                 )
                                                             }
                                                         </Grid>
