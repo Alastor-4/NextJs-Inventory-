@@ -115,22 +115,6 @@ export interface storeDepotsStatsProps {
     depotsWithDiscountTotal: number;
 }
 
-interface saleReceivable {
-    total_price: number;
-    payment_method?: string;
-    pay_before_date?: string;
-    payed_at?: string;
-    status: string;
-    created_at: string;
-    sell_receivable_products: sell_receivable_products[];
-}
-
-export interface storeSalesReceivableProps {
-    todaySalesReceivableCreated: saleReceivable[],
-    todaySalesReceivablePayed: saleReceivable[],
-    allSalesReceivablePending: saleReceivable[],
-}
-
 export interface StoreMainTableProps {
     userId?: number;
     ownerId?: number;
@@ -401,6 +385,12 @@ export interface ModalSellsTodayProps {
     setIsOpen: (bool: boolean) => void;
     dialogTitle: string;
     todaySellsData: storeSellsDetailsProps[];
+}
+export interface ModalSellsReceivableTodayProps {
+    isOpen: boolean;
+    setIsOpen: (bool: boolean) => void;
+    dialogTitle: string;
+    todaySellsReceivableData: storeSellsReceivableDetailsProps[];
 }
 export interface sellsWithSellProducts {
     id: number;

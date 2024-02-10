@@ -7,12 +7,12 @@ import {
 } from '@mui/material';
 import { Close, ExpandLessOutlined, ExpandMoreOutlined } from '@mui/icons-material';
 import { ModalSellsTodayProps, storeSellsDetailsProps } from '@/types/interfaces';
+import calcSellProductsUnits from '@/utils/calcSellProductsUnits';
 import calcReturnedQuantity from '@/utils/calcReturnedQuantity';
 import { TableNoData } from '@/components/TableNoData';
 import SellsMoreDetails from '../SellsMoreDetails';
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import calcSellProductsUnits from '@/utils/calcSellProductsUnits';
 
 dayjs.locale("es");
 

@@ -11,7 +11,7 @@ import {
 } from "@mui/icons-material"
 import {
     productSellsStatsProps, storeDepotsStatsProps, storeDepotsWithAny,
-    storeSalesReceivableProps, storeSellsDetailsProps, storeWithStoreDepots
+    storeSellsDetailsProps, storeSellsReceivableDetailsProps, storeWithStoreDepots
 } from "@/types/interfaces";
 import { daysMap, notifySuccess, notifyWarning, numberFormat, transactionToWarehouse } from "@/utils/generalFunctions";
 import ModalTransfersToday from "@/app/inventory/seller/store/[sellerStoreId]/components/Modal/ModalTransfersToday";
@@ -25,13 +25,10 @@ import isBetween from "dayjs/plugin/isBetween";
 import utc from "dayjs/plugin/utc";
 import Link from "next/link";
 import dayjs from "dayjs";
+import ModalSellsReceivableToday from "./Modal/ModalSellsReceivableToday";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);
-
-let dateStart = dayjs().set("h", 0).set("m", 0).set("s", 0);
-const todayStart = dateStart.format();
-let todayEnd = dateStart.add(24, "hours").format();
 
 interface DetailsTodayTransfer {
     places: number,
@@ -66,7 +63,7 @@ const StoreMain = ({ userId }: { userId?: number }) => {
     const [todaySellsStats, setTodaySellsStats] = useState<productSellsStatsProps | null>(null);
     const [todaySells, setTodaySells] = useState<storeSellsDetailsProps[] | null>(null);
     const [todayTransfers, setTodayTransfers] = useState<todayTransferProps | null>(null)
-    const [allSalesReceivable, setAllSalesReceivable] = useState<storeSalesReceivableProps | null>(null)
+    const [todaySellsReceivable, setTodaySellsReceivable] = useState<storeSellsReceivableDetailsProps[] | null>(null)
 
     //GET initial store and sellsStats details
     useEffect(() => {
@@ -111,10 +108,10 @@ const StoreMain = ({ userId }: { userId?: number }) => {
             const storeDetailsPromise = stores.storeDetails(userId!, sellerStoreId);
             const storeTodaySellsDetailsPromise = stores.storeSellsDetails(sellerStoreId);
             const storeTodayTransferDetailsPromise = stores.getTodayTransfersStats(sellerStoreId)
-            const storeSalesReceivablePromise = stores.getSellsReceivable(sellerStoreId)
+            const storeTodaySellsReceivablePromise = stores.getSellsReceivableDetails(sellerStoreId)
 
-            const [storeDetails, storeTodaySellsDetails, storeTodayTransferDetails, storeSalesReceivable] =
-                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeTodayTransferDetailsPromise, storeSalesReceivablePromise]);
+            const [storeDetails, storeTodaySellsDetails, storeTodayTransferDetails, storeTodaySellsReceivable] =
+                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeTodayTransferDetailsPromise, storeTodaySellsReceivablePromise]);
 
             if (storeDetails) {
                 setStoreDetails(storeDetails);
@@ -245,8 +242,8 @@ const StoreMain = ({ userId }: { userId?: number }) => {
                 setTodayTransfers(newTodayTransfers)
             }
 
-            if (storeSalesReceivable) {
-                setAllSalesReceivable(storeSalesReceivable);
+            if (storeTodaySellsReceivable) {
+                setTodaySellsReceivable(storeTodaySellsReceivable);
             }
         }
 
@@ -261,7 +258,17 @@ const StoreMain = ({ userId }: { userId?: number }) => {
         if (todaySells?.length! > 0) {
             setIsModalSellsOpen(!isModalSellsOpen)
         } else {
-            notifySuccess("La tienda no posee ventas registradas hoy")
+            notifyWarning("La tienda no posee ventas registradas hoy")
+        }
+    };
+
+    // modal today sells receivable details
+    const [isModalSellsReceivableOpen, setIsModalSellsReceivableOpen] = useState<boolean>(false);
+    const toggleModalSellsReceivableOpen = () => {
+        if (todaySellsReceivable?.length! > 0) {
+            setIsModalSellsReceivableOpen(!isModalSellsReceivableOpen)
+        } else {
+            notifyWarning("La tienda no posee ventas por cobrar registradas hoy")
         }
     };
 
@@ -724,7 +731,7 @@ const StoreMain = ({ userId }: { userId?: number }) => {
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Grid container columnSpacing={2} justifyContent={"space-between"}>
                     <Grid item xs={'auto'}>
-                        <Typography variant="h6" sx={{ color: "blue", cursor: "pointer", fontSize: "18px" }}>
+                        <Typography variant="h6" onClick={toggleModalSellsReceivableOpen} sx={{ color: "blue", cursor: "pointer", fontSize: "18px" }}>
                             Ventas por cobrar
                         </Typography>
                     </Grid>
@@ -744,15 +751,12 @@ const StoreMain = ({ userId }: { userId?: number }) => {
 
                         <Grid item xs={12} display={"flex"} alignItems={"center"}>
                             <ChevronRightOutlined fontSize={"small"} />
-                            Creadas: {allSalesReceivable?.filter(sell => {
-                                return todayStart <= sell.created_at && sell.created_at <= todayEnd
-                            }).length!
-                            }
+                            Creadas: {todaySellsReceivable?.length!}
                         </Grid>
 
                         <Grid item xs={12} display={"flex"} alignItems={"center"}>
                             <ChevronRightOutlined fontSize={"small"} />
-                            Pagadas: {allSalesReceivable?.filter(sell => sell.status === "COBRADA").length!}
+                            Pagadas: {todaySellsReceivable?.filter(sell => sell.status === "COBRADA").length!}
                         </Grid>
                     </Grid>
 
@@ -763,7 +767,7 @@ const StoreMain = ({ userId }: { userId?: number }) => {
 
                         <Grid item xs={12} display={"flex"} alignItems={"center"}>
                             <ChevronRightOutlined fontSize={"small"} />
-                            Total pendientes: {allSalesReceivable?.filter(sell => sell.status === "PENDIENTE").length!}
+                            Total pendientes: {todaySellsReceivable?.filter(sell => sell.status === "PENDIENTE").length!}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -948,6 +952,12 @@ const StoreMain = ({ userId }: { userId?: number }) => {
                 isOpen={isModalSellsOpen}
                 setIsOpen={setIsModalSellsOpen}
                 todaySellsData={todaySells!}
+            />}
+            {todaySellsReceivable && <ModalSellsReceivableToday
+                dialogTitle="Ventas por cobrar hoy"
+                isOpen={isModalSellsReceivableOpen}
+                setIsOpen={setIsModalSellsReceivableOpen}
+                todaySellsReceivableData={todaySellsReceivable!}
             />}
 
             <ModalTransfersToday

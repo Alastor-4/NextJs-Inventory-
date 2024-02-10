@@ -78,9 +78,9 @@ const sellerStore = {
         return false
     },
 
-    getSellsReceivable: async function (sellerStoreId: number) {
+    getSellsReceivableDetails: async function (sellerStoreId: number, loadAllSells?: boolean) {
         try {
-            const response = await apiRequest.get(sellsReceivableUrl(sellerStoreId), { params: { storeId: sellerStoreId, todayStart: todayStart, todayEnd: todayEnd } });
+            const response = await apiRequest.get(sellsReceivableUrl(sellerStoreId), { params: { storeId: sellerStoreId, todayStart: todayStart, todayEnd: todayEnd, loadAllSells } });
             return response.data;
         } catch (e) {
             notifyError("Ha ocurrido un error al obtener los detalles de las ventas por cobrar. Inténtelo nuevamente");
