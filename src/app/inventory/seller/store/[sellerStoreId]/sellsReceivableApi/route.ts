@@ -3,65 +3,45 @@ import { prisma } from "db";
 
 // GET receivable sells
 export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
+    try {
+        const { searchParams } = new URL(req.url);
+        const storeId = +searchParams.get("storeId")!;
+        const allSells = searchParams.get("loadAllSells");
+        const todayStart = searchParams.get("todayStart");
+        const todayEnd = searchParams.get("todayEnd");
 
-    const storeId = +searchParams.get("storeId")!;
-    // const todayStart = searchParams.get("todayStart");
-    // const todayEnd = searchParams.get("todayEnd");
-
-    const sellsReceivable = await prisma.sells_receivable.findMany({
-        where: {
-            sell_receivable_products: { some: { store_depots: { store_id: storeId } } }
-        },
-        include: {
-            sell_receivable_products: { include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } }
+        if (storeId && (allSells === 'true')) {
+            const storeAllSellsReceivable = await prisma.sells_receivable.findMany({
+                where: {
+                    sell_receivable_products: { some: { store_depots: { store_id: storeId } } }
+                },
+                include: {
+                    sell_receivable_products: { include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } }
+                }
+            })
+            return NextResponse.json(storeAllSellsReceivable);
+        } else if (storeId) {
+            const storeTodaySellsReceivable = await prisma.sells_receivable.findMany(
+                {
+                    where: {
+                        created_at: {
+                            gte: new Date(todayStart!),
+                            lt: new Date(todayEnd!),
+                        },
+                        OR: [
+                            { sell_receivable_products: { some: { store_depots: { store_id: storeId } } } },
+                        ]
+                    },
+                    include: {
+                        sell_receivable_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
+                    }
+                }
+            )
+            return NextResponse.json(storeTodaySellsReceivable);
         }
-    })
-
-    // const storeTodaySalesReceivableCreated = await prisma.sells_receivable.findMany(
-    //     {
-    //         where: {
-    //             created_at: {
-    //                 gte: new Date(todayStart!),
-    //                 lt: new Date(todayEnd!),
-    //             },
-    //             sell_receivable_products: { some: { store_depots: { store_id: storeId } } },
-    //         },
-    //         include: {
-    //             sell_receivable_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
-    //         }
-    //     }
-    // )
-
-    // const storeTodaySalesReceivablePayed = await prisma.sells_receivable.findMany(
-    //     {
-    //         where: {
-    //             payed_at: {
-    //                 gte: new Date(todayStart!),
-    //                 lt: new Date(todayEnd!),
-    //             },
-    //             sell_receivable_products: { some: { store_depots: { store_id: storeId } } },
-    //         },
-    //         include: {
-    //             sell_receivable_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
-    //         }
-    //     }
-    // )
-
-    // const storeAllSalesReceivablePending = await prisma.sells_receivable.findMany(
-    //     {
-    //         where: {
-    //             status: "PENDIENTE",
-    //             sell_receivable_products: { some: { store_depots: { store_id: storeId } } },
-    //         },
-    //         include: {
-    //             sell_receivable_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
-    //         }
-    //     }
-    // )
-
-    return NextResponse.json(sellsReceivable)
-    // return NextResponse.json({ storeTodaySalesReceivableCreated, storeTodaySalesReceivablePayed, storeAllSalesReceivablePending })
+    } catch (error) {
+        return new NextResponse("Internal Error", { status: 500 });
+    }
 }
 
 // CANCEL/CONFIRM sell receivable
