@@ -28,7 +28,7 @@ import ModalAddProduct from "./ModalAddProduct";
 import { grey } from "@mui/material/colors";
 import { useRouter } from "next/navigation";
 import { AxiosResponse } from "axios";
-import { Formik } from "formik";
+import {Formik, FormikProps} from "formik";
 import * as Yup from "yup";
 import dayjs from "dayjs";
 
@@ -260,6 +260,7 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                 setDisplayNewUnitsForm(false);
             }
         }
+
         const handleClose = () => {
             !!formik && formik.resetForm();
             setDisplayNewUnitsForm(false);
@@ -402,7 +403,10 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
             if (updateResponse?.updatedDepot && updateResponse?.updatedStoreDepot) {
                 updateLocalData(updateResponse.updatedDepot, updateResponse.updatedStoreDepot)
 
-                formik.resetForm();
+                await formik.setFieldValue("productStoreDepotDistribution.warehouseQuantity", "");
+                await formik.setFieldValue("productStoreDepotDistribution.storeQuantity", "");
+                await formik.setFieldValue("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity", "");
+                await formik.setFieldValue("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity", "");
 
                 setDisplayUpdateDepotQuantityForm(false);
             }
@@ -423,7 +427,10 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
             if (updateResponse?.updatedDepot && updateResponse?.updatedStoreDepot) {
                 updateLocalData(updateResponse.updatedDepot, updateResponse.updatedStoreDepot)
 
-                formik.resetForm();
+                await formik.setFieldValue("productStoreDepotDistribution.warehouseQuantity", "");
+                await formik.setFieldValue("productStoreDepotDistribution.storeQuantity", "");
+                await formik.setFieldValue("productStoreDepotDistribution.moveFromWarehouseToStoreQuantity", "");
+                await formik.setFieldValue("productStoreDepotDistribution.moveFromStoreToWarehouseQuantity", "");
 
                 setDisplayUpdateDepotQuantityForm(false);
             }
@@ -898,7 +905,6 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             dialogTitle={"Agregar unidades"}
                             open={displayNewUnitsForm}
                             setOpen={setDisplayNewUnitsForm}
-                            formik={formik}
                         >
                             <NewUnitsQuantityForm formik={formik} />
                         </UpdateValueDialog>
@@ -915,7 +921,6 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
                             dialogTitle={"Redistribuir productos"}
                             open={displayUpdateDepotQuantityForm}
                             setOpen={setDisplayUpdateDepotQuantityForm}
-                            formik={formik}
                         >
                             <UpdateStoreDepotQuantityForm formik={formik} />
                         </UpdateValueDialog>

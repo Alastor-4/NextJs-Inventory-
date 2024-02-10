@@ -6,7 +6,6 @@ import React from "react";
 export default function UpdateValueDialog({ dialogTitle, open, formik, setOpen, children, fullScreen }: UpdateValueDialogProps) {
 
     const handleClose = () => {
-        !!formik && formik.resetForm();
         setOpen(false);
     };
 
