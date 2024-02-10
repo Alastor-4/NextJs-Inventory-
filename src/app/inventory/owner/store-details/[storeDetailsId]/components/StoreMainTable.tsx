@@ -24,7 +24,7 @@ import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import StoreMoreDetails from "./StoreMoreDetails";
 import { useParams, useRouter } from "next/navigation";
-import { images } from "@prisma/client";
+import {images, store_depot_properties} from "@prisma/client";
 import { Formik } from "formik";
 import ModalProductPrice from "./Modal/ModalProductPrice";
 import { grey } from "@mui/material/colors";
@@ -156,9 +156,8 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
         const headCells = [
             { id: "details", label: "", padding: "checkbox", },
             { id: "name", label: "Nombre", },
-            { id: "departaments", label: "Departamento", },
-            { id: "buy_Price", label: "Precio", },
-            { id: "units", label: "Unidades", },
+            { id: "price", label: "Precio", },
+            { id: "units", label: "Cantidad", },
             { id: "Active", label: "Estado", },
         ]
 
@@ -212,8 +211,18 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
         setOpenImagesDialog(true)
     }
 
-    function productHasActiveOffer(offers: any[]) {
-        return offers.some((item: any) => item.is_active)
+    const updateStoreDepotProperties = async (storeDepotIndex: number, newStoreDepotProperties: store_depot_properties[]) => {
+        const newDepartments = [...allProductsByDepartment!];
+        for (const productsByDepartments of allProductsByDepartment!) {
+            const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
+
+            const productIndex = productsByDepartments!.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === storeDepotIndex);
+            if (productIndex > -1) {
+                newDepartments![departmentIndex].products![productIndex].depots![0].store_depots![0].store_depot_properties = newStoreDepotProperties
+            }
+        }
+
+        setAllProductsByDepartment(newDepartments)
     }
 
     const TableContent = ({ formik }: { formik: any }) => {
@@ -222,7 +231,7 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                 {dataProducts?.filter(
                     (product: productsProps) =>
                         product?.name!.toUpperCase().includes(formik.values.searchBarValue.toUpperCase())).map(
-                            (product: productsProps, index: number) => {
+                            (product: productsProps) => {
 
                                 const baseProductPrice = product?.depots![0].store_depots![0].sell_price! === 0
                                     ? null
@@ -305,9 +314,6 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                                                 </Box>
                                             </TableCell>
                                             <TableCell>
-                                                {product.departments?.name}
-                                            </TableCell>
-                                            <TableCell>
                                                 <Grid container rowSpacing={1}>
                                                     <Grid container item xs={12} flexWrap={"nowrap"} alignItems={"center"}>
                                                         <MoneyInfoTag
@@ -379,6 +385,7 @@ export const StoreMainTable = ({ userId }: StoreMainTableProps) => {
                                                         displayPriceDiscount={displayPriceDiscount}
                                                         sellerProfitQuantity={sellerProfitQuantity}
                                                         finalProductPrice={finalProductPrice}
+                                                        updateStoreDepotProperties={updateStoreDepotProperties}
                                                     />
                                                 )}
                                             </TableCell>

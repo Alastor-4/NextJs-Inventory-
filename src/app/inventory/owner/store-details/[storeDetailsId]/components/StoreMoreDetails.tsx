@@ -1,5 +1,5 @@
 import { EditOutlined, SwapVert } from '@mui/icons-material'
-import { Collapse, Grid, IconButton, Typography } from '@mui/material'
+import {Box, Collapse, Grid, IconButton, Typography} from '@mui/material'
 import React, { useState } from 'react'
 import StoreListOffers from './offers/components/StoreListOffers'
 import StoreModalDefault from './Modal/StoreModalDefault'
@@ -10,6 +10,7 @@ import TransferUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/
 import StoreEditUnits from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/StoreEditUnits";
 import { storeDepotsWithAny } from "@/types/interfaces";
 import ModalProductPrice from "@/app/inventory/owner/store-details/[storeDetailsId]/components/Modal/ModalProductPrice";
+import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPropertiesManage";
 
 function StoreMoreDetails(props: any) {
     const {
@@ -24,6 +25,7 @@ function StoreMoreDetails(props: any) {
         displayPriceDiscount,
         sellerProfitQuantity,
         finalProductPrice,
+        updateStoreDepotProperties
     } = props
 
     const [activeModalPrice, setActiveModalPrice] = useState<{ active: boolean, storeDepot: storeDepotsWithAny | null }>({ active: false, storeDepot: null });
@@ -103,6 +105,16 @@ function StoreMoreDetails(props: any) {
                     </Grid>
 
                     <Grid container item spacing={1} xs={12}>
+                        <Grid container item xs={"auto"} alignItems={"center"} sx={{ fontWeight: 600 }}>Propiedades:</Grid>
+                        <Grid container item xs={true} alignItems={"center"}>
+                            <StoreDepotPropertiesManage
+                                data={row}
+                                updateFunction={updateStoreDepotProperties}
+                            />
+                        </Grid>
+                    </Grid>
+
+                    <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
                         <Grid item xs={true}>{row.departments?.name ?? "-"}</Grid>
                     </Grid>
@@ -112,29 +124,9 @@ function StoreMoreDetails(props: any) {
                         <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                             {row.characteristics.length > 0
                                 ? row.characteristics.map((item: any) => (
-                                    <Grid
-                                        key={item.id}
-                                        sx={{
-                                            display: "inline-flex",
-                                            margin: "3px",
-                                            backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                            padding: "2px 4px",
-                                            borderRadius: "5px 2px 2px 2px",
-                                            border: "1px solid rgba(130, 130, 130)",
-                                            fontSize: 14,
-                                        }}
-                                    >
-                                        <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
-                                            <Typography variant={"caption"}
-                                                sx={{ color: "white", fontWeight: "600" }}>
-                                                {item.name.toUpperCase()}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid container item alignItems={"center"}
-                                            sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                            {item.value}
-                                        </Grid>
-                                    </Grid>
+                                    <Box key={item.id} display={"inline-flex"} mr={"5px"}>
+                                        {`${item.name.toUpperCase()} = ${item.value}`}
+                                    </Box>
                                 )) : "-"
                             }
                         </Grid>
@@ -142,8 +134,13 @@ function StoreMoreDetails(props: any) {
 
                     <Grid container item spacing={1} xs={12}>
                         <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Precios del producto:</Grid>
-                        <Grid item xs={true}>
-                            Costo: {row.buy_price} {row.buy_price ? "CUP" : "-"} | Venta: {row.fixed_sell_price} {row.fixed_sell_price ? row.fixed_sell_price_unit : "-"}
+                        <Grid container item xs={true}>
+                            <Grid item xs={12}>
+                                Costo: {row.buy_price} {row.buy_price ? "CUP" : "-"}
+                            </Grid>
+                            <Grid item xs={12}>
+                                Venta: {row.fixed_sell_price} {row.fixed_sell_price ? row.fixed_sell_price_unit : "-"}
+                            </Grid>
                         </Grid>
                     </Grid>
 
