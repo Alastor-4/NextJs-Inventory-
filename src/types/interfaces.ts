@@ -11,6 +11,8 @@ import {
     roles,
     sell_receivable_products,
     store_depot_properties,
+    sells_receivable,
+    $Enums,
 } from '@prisma/client';
 import { ReactNode } from "react";
 
@@ -111,22 +113,6 @@ export interface storeDepotsStatsProps {
     depotsNotActiveTotal: number;
     depotsWithoutPriceTotal: number;
     depotsWithDiscountTotal: number;
-}
-
-interface saleReceivable {
-    total_price: number;
-    payment_method?: string;
-    pay_before_date?: string;
-    payed_at?: string;
-    status: string;
-    created_at: string;
-    sell_receivable_products: sell_receivable_products[];
-}
-
-export interface storeSalesReceivableProps {
-    todaySalesReceivableCreated: saleReceivable[],
-    todaySalesReceivablePayed: saleReceivable[],
-    allSalesReceivablePending: saleReceivable[],
 }
 
 export interface StoreMainTableProps {
@@ -350,6 +336,19 @@ export interface SellsMoreDetailsProps {
     history?: boolean;
     refreshData?: () => Promise<void>
 }
+export interface SellsReceivableMoreDetailsProps {
+    sell_receivable_products: {
+        id: number;
+        store_depot_id: number;
+        units_quantity: number;
+        created_at: Date;
+        price: number;
+        store_depots: storeDepotsWithAny;
+    }[];
+    show: boolean;
+    history?: boolean;
+    refreshData?: () => Promise<void>
+}
 
 export interface sellProducts {
     id: number;
@@ -386,6 +385,12 @@ export interface ModalSellsTodayProps {
     setIsOpen: (bool: boolean) => void;
     dialogTitle: string;
     todaySellsData: storeSellsDetailsProps[];
+}
+export interface ModalSellsReceivableTodayProps {
+    isOpen: boolean;
+    setIsOpen: (bool: boolean) => void;
+    dialogTitle: string;
+    todaySellsReceivableData: storeSellsReceivableDetailsProps[];
 }
 export interface sellsWithSellProducts {
     id: number;
@@ -456,6 +461,25 @@ export interface storeSellsDetailsProps {
         price: number;
         store_depots: storeDepotsWithAny;
     }[];
+}
+export interface storeSellsReceivableDetailsProps {
+    id: number;
+    total_price: number;
+    payment_method: string | null;
+    description: string | null;
+    pay_before_date: Date | null;
+    payed_at: Date | null;
+    status: $Enums.sell_receivable_status;
+    created_at: Date;
+    sell_receivable_products: {
+        id: number;
+        sell_receivable_id: number;
+        store_depot_id: number;
+        units_quantity: number;
+        price: number;
+        created_at: Date;
+        store_depots: storeDepotsWithAny
+    }[]
 }
 
 export interface TransferUnitsProps {

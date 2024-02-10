@@ -3,20 +3,20 @@
 import {
     Dialog, DialogActions, DialogContent, DialogTitle,
     IconButton, Button, Typography, Grid, TableCell, TableRow,
-    TableHead, TableBody, Card, TableContainer, Table, Tooltip
+    TableHead, TableBody, Card, TableContainer, Table, Tooltip, Chip
 } from '@mui/material';
+import { ModalSellsReceivableTodayProps, storeSellsReceivableDetailsProps } from '@/types/interfaces';
+import calcSellReceivableProductsUnits from '@/utils/calcSellReceivableProductsUnits';
 import { Close, ExpandLessOutlined, ExpandMoreOutlined } from '@mui/icons-material';
-import { ModalSellsTodayProps, storeSellsDetailsProps } from '@/types/interfaces';
-import calcSellProductsUnits from '@/utils/calcSellProductsUnits';
-import calcReturnedQuantity from '@/utils/calcReturnedQuantity';
+import SellsReceivableMoreDetails from '../SellsReceivableMoreDetails';
+import { getColorByStatus } from '@/utils/getColorByStatus';
 import { TableNoData } from '@/components/TableNoData';
-import SellsMoreDetails from '../SellsMoreDetails';
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 
 dayjs.locale("es");
 
-const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: ModalSellsTodayProps) => {
+const ModalSellsReceivableToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsReceivableData }: ModalSellsReceivableTodayProps) => {
 
     const [showDetails, setShowDetails] = useState<number>(-1);
 
@@ -24,7 +24,7 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
         setIsOpen(false);
     }
 
-    if (!todaySellsData) {
+    if (!todaySellsReceivableData) {
         setIsOpen(false);
         return;
     }
@@ -35,9 +35,10 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
                 <TableRow>
                     <TableCell id='details' />
                     <TableCell align='center' id='total_price_payment_method'>Importe total</TableCell>
+                    <TableCell align='center' id='status'>Estado</TableCell>
+                    <TableCell align='center' id='pay_before'>Pagar antes de</TableCell>
                     <TableCell align='center' id='sell_products_quantity'>Productos</TableCell>
                     <TableCell align='center' id='units'>Unidades</TableCell>
-                    <TableCell align='center' id='sell_units_returned_quantity'>Devoluciones</TableCell>
                     <TableCell align='center' id='created_at'>Registrado</TableCell>
                 </TableRow>
             </TableHead>
@@ -47,8 +48,8 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
     const TableContent = () => {
         return (
             <TableBody>
-                {todaySellsData?.map(
-                    (sell: storeSellsDetailsProps) => (
+                {todaySellsReceivableData?.map(
+                    (sell: storeSellsReceivableDetailsProps) => (
                         <React.Fragment key={sell.id}>
                             <TableRow
                                 key={sell.id}
@@ -69,18 +70,24 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
                                         </IconButton>
                                     </Tooltip>
                                 </TableCell>
+                                <TableCell align='center'><Chip
+                                    size={"small"}
+                                    label={sell.status}
+                                    color={getColorByStatus(sell.status)}
+                                    sx={{ border: "1px solid lightGreen" }}
+                                /></TableCell>
+                                <TableCell align='center'>{dayjs(sell.pay_before_date).format('MMM D, YYYY')}</TableCell>
                                 <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
-                                <TableCell align='center'>{sell.sell_products.length! !== 1 ? sell.sell_products.length! : sell.sell_products[0].store_depots.depots?.products?.name}</TableCell>
-                                <TableCell align='center'>{`${calcSellProductsUnits(sell)}`}</TableCell>
-                                <TableCell align='center'>{`${calcReturnedQuantity(sell)}`}</TableCell>
+                                <TableCell align='center'>{sell.sell_receivable_products.length! !== 1 ? sell.sell_receivable_products.length! : sell.sell_receivable_products[0].store_depots.depots?.products?.name}</TableCell>
+                                <TableCell align='center'>{`${calcSellReceivableProductsUnits(sell)}`}</TableCell>
                                 <TableCell align='center'>{dayjs(sell.created_at).format('h:mm A')}</TableCell>
                             </TableRow>
                             <TableRow >
                                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                                     {showDetails === sell.id && (
-                                        <SellsMoreDetails
+                                        <SellsReceivableMoreDetails
                                             show={(showDetails === sell.id)}
-                                            sell_products={sell.sell_products}
+                                            sell_receivable_products={sell.sell_receivable_products}
                                         />
                                     )}
                                 </TableCell>
@@ -114,19 +121,19 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
             <DialogContent dividers >
                 <Grid item container>
                     <Grid item xs={12} display={"flex"} justifyContent={"center"}>
-                        <Typography variant='h6'>Ventas efectuadas: {todaySellsData.length!}</Typography>
+                        <Typography variant='h6'>Ventas por cobrar creadas hoy: {todaySellsReceivableData.length!}</Typography>
                     </Grid>
                     <Card variant={"outlined"} sx={{ paddingTop: "20px", width: "110%", marginTop: "10px", mx: "-15px" }}>
                         <Grid container rowSpacing={2}>
                             {
-                                todaySellsData?.length! > 0
+                                todaySellsReceivableData?.length! > 0
                                     ? <TableContainer sx={{ width: "100%", maxHeight: "70vh", overflowX: "auto" }}>
                                         <Table sx={{ width: "100%" }} size={"small"}>
                                             <TableHeader />
                                             <TableContent />
                                         </Table>
                                     </TableContainer> :
-                                    <TableNoData hasData={todaySellsData?.length!} />
+                                    <TableNoData hasData={todaySellsReceivableData?.length!} />
                             }
                         </Grid>
                     </Card>
@@ -138,4 +145,4 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
         </Dialog>
     )
 }
-export default ModalSellsToday
+export default ModalSellsReceivableToday
