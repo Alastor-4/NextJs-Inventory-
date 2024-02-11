@@ -2,20 +2,20 @@
 
 import {
     AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent, Checkbox, Collapse,
-    Divider, FormHelperText, Grid, IconButton, InputBase, MenuItem, Switch, Table, TableBody,
-    TableCell, TableContainer, TableHead, TableRow, TextField, Toolbar, Typography
+    Grid, IconButton, InputBase, Switch, Table, TableBody,
+    TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography
 } from "@mui/material";
 import {
     ArrowLeft, DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
-    FilterAlt, FilterAltOff, ForwardToInbox, HelpOutline, KeyboardArrowRight,
+    FilterAlt, FilterAltOff, ForwardToInbox, HelpOutline,
     SellOutlined, SellRounded,
 } from "@mui/icons-material";
-import { computeDepotPricePerUnit, notifyError, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 import { storeDetails } from "@/app/inventory/owner/store-details/[storeDetailsId]/request/storeDetails";
 import { StoreActionsMainProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
 import { CharacteristicInfoTag, CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
+import { notifyError, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
 import FilterProductsByConditionsModal from "@/components/modals/FilterProductsByConditionsModal";
 import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPropertiesManage";
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
@@ -23,16 +23,15 @@ import { images, product_offers, store_depot_properties } from "@prisma/client";
 import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import UpdateValueDialog from "@/components/UpdateValueDialog";
 import { TableNoData } from "@/components/TableNoData";
 import SearchIcon from '@mui/icons-material/Search';
+import ProductSellForm from "./Modal/ProductSellForm";
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
 import { useRouter } from "next/navigation";
 import { grey } from "@mui/material/colors";
 import { Formik } from "formik";
 import 'dayjs/locale/es';
-import ProductSellForm from "./Modal/ProductSellForm";
 
 const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     const router = useRouter();
@@ -714,34 +713,6 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     const [isModalProductSellOpen, setIsModalProductSellOpen] = useState<boolean>(false);
     const [isModalProductSellReceivableOpen, setIsModalProductSellReceivableOpen] = useState<boolean>(false);
 
-    // const ProductSellForm = ({ formik, closeForm, isSaleReceivable }: { formik: any, closeForm: any, isSaleReceivable?: boolean }) => {
-
-
-
-    //     return (
-    //         <Grid container item spacing={3}>
-    //             <Grid container item xs={12} rowSpacing={2}>
-
-
-    //                 <Grid item xs={12}>
-    //                     <Divider />
-    //                 </Grid>
-
-    //             </Grid>
-
-    //             <Grid container item justifyContent={"flex-end"}>
-    //                 <Button color={"primary"} disabled={isSaleReceivable ?
-    //                     !!formik.errors.productSell :
-    //                     !!formik.errors.productSell?.products ||
-    //                     !!formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod
-    //                 } onClick={productsSell}>
-    //                     Vender
-    //                 </Button>
-    //             </Grid>
-    //         </Grid >
-    //     )
-    // }
-
     const loadData = async () => {
         let selectedDepartment = new Map();
 
@@ -801,51 +772,33 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                 message={`Confirma vender "${sellProductItem?.name}" con precio ${sellProductItem?.depots[0]?.store_depots[0]?.sell_price} ${sellProductItem?.depots[0]?.store_depots[0]?.sell_price_unit}`}
                                 confirmAction={handleSellProduct}
                             />
-
-
-                            {/* isModalProductSellOpen
-setIsModalProductSellOpen
-isModalProductSellReceivableOpen
-setIsModalProductSellReceivableOpen */}
                             {
                                 isModalProductSellOpen && (
                                     <ProductSellForm
+                                        storeId={storeId!}
                                         isModalOpen={isModalProductSellOpen}
+                                        allProductsByDepartment={allProductsByDepartment!}
+                                        setAllProductsByDepartment={setAllProductsByDepartment!}
                                         setIsOpen={setIsModalProductSellOpen}
                                         selectedProducts={selectedProducts}
                                         setSelectedProducts={setSelectedProducts}
                                     />
-                                    // <UpdateValueDialog
-                                    //     dialogTitle={"Vender productos"}
-                                    //     open={displayProductSellForm}
-                                    //     setOpen={setDisplayProductSellForm}
-                                    //     fullScreen
-                                    // >
-                                    //     <ProductSellForm
-                                    //         formik={formik}
-                                    //         closeForm={() => setDisplayProductSellForm(false)}
-                                    //     />
-                                    // </UpdateValueDialog>
                                 )
                             }
-
-
-                            {/* {
-                                displaySaleReceivableForm && (
-                                    <UpdateValueDialog
-                                        dialogTitle={"Venta por cobrar"}
-                                        open={displaySaleReceivableForm}
-                                        setOpen={setDisplaySaleReceivableForm}
-                                        fullScreen
-                                    >
-                                        <ProductSellForm
-                                            formik={formik}
-                                            closeForm={() => setDisplaySaleReceivableForm(false)}
-                                            isSaleReceivable
-                                        />
-                                    </UpdateValueDialog>
+                            {
+                                isModalProductSellReceivableOpen && (
+                                    <ProductSellForm
+                                        storeId={storeId!}
+                                        isModalOpen={isModalProductSellReceivableOpen}
+                                        allProductsByDepartment={allProductsByDepartment!}
+                                        setAllProductsByDepartment={setAllProductsByDepartment!}
+                                        setIsOpen={setIsModalProductSellReceivableOpen}
+                                        selectedProducts={selectedProducts}
+                                        isReceivable
+                                        setSelectedProducts={setSelectedProducts}
+                                    />
                                 )
-                            } */}
+                            }
 
                             <ModalTransfer
                                 open={activeModalTransfer}
