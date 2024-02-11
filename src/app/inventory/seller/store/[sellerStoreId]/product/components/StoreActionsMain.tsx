@@ -21,23 +21,18 @@ import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPro
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
 import { images, product_offers, store_depot_properties } from "@prisma/client";
 import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import UpdateValueDialog from "@/components/UpdateValueDialog";
 import { TableNoData } from "@/components/TableNoData";
 import SearchIcon from '@mui/icons-material/Search';
 import React, { useEffect, useState } from "react";
 import InfoTooltip from "@/components/InfoTooltip";
-import { esES } from '@mui/x-date-pickers/locales'
 import { useRouter } from "next/navigation";
 import { grey } from "@mui/material/colors";
 import { Formik } from "formik";
-import * as Yup from "yup";
-import dayjs from "dayjs";
 import 'dayjs/locale/es';
+import ProductSellForm from "./Modal/ProductSellForm";
 
 const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     const router = useRouter();
@@ -248,16 +243,14 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     }
 
     //confirm sell product
-    const [sellProductItem, setSellProductItem] = React.useState<any | null>(null)
-    const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false)
+    const [sellProductItem, setSellProductItem] = useState<any | null>(null);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 
-    const handleCloseConfirmDialog = () => setOpenConfirmDialog(false)
+    const handleCloseConfirmDialog = () => setOpenConfirmDialog(false);
     const handleOpenConfirmDialog = (e: any, productItem: any) => {
-        e.stopPropagation()
-
-        setSellProductItem(productItem)
-
-        setOpenConfirmDialog(true)
+        e.stopPropagation();
+        setSellProductItem(productItem);
+        setOpenConfirmDialog(true);
     }
 
     const handleSellProduct = async () => {
@@ -274,10 +267,8 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                 }
             }
 
-            setAllProductsByDepartment(newDepartments)
-
+            setAllProductsByDepartment(newDepartments);
             if (updatedDepot.product_remaining_units === 0) cancelChecked(sellProductItem.id);
-
             notifySuccess("Vendida una unidad del producto");
         }
     }
@@ -708,8 +699,6 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
         )
     }
 
-    const paymentMethods = ["Efectivo CUP", "Transferencia CUP", "Otro"];
-
     const initialValues = {
         searchBarValue: "",
         onSellFilter: false,
@@ -720,262 +709,38 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
         withoutDisponibilityFilter: false,
         disponibilityLessThan10Filter: false,
         disponibilityLessThan20Filter: false,
-
-        productSell: {
-            products: [
-                {
-                    maxUnitsQuantity: "1",
-                    unitsQuantity: "1",
-                }
-            ],
-            totalPrice: "",
-            paymentMethod: "",
-            description: "",
-            payBefore: dayjs()
-        }
     }
 
-    const validationSchema = Yup.object({
-        productSell: Yup.object({
-            products: Yup.array().of(Yup.object({
-                maxUnitsQuantity: Yup.number().integer().typeError("Debe ser un número"),
-                unitsQuantity: Yup
-                    .number().integer().typeError("Debe ser un número")
-                    .required("Requerido")
-                    .min(1, "Al menos 1")
-                    .max(Yup.ref("maxUnitsQuantity"), "Cantidad superior a la cantidad disponible"),
-            })).required(),
-            paymentMethod: Yup.string().required("Especifique método"),
-            description: Yup.string().required("Especifique datos de la venta a pagar"),
-            payBefore: Yup.date().required("Este dato es requerido")
-        })
-    })
+    const [isModalProductSellOpen, setIsModalProductSellOpen] = useState<boolean>(false);
+    const [isModalProductSellReceivableOpen, setIsModalProductSellReceivableOpen] = useState<boolean>(false);
 
-    const [displayProductSellForm, setDisplayProductSellForm] = useState<boolean>(false);
-    const [displaySaleReceivableForm, setDisplaySaleReceivableForm] = useState<boolean>(false);
+    // const ProductSellForm = ({ formik, closeForm, isSaleReceivable }: { formik: any, closeForm: any, isSaleReceivable?: boolean }) => {
 
-    const handleOpenSellProduct = (formik: any, isSaleReceivable?: boolean) => {
-        let productsData: any = [];
-        selectedProducts.forEach((productSelected: productsProps) => {
-            const storeDepot = productSelected.depots![0].store_depots![0];
 
-            productsData.push({
-                maxUnitsQuantity: storeDepot.product_remaining_units,
-                unitsQuantity: 1,
-            })
-        })
 
-        formik.setFieldValue("productSell.products", productsData);
-        formik.setFieldValue("productSell.paymentMethod", paymentMethods[0]);
+    //     return (
+    //         <Grid container item spacing={3}>
+    //             <Grid container item xs={12} rowSpacing={2}>
 
-        if (isSaleReceivable) {
-            setDisplaySaleReceivableForm(true)
-        } else {
-            setDisplayProductSellForm(true)
-        }
-    }
 
-    const ProductSellForm = ({ formik, closeForm, isSaleReceivable }: { formik: any, closeForm: any, isSaleReceivable?: boolean }) => {
-        async function productsSell() {
-            let sellProduct: any[] = []
+    //                 <Grid item xs={12}>
+    //                     <Divider />
+    //                 </Grid>
 
-            formik.values.productSell.products.forEach((item: any, index: number) => {
-                const storeDepot = selectedProducts[index].depots![0].store_depots![0];
+    //             </Grid>
 
-                sellProduct.push({
-                    storeDepotId: storeDepot.id,
-                    unitsQuantity: item.unitsQuantity,
-                    price: computeDepotPricePerUnit(storeDepot, item.unitsQuantity) * item.unitsQuantity
-                });
-            })
-
-            const totalPrice = sellProduct.reduce((accumulate, current) => accumulate + current.price, 0);
-
-            const sell = { paymentMethod: formik.values.productSell.paymentMethod, totalPrice: totalPrice }
-
-            const data = {
-                sellerStoreId: storeId,
-                sellData: sell,
-                sellProductsData: sellProduct,
-            }
-
-            let sellItemResponse;
-            if (isSaleReceivable) {
-                const sellReceivableData = { description: formik.values.productSell.description, payBefore: formik.values.productSell.payBefore }
-                const newData = { ...data, sellReceivableData }
-                sellItemResponse = await sellerStoreProduct.createSellReceivable(newData)
-            } else {
-                sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(data)
-            }
-
-            if (sellItemResponse) {
-                const newDepartments = [...allProductsByDepartment!];
-
-                sellProduct.forEach(sellProductItem => {
-                    for (const productsByDepartments of allProductsByDepartment!) {
-                        const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
-
-                        const productIndex = productsByDepartments.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === sellProductItem.storeDepotId);
-                        if (productIndex > -1) {
-                            newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units
-                                = allProductsByDepartment![departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units! - sellProductItem.unitsQuantity;
-                        }
-                    }
-                })
-
-                setAllProductsByDepartment(newDepartments);
-
-                notifySuccess(isSaleReceivable ? "Venta por cobrar registrada" : "La venta ha sido registrada");
-            }
-            formik.resetForm();
-            closeForm();
-            setSelectedProducts([]);
-        }
-
-        const getTotals = () => {
-            let totalProducts = 0
-            let totalPrice = 0
-
-            formik.values.productSell.products.forEach((item: any, index: number) => {
-                totalProducts += item.unitsQuantity;
-                const storeDepot = selectedProducts[index].depots![0].store_depots![0];
-                const pricePerUnit = computeDepotPricePerUnit(storeDepot, item.unitsQuantity);
-                totalPrice += (pricePerUnit * item.unitsQuantity);
-            })
-            return { totalProducts, totalPrice }
-        }
-
-        return (
-            <Grid container item spacing={3}>
-                <Grid container item xs={12} rowSpacing={2}>
-                    {
-                        formik.values.productSell.products.map((item: any, index: number) => {
-                            const storeDepot = selectedProducts[index].depots![0].store_depots![0];
-
-                            const pricePerUnit = computeDepotPricePerUnit(storeDepot, item.unitsQuantity);
-
-                            return (
-                                <Grid container item xs={12} key={selectedProducts[index].id} alignItems={'center'}>
-                                    <Grid container item xs={12} flexWrap={"nowrap"} sx={{ overflowX: "auto" }}>
-                                        <Grid container item xs={"auto"} justifyContent={"center"}>
-                                            <KeyboardArrowRight fontSize={"small"} />
-                                        </Grid>
-
-                                        <Grid item xs={true}>
-                                            {selectedProducts[index].name + " "}
-                                            <small>{selectedProducts[index].description}</small>
-                                        </Grid>
-                                    </Grid>
-
-                                    <Grid container item xs={12} columnSpacing={2}>
-                                        <Grid item xs={"auto"}>
-                                            <TextField
-                                                name={"unitsQuantity"}
-                                                variant={"standard"}
-                                                size={"small"}
-                                                type={"number"}
-                                                sx={{ width: "60px" }}
-                                                {...formik.getFieldProps(`productSell.products.${index}.unitsQuantity`)}
-                                                error={!!formik.errors.productSell?.products && !!formik.errors.productSell?.products[index]?.unitsQuantity}
-                                            />
-                                        </Grid>
-
-                                        <Grid container item xs={true} alignItems={"center"}>
-                                            <Divider sx={{ width: 1 }} />
-                                        </Grid>
-
-                                        <Grid container item xs={"auto"} alignItems={"center"}>
-                                            Precio: {numberFormat(String(pricePerUnit * (item.unitsQuantity === '' ? 0 : item.unitsQuantity)))}
-                                        </Grid>
-                                    </Grid>
-
-                                    {!!formik.errors.productSell?.products &&
-                                        formik.errors.productSell?.products[index]?.unitsQuantity && (
-                                            <Grid item xs={12}>
-                                                <FormHelperText sx={{ color: "#d32f2f" }}>
-                                                    {formik.errors.productSell?.products[index]?.unitsQuantity}
-                                                </FormHelperText>
-                                            </Grid>
-                                        )
-                                    }
-                                </Grid>
-                            )
-                        })
-                    }
-
-                    <Grid item xs={12}>
-                        <Divider />
-                    </Grid>
-
-                    <Grid container item xs={12}>
-                        <Grid item xs={"auto"}>
-                            Total {getTotals().totalProducts}
-                        </Grid>
-
-                        <Grid container item xs={true} justifyContent={"flex-end"}>
-                            Precio: {numberFormat(String(getTotals().totalPrice))}
-                        </Grid>
-                    </Grid>
-                </Grid>
-
-                <Grid item xs={12}>
-                    <TextField
-                        name={"paymentMethod"}
-                        label="Método de pago"
-                        size={"small"}
-                        fullWidth
-                        select
-                        {...formik.getFieldProps("productSell.paymentMethod")}
-                        error={!!formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod}
-                        helperText={(!!formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod) && formik.errors.productSell?.paymentMethod}
-                    >
-                        {
-                            paymentMethods.map(item => (<MenuItem value={item} key={item}>{item}</MenuItem>))
-                        }
-                    </TextField>
-                </Grid>
-                {isSaleReceivable &&
-                    <Grid item xs={12}>
-                        <TextField
-                            label="Descripción"
-                            size={"small"}
-                            fullWidth
-                            {...formik.getFieldProps("productSell.description")}
-                            error={!!formik.errors.productSell?.description && formik.touched.productSell?.description}
-                            helperText={(!!formik.errors.productSell?.description && formik.touched.productSell?.description) && !!formik.errors.productSell?.description}
-                        />
-                    </Grid>
-                }
-
-                {isSaleReceivable &&
-                    <Grid item xs={12} mx={"40px"}>
-                        <LocalizationProvider
-                            dateAdapter={AdapterDayjs}
-                            localeText={esES.components.MuiLocalizationProvider.defaultProps.localeText}
-                            adapterLocale='es'>
-                            <DemoContainer components={['DatePicker']}>
-                                <DatePicker
-                                    slotProps={{ field: { clearable: true }, toolbar: { hidden: true } }}
-                                    label="Pagar antes de:" disablePast onChange={(value) => {
-                                        formik.setFieldValue("productSell.payBefore", value)
-                                    }} />
-                            </DemoContainer>
-                        </LocalizationProvider>
-                    </Grid>
-                }
-
-                <Grid container item justifyContent={"flex-end"}>
-                    <Button color={"primary"} disabled={isSaleReceivable ?
-                        !!formik.errors.productSell :
-                        !!formik.errors.productSell?.products ||
-                        !!formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod
-                    } onClick={productsSell}>
-                        Vender
-                    </Button>
-                </Grid>
-            </Grid >
-        )
-    }
+    //             <Grid container item justifyContent={"flex-end"}>
+    //                 <Button color={"primary"} disabled={isSaleReceivable ?
+    //                     !!formik.errors.productSell :
+    //                     !!formik.errors.productSell?.products ||
+    //                     !!formik.errors.productSell?.paymentMethod && formik.touched.productSell?.paymentMethod
+    //                 } onClick={productsSell}>
+    //                     Vender
+    //                 </Button>
+    //             </Grid>
+    //         </Grid >
+    //     )
+    // }
 
     const loadData = async () => {
         let selectedDepartment = new Map();
@@ -999,7 +764,6 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
     return (
         <Formik
             initialValues={initialValues}
-            validationSchema={validationSchema}
             onSubmit={() => { }}
         >
             {
@@ -1038,23 +802,35 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                 confirmAction={handleSellProduct}
                             />
 
+
+                            {/* isModalProductSellOpen
+setIsModalProductSellOpen
+isModalProductSellReceivableOpen
+setIsModalProductSellReceivableOpen */}
                             {
-                                displayProductSellForm && (
-                                    <UpdateValueDialog
-                                        dialogTitle={"Vender productos"}
-                                        open={displayProductSellForm}
-                                        setOpen={setDisplayProductSellForm}
-                                        fullScreen
-                                    >
-                                        <ProductSellForm
-                                            formik={formik}
-                                            closeForm={() => setDisplayProductSellForm(false)}
-                                        />
-                                    </UpdateValueDialog>
+                                isModalProductSellOpen && (
+                                    <ProductSellForm
+                                        isModalOpen={isModalProductSellOpen}
+                                        setIsOpen={setIsModalProductSellOpen}
+                                        selectedProducts={selectedProducts}
+                                        setSelectedProducts={setSelectedProducts}
+                                    />
+                                    // <UpdateValueDialog
+                                    //     dialogTitle={"Vender productos"}
+                                    //     open={displayProductSellForm}
+                                    //     setOpen={setDisplayProductSellForm}
+                                    //     fullScreen
+                                    // >
+                                    //     <ProductSellForm
+                                    //         formik={formik}
+                                    //         closeForm={() => setDisplayProductSellForm(false)}
+                                    //     />
+                                    // </UpdateValueDialog>
                                 )
                             }
 
-                            {
+
+                            {/* {
                                 displaySaleReceivableForm && (
                                     <UpdateValueDialog
                                         dialogTitle={"Venta por cobrar"}
@@ -1069,7 +845,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                         />
                                     </UpdateValueDialog>
                                 )
-                            }
+                            } */}
 
                             <ModalTransfer
                                 open={activeModalTransfer}
@@ -1181,7 +957,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                                                 size={"small"}
                                                                                 color={"primary"}
                                                                                 variant={"outlined"}
-                                                                                onClick={() => handleOpenSellProduct(formik)}
+                                                                                onClick={() => setIsModalProductSellOpen(true)}
                                                                                 startIcon={<SellOutlined fontSize={"small"} />}
                                                                             >
                                                                                 Vender
@@ -1208,7 +984,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                                                                 size={"small"}
                                                                                 color={"primary"}
                                                                                 variant={"outlined"}
-                                                                                onClick={() => handleOpenSellProduct(formik, true)}
+                                                                                onClick={() => setIsModalProductSellReceivableOpen(true)}
                                                                                 startIcon={<SellRounded fontSize={"small"} />}
                                                                             >
                                                                                 Venta por cobrar

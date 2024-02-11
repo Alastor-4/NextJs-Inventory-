@@ -120,6 +120,14 @@ export interface StoreMainTableProps {
     ownerId?: number;
 }
 
+export interface ProductSellFormProps {
+    isModalOpen: boolean;
+    setIsOpen: (bool: boolean) => void;
+    isReceivable?: boolean;
+    selectedProducts: productsProps[];
+    setSelectedProducts: (products: productsProps[]) => void;
+}
+
 export interface StoreActionsMainProps {
     storeId?: number;
 }
