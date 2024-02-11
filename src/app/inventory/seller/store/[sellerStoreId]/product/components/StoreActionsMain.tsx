@@ -2,26 +2,24 @@
 
 import {
     AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent, Checkbox, Collapse,
-    Grid, IconButton, InputBase, Switch, Table, TableBody,
-    TableCell, TableContainer, TableHead, TableRow, Toolbar, Typography
+    Grid, IconButton, InputBase, Switch, Table, TableBody, TableCell,
+    TableContainer, TableHead, TableRow, Toolbar, Typography
 } from "@mui/material";
 import {
-    ArrowLeft, DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
-    FilterAlt, FilterAltOff, ForwardToInbox, HelpOutline,
-    SellOutlined, SellRounded,
+    ArrowLeft, Circle, DescriptionOutlined, ExpandLessOutlined, ExpandMoreOutlined,
+    FilterAlt, FilterAltOff, ForwardToInbox, HelpOutline, SellOutlined, SellRounded,
 } from "@mui/icons-material";
 import sellerStoreProduct from "@/app/inventory/seller/store/[sellerStoreId]/product/requests/sellerStoreProduct";
 import { storeDetails } from "@/app/inventory/owner/store-details/[storeDetailsId]/request/storeDetails";
 import { StoreActionsMainProps, allProductsByDepartmentProps, productsProps } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
-import { CharacteristicInfoTag, CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import { notifyError, notifySuccess, notifyWarning, numberFormat } from "@/utils/generalFunctions";
-import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import FilterProductsByConditionsModal from "@/components/modals/FilterProductsByConditionsModal";
 import StoreDepotPropertiesManage from "@/app/inventory/components/StoreDepotPropertiesManage";
 import TransferBetweenStores from "./transferBetweenStores/components/TransferBetweenStores";
 import { images, product_offers, store_depot_properties } from "@prisma/client";
 import ModalTransfer from "./transferBetweenStores/components/ModalTransfer";
+import { CustomTooltip, InfoTag, MoneyInfoTag } from "@/components/InfoTags";
 import ConfirmDeleteDialog from "@/components/ConfirmDeleteDialog";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import { TableNoData } from "@/components/TableNoData";
@@ -469,7 +467,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                                         </TableCell>
 
                                         <TableCell align="center" padding={"none"}>
-                                            <Circle color={product.depots![0].store_depots![0].is_active ? "success" : "warning"}/>
+                                            <Circle color={product.depots![0].store_depots![0].is_active ? "success" : "warning"} />
                                         </TableCell>
 
                                         <TableCell>
