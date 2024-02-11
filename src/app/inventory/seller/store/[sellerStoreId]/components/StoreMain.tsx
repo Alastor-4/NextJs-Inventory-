@@ -9,16 +9,15 @@ import {
     ArrowLeft, ChevronRightOutlined, ExpandLessOutlined, ExpandMoreOutlined,
     ForwardToInbox, InfoOutlined, Mail, Schedule
 } from "@mui/icons-material"
-import { daysMap, notifySuccess, notifyWarning, numberFormat, transactionToWarehouse } from "@/utils/generalFunctions";
-import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
 import {
-    productSellsStatsProps,
-    storeDepotsStatsProps,
-    storeDepotsWithAny,
-    storeSalesReceivableProps,
-    storeSellsDetailsProps,
-    storeWithStoreDepots
+    productSellsStatsProps, storeDepotsStatsProps, storeDepotsWithAny,
+    storeSellsDetailsProps, storeSellsReceivableDetailsProps, storeWithStoreDepots
 } from "@/types/interfaces";
+import { daysMap, notifySuccess, notifyWarning, numberFormat, transactionToWarehouse } from "@/utils/generalFunctions";
+import ModalTransfersToday from "@/app/inventory/seller/store/[sellerStoreId]/components/Modal/ModalTransfersToday";
+import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
+import { product_store_transfers, store_depot_transfers } from "@prisma/client";
+import userProfileStyles from "@/assets/styles/userProfileStyles";
 import { useParams, useRouter } from "next/navigation";
 import ModalSellsToday from "./Modal/ModalSellsToday";
 import React, { useEffect, useState } from "react";
@@ -26,9 +25,7 @@ import isBetween from "dayjs/plugin/isBetween";
 import utc from "dayjs/plugin/utc";
 import Link from "next/link";
 import dayjs from "dayjs";
-import userProfileStyles from "@/assets/styles/userProfileStyles";
-import { product_store_transfers, store_depot_transfers } from "@prisma/client";
-import ModalTransfersToday from "@/app/inventory/seller/store/[sellerStoreId]/components/Modal/ModalTransfersToday";
+import ModalSellsReceivableToday from "./Modal/ModalSellsReceivableToday";
 
 dayjs.extend(isBetween);
 dayjs.extend(utc);
@@ -55,7 +52,7 @@ interface todayTransferDetails {
     store: product_store_transfers[],
 }
 
-export default function StoreMain({ userId }: { userId?: number }) {
+const StoreMain = ({ userId }: { userId?: number }) => {
     const params = useParams();
     const router = useRouter();
 
@@ -66,44 +63,32 @@ export default function StoreMain({ userId }: { userId?: number }) {
     const [todaySellsStats, setTodaySellsStats] = useState<productSellsStatsProps | null>(null);
     const [todaySells, setTodaySells] = useState<storeSellsDetailsProps[] | null>(null);
     const [todayTransfers, setTodayTransfers] = useState<todayTransferProps | null>(null)
-    const [allSalesReceivable, setAllSalesReceivable] = useState<storeSalesReceivableProps | null>(null)
+    const [todaySellsReceivable, setTodaySellsReceivable] = useState<storeSellsReceivableDetailsProps[] | null>(null)
 
     //GET initial store and sellsStats details
     useEffect(() => {
         const getDataTransferWarehouseAndStore = (data) => {
-            let fromWarehouse = {
-                transfers: 0
-            }
-            let toWarehouse = {
-                transfers: 0
-            }
+            let fromWarehouse = { transfers: 0 }
+            let toWarehouse = { transfers: 0 }
 
             data.forEach((element) => {
                 if (element.transfer_direction === transactionToWarehouse) {
-                    toWarehouse.transfers++
+                    toWarehouse.transfers++;
                 } else {
-                    fromWarehouse.transfers++
+                    fromWarehouse.transfers++;
                 }
             })
 
             return {
-                fromWarehouse: {
-                    transfers: fromWarehouse.transfers
-                },
-                toWarehouse: {
-                    transfers: toWarehouse.transfers
-                }
+                fromWarehouse: { transfers: fromWarehouse.transfers },
+                toWarehouse: { transfers: toWarehouse.transfers }
             }
 
         }
 
         const getDataTransferStore = (data) => {
-            let fromStore = {
-                transfers: 0
-            }
-            let toStore = {
-                transfers: 0
-            }
+            let fromStore = { transfers: 0 }
+            let toStore = { transfers: 0 }
 
             data.forEach((element) => {
                 if (element.to_store_id === sellerStoreId) {
@@ -114,24 +99,19 @@ export default function StoreMain({ userId }: { userId?: number }) {
             })
 
             return {
-                fromStore: {
-                    transfers: fromStore.transfers
-                },
-                toStore: {
-                    transfers: toStore.transfers
-                }
+                fromStore: { transfers: fromStore.transfers },
+                toStore: { transfers: toStore.transfers }
             }
-
         }
 
-        async function loadStatsData() {
-            const storeDetailsPromise = stores.storeDetails(userId, sellerStoreId);
+        const loadStatsData = async () => {
+            const storeDetailsPromise = stores.storeDetails(userId!, sellerStoreId);
             const storeTodaySellsDetailsPromise = stores.storeSellsDetails(sellerStoreId);
             const storeTodayTransferDetailsPromise = stores.getTodayTransfersStats(sellerStoreId)
-            const storeSalesReceivablePromise = stores.getTodaySalesReceivable(sellerStoreId)
+            const storeTodaySellsReceivablePromise = stores.getSellsReceivableDetails(sellerStoreId)
 
-            const [storeDetails, storeTodaySellsDetails, storeTodayTransferDetails, storeSalesReceivable] =
-                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeTodayTransferDetailsPromise, storeSalesReceivablePromise]);
+            const [storeDetails, storeTodaySellsDetails, storeTodayTransferDetails, storeTodaySellsReceivable] =
+                await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeTodayTransferDetailsPromise, storeTodaySellsReceivablePromise]);
 
             if (storeDetails) {
                 setStoreDetails(storeDetails);
@@ -198,7 +178,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
                         });
                         reservationSellsAmountTotal += sells.total_price!;
                         for (const sell_product of sells.sell_products) {
-                            reservationSellsUnitsReturnedTotal += sell_product.units_returned_quantity;
+                            reservationSellsUnitsReturnedTotal += sell_product.units_returned_quantity!;
                         }
                         reservationSellerProfitTotal += sellProfitQuantity;
                     } else {
@@ -216,7 +196,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
                         });
                         normalSellsAmountTotal += sells.total_price!;
                         for (const sell_product of sells.sell_products) {
-                            reservationSellsUnitsReturnedTotal += sell_product.units_returned_quantity;
+                            reservationSellsUnitsReturnedTotal += sell_product.units_returned_quantity!;
                         }
                         normalSellerProfitTotal += sellProfitQuantity;
                     }
@@ -262,8 +242,8 @@ export default function StoreMain({ userId }: { userId?: number }) {
                 setTodayTransfers(newTodayTransfers)
             }
 
-            if (storeSalesReceivable) {
-                setAllSalesReceivable(storeSalesReceivable)
+            if (storeTodaySellsReceivable) {
+                setTodaySellsReceivable(storeTodaySellsReceivable);
             }
         }
 
@@ -275,10 +255,20 @@ export default function StoreMain({ userId }: { userId?: number }) {
     // modal today sells details
     const [isModalSellsOpen, setIsModalSellsOpen] = useState<boolean>(false);
     const toggleModalSellsOpen = () => {
-        if (todaySells?.length > 0) {
+        if (todaySells?.length! > 0) {
             setIsModalSellsOpen(!isModalSellsOpen)
         } else {
-            notifySuccess("La tienda no posee ventas registradas hoy")
+            notifyWarning("La tienda no posee ventas registradas hoy")
+        }
+    };
+
+    // modal today sells receivable details
+    const [isModalSellsReceivableOpen, setIsModalSellsReceivableOpen] = useState<boolean>(false);
+    const toggleModalSellsReceivableOpen = () => {
+        if (todaySellsReceivable?.length! > 0) {
+            setIsModalSellsReceivableOpen(!isModalSellsReceivableOpen)
+        } else {
+            notifyWarning("La tienda no posee ventas por cobrar registradas hoy")
         }
     };
 
@@ -288,17 +278,16 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
     const openModalTransfersDetails = async () => {
 
-
         if (todayTransfers?.totalTransfers) {
             if (!todayTransfersDetails) {
-                const data = await stores.getTodayTransfersDetails(sellerStoreId)
-                if (data) setTodayTransfersDetails(data)
+                const data = await stores.getTodayTransfersDetails(sellerStoreId);
+                if (data) setTodayTransfersDetails(data);
             }
 
-            return setIsModalTransfersOpen(true)
+            return setIsModalTransfersOpen(true);
         }
 
-        return notifySuccess("La tienda no posee transferencias registradas hoy")
+        return notifySuccess("La tienda no posee transferencias registradas hoy");
     };
 
     const CustomToolbar = () => (
@@ -331,96 +320,95 @@ export default function StoreMain({ userId }: { userId?: number }) {
         }
     }, [storeDetails])
 
-    async function handleToggleAutoOpen() {
+    const handleToggleAutoOpen = async () => {
         //change auto open time
-        const updatedStore = await stores.changeAutoOpenTime(sellerStoreId)
+        const updatedStore = await stores.changeAutoOpenTime(sellerStoreId);
 
         let storeData = { ...storeDetails! }
-        storeData.auto_open_time = updatedStore.auto_open_time
+        storeData.auto_open_time = updatedStore.auto_open_time;
 
-        setStoreDetails(storeData)
+        setStoreDetails(storeData);
 
         if (updatedStore.auto_open_time) {
-            notifySuccess("La tienda abre automáticamente en los horarios establecidos")
+            notifySuccess("La tienda abre automáticamente en los horarios establecidos");
         } else {
-            notifyWarning("La tienda permanecerá cerrada hasta que no vuelva a cambiar esta opción")
+            notifyWarning("La tienda permanecerá cerrada hasta que no vuelva a cambiar esta opción");
         }
     }
 
-    const [autoReservationTime, setAutoReservationTime] = useState(true)
+    const [autoReservationTime, setAutoReservationTime] = useState(true);
     useEffect(() => {
         if (storeDetails) {
-            setAutoReservationTime(storeDetails?.auto_reservation_time ?? false)
+            setAutoReservationTime(storeDetails?.auto_reservation_time ?? false);
         }
-    }, [storeDetails])
+    }, [storeDetails]);
 
-    async function handleToggleAutoReservation() {
+    const handleToggleAutoReservation = async () => {
         //change auto reservation time
-        const updatedStore = await stores.changeAutoReservationTime(sellerStoreId)
+        const updatedStore = await stores.changeAutoReservationTime(sellerStoreId);
 
-        let storeData = { ...storeDetails }
-        storeData.auto_reservation_time = updatedStore.auto_reservation_time
+        let storeData = { ...storeDetails! }
+        storeData.auto_reservation_time = updatedStore.auto_reservation_time;
 
-        setStoreDetails(storeData)
+        setStoreDetails(storeData);
 
         if (updatedStore.auto_reservation_time) {
-            notifySuccess("La tienda recibe reservaciones automáticamente en los horarios establecidos")
+            notifySuccess("La tienda recibe reservaciones automáticamente en los horarios establecidos");
         } else {
-            notifyWarning("La tienda permanecerá sin recibir reservaciones hasta que no vuelva a cambiar esta opción")
+            notifyWarning("La tienda permanecerá sin recibir reservaciones hasta que no vuelva a cambiar esta opción");
         }
     }
 
-    function checkOpenCondition() {
-        if (!storeDetails.auto_open_time) return false
+    const checkOpenCondition = () => {
+        if (!storeDetails?.auto_open_time) return false;
 
-        const openDays = storeDetails.store_open_days
+        const openDays = storeDetails?.store_open_days!
 
-        const todayWorkIndex = openDays.findIndex(openItem => openItem.week_day_number === dayjs().get("day"))
-        const todayIsWorkDay = todayWorkIndex > -1
+        const todayWorkIndex = openDays.findIndex(openItem => openItem.week_day_number === dayjs().get("day"));
+        const todayIsWorkDay = todayWorkIndex > -1;
 
-        if (!todayIsWorkDay) return false
+        if (!todayIsWorkDay) return false;
 
-        const openTime = dayjs(openDays[todayWorkIndex].day_start_time)
-        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time)
-        const now = dayjs()
+        const openTime = dayjs(openDays[todayWorkIndex].day_start_time);
+        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time);
+        const now = dayjs();
 
         if (openTime.hour() <= now.hour() && now.hour() <= closeTime.hour()) {
-            if (openTime.hour() === now.hour() && openTime.minute() > now.minute()) return false
+            if (openTime.hour() === now.hour() && openTime.minute() > now.minute()) return false;
 
-            return !(closeTime.hour() === now.hour() && closeTime.minute() < now.minute())
+            return !(closeTime.hour() === now.hour() && closeTime.minute() < now.minute());
         }
 
-        return false
+        return false;
     }
 
-    function checkOpenReservationCondition() {
-        if (!storeDetails.auto_reservation_time) return false
+    const checkOpenReservationCondition = () => {
+        if (!storeDetails?.auto_reservation_time) return false;
 
-        const openDays = storeDetails.store_reservation_days
+        const openDays = storeDetails?.store_reservation_days!;
 
-        const todayWorkIndex = openDays.findIndex(openItem => openItem.week_day_number === dayjs().get("day"))
-        const todayIsWorkDay = todayWorkIndex > -1
+        const todayWorkIndex = openDays.findIndex(openItem => openItem.week_day_number === dayjs().get("day"));
+        const todayIsWorkDay = todayWorkIndex > -1;
 
-        if (!todayIsWorkDay) return false
+        if (!todayIsWorkDay) return false;
 
-        const openTime = dayjs(openDays[todayWorkIndex].day_start_time)
-        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time)
-        const now = dayjs()
+        const openTime = dayjs(openDays[todayWorkIndex].day_start_time);
+        const closeTime = dayjs(openDays[todayWorkIndex].day_end_time);
+        const now = dayjs();
 
         if (openTime.hour() <= now.hour() && now.hour() <= closeTime.hour()) {
-            if (openTime.hour() === now.hour() && openTime.minute() > now.minute()) return false
+            if (openTime.hour() === now.hour() && openTime.minute() > now.minute()) return false;
 
-            return !(closeTime.hour() === now.hour() && closeTime.minute() < now.minute())
+            return !(closeTime.hour() === now.hour() && closeTime.minute() < now.minute());
         }
 
-        return false
+        return false;
     }
 
     const [displayAutoOpenSection, setDisplayAutoOpenSection] = useState<boolean>(false);
     const [displayAutoReservationSection, setDisplayAutoReservationSection] = useState<boolean>(false);
 
     const StoreProducts = () => {
-
         return (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
@@ -428,7 +416,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                         Productos
                     </Link>
                 </Typography>
-
                 {
                     storeDepotsStats && (
                         <Grid container rowSpacing={2} mt={"8px"}>
@@ -441,7 +428,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     {storeDepotsStats.depotsTotal} ({storeDepotsStats.depotsRemainingUnitsTotal} total de unidades)
                                 </Grid>
                             </Grid>
-
                             <Grid container item spacing={1} xs={12}>
                                 <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                     <ChevronRightOutlined fontSize={"small"} />
@@ -451,7 +437,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     {storeDepotsStats.depotsNotRemainingUnitsTotal}
                                 </Grid>
                             </Grid>
-
                             <Grid container item spacing={1} xs={12}>
                                 <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                     <ChevronRightOutlined fontSize={"small"} />
@@ -461,7 +446,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     {storeDepotsStats.depotsNotActiveTotal}
                                 </Grid>
                             </Grid>
-
                             <Grid container item spacing={1} xs={12}>
                                 <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                     <ChevronRightOutlined fontSize={"small"} />
@@ -471,7 +455,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     {storeDepotsStats.depotsWithoutPriceTotal}
                                 </Grid>
                             </Grid>
-
                             <Grid container item spacing={1} xs={12}>
                                 <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                     <ChevronRightOutlined fontSize={"small"} />
@@ -489,7 +472,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
     }
 
     const StoreReservation = () => {
-
         return (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Typography variant={"h6"} sx={{ overflowX: "auto", flexWrap: "nowrap", fontSize: "18px" }}>
@@ -497,7 +479,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                         Reservaciones
                     </Link>
                 </Typography>
-
                 {
                     storeDepotsStats && (
                         <Grid container rowSpacing={2} mt={"8px"}>
@@ -510,7 +491,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     x (x de hoy)
                                 </Grid>
                             </Grid>
-
                             <Grid container item spacing={1} xs={12}>
                                 <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                     <ChevronRightOutlined fontSize={"small"} />
@@ -520,7 +500,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     x
                                 </Grid>
                             </Grid>
-
                             <Grid container item spacing={1} xs={12}>
                                 <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                     <ChevronRightOutlined fontSize={"small"} />
@@ -530,7 +509,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     x
                                 </Grid>
                             </Grid>
-
                             <Grid container item spacing={1} xs={12}>
                                 <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>
                                     <ChevronRightOutlined fontSize={"small"} />
@@ -547,7 +525,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
             </Card>
         )
     }
-
 
     const SellsModule = () => {
         return (
@@ -582,17 +559,14 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             <Grid item xs={12}>
                                 Total: ${todaySellsStats?.sellsAmountTotal}
                             </Grid>
-
                             <Grid item xs={12}>
                                 Dueño: ${numberFormat(`${todaySellsStats?.sellsAmountTotal! - todaySellsStats?.sellerProfitTotal!}`)}
                             </Grid>
-
                             <Grid item xs={12}>
                                 Vendedor: ${numberFormat(`${todaySellsStats?.sellerProfitTotal}`)}
                             </Grid>
                         </Grid>
                     </Grid>
-
                     {todaySellsStats?.sellsUnitsReturnedTotal! > 0 &&
                         <Grid container item spacing={1} xs={12} alignItems={"center"}>
                             <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
@@ -602,15 +576,12 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             <Grid item xs={true} >{todaySellsStats?.sellsUnitsReturnedTotal}</Grid>
                         </Grid>
                     }
-
                     {/* Presenciales */}
                     <Grid container rowSpacing={1} marginTop={"2px"}>
                         {storeDetails?.online_reservation &&
                             <>
                                 <Grid item xs={12}><Divider orientation="horizontal" variant="fullWidth" /></Grid>
-
                                 <Grid sx={{ fontWeight: 600, mb: "5px", mt: "10px" }}>Presenciales:</Grid>
-
                                 <Grid container item spacing={1} xs={12} alignItems={"center"}>
                                     <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
                                         <ChevronRightOutlined fontSize={"small"} />
@@ -618,7 +589,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     </Grid>
                                     <Grid item xs={true}>{todaySellsStats?.normalSellsTotal}</Grid>
                                 </Grid>
-
                                 <Grid container item spacing={1} xs={12} alignItems={"center"}>
                                     <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
                                         <ChevronRightOutlined fontSize={"small"} />
@@ -628,7 +598,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                         {todaySellsStats?.normalSellsDifferentProductsTotal} {`(${todaySellsStats?.normalSellsProductsQuantity} unidades totales)`}
                                     </Grid>
                                 </Grid>
-
                                 <Grid container item spacing={1} xs={12} alignItems={"center"}>
                                     <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
                                         <ChevronRightOutlined fontSize={"small"} />
@@ -638,17 +607,14 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                         <Grid item xs={12}>
                                             Total: ${todaySellsStats?.normalSellsAmountTotal}
                                         </Grid>
-
                                         <Grid item xs={12}>
                                             Dueño: ${numberFormat(`${todaySellsStats?.normalSellsAmountTotal! - todaySellsStats?.normalSellerProfitTotal!}`)}
                                         </Grid>
-
                                         <Grid item xs={12}>
                                             Vendedor: ${numberFormat(`${todaySellsStats?.normalSellerProfitTotal}`)}
                                         </Grid>
                                     </Grid>
                                 </Grid>
-
                                 {todaySellsStats?.normalSellsUnitsReturnedTotal! > 0 &&
                                     <Grid container item spacing={1} xs={12} alignItems={"center"}>
                                         <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
@@ -661,14 +627,11 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             </>
                         }
                     </Grid>
-
                     {/* Por reservaciones */}
                     {storeDetails?.online_reservation &&
                         <Grid container rowSpacing={1} mt={"1px"}>
                             <Grid item xs={12}><Divider orientation="horizontal" variant="fullWidth" /></Grid>
-
                             <Grid sx={{ fontWeight: 600, mt: "5px" }}>Por reservaciones:</Grid>
-
                             <Grid container item spacing={1} xs={12} alignItems={"center"}>
                                 <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
                                     <ChevronRightOutlined fontSize={"small"} />
@@ -676,7 +639,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                 </Grid>
                                 <Grid item xs={true}>{todaySellsStats?.reservationSellsTotal}</Grid>
                             </Grid>
-
                             <Grid container item spacing={1} xs={12} alignItems={"center"}>
                                 <Grid item xs={"auto"} sx={{ display: "flex", alignItems: "center" }}>
                                     <ChevronRightOutlined fontSize={"small"} />
@@ -686,11 +648,9 @@ export default function StoreMain({ userId }: { userId?: number }) {
                                     <Grid item xs={12}>
                                         Total: ${todaySellsStats?.reservationSellsAmountTotal}
                                     </Grid>
-
                                     <Grid item xs={12}>
                                         Dueño: ${numberFormat(`${todaySellsStats?.reservationSellsAmountTotal! - todaySellsStats?.reservationSellerProfitTotal!}`)}
                                     </Grid>
-
                                     <Grid item xs={12}>
                                         Vendedor: ${numberFormat(`${todaySellsStats?.reservationSellerProfitTotal}`)}
                                     </Grid>
@@ -715,53 +675,44 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             Transferencias hoy
                         </Typography>
                     </Grid>
-
                     <Grid item container xs={'auto'}>
                         <IconButton size="small" onClick={() => handleTransfer(false)}>
                             <Mail color="primary" />
                         </IconButton>
-
                         <IconButton size="small" onClick={() => handleTransfer(true)} sx={{ ml: "5px" }}>
                             <ForwardToInbox color="secondary" />
                         </IconButton>
                     </Grid>
                 </Grid>
-
                 <Grid container rowSpacing={2} mt={"8px"}>
                     <Grid container item xs={12} alignItems={"center"}>
                         <ChevronRightOutlined fontSize={"small"} />
                         Total de transferencias: {todayTransfers?.totalTransfers}
                     </Grid>
-
                     {
-                        todayTransfers?.totalTransfers > 0 && (
+                        todayTransfers?.totalTransfers! > 0 && (
                             <>
                                 <Grid container item spacing={1} xs={12}>
                                     <Grid item xs={12} sx={{ fontWeight: 600 }}>
                                         Recibidas
                                     </Grid>
-
                                     <Grid item xs={12} display={"flex"} alignItems={"center"}>
                                         <ChevronRightOutlined fontSize={"small"} />
                                         Desde almacén: {todayTransfers?.fromWarehouse.transfers}
                                     </Grid>
-
                                     <Grid item xs={12} display={"flex"} alignItems={"center"}>
                                         <ChevronRightOutlined fontSize={"small"} />
                                         Desde tienda: {todayTransfers?.fromStore.transfers}
                                     </Grid>
                                 </Grid>
-
                                 <Grid container item spacing={1} xs={12}>
                                     <Grid item xs={12} sx={{ fontWeight: 600 }}>
                                         Enviadas
                                     </Grid>
-
                                     <Grid item xs={12} display={"flex"} alignItems={"center"}>
                                         <ChevronRightOutlined fontSize={"small"} />
                                         Hacia almacén: {todayTransfers?.toWarehouse.transfers}
                                     </Grid>
-
                                     <Grid item xs={12} display={"flex"} alignItems={"center"}>
                                         <ChevronRightOutlined fontSize={"small"} />
                                         Hacia tienda: {todayTransfers?.toStore.transfers}
@@ -775,15 +726,20 @@ export default function StoreMain({ userId }: { userId?: number }) {
         )
     }
 
-    const SalesReceivable = () => {
-
+    const SalesReceivableModule = () => {
         return (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Grid container columnSpacing={2} justifyContent={"space-between"}>
                     <Grid item xs={'auto'}>
-                        <Typography variant="h6" sx={{ color: "blue", cursor: "pointer", fontSize: "18px" }}>
+                        <Typography variant="h6" onClick={toggleModalSellsReceivableOpen} sx={{ color: "blue", cursor: "pointer", fontSize: "18px" }}>
                             Ventas por cobrar
                         </Typography>
+                    </Grid>
+                    <Grid item container xs={'auto'} mr={"20px"} />
+                    <Grid item container xs={'auto'}>
+                        <IconButton size="small" onClick={() => { router.push(`/inventory/seller/store/${params.sellerStoreId}/sellsReceivableHistory/`) }} >
+                            <Schedule color="primary" />
+                        </IconButton>
                     </Grid>
                 </Grid>
 
@@ -795,12 +751,12 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
                         <Grid item xs={12} display={"flex"} alignItems={"center"}>
                             <ChevronRightOutlined fontSize={"small"} />
-                            Creadas: {allSalesReceivable?.storeTodaySalesReceivableCreated?.length}
+                            Creadas: {todaySellsReceivable?.length!}
                         </Grid>
 
                         <Grid item xs={12} display={"flex"} alignItems={"center"}>
                             <ChevronRightOutlined fontSize={"small"} />
-                            Pagadas: {allSalesReceivable?.storeTodaySalesReceivablePayed?.length}
+                            Pagadas: {todaySellsReceivable?.filter(sell => sell.status === "COBRADA").length!}
                         </Grid>
                     </Grid>
 
@@ -811,7 +767,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
                         <Grid item xs={12} display={"flex"} alignItems={"center"}>
                             <ChevronRightOutlined fontSize={"small"} />
-                            Total pendientes: {allSalesReceivable?.storeAllSalesReceivablePending?.length}
+                            Total pendientes: {todaySellsReceivable?.filter(sell => sell.status === "PENDIENTE").length!}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -821,7 +777,6 @@ export default function StoreMain({ userId }: { userId?: number }) {
 
 
     const StoreCollections = () => {
-
         return (
             <Card variant={"outlined"} sx={userProfileStyles.cardButton}>
                 <Typography variant="h6" sx={{ color: "blue", cursor: "pointer", fontSize: "18px" }}>
@@ -998,11 +953,17 @@ export default function StoreMain({ userId }: { userId?: number }) {
                 setIsOpen={setIsModalSellsOpen}
                 todaySellsData={todaySells!}
             />}
+            {todaySellsReceivable && <ModalSellsReceivableToday
+                dialogTitle="Ventas por cobrar hoy"
+                isOpen={isModalSellsReceivableOpen}
+                setIsOpen={setIsModalSellsReceivableOpen}
+                todaySellsReceivableData={todaySellsReceivable!}
+            />}
 
             <ModalTransfersToday
                 isOpen={isModalTransfersOpen}
                 setIsOpen={setIsModalTransfersOpen}
-                transfersData={todayTransfersDetails}
+                transfersData={todayTransfersDetails!}
                 storeId={sellerStoreId}
             />
 
@@ -1081,7 +1042,7 @@ export default function StoreMain({ userId }: { userId?: number }) {
                             </Grid>
 
                             <Grid item xs={12} md={6}>
-                                <SalesReceivable />
+                                <SalesReceivableModule />
                             </Grid>
 
                             {/*<Grid item xs={12} md={6}>
@@ -1106,3 +1067,5 @@ export default function StoreMain({ userId }: { userId?: number }) {
         </Card>
     )
 }
+
+export default StoreMain

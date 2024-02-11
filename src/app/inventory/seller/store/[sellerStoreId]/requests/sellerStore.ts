@@ -1,15 +1,19 @@
-//@ts-nocheck
-import apiRequest from "@/api"
-import { notifyError } from "@/utils/generalFunctions";
+import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import apiRequest from "@/api";
 import dayjs from "dayjs";
 
-const url = (sellerStoreId) => `/inventory/seller/store/${sellerStoreId}/api`
-const sellsUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/sellsApi`
-const transferUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/transferApi`
-const saleReceivableUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/saleReceivableApi`
+const url = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/api`;
+const sellsUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/sellsApi`;
+const transferUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/transferApi`;
+const sellsReceivableUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/sellsReceivableApi`;
+
+
+let dateStart = dayjs().set("h", 0).set("m", 0).set("s", 0);
+const todayStart = dateStart.format();
+let todayEnd = dateStart.add(24, "hours").format();
 
 const sellerStore = {
-    storeDetails: async function (userId, sellerStoreId) {
+    storeDetails: async function (userId: number, sellerStoreId: number) {
         try {
             const response = await apiRequest.get(url(sellerStoreId), { params: { id: userId } })
             return response.data
@@ -21,14 +25,8 @@ const sellerStore = {
     },
 
     storeSellsDetails: async function (sellerStoreId: number, allSells?: boolean) {
-        let todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
-        let todayEnd = todayStart.add(24, "hours")
-
-        todayStart = todayStart.format()
-        todayEnd = todayEnd.format()
-
         try {
-            const response = await apiRequest.get(sellsUrl(sellerStoreId), { params: { storeId: sellerStoreId, loadAllSells: allSells, todayStart: todayStart,  todayEnd: todayEnd} });
+            const response = await apiRequest.get(sellsUrl(sellerStoreId), { params: { storeId: sellerStoreId, loadAllSells: allSells, todayStart: todayStart, todayEnd: todayEnd } });
             return response.data;
         } catch (e) {
             notifyError(`Ha ocurrido un error obteniendo los datos de las ventas de la tienda. Inténtelo nuevamente`)
@@ -36,7 +34,7 @@ const sellerStore = {
         return false
     },
 
-    changeAutoOpenTime: async function (sellerStoreId) {
+    changeAutoOpenTime: async function (sellerStoreId: number) {
         try {
             const response = await apiRequest.put(url(sellerStoreId), null)
             return response.data
@@ -47,7 +45,7 @@ const sellerStore = {
         return false
     },
 
-    changeAutoReservationTime: async function (sellerStoreId) {
+    changeAutoReservationTime: async function (sellerStoreId: number) {
         try {
             const response = await apiRequest.patch(url(sellerStoreId), null)
             return response.data
@@ -58,15 +56,9 @@ const sellerStore = {
         return false
     },
 
-    getTodayTransfersStats: async function (sellerStoreId) {
-        let todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
-        let todayEnd = todayStart.add(24, "hours")
-
-        todayStart = todayStart.format()
-        todayEnd = todayEnd.format()
-
+    getTodayTransfersStats: async function (sellerStoreId: number) {
         try {
-            const response = await apiRequest.get(transferUrl(sellerStoreId), { params: { todayStart: todayStart,  todayEnd: todayEnd} })
+            const response = await apiRequest.get(transferUrl(sellerStoreId), { params: { todayStart: todayStart, todayEnd: todayEnd } })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error al obtener los detalles de las transferencia. Inténtelo nuevamente")
@@ -75,15 +67,9 @@ const sellerStore = {
         return false
     },
 
-    getTodayTransfersDetails: async function (sellerStoreId) {
-        let todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
-        let todayEnd = todayStart.add(24, "hours")
-
-        todayStart = todayStart.format()
-        todayEnd = todayEnd.format()
-
+    getTodayTransfersDetails: async function (sellerStoreId: number) {
         try {
-            const response = await apiRequest.post(transferUrl(sellerStoreId), null, { params: { todayStart: todayStart,  todayEnd: todayEnd} })
+            const response = await apiRequest.post(transferUrl(sellerStoreId), null, { params: { todayStart: todayStart, todayEnd: todayEnd } })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error al obtener los detalles de la transferencias. Inténtelo nuevamente")
@@ -92,21 +78,24 @@ const sellerStore = {
         return false
     },
 
-    getTodaySalesReceivable: async function (sellerStoreId) {
-        let todayStart = dayjs().set("h", 0).set("m", 0).set("s", 0)
-        let todayEnd = todayStart.add(24, "hours")
-
-        todayStart = todayStart.format()
-        todayEnd = todayEnd.format()
-
+    getSellsReceivableDetails: async function (sellerStoreId: number, loadAllSells?: boolean) {
         try {
-            const response = await apiRequest.get(saleReceivableUrl(sellerStoreId), { params: { todayStart: todayStart,  todayEnd: todayEnd} })
-            return response.data
+            const response = await apiRequest.get(sellsReceivableUrl(sellerStoreId), { params: { storeId: sellerStoreId, todayStart: todayStart, todayEnd: todayEnd, loadAllSells } });
+            return response.data;
         } catch (e) {
-            notifyError("Ha ocurrido un error al obtener los detalles de las ventas. Inténtelo nuevamente")
+            notifyError("Ha ocurrido un error al obtener los detalles de las ventas por cobrar. Inténtelo nuevamente");
         }
+        return false;
+    },
 
-        return false
+    payOrCancelSellReceivable: async function (sellId: number, action: string) {
+        try {
+            const response = await apiRequest.patch(sellsReceivableUrl(sellId), { sellId, action });
+            notifySuccess(response.data);
+            return response.data;
+        } catch (error) {
+            notifyError("Ha ocurrido un error procesando la venta por pagar");
+        }
     },
 
     addReturnToSellProducts: async function (sellerStoreId: number, sellProductsId: number, returnedQuantity: number, returnedReason: string) {
@@ -114,10 +103,11 @@ const sellerStore = {
             const response = await apiRequest.put(sellsUrl(sellerStoreId), { sell_product_id: sellProductsId, returned_quantity: returnedQuantity, returned_reason: returnedReason });
             return response.status
         } catch (e) {
-            notifyError("Ha ocurrido un añadiendo una devolución")
+            notifyError("Ha ocurrido un error añadiendo una devolución");
         }
         return false
-    }
+    },
+
 }
 
 export default sellerStore;
