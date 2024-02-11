@@ -70,13 +70,11 @@ const SellsReceivableHistory = () => {
 
     const handlePaySell = async (sellId: number) => {
         const paidSell = await stores.payOrCancelSellReceivable(sellId, "confirm");
-        console.log('paid', paidSell);
         refreshData();
     }
 
     const handleCancelSell = async (sellId: number) => {
         const canceledSell = await stores.payOrCancelSellReceivable(sellId, "cancel");
-        console.log("canceled", canceledSell);
         refreshData();
     }
 
