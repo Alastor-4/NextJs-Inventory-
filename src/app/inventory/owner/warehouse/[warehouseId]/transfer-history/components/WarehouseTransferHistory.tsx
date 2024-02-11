@@ -1,3 +1,5 @@
+"use client"
+
 import {
     AppBar, Avatar, AvatarGroup, Box, Card, CardContent, Grid, IconButton, Table,
     TableBody, TableCell, TableContainer, TableHead, TableRow,
@@ -164,8 +166,8 @@ const WarehouseTransferHistory = ({warehouseId}: {warehouseId: number}) => {
                                 <Grid container>
                                     <Grid container item xs={12} justifyContent={"center"}>
                                         {transfer.transfer_direction === transactionToStore
-                                            ? <Mail fontSize={"small"} color={"primary"}/>
-                                            : <ForwardToInbox fontSize={"small"} color={"secondary"}/>
+                                            ? <ForwardToInbox fontSize={"small"} color={"primary"}/>
+                                            : <Mail fontSize={"small"} color={"secondary"}/>
                                         }
                                     </Grid>
 
@@ -177,7 +179,17 @@ const WarehouseTransferHistory = ({warehouseId}: {warehouseId: number}) => {
                             </TableCell>
                             <TableCell align='center'>{transfer.units_transferred_quantity}</TableCell>
                             <TableCell align='center'>{transfer.created_by_user.name}</TableCell>
-                            <TableCell align='center'>{dayjs(transfer.created_at).format()}</TableCell>
+                            <TableCell align='center'>
+                                <Grid container>
+                                    <Grid item xs={12} sx={{wordWrap: "nowrap", whiteSpace: "nowrap"}}>
+                                        {dayjs(transfer.created_at).format("MMM D, YYYY")}
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {dayjs(transfer.created_at).format("h:mm A")}
+                                    </Grid>
+                                </Grid>
+
+                            </TableCell>
                         </TableRow>
                     ))}
             </TableBody>

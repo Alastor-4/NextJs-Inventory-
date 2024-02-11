@@ -9,7 +9,7 @@ import {
 import {
     Add, AddOutlined, ArrowLeft, ChevronRightOutlined,
     Done, EditOutlined, ExpandLessOutlined, ExpandMoreOutlined,
-    FilterAlt, HelpOutline, ShareOutlined,
+    FilterAlt, HelpOutline, History, ShareOutlined,
 } from "@mui/icons-material";
 import { UserWarehouseMainTableProps, allProductsByDepartmentProps, productsProps, storeDepotsWithAny } from "@/types/interfaces";
 import FilterProductsByDepartmentsModal from "@/components/modals/FilterProductsByDepartmentsModal";
@@ -212,6 +212,10 @@ const UserWarehouseMainTable = ({ ownerId, warehouseDetails }: UserWarehouseMain
 
                         <IconButton color={"inherit"} sx={{ color: 'white' }} onClick={() => setActiveModalAddProduct(true)} >
                             <AddOutlined />
+                        </IconButton>
+
+                        <IconButton color={"inherit"} sx={{ color: 'white' }} onClick={() => router.push(`/inventory/owner/warehouse/${warehouseDetails?.id}/transfer-history`)} >
+                            <History />
                         </IconButton>
                     </>
                 </Box>
