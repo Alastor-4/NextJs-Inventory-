@@ -184,7 +184,7 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
         >
             {
                 ({ values, errors, resetForm, setFieldValue, touched, getFieldProps }) => (
-                    <Dialog open={isModalOpen} fullWidth onClose={handleClose}>
+                    <Dialog open={isModalOpen} fullScreen onClose={handleClose}>
                         <DialogTitle
                             display={"flex"}
                             justifyContent={"space-between"}
@@ -195,7 +195,7 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                         >
                             <Grid item container >
                                 <Grid item xs={10} textAlign={"center"}>
-                                    {isReceivable ? "Añadir venta por cobrar" : "Vender productos"}
+                                    {isReceivable ? "Crear venta por cobrar" : "Vender productos"}
                                 </Grid>
                             </Grid>
                             <Grid item xs={2}>
@@ -211,9 +211,9 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                         </DialogTitle>
                         <DialogContent dividers>
                             <Grid container padding={"10px"}>
-                                <Grid item xs={5}>Producto:</Grid>
-                                <Grid item xs={4}>Cantidad:</Grid>
-                                <Grid item xs={3}>Precio:</Grid>
+                                <Grid item xs={7}>Producto:</Grid>
+                                <Grid item xs={3}>Cantidad:</Grid>
+                                <Grid item xs={2}>Precio:</Grid>
                                 <Grid item xs={12}>  <Divider sx={{ height: "5px", width: "100%" }} component={"div"} /></Grid>
                                 {
                                     values.products.map(({ unitsQuantity }: Product, index: number) => {
@@ -221,15 +221,15 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                                         const pricePerUnit: number = computeDepotPricePerUnit(storeDepot, unitsQuantity);
                                         return (
                                             <Grid container item xs={12} key={selectedProducts[index].id} alignItems={'center'}>
-                                                <Grid item xs={5} >
+                                                <Grid item xs={7} >
                                                     <Grid item >{selectedProducts[index].name}</Grid>
                                                 </Grid>
-                                                <Grid item xs={4} justifyContent={"center"}>
+                                                <Grid item xs={3} justifyContent={"center"}>
                                                     <TextField
                                                         variant='standard'
                                                         size={"small"}
                                                         type={"number"}
-                                                        sx={{ width: "60px" }}
+                                                        sx={{ width: "50px", marginLeft: "10px" }}
                                                         {...getFieldProps(`products.${index}.unitsQuantity`)}
                                                         error={!!errors.products}
                                                     />
@@ -256,15 +256,15 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                                     })
                                 }
                                 <Grid container item xs={12} mt={"5px"}>
-                                    <Grid item xs={8}>
+                                    <Grid item xs={9}>
 
                                     </Grid>
-                                    <Grid container item xs={4}>
+                                    <Grid container item xs={3}>
                                         Total: {numberFormat(String(getTotals(values.products).totalPrice))}
                                     </Grid>
                                 </Grid>
                                 <Grid item container>
-                                    <Grid item xs={8} marginTop={"15px"}>
+                                    <Grid item xs={12} marginTop={"15px"}>
                                         <TextField
                                             label="Método de pago"
                                             size={"small"}
