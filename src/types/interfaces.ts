@@ -13,6 +13,7 @@ import {
     store_depot_properties,
     sells_receivable,
     $Enums,
+    stores,
 } from '@prisma/client';
 import { ReactNode } from "react";
 
@@ -314,9 +315,11 @@ export interface storeDepotsWithAny {
             description: string | null;
             buy_price: number | null;
             created_at: Date;
-            departments?: departments | null
+            departments?: departments | null;
+            images?: images[] | null;
         } | null;
-    } | null
+    } | null,
+    stores?: stores | null
 }
 
 export interface SellsMoreDetailsProps {
@@ -418,6 +421,15 @@ export interface StoreModalDefaultProps {
     setOpen: (bool: boolean) => void;
     children?: ReactNode;
     dialogTitle?: string;
+}
+
+export interface warehouseTransferProps {
+    id: number;
+    transfer_direction: string,
+    units_transferred_quantity: number,
+    created_by_user: users
+    created_at: string
+    store_depots: storeDepotsWithAny,
 }
 
 export interface storeSellsDetailsProps {
