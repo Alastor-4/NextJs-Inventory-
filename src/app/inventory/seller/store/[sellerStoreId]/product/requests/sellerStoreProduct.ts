@@ -42,7 +42,7 @@ const sellerStoreProduct = {
 
     sellStoreDepotManual: async function ({ sellerStoreId, sellData, sellProductsData }: any) {
         try {
-            const response = await apiRequest.post(url(sellerStoreId), { sellData, sellProductsData })
+            const response = await apiRequest.post(url(sellerStoreId), { sellData, sellProductsData });
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error creando la venta de los productos. Inténtelo nuevamente")
@@ -53,7 +53,7 @@ const sellerStoreProduct = {
 
     createSellReceivable: async function ({ sellerStoreId, sellData, sellProductsData, sellReceivableData }: createSellReceivableProps) {
         try {
-            const response = await apiRequest.post(urlSellReceivable(sellerStoreId!), { sellData, sellProductsData, sellReceivableData })
+            const response = await apiRequest.post(urlSellReceivable(sellerStoreId!), { sellData, sellProductsData, sellReceivableData });
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error creando la venta de los productos. Inténtelo nuevamente")
@@ -64,7 +64,7 @@ const sellerStoreProduct = {
 
     createStoreDepotProperty: async function (sellerStoreId: number, propertyName: string, propertyValue: string) {
         try {
-            const response = await apiRequest.post(urlProperty(sellerStoreId), {name: propertyName, value: propertyValue}, { params : {storeDepotId: sellerStoreId} })
+            const response = await apiRequest.post(urlProperty(sellerStoreId), { name: propertyName, value: propertyValue }, { params: { storeDepotId: sellerStoreId } })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error creando la propiedad. Inténtelo nuevamente")
@@ -75,7 +75,7 @@ const sellerStoreProduct = {
 
     toggleActiveStoreDepotProperty: async function (sellerStoreId: number, propertyId: number, isActive: boolean) {
         try {
-            const response = await apiRequest.put(urlProperty(sellerStoreId), {isActive: isActive}, { params : {propertyId: propertyId} })
+            const response = await apiRequest.put(urlProperty(sellerStoreId), { isActive: isActive }, { params: { propertyId: propertyId } })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error modificando la propiedad. Inténtelo nuevamente")
@@ -86,7 +86,7 @@ const sellerStoreProduct = {
 
     deleteStoreDepotProperty: async function (sellerStoreId: number, propertyId: number) {
         try {
-            const response = await apiRequest.delete(urlProperty(sellerStoreId), { params : {propertyId: propertyId} })
+            const response = await apiRequest.delete(urlProperty(sellerStoreId), { params: { propertyId: propertyId } })
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error eliminando la propiedad. Inténtelo nuevamente")
