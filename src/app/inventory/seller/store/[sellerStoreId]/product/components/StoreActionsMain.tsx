@@ -380,7 +380,7 @@ const StoreActionsMain = ({ storeId }: StoreActionsMainProps) => {
                 )
                     .map(
                         (product: productsProps) => {
-                            const baseProductPrice = product.depots![0].store_depots![0].sell_price === "0"
+                            const baseProductPrice = (!product.depots![0].store_depots![0].sell_price || product.depots![0].store_depots![0].sell_price === "0")
                                 ? null
                                 : numberFormat(product.depots![0].store_depots![0].sell_price);
 
