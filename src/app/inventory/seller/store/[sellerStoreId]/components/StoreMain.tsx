@@ -127,7 +127,7 @@ const StoreMain = ({ userId }: { userId?: number }) => {
                     depotsRemainingUnitsTotal += storeDepot.product_remaining_units!
                     if (!storeDepot.product_remaining_units) depotsNotRemainingUnitsTotal++
                     if (!storeDepot.is_active) depotsNotActiveTotal++
-                    if (storeDepot.sell_price.toString() === "0") depotsWithoutPriceTotal++
+                    if (!storeDepot.sell_price || storeDepot.sell_price.toString() === "0") depotsWithoutPriceTotal++
                     if (storeDepot.price_discount_percentage || storeDepot.price_discount_quantity) depotsWithDiscountTotal++
                 })
 
