@@ -8,6 +8,7 @@ import {
     Checkbox,
     DialogActions,
     Grid,
+    InputAdornment,
     MenuItem,
     TextField,
     Toolbar,
@@ -216,13 +217,16 @@ const StoresForm = ({ userId, storeId, sellerUsers }: { userId?: number, storeId
 
     const initialValues = {
         name: updateItem ? updateItem.name : "",
-        description: updateItem ? updateItem.description : "",
-        slogan: updateItem ? updateItem.slogan : "",
-        address: updateItem ? updateItem.address : "",
+        description: updateItem?.description ? updateItem.description : "",
+        slogan: updateItem?.slogan ? updateItem.slogan : "",
+        address: updateItem?.address ? updateItem.address : "",
         sellerUser: userSeller,
         valueSellProfit: sellProfit
-            ? (updateItem?.fixed_seller_profit_percentage ?? 0)
-            : (updateItem?.fixed_seller_profit_quantity ?? 0),
+            ? (updateItem?.fixed_seller_profit_percentage ?? "")
+            : (updateItem?.fixed_seller_profit_quantity ?? ""),
+        fixedSellerDailyProfitQuantity: updateItem?.fixed_seller_daily_profit_quantity
+            ? updateItem.fixed_seller_daily_profit_quantity
+            : "",
         openingDays: storeOpeningDays,  //store_open_days table
         reservationDays: storeReservationDays, //store_reservation_days table
     }
@@ -234,21 +238,14 @@ const StoresForm = ({ userId, storeId, sellerUsers }: { userId?: number, storeId
         address: Yup.string(),
         sellerUser: Yup.object(),
         valueSellProfit: sellProfit
-            ? (
-                Yup.number()
-                    .min(0, "El minimo q puedes ingresar es 0")
-                    .max(100, "El maximo q puedes ingresar es 100")
-                    .required("Campo obligatorio")
-
-            )
-            : (
-                Yup.number()
-                    .min(0, "El minimo q puedes ingresar es 0")
-                    .required("Campo obligatorio")
-            ),
+            ? Yup.number()
+                .min(0, "El minimo q puedes ingresar es 0")
+                .max(100, "El maximo q puedes ingresar es 100")
+            : Yup.number().min(0, "El minimo q puedes ingresar es 0"),
+        fixedSellerDailyProfitQuantity: Yup.number()
+            .min(0, "El minimo q puedes ingresar es 0"),
         openingDays: Yup.array(),  //ToDo: make validation to selected days and times
         reservationDays: Yup.array(),  //ToDo: make validation to selected days and times
-        //currency: Yup.object()
     })
 
     const handleSubmit = async (values: any) => {
@@ -260,8 +257,9 @@ const StoresForm = ({ userId, storeId, sellerUsers }: { userId?: number, storeId
             slogan: values.slogan,
             address: values.address,
             sellerUserId: values.sellerUser?.id ?? null,
-            fixed_seller_profit_percentage: (sellProfit) ? parseFloat(values.valueSellProfit) : null,
-            fixed_seller_profit_quantity: (!sellProfit) ? parseFloat(values.valueSellProfit) : null,
+            fixed_seller_daily_profit_quantity: values.fixedSellerDailyProfitQuantity ? parseFloat(values.fixedSellerDailyProfitQuantity) : null,
+            fixed_seller_profit_percentage: sellProfit && values.valueSellProfit ? parseFloat(values.valueSellProfit) : null,
+            fixed_seller_profit_quantity: !sellProfit && values.valueSellProfit ? parseFloat(values.valueSellProfit) : null,
             online_catalog: activeCollection,
             online_reservation: activeReservations
         }
@@ -315,42 +313,37 @@ const StoresForm = ({ userId, storeId, sellerUsers }: { userId?: number, storeId
     })
 
     const editPercentage = (formik: any) => (
-        <Grid item container columnSpacing={1}>
-            <Grid item>
-                <TextField
-                    name={"sell_profit_percentage"}
-                    label="Ganancia del vendedor"
-                    size={"small"}
-                    {...formik.getFieldProps("valueSellProfit")}
-                    error={formik.errors.valueSellProfit && formik.touched.valueSellProfit}
-                    helperText={(formik.errors.valueSellProfit && formik.touched.valueSellProfit) && formik.errors.valueSellProfit}
-                />
-            </Grid>
-
-            <Grid item alignSelf={"center"}>
-                <Typography variant="h6" >%</Typography>
-            </Grid>
-
+        <Grid item xs={12}>
+            <TextField
+                name={"sell_profit_percentage"}
+                label="Salario por producto"
+                size={"small"}
+                fullWidth
+                {...formik.getFieldProps("valueSellProfit")}
+                error={formik.errors.valueSellProfit && formik.touched.valueSellProfit}
+                helperText={(formik.errors.valueSellProfit && formik.touched.valueSellProfit) && formik.errors.valueSellProfit}
+                InputProps={{
+                    endAdornment: <InputAdornment position='end'>%</InputAdornment>
+                }}
+            />
         </Grid>
 
     )
 
     const editQuantity = (formik: any) => (
-        <Grid item container columnSpacing={1}>
-            <Grid item>
-                <TextField
-                    name={"sell_profit_quantity"}
-                    label="Ganancia del vendedor"
-                    size={"small"}
-                    {...formik.getFieldProps("valueSellProfit")}
-                    error={formik.errors.valueSellProfit && formik.touched.valueSellProfit}
-                    helperText={(formik.errors.valueSellProfit && formik.touched.valueSellProfit) && formik.errors.valueSellProfit}
-                />
-            </Grid>
-
-            <Grid item alignSelf={"center"}>
-                <Typography variant="h6" >CUP</Typography>
-            </Grid>
+        <Grid item xs={12}>
+            <TextField
+                name={"sell_profit_quantity"}
+                label="Salario por producto"
+                size={"small"}
+                fullWidth
+                {...formik.getFieldProps("valueSellProfit")}
+                error={formik.errors.valueSellProfit && formik.touched.valueSellProfit}
+                helperText={(formik.errors.valueSellProfit && formik.touched.valueSellProfit) && formik.errors.valueSellProfit}
+                InputProps={{
+                    endAdornment: <InputAdornment position='end'>CUP</InputAdornment>
+                }}
+            />
         </Grid>
     )
 
@@ -433,7 +426,23 @@ const StoresForm = ({ userId, storeId, sellerUsers }: { userId?: number, storeId
                         </Grid>
 
                         {formik.values.sellerUser &&
-                            <Grid item xs={12}>
+                            <Grid container item xs={12} rowSpacing={2}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        name={"Address"}
+                                        label="Salario fijo diario"
+                                        placeholder={"Cantidad"}
+                                        size={"small"}
+                                        fullWidth
+                                        {...formik.getFieldProps("fixedSellerDailyProfitQuantity")}
+                                        error={formik.errors.fixedSellerDailyProfitQuantity && formik.touched.fixedSellerDailyProfitQuantity}
+                                        helperText={(formik.errors.fixedSellerDailyProfitQuantity && formik.touched.fixedSellerDailyProfitQuantity) && formik.errors.fixedSellerDailyProfitQuantity}
+                                        InputProps={{
+                                            endAdornment: <InputAdornment position='end'>CUP</InputAdornment>
+                                        }}
+                                    />
+                                </Grid>
+
                                 {
                                     sellProfit
                                         ? editPercentage(formik)

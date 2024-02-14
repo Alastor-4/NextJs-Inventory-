@@ -263,21 +263,23 @@ const StoresMainTable = ({ userId }: StoresMainTableProps) => {
                                                     {
                                                         (row.seller_user)
                                                             ? `${row.seller_user.name} (${row.seller_user.username})`
-                                                            : "No hay vendedor asignado"
+                                                            : "Sin asignar"
                                                     }
                                                 </Grid>
                                             </Grid>
 
-
                                             <Grid container item spacing={1} xs={12}>
-                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Ganacia del vendedor por
-                                                    defecto:</Grid>
+                                                <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Salario del vendedor:</Grid>
                                                 <Grid item xs={true}>
-                                                    {
-                                                        (row.fixed_seller_profit_percentage !== null)
-                                                            ? `${row.fixed_seller_profit_percentage} %`
-                                                            : `${row.fixed_seller_profit_quantity} CUP`
-                                                    }
+                                                    <Grid item xs={12}>
+                                                        Diario: {row.fixed_seller_daily_profit_quantity ? `${row.fixed_seller_daily_profit_quantity} CUP` : "-"}
+                                                    </Grid>
+                                                    <Grid item xs={12}>
+                                                        Por producto:
+                                                        {row.fixed_seller_profit_percentage && `${row.fixed_seller_profit_percentage} %`}
+                                                        {row.fixed_seller_profit_quantity && `${row.fixed_seller_profit_quantity} CUP`}
+                                                        {!row.fixed_seller_profit_percentage && !row.fixed_seller_profit_quantity && "-"}
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
 

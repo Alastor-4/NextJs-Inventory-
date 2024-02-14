@@ -14,7 +14,6 @@ export async function GET(req: Request) {
 
         return NextResponse.json(stores)
     } catch (error) {
-        console.log('[STORE_GET_ALL]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -22,22 +21,38 @@ export async function GET(req: Request) {
 // CREATE new user store
 export async function POST(req: Request) {
     try {
-        const { ownerId, name, description, slogan, address,
-            sellerUserId, fixed_seller_profit_percentage, fixed_seller_profit_quantity,
-            online_catalog, online_reservation } = await req.json()
+        const {
+            ownerId,
+            name,
+            description,
+            slogan,
+            address,
+            sellerUserId,
+            fixed_seller_profit_percentage,
+            fixed_seller_profit_quantity,
+            online_catalog,
+            online_reservation,
+            fixed_seller_daily_profit_quantity
+        } = await req.json()
 
         const newStore = await prisma.stores.create({
             data: {
-                owner_id: ownerId, name, description,
-                slogan, address, seller_user_id: sellerUserId,
-                fixed_seller_profit_percentage, fixed_seller_profit_quantity,
-                online_catalog, online_reservation
+                owner_id: ownerId,
+                name,
+                description,
+                slogan,
+                address,
+                seller_user_id: sellerUserId,
+                fixed_seller_profit_percentage,
+                fixed_seller_profit_quantity,
+                fixed_seller_daily_profit_quantity,
+                online_catalog,
+                online_reservation,
             }
         })
 
         return NextResponse.json(newStore)
     } catch (error) {
-        console.log('[STORE_CREATE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -45,21 +60,37 @@ export async function POST(req: Request) {
 // UPDATE user store
 export async function PUT(req: Request) {
     try {
-        const { storeId, name, description, slogan, address, sellerUserId,
-            fixed_seller_profit_percentage, fixed_seller_profit_quantity,
-            online_catalog, online_reservation } = await req.json()
+        const {
+            storeId,
+            name,
+            description,
+            slogan,
+            address,
+            sellerUserId,
+            fixed_seller_profit_percentage,
+            fixed_seller_profit_quantity,
+            fixed_seller_daily_profit_quantity,
+            online_catalog,
+            online_reservation
+        } = await req.json()
 
         const updatedStore = await prisma.stores.update({
             data: {
-                name, description, slogan, address, seller_user_id: sellerUserId,
-                fixed_seller_profit_percentage, fixed_seller_profit_quantity,
-                online_catalog, online_reservation
+                name,
+                description,
+                slogan,
+                address,
+                seller_user_id: sellerUserId,
+                fixed_seller_profit_percentage,
+                fixed_seller_profit_quantity,
+                fixed_seller_daily_profit_quantity,
+                online_catalog,
+                online_reservation
             }, where: { id: storeId }
         })
 
         return NextResponse.json(updatedStore)
     } catch (error) {
-        console.log('[STORE_UPDATE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
@@ -74,7 +105,6 @@ export async function DELETE(req: Request) {
 
         return NextResponse.json(deletedStore)
     } catch (error) {
-        console.log('[STORE_DELETE]', error);
         return new NextResponse("Internal Error", { status: 500 });
     }
 }

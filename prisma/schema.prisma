@@ -158,28 +158,29 @@ model store_depot_properties {
 }
 
 model stores {
-  id                             Int                       @id @default(autoincrement())
-  owner_id                       Int?
-  name                           String?                   @unique(map: "name") @db.VarChar(255)
-  description                    String?                   @db.VarChar(255)
-  slogan                         String?                   @db.VarChar(255)
-  address                        String?                   @db.VarChar(255)
-  seller_user_id                 Int?
-  created_at                     DateTime                  @default(now()) @db.Timestamp(0)
-  auto_open_time                 Boolean?                  @default(true)
-  auto_reservation_time          Boolean?                  @default(true)
-  fixed_seller_profit_percentage Float?                    @db.Real
-  online_catalog                 Boolean?                  @default(false)
-  online_reservation             Boolean?                  @default(false)
-  fixed_seller_profit_quantity   Float?                    @db.Real
-  fixed_seller_profit_unit       String?                   @db.VarChar(255)
-  product_store_transfers        product_store_transfers[]
-  store_collections              store_collections[]
-  store_depots                   store_depots[]
-  store_open_days                store_open_days[]
-  store_reservation_days         store_reservation_days[]
-  seller_user                    users?                    @relation("seller_user", fields: [seller_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_seller_FK")
-  owner_user                     users?                    @relation("owner_user", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_owner_FK")
+  id                                 Int                       @id @default(autoincrement())
+  owner_id                           Int?
+  name                               String?                   @unique(map: "name") @db.VarChar(255)
+  description                        String?                   @db.VarChar(255)
+  slogan                             String?                   @db.VarChar(255)
+  address                            String?                   @db.VarChar(255)
+  seller_user_id                     Int?
+  created_at                         DateTime                  @default(now()) @db.Timestamp(0)
+  auto_open_time                     Boolean?                  @default(true)
+  auto_reservation_time              Boolean?                  @default(true)
+  fixed_seller_profit_percentage     Float?                    @db.Real
+  online_catalog                     Boolean?                  @default(false)
+  online_reservation                 Boolean?                  @default(false)
+  fixed_seller_daily_profit_quantity Float?                    @db.Real
+  fixed_seller_profit_quantity       Float?                    @db.Real
+  fixed_seller_profit_unit           String?                   @db.VarChar(255)
+  product_store_transfers            product_store_transfers[]
+  store_collections                  store_collections[]
+  store_depots                       store_depots[]
+  store_open_days                    store_open_days[]
+  store_reservation_days             store_reservation_days[]
+  seller_user                        users?                    @relation("seller_user", fields: [seller_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_seller_FK")
+  owner_user                         users?                    @relation("owner_user", fields: [owner_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "store_owner_FK")
 
   @@index([owner_id], map: "store_owner_id")
   @@index([seller_user_id], map: "stores_FK")
