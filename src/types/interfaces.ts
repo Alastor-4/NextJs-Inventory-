@@ -42,6 +42,7 @@ export interface storeWithStoreDepots {
     auto_reservation_time: boolean | null;
     fixed_seller_profit_percentage: number | null;
     fixed_seller_profit_quantity: number | null;
+    fixed_seller_daily_profit_quantity: number | null;
     fixed_seller_profit_unit: string | null;
     store_open_days?: {
         id: number;
