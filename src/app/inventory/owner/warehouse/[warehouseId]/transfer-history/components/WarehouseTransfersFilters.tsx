@@ -18,6 +18,10 @@ import React, { useEffect, useState } from 'react';
 import * as Yup from "yup";
 import {stores} from "@prisma/client";
 import {Formik} from "formik";
+import {DatePicker, esES, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {DemoContainer} from "@mui/x-date-pickers/internals/demo";
+import dayjs from "dayjs";
 
 interface FiltersProps {
     open: boolean
@@ -30,8 +34,8 @@ const WarehouseTransfersFilters = ({ open, handleClose, storeOptions, loadData  
 
     const initialValues = {
         storeId: "",
-        startDate: "",
-        endDate: '',
+        startDate: dayjs().subtract(30, "day").set("hour", 0).set("minute", 0).set("second", 0),
+        endDate: dayjs().set("hour", 23).set("minute", 59).set("second", 59),
     }
 
     const validationSchema = Yup.object({
@@ -45,7 +49,7 @@ const WarehouseTransfersFilters = ({ open, handleClose, storeOptions, loadData  
             initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={(values) => {
-                loadData(values.storeId, values.startDate, values.endDate)
+                loadData(values.storeId, values.startDate.format(), values.endDate.format())
                 handleClose()
             }}
         >
@@ -87,6 +91,40 @@ const WarehouseTransfersFilters = ({ open, handleClose, storeOptions, loadData  
                                             storeOptions.map(item => (<MenuItem key={item.id} value={item.id}>{item.name}</MenuItem>))
                                         }
                                     </TextField>
+                                </Grid>
+
+                                <Grid item xs={12} >
+                                    <LocalizationProvider
+                                        dateAdapter={AdapterDayjs}
+                                        localeText={esES.components.MuiLocalizationProvider.defaultProps.localeText}
+                                        adapterLocale='es'>
+                                        <DemoContainer components={['DatePicker']}>
+                                            <DatePicker
+                                                slotProps={{ field: { clearable: true }, toolbar: { hidden: true }, textField: { size: 'small', fullWidth: true } }}
+                                                label="Desde"
+                                                disableFuture
+                                                value={formik.values.startDate}
+                                                onChange={(value) => formik.setFieldValue("startDate", value)}
+                                            />
+                                        </DemoContainer>
+                                    </LocalizationProvider>
+                                </Grid>
+
+                                <Grid item xs={12} >
+                                    <LocalizationProvider
+                                        dateAdapter={AdapterDayjs}
+                                        localeText={esES.components.MuiLocalizationProvider.defaultProps.localeText}
+                                        adapterLocale='es'>
+                                        <DemoContainer components={['DatePicker']}>
+                                            <DatePicker
+                                                slotProps={{ field: { clearable: true }, toolbar: { hidden: true }, textField: { size: 'small', fullWidth: true } }}
+                                                label="Hasta"
+                                                disableFuture
+                                                value={formik.values.endDate}
+                                                onChange={(value) => formik.setFieldValue("endDate", value)}
+                                            />
+                                        </DemoContainer>
+                                    </LocalizationProvider>
                                 </Grid>
                             </Grid>
                         </DialogContent>
