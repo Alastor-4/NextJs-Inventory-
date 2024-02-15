@@ -1,12 +1,12 @@
 "use client"
 
 import {
-    AppBar, Avatar, AvatarGroup, Box, Card, CardContent, Grid, IconButton, Table,
+    AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent, Grid, IconButton, Table,
     TableBody, TableCell, TableContainer, TableHead, TableRow,
     Toolbar, Typography
 } from '@mui/material';
 import {
-    ArrowLeft,
+    ArrowLeft, FilterAlt,
     ForwardToInbox,
     Mail
 } from '@mui/icons-material';
@@ -18,32 +18,54 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import warehouseTransfers
     from "@/app/inventory/owner/warehouse/[warehouseId]/transfer-history/requests/warehouseTransfers";
-import {images} from "@prisma/client";
+import {images, stores} from "@prisma/client";
 import ImagesDisplayDialog from "@/components/ImagesDisplayDialog";
 import {transactionToStore} from "@/utils/generalFunctions";
+import {grey} from "@mui/material/colors";
+import WarehouseTransfersFilters
+    from "@/app/inventory/owner/warehouse/[warehouseId]/transfer-history/components/WarehouseTransfersFilters";
 
 dayjs.locale("es");
 
-const WarehouseTransferHistory = ({warehouseId}: {warehouseId: number}) => {
+const WarehouseTransferHistory = ({warehouseId, ownerStores}: {warehouseId: number, ownerStores: stores[]}) => {
     const router = useRouter();
 
     const [allTransfers, setAllTransfers] = useState<warehouseTransferProps[] | null>(null);
 
-    function getLast30Days() {
-        const endDay = dayjs()
-        const startDay = endDay.subtract(30, "day")
-        return [startDay, endDay]
-    }
+    const [storeIdFilter, setStoreIdFilter] = React.useState(null)
+    const [dateStartFilter, setDayStartFilter] = React.useState(null)
+    const [dateEndFilter, setDayEndFilter] = React.useState(null)
 
     useEffect(() => {
         const loadData = async () => {
-            const warehouseTransfer = await warehouseTransfers.allWarehouseTransfers(warehouseId);
+            //las 30 days transfers for all stores
+            const endDay = dayjs()
+            const startDay = endDay.subtract(30, "day")
+
+            const warehouseTransfer = await warehouseTransfers.allWarehouseTransfers(
+                warehouseId,
+                undefined,
+                startDay.format(),
+                endDay.format()
+            );
 
             if (warehouseTransfer)
                 setAllTransfers(warehouseTransfer);
         }
         loadData();
     }, [warehouseId]);
+
+    async function loadData(storeId: string, startDate: string, endDate: string) {
+        const warehouseTransfer = await warehouseTransfers.allWarehouseTransfers(
+            warehouseId,
+            storeId,
+            startDate,
+            endDate
+        );
+
+        if (warehouseTransfer)
+            setAllTransfers(warehouseTransfer);
+    }
 
 
     const handleNavigateBack = () => router.back();
@@ -165,6 +187,10 @@ const WarehouseTransferHistory = ({warehouseId}: {warehouseId: number}) => {
         )
     }
 
+    const [transfersFilterOpen, setTransfersFilterOpen] = useState<boolean>(false);
+    const handleOpenTransfersFilter = () => setTransfersFilterOpen(true)
+    const handleCloseTransfersFilter = () => setTransfersFilterOpen(false)
+
     return (
         <>
             <ImagesDisplayDialog
@@ -173,9 +199,36 @@ const WarehouseTransferHistory = ({warehouseId}: {warehouseId: number}) => {
                 images={dialogImages}
             />
 
+            <WarehouseTransfersFilters
+                open={transfersFilterOpen}
+                handleClose={handleCloseTransfersFilter}
+                storeOptions={ownerStores}
+                loadData={loadData}
+            />
+
             <Card variant={"outlined"}>
                 <CustomToolbar />
                 <CardContent>
+                    <Card variant={"outlined"} sx={{ padding: "10px", marginBottom: "10px" }}>
+                        <Grid container alignItems="center">
+                            <Button
+                                size="small"
+                                sx={{
+                                    color: grey[600],
+                                    borderColor: grey[600],
+                                    '&:hover': {
+                                        borderColor: grey[800],
+                                        backgroundColor: grey[200],
+                                    },
+                                }}
+                                onClick={handleOpenTransfersFilter}
+                                startIcon={<FilterAlt/>}
+                                variant="outlined">
+                                Aplicar filtros
+                            </Button>
+                        </Grid>
+                    </Card>
+
                     <Card variant={"outlined"} sx={{ paddingTop: "20px", mx: "-5px" }}>
                         {
                             allTransfers?.length! > 0 ?
