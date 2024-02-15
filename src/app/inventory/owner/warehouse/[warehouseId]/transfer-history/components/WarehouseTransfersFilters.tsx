@@ -26,14 +26,17 @@ interface FiltersProps {
     handleClose: () => void
     storeOptions: stores[]
     loadData: (storeId: string, startDate: string, endDate: string) => void
+    storeIdInitialValue: string,
+    dateStartInitialValue: string,
+    dateEndInitialValue: string,
 }
 
-const WarehouseTransfersFilters = ({ open, handleClose, storeOptions, loadData  }: FiltersProps) => {
+const WarehouseTransfersFilters = ({ open, handleClose, storeOptions, loadData, storeIdInitialValue, dateStartInitialValue, dateEndInitialValue }: FiltersProps) => {
 
     const initialValues = {
-        storeId: "",
-        startDate: dayjs().subtract(30, "day").set("hour", 0).set("minute", 0).set("second", 0),
-        endDate: dayjs().set("hour", 23).set("minute", 59).set("second", 59),
+        storeId: storeIdInitialValue,
+        startDate: dayjs(dateStartInitialValue),
+        endDate: dayjs(dateEndInitialValue),
     }
 
     const validationSchema = Yup.object({

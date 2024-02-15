@@ -1,12 +1,27 @@
 "use client"
 
 import {
-    AppBar, Avatar, AvatarGroup, Box, Button, Card, CardContent, Grid, IconButton, Table,
-    TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Toolbar, Typography
+    AppBar,
+    Avatar,
+    AvatarGroup,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Grid,
+    IconButton,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Toolbar,
+    Typography
 } from '@mui/material';
 import {
-    ArrowLeft, FilterAlt,
+    ArrowLeft,
+    FilterAlt,
     ForwardToInbox,
     Mail
 } from '@mui/icons-material';
@@ -32,15 +47,15 @@ const WarehouseTransferHistory = ({warehouseId, ownerStores}: {warehouseId: numb
 
     const [allTransfers, setAllTransfers] = useState<warehouseTransferProps[] | null>(null);
 
-    const [storeIdFilter, setStoreIdFilter] = React.useState(null)
-    const [dateStartFilter, setDayStartFilter] = React.useState(null)
-    const [dateEndFilter, setDayEndFilter] = React.useState(null)
+    const [storeIdFilter, setStoreIdFilter] = React.useState("")
+    const [dateStartFilter, setDayStartFilter] = React.useState(dayjs().subtract(30, "day").set("hour", 0).set("minute", 0).set("second", 0).format())
+    const [dateEndFilter, setDayEndFilter] = React.useState(dayjs().set("hour", 23).set("minute", 59).set("second", 59).format())
 
     useEffect(() => {
         const loadData = async () => {
             //las 30 days transfers for all stores
-            const endDay = dayjs()
-            const startDay = endDay.subtract(30, "day")
+            const endDay = dayjs().set("hour", 23).set("minute", 59).set("second", 59)
+            const startDay = dayjs().subtract(30, "day").set("hour", 0).set("minute", 0).set("second", 0)
 
             const warehouseTransfer = await warehouseTransfers.allWarehouseTransfers(
                 warehouseId,
@@ -56,6 +71,10 @@ const WarehouseTransferHistory = ({warehouseId, ownerStores}: {warehouseId: numb
     }, [warehouseId]);
 
     async function loadData(storeId: string, startDate: string, endDate: string) {
+        setStoreIdFilter(storeId)
+        setDayStartFilter(startDate)
+        setDayEndFilter(endDate)
+
         const warehouseTransfer = await warehouseTransfers.allWarehouseTransfers(
             warehouseId,
             storeId,
@@ -66,7 +85,6 @@ const WarehouseTransferHistory = ({warehouseId, ownerStores}: {warehouseId: numb
         if (warehouseTransfer)
             setAllTransfers(warehouseTransfer);
     }
-
 
     const handleNavigateBack = () => router.back();
 
@@ -199,12 +217,19 @@ const WarehouseTransferHistory = ({warehouseId, ownerStores}: {warehouseId: numb
                 images={dialogImages}
             />
 
-            <WarehouseTransfersFilters
-                open={transfersFilterOpen}
-                handleClose={handleCloseTransfersFilter}
-                storeOptions={ownerStores}
-                loadData={loadData}
-            />
+            {
+                transfersFilterOpen && (
+                    <WarehouseTransfersFilters
+                        open={transfersFilterOpen}
+                        handleClose={handleCloseTransfersFilter}
+                        storeOptions={ownerStores}
+                        loadData={loadData}
+                        storeIdInitialValue={storeIdFilter}
+                        dateStartInitialValue={dateStartFilter}
+                        dateEndInitialValue={dateEndFilter}
+                    />
+                )
+            }
 
             <Card variant={"outlined"}>
                 <CustomToolbar />
