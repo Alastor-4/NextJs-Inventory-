@@ -1,20 +1,18 @@
 'use client'
 import {
     Button,
-    Chip,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     Grid,
-    IconButton, MenuItem,
-    Stack,
+    IconButton,
+    MenuItem,
     TextField
 } from '@mui/material';
 import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
-import { allProductsByDepartmentProps } from '@/types/interfaces';
-import { FilterAlt, FilterAltOff } from '@mui/icons-material';
-import React, { useEffect, useState } from 'react';
+import { FilterAlt } from '@mui/icons-material';
+import React from 'react';
 import * as Yup from "yup";
 import {stores} from "@prisma/client";
 import {Formik} from "formik";
