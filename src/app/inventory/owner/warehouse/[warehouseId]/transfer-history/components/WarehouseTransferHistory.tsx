@@ -48,14 +48,14 @@ const WarehouseTransferHistory = ({warehouseId, ownerStores}: {warehouseId: numb
     const [allTransfers, setAllTransfers] = useState<warehouseTransferProps[] | null>(null);
 
     const [storeIdFilter, setStoreIdFilter] = React.useState("")
-    const [dateStartFilter, setDayStartFilter] = React.useState(dayjs().subtract(30, "day").set("hour", 0).set("minute", 0).set("second", 0).format())
+    const [dateStartFilter, setDayStartFilter] = React.useState(dayjs().subtract(15, "day").set("hour", 0).set("minute", 0).set("second", 0).format())
     const [dateEndFilter, setDayEndFilter] = React.useState(dayjs().set("hour", 23).set("minute", 59).set("second", 59).format())
 
     useEffect(() => {
         const loadData = async () => {
             //las 30 days transfers for all stores
             const endDay = dayjs().set("hour", 23).set("minute", 59).set("second", 59)
-            const startDay = dayjs().subtract(30, "day").set("hour", 0).set("minute", 0).set("second", 0)
+            const startDay = dayjs().subtract(15, "day").set("hour", 0).set("minute", 0).set("second", 0)
 
             const warehouseTransfer = await warehouseTransfers.allWarehouseTransfers(
                 warehouseId,
