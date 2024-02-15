@@ -292,20 +292,6 @@ model reservation_status {
   reservations reservations[]
 }
 
-model payment_methods {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(100)
-  description String?  @db.VarChar(255)
-  created_at  DateTime @default(now()) @db.Timestamp(0)
-}
-
-model payment_units {
-  id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(100)
-  description String?  @db.VarChar(255)
-  created_at  DateTime @default(now()) @db.Timestamp(0)
-}
-
 model product_offers {
   id                     Int          @id @default(autoincrement())
   compare_units_quantity Int
@@ -372,16 +358,34 @@ model sell_products {
   @@index([store_depot_id], map: "reservation_products_FK_1")
 }
 
+model sell_payment_methods {
+  id                  Int                  @id @default(autoincrement())
+  quantity            Float
+  created_at          DateTime             @default(now()) @db.Timestamp(0)
+  payment_method      payment_methods_enum @default(EfectivoCUP)
+  sells               sells?               @relation(fields: [sells_id], references: [id])
+  sells_id            Int?
+  sells_receivable    sells_receivable?    @relation(fields: [sells_receivable_id], references: [id])
+  sells_receivable_id Int?
+}
+
+enum payment_methods_enum {
+  TransferenciaCUP
+  EfectivoCUP
+  Otro
+}
+
 model sells {
-  id                  Int             @id @default(autoincrement())
-  total_price         Float?
-  payment_method      String?         @db.VarChar(255)
-  created_at          DateTime        @default(now()) @db.Timestamp(0)
-  from_reservation_id Int?
-  requesting_user_id  Int?
-  sell_products       sell_products[]
-  reservations        reservations?   @relation(fields: [from_reservation_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_reservations_FK")
-  users               users?          @relation(fields: [requesting_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_users_FK")
+  id                   Int                    @id @default(autoincrement())
+  total_price          Float?
+  payment_method       String?                @db.VarChar(255)
+  created_at           DateTime               @default(now()) @db.Timestamp(0)
+  from_reservation_id  Int?
+  requesting_user_id   Int?
+  sell_payment_methods sell_payment_methods[]
+  sell_products        sell_products[]
+  reservations         reservations?          @relation(fields: [from_reservation_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_reservations_FK")
+  users                users?                 @relation(fields: [requesting_user_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "sells_users_FK")
 
   @@index([from_reservation_id], map: "products_sell_FK")
   @@index([requesting_user_id], map: "sells_FK")
@@ -402,6 +406,7 @@ model sells_receivable {
   pay_before_date          DateTime?                  @db.Timestamp(0)
   payed_at                 DateTime?                  @db.Timestamp(0)
   status                   sell_receivable_status     @default(PENDIENTE)
+  payment_methods          sell_payment_methods[]
   created_at               DateTime                   @default(now()) @db.Timestamp(0)
   sell_receivable_products sell_receivable_products[]
 }

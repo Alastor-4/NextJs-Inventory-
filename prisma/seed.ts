@@ -161,57 +161,57 @@ async function main() {
         ],
     })
 
-    //payment units
-    await prisma.payment_units.createMany({
-        data: [
-            {
-                name: 'CUP',
-                description: 'CUP.',
-            },
-            {
-                name: 'MLC',
-                description: 'MLC.',
-            },
-            {
-                name: 'USD',
-                description: 'USD.',
-            },
-            {
-                name: 'Otro',
-                description: 'Otra moneda.',
-            },
-        ],
-    })
+    // //payment units
+    // await prisma.payment_units.createMany({
+    //     data: [
+    //         {
+    //             name: 'CUP',
+    //             description: 'CUP.',
+    //         },
+    //         {
+    //             name: 'MLC',
+    //             description: 'MLC.',
+    //         },
+    //         {
+    //             name: 'USD',
+    //             description: 'USD.',
+    //         },
+    //         {
+    //             name: 'Otro',
+    //             description: 'Otra moneda.',
+    //         },
+    //     ],
+    // })
 
-    //payment methods
-    await prisma.payment_methods.createMany({
-        data: [
-            {
-                name: 'Efectivo CUP',
-                description: 'Efectivo CUP.',
-            },
-            {
-                name: 'Transferencia CUP',
-                description: 'Transferencia CUP.',
-            },
-            {
-                name: 'Efectivo USD',
-                description: 'Efectivo USD.',
-            },
-            {
-                name: 'Transferencia MLC',
-                description: 'Transferencia MLC.',
-            },
-            {
-                name: 'Transferencia Zelle',
-                description: 'Transferencia mediante aplicación Zelle.',
-            },
-            {
-                name: 'Otro',
-                description: 'Otro método.',
-            },
-        ],
-    })
+    // //payment methods
+    // await prisma.payment_methods.createMany({
+    //     data: [
+    //         {
+    //             name: 'Efectivo CUP',
+    //             description: 'Efectivo CUP.',
+    //         },
+    //         {
+    //             name: 'Transferencia CUP',
+    //             description: 'Transferencia CUP.',
+    //         },
+    //         {
+    //             name: 'Efectivo USD',
+    //             description: 'Efectivo USD.',
+    //         },
+    //         {
+    //             name: 'Transferencia MLC',
+    //             description: 'Transferencia MLC.',
+    //         },
+    //         {
+    //             name: 'Transferencia Zelle',
+    //             description: 'Transferencia mediante aplicación Zelle.',
+    //         },
+    //         {
+    //             name: 'Otro',
+    //             description: 'Otro método.',
+    //         },
+    //     ],
+    // })
 }
 
 main()

@@ -1,7 +1,10 @@
-//@ts-nocheck
+
 "use client"
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormHelperText, Grid, IconButton, MenuItem, TextField } from '@mui/material';
+import {
+    Button, Dialog, DialogActions, DialogContent, DialogTitle,
+    Divider, FormHelperText, Grid, IconButton, MenuItem, Select, TextField
+} from '@mui/material';
 import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
 import { computeDepotPricePerUnit, notifySuccess, numberFormat } from '@/utils/generalFunctions';
 import { ProductSellFormProps, productsProps } from '@/types/interfaces';
@@ -9,9 +12,10 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import sellerStoreProduct from '../../requests/sellerStoreProduct';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import React, { useEffect, useMemo, useState } from 'react';
+import { payment_methods_enum } from '@prisma/client';
+import React, { useEffect, useState } from 'react';
 import { esES } from '@mui/x-date-pickers/locales'
-import { Formik } from 'formik';
+import { Field, FieldArray, Formik } from 'formik';
 import * as Yup from "yup";
 import 'dayjs/locale/es';
 
@@ -25,17 +29,22 @@ interface initialValuesProps {
         maxUnitsQuantity: number;
         unitsQuantity: number;
     }[];
-    paymentMethod?: string;
+    sellPaymentMethod: {
+        paymentMethod: payment_methods_enum,
+        amount: number
+    }[],
     description?: string;
     payBefore?: Date;
 }
 
-const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, selectedProducts, allProductsByDepartment, setAllProductsByDepartment, setSelectedProducts, }: ProductSellFormProps) => {
+const ProductSellForm = (
+    { isModalOpen, storeId, setIsOpen, isReceivable,
+        selectedProducts, allProductsByDepartment,
+        setAllProductsByDepartment, setSelectedProducts }: ProductSellFormProps) => {
 
     const handleClose = () => {
         setIsOpen(false);
     };
-
 
     const createFormValues = (products: productsProps[]) => {
         const productsArray = products.map((product) =>
@@ -44,15 +53,15 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
 
         return {
             products: productsArray,
-            paymentMethod: "",
+            sellPaymentMethod: [{
+                paymentMethod: payment_methods_enum.EfectivoCUP,
+                amount: 0
+            }],
             description: "",
             payBefore: undefined,
         };
     }
     const [initialValues, setInitialValues] = useState<initialValuesProps>(createFormValues(selectedProducts));
-
-    const paymentMethods = useMemo(() => ["Efectivo CUP", "Transferencia CUP"], []);
-    // const paymentMethods = useMemo(() => ["Efectivo CUP", "Transferencia CUP", "Otro"], []);
 
     useEffect(() => {
         const handleOpenModal = () => {
@@ -70,22 +79,19 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                     products: [...productsData],
                     description: "",
                     payBefore: new Date(),
-                    paymentMethod: paymentMethods[0],
+                    sellPaymentMethod: [{ paymentMethod: 'EfectivoCUP', amount: 0 }],
                 })
             } else {
                 setInitialValues({
                     products: [...productsData],
-                    paymentMethod: paymentMethods[0],
+                    sellPaymentMethod: [{ paymentMethod: 'EfectivoCUP', amount: 0 }],
                 })
             }
         }
         handleOpenModal();
-    }, [paymentMethods, selectedProducts, isReceivable]);
+    }, [selectedProducts, isReceivable]);
 
-    const sellValidationSchema = Yup.object<{
-        products: Product[];
-        paymentMethod: string;
-    }>({
+    const sellValidationSchema = Yup.object({
         products: Yup.array().of(
             Yup.object<Product>({
                 maxUnitsQuantity: Yup.number().integer().typeError("Debe ser un número"),
@@ -95,15 +101,16 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                     .min(1, "Al menos 1")
                     .max(Yup.ref("maxUnitsQuantity"), "Cantidad superior a lo disponible"),
             })).required(),
-        paymentMethod: Yup.string().required("Especifique método")
+        sellPaymentMethod: Yup.object().shape({
+            paymentMethod: Yup.string().required('El método de pago es obligatorio').oneOf(
+                [payment_methods_enum.EfectivoCUP, payment_methods_enum.TransferenciaCUP, payment_methods_enum.Otro],
+                'Método de pago no válido'
+            ),
+            amount: Yup.number().required('La cantidad es obligatoria').positive('La cantidad debe ser positiva'),
+        })
     });
 
-    const sellReceivableValidationSchema = Yup.object<{
-        products: {}[];
-        paymentMethod: string;
-        description: string;
-        payBefore: Date;
-    }>({
+    const sellReceivableValidationSchema = Yup.object({
         products: Yup.array().of(Yup.object<Product>({
             maxUnitsQuantity: Yup.number().integer().typeError("Debe ser un número"),
             unitsQuantity: Yup
@@ -112,7 +119,13 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                 .min(1, "Al menos 1")
                 .max(Yup.ref("maxUnitsQuantity"), "Cantidad superior a lo disponible"),
         })).required(),
-        paymentMethod: Yup.string().required("Especifique método"),
+        sellPaymentMethod: Yup.object().shape({
+            paymentMethod: Yup.string().required('El método de pago es obligatorio').oneOf(
+                [payment_methods_enum.EfectivoCUP, payment_methods_enum.TransferenciaCUP, payment_methods_enum.Otro],
+                'Método de pago no válido'
+            ),
+            amount: Yup.number().required('La cantidad es obligatoria').positive('La cantidad debe ser positiva'),
+        }),
         description: Yup.string().required("Especifique datos de la venta a pagar"),
         payBefore: Yup.date().required("Este dato es requerido")
     });
@@ -130,35 +143,36 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
         });
 
         const totalPrice = sellProduct.reduce((accumulate, current) => accumulate + current.price, 0);
-        const sell = { paymentMethod: values.paymentMethod!, totalPrice: totalPrice };
-        const data = { sellerStoreId: storeId, sellData: sell, sellProductsData: sellProduct };
+        // const paymenthMethods = values.sellPaymentMethod.map((paymentMethod, amount) => {});
+        // const sell = { paymentMethod: values.paymentMethod!, totalPrice: totalPrice };
+        // const data = { sellerStoreId: storeId, sellData: sell, sellProductsData: sellProduct };
 
-        let sellItemResponse;
-        if (isReceivable) {
-            const sellReceivableData = { description: values.description!, payBefore: values.payBefore! }
-            const newData = { ...data!, sellReceivableData }
-            sellItemResponse = await sellerStoreProduct.createSellReceivable(newData);
-        } else {
-            sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(data);
-        }
+        // let sellItemResponse;
+        // if (isReceivable) {
+        //     const sellReceivableData = { description: values.description!, payBefore: values.payBefore! }
+        //     const newData = { ...data!, sellReceivableData }
+        //     sellItemResponse = await sellerStoreProduct.createSellReceivable(newData);
+        // } else {
+        //     sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(data);
+        // }
 
-        if (sellItemResponse) {
-            const newDepartments = [...allProductsByDepartment!];
+        // if (sellItemResponse) {
+        //     const newDepartments = [...allProductsByDepartment!];
 
-            sellProduct.forEach(sellProductItem => {
-                for (const productsByDepartments of allProductsByDepartment!) {
-                    const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
+        //     sellProduct.forEach(sellProductItem => {
+        //         for (const productsByDepartments of allProductsByDepartment!) {
+        //             const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
 
-                    const productIndex = productsByDepartments.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === sellProductItem.storeDepotId);
-                    if (productIndex > -1) {
-                        newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units
-                            = allProductsByDepartment![departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units! - sellProductItem.unitsQuantity;
-                    }
-                }
-            })
-            setAllProductsByDepartment(newDepartments);
-            notifySuccess(isReceivable ? "Venta por cobrar registrada" : "La venta ha sido registrada");
-        }
+        //             const productIndex = productsByDepartments.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === sellProductItem.storeDepotId);
+        //             if (productIndex > -1) {
+        //                 newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units
+        //                     = allProductsByDepartment![departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units! - sellProductItem.unitsQuantity;
+        //             }
+        //         }
+        //     })
+        //     setAllProductsByDepartment(newDepartments);
+        //     notifySuccess(isReceivable ? "Venta por cobrar registrada" : "La venta ha sido registrada");
+        // }
         setSelectedProducts([]);
         handleClose()
     }
@@ -265,7 +279,29 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                                 </Grid>
                                 <Grid item container>
                                     <Grid item xs={12} marginTop={"15px"}>
-                                        <TextField
+                                        <FieldArray name="sellPaymentMethod">
+                                            {({ push, remove }) => (
+                                                <div>
+                                                    {values.sellPaymentMethod.map((purchase, index) => (
+                                                        <div key={index}>
+                                                            <Field name={`sellPaymentMethod[${index}].paymentMethod`} as={Select} label="Método de Pago" variant="outlined">
+                                                                <MenuItem value="TransferenciaCUP">Transferencia CUP</MenuItem>
+                                                                <MenuItem value="EfectivoCUP">Efectivo CUP</MenuItem>
+                                                                <MenuItem value="Otro">Otro</MenuItem>
+                                                            </Field>
+                                                            <Field name={`sellPaymentMethod[${index}].amount`} as={TextField} label="Cantidad" variant="outlined" type="number" />
+
+                                                            {index > 0 && (
+                                                                <Button type="button" onClick={() => remove(index)}>-</Button>
+                                                            )}
+                                                        </div>
+                                                    ))}
+
+                                                    <Button type="button" onClick={() => push({ paymentMethod: '', amount: 0 })}>+</Button>
+                                                </div>
+                                            )}
+                                        </FieldArray>
+                                        {/* <TextField
                                             label="Método de pago"
                                             size={"small"}
                                             fullWidth
@@ -275,7 +311,7 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                                             helperText={(!!errors.paymentMethod && touched.paymentMethod) && errors.paymentMethod}
                                         >
                                             {paymentMethods.map(item => (<MenuItem value={item} key={item}>{item}</MenuItem>))}
-                                        </TextField>
+                                        </TextField> */}
                                     </Grid>
                                 </Grid>
 
@@ -334,18 +370,18 @@ const ProductSellForm = ({ isModalOpen, storeId, setIsOpen, isReceivable, select
                             <DialogActions sx={{ display: "flex", justifyContent: "flex-end" }}>
                                 <Button color="error" variant="outlined" onClick={() => { handleClose(); resetForm(); }}>Cerrar</Button>
                                 <Button color="primary"
-                                    disabled={
-                                        isReceivable ?
-                                            touched.paymentMethod === undefined ?
-                                                !touched.paymentMethod :
-                                                !!errors.products ||
-                                                !!errors.paymentMethod ||
-                                                !!errors.payBefore ||
-                                                !!errors.description
-                                            : touched.paymentMethod === undefined ?
-                                                !touched.paymentMethod :
-                                                !!errors.products
-                                    }
+                                    // disabled={
+                                    //     isReceivable ?
+                                    //         touched.paymentMethod === undefined ?
+                                    //             !touched.paymentMethod :
+                                    //             !!errors.products ||
+                                    //             !!errors.paymentMethod ||
+                                    //             !!errors.payBefore ||
+                                    //             !!errors.description
+                                    //         : touched.paymentMethod === undefined ?
+                                    //             !touched.paymentMethod :
+                                    //             !!errors.products
+                                    // }
                                     variant="outlined" onClick={() => { handleSell(values); resetForm(); }}
                                 >Vender</Button>
                             </DialogActions>
