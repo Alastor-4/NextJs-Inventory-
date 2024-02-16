@@ -8,6 +8,7 @@ import {
 import { DatePicker, DateValidationError, LocalizationProvider, PickerChangeHandlerContext } from '@mui/x-date-pickers';
 import { ArrowLeft, ExpandLessOutlined, ExpandMoreOutlined, HelpOutline } from '@mui/icons-material';
 import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/sellerStore";
+import formatPaymentMethods from '@/utils/getFormattedPaymentMethod';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import calcSellProductsUnits from '@/utils/calcSellProductsUnits';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -117,7 +118,7 @@ const SellsHistory = () => {
             <TableHead>
                 <TableRow>
                     <TableCell id='details' />
-                    <TableCell align='center' id='total_price_payment_method'>Importe total</TableCell>
+                    <TableCell align='center' sx={{ whiteSpace: "nowrap" }} id='total_price_payment_method'>Importe total</TableCell>
                     <TableCell align='center' id='sell_products_quantity'>Productos</TableCell>
                     <TableCell align='center' id='units'>Unidades</TableCell>
                     <TableCell align='center' id='sell_units_returned_quantity'>Devoluciones</TableCell>
@@ -173,7 +174,10 @@ const SellsHistory = () => {
                                         </IconButton>
                                     </Tooltip>
                                 </TableCell>
-                                <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
+                                {sell.sell_payment_methods.length > 0 ?
+                                    <TableCell align='center' >{formatPaymentMethods(sell.sell_payment_methods!)}</TableCell>
+                                    : <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
+                                }
                                 <TableCell align='center'>{sell.sell_products.length! !== 1 ? sell.sell_products.length! : sell.sell_products[0].store_depots.depots?.products?.name}</TableCell>
                                 <TableCell align='center'>{`${calcSellProductsUnits(sell)}`}</TableCell>
                                 <TableCell align='center'>{`${calcReturnedQuantity(sell)}`}</TableCell>

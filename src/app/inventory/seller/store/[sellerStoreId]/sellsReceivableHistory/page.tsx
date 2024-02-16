@@ -11,6 +11,7 @@ import stores from "@/app/inventory/seller/store/[sellerStoreId]/requests/seller
 import calcSellReceivableProductsUnits from '@/utils/calcSellReceivableProductsUnits';
 import SellsReceivableMoreDetails from '../components/SellsReceivableMoreDetails';
 import { storeSellsReceivableDetailsProps } from '@/types/interfaces';
+import formatPaymentMethods from '@/utils/getFormattedPaymentMethod';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { getColorByStatus } from '@/utils/getColorByStatus';
@@ -206,7 +207,10 @@ const SellsReceivableHistory = () => {
                                     }
                                 </TableCell>
                                 <TableCell align='center'>{dayjs(sell.pay_before_date).format('MMM D, YYYY')}</TableCell>
-                                <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
+                                {sell.sell_payment_methods.length > 0 ?
+                                    <TableCell align='center' >{formatPaymentMethods(sell.sell_payment_methods!)}</TableCell>
+                                    : <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
+                                }
                                 <TableCell align='center'>{sell.sell_receivable_products.length! !== 1 ? sell.sell_receivable_products.length! : sell.sell_receivable_products[0].store_depots.depots?.products?.name}</TableCell>
                                 <TableCell align='center'>{`${calcSellReceivableProductsUnits(sell)}`}</TableCell>
                                 <TableCell align='center'>{dayjs(sell.created_at).format('MMM D, YYYY')} <br /> {dayjs(sell.created_at).format('h:mm A')}</TableCell>
