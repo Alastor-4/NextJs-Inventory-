@@ -20,6 +20,7 @@ export async function GET(req: Request) {
                     ]
                 },
                 include: {
+                    sell_payment_methods: true,
                     sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
                     reservations: {
                         where: { reservation_products: { some: { store_depots: { store_id: storeId } } } },
@@ -43,6 +44,7 @@ export async function GET(req: Request) {
                     ]
                 },
                 include: {
+                    sell_payment_methods: true,
                     sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
                     reservations: {
                         where: { reservation_products: { some: { store_depots: { store_id: storeId } } } },

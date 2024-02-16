@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from "db";
+import { sell_payment_methods } from '@prisma/client';
 
 // GET receivable sells
 export async function GET(req: Request) {
@@ -16,6 +17,7 @@ export async function GET(req: Request) {
                     sell_receivable_products: { some: { store_depots: { store_id: storeId } } }
                 },
                 include: {
+                    sell_payment_methods: true,
                     sell_receivable_products: { include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } }
                 }
             })
@@ -33,6 +35,7 @@ export async function GET(req: Request) {
                         ]
                     },
                     include: {
+                        sell_payment_methods: true,
                         sell_receivable_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
                     }
                 }
@@ -50,20 +53,35 @@ export async function PATCH(req: Request) {
 
         const { sellId, action } = await req.json();
 
+        let sellPaymentMethods: sell_payment_methods[] = [];
+
         if (action === "confirm") {
             const confirmedSellReceivable = await prisma.sells_receivable.update({
                 where: { id: sellId },
                 data: { status: "COBRADA", payed_at: new Date() },
-                include: { sell_receivable_products: true }
+                include: { sell_receivable_products: true, sell_payment_methods: true }
             });
+
+            for (const sellPaymentMethod of confirmedSellReceivable.sell_payment_methods) {
+                const method = await prisma.sell_payment_methods.create({
+                    data: {
+                        quantity: sellPaymentMethod.quantity,
+                        payment_method: sellPaymentMethod.payment_method,
+                    },
+                });
+                sellPaymentMethods.push(method);
+            }
 
             await prisma.$transaction(async (tx) => {
                 const sellItem = await tx.sells.create({
-                    data: {
-                        payment_method: confirmedSellReceivable.payment_method,
-                        total_price: confirmedSellReceivable.total_price,
-                    }
-                })
+                    data: { total_price: confirmedSellReceivable.total_price }
+                });
+
+                for (const method of sellPaymentMethods) {
+                    await tx.sell_payment_methods.update({
+                        where: { id: method.id }, data: { sells_id: sellItem.id }
+                    });
+                }
 
                 for (const sellProduct of confirmedSellReceivable.sell_receivable_products) {
                     await tx.sell_products.create({
