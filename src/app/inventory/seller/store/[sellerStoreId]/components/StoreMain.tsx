@@ -287,7 +287,7 @@ const StoreMain = ({ userId }: { userId?: number }) => {
             return setIsModalTransfersOpen(true);
         }
 
-        return notifySuccess("La tienda no posee transferencias registradas hoy");
+        return notifyWarning("La tienda no posee transferencias registradas hoy");
     };
 
     const CustomToolbar = () => (

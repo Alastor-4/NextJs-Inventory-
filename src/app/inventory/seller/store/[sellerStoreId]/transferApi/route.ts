@@ -90,7 +90,8 @@ export async function POST(req: Request, { params }: Params) {
                             }
                         }
                     }
-                }
+                },
+                created_by_user: true,
             }
         })
 
