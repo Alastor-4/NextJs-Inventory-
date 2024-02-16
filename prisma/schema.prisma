@@ -406,7 +406,7 @@ model sells_receivable {
   pay_before_date          DateTime?                  @db.Timestamp(0)
   payed_at                 DateTime?                  @db.Timestamp(0)
   status                   sell_receivable_status     @default(PENDIENTE)
-  payment_methods          sell_payment_methods[]
+  sell_payment_methods     sell_payment_methods[]
   created_at               DateTime                   @default(now()) @db.Timestamp(0)
   sell_receivable_products sell_receivable_products[]
 }
