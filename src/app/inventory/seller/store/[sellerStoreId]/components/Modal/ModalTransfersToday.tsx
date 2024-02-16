@@ -52,6 +52,12 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
         setIsOpen(false);
     }
 
+    React.useEffect(() => {
+        if (transfersData?.store?.length === 0) {
+            setDisplayStoreStoreTransfers(false)
+        }
+    }, [transfersData])
+
     const StoreToStoreTransfers = ({storeTransfers}: {storeTransfers: any[]}) => {
         const TableHeader = () => {
             const headCells = [
@@ -437,13 +443,6 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
            </>
         )
     }
-
-    const handleChange = (
-        event: React.MouseEvent<HTMLElement>,
-        newValue: boolean,
-    ) => {
-        setDisplayStoreStoreTransfers(newValue);
-    };
 
     return (
         <Dialog open={isOpen} onClose={handleCloseModal} fullScreen>
