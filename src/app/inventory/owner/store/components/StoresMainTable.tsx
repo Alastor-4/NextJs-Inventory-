@@ -402,7 +402,7 @@ const StoresMainTable = ({ userId }: StoresMainTableProps) => {
                 confirmAction={handleRemove}
             />
 
-            <CardContent>
+            <Card variant={"outlined"} sx={{ margin: "10px" }}>
                 {
                     data?.length > 0
                         ? (
@@ -418,7 +418,7 @@ const StoresMainTable = ({ userId }: StoresMainTableProps) => {
                             <TableNoData />
                         )
                 }
-            </CardContent>
+            </Card>
         </Card>
     )
 }
