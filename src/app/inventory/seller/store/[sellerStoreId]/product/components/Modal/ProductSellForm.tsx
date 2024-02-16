@@ -3,7 +3,7 @@
 
 import {
     Button, Dialog, DialogActions, DialogContent, DialogTitle,
-    Divider, FormHelperText, Grid, IconButton, MenuItem, Select, TextField
+    Divider, FormHelperText, Grid, IconButton, MenuItem, Select, TextField, Typography
 } from '@mui/material';
 import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
 import { computeDepotPricePerUnit, notifySuccess, numberFormat } from '@/utils/generalFunctions';
@@ -12,12 +12,13 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import sellerStoreProduct from '../../requests/sellerStoreProduct';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { payment_methods_enum } from '@prisma/client';
+import { $Enums, payment_methods_enum } from '@prisma/client';
 import React, { useEffect, useState } from 'react';
 import { esES } from '@mui/x-date-pickers/locales'
 import { Field, FieldArray, Formik } from 'formik';
 import * as Yup from "yup";
 import 'dayjs/locale/es';
+import { AddOutlined, IndeterminateCheckBoxOutlined, Remove, TapasTwoTone } from '@mui/icons-material';
 
 interface Product {
     maxUnitsQuantity: number;
@@ -31,7 +32,7 @@ interface initialValuesProps {
     }[];
     sellPaymentMethod: {
         paymentMethod: payment_methods_enum,
-        amount: number
+        quantity: number
     }[],
     description?: string;
     payBefore?: Date;
@@ -55,7 +56,7 @@ const ProductSellForm = (
             products: productsArray,
             sellPaymentMethod: [{
                 paymentMethod: payment_methods_enum.EfectivoCUP,
-                amount: 0
+                quantity: 0
             }],
             description: "",
             payBefore: undefined,
@@ -79,12 +80,12 @@ const ProductSellForm = (
                     products: [...productsData],
                     description: "",
                     payBefore: new Date(),
-                    sellPaymentMethod: [{ paymentMethod: 'EfectivoCUP', amount: 0 }],
+                    sellPaymentMethod: [{ paymentMethod: 'EfectivoCUP', quantity: 0 }],
                 })
             } else {
                 setInitialValues({
                     products: [...productsData],
-                    sellPaymentMethod: [{ paymentMethod: 'EfectivoCUP', amount: 0 }],
+                    sellPaymentMethod: [{ paymentMethod: 'EfectivoCUP', quantity: 0 }],
                 })
             }
         }
@@ -94,9 +95,9 @@ const ProductSellForm = (
     const sellValidationSchema = Yup.object({
         products: Yup.array().of(
             Yup.object<Product>({
-                maxUnitsQuantity: Yup.number().integer().typeError("Debe ser un número"),
+                maxUnitsQuantity: Yup.number().integer("Debe ser un número entero").typeError("Debe ser un número"),
                 unitsQuantity: Yup
-                    .number().integer().typeError("Debe ser un número")
+                    .number().integer("Debe ser un número entero").typeError("Debe ser un número")
                     .required("Requerido")
                     .min(1, "Al menos 1")
                     .max(Yup.ref("maxUnitsQuantity"), "Cantidad superior a lo disponible"),
@@ -106,15 +107,15 @@ const ProductSellForm = (
                 [payment_methods_enum.EfectivoCUP, payment_methods_enum.TransferenciaCUP, payment_methods_enum.Otro],
                 'Método de pago no válido'
             ),
-            amount: Yup.number().required('La cantidad es obligatoria').positive('La cantidad debe ser positiva'),
+            quantity: Yup.number().required('La cantidad es obligatoria').positive('La cantidad debe ser positiva'),
         })
     });
 
     const sellReceivableValidationSchema = Yup.object({
         products: Yup.array().of(Yup.object<Product>({
-            maxUnitsQuantity: Yup.number().integer().typeError("Debe ser un número"),
+            maxUnitsQuantity: Yup.number().integer("Debe ser un número entero").typeError("Debe ser un número"),
             unitsQuantity: Yup
-                .number().integer().typeError("Debe ser un número")
+                .number().integer("Debe ser un número entero").typeError("Debe ser un número")
                 .required("Requerido")
                 .min(1, "Al menos 1")
                 .max(Yup.ref("maxUnitsQuantity"), "Cantidad superior a lo disponible"),
@@ -124,13 +125,13 @@ const ProductSellForm = (
                 [payment_methods_enum.EfectivoCUP, payment_methods_enum.TransferenciaCUP, payment_methods_enum.Otro],
                 'Método de pago no válido'
             ),
-            amount: Yup.number().required('La cantidad es obligatoria').positive('La cantidad debe ser positiva'),
+            quantity: Yup.number().required('La cantidad es obligatoria').positive('La cantidad debe ser positiva'),
         }),
         description: Yup.string().required("Especifique datos de la venta a pagar"),
         payBefore: Yup.date().required("Este dato es requerido")
     });
 
-    const handleSell = async (values: initialValuesProps) => {
+    const handleSell = async (values: initialValuesProps, setFieldError: any) => {
         let sellProduct: { storeDepotId: number; unitsQuantity: number, price: number }[] = [];
 
         values.products.forEach(({ unitsQuantity }: Product, index: number) => {
@@ -142,8 +143,19 @@ const ProductSellForm = (
             });
         });
 
+        console.log(values.sellPaymentMethod);
+        let pricePaid = 0;
+        values.sellPaymentMethod.forEach((paymentMethod) => pricePaid += paymentMethod.quantity);
+
+
         const totalPrice = sellProduct.reduce((accumulate, current) => accumulate + current.price, 0);
-        // const paymenthMethods = values.sellPaymentMethod.map((paymentMethod, amount) => {});
+        if (pricePaid !== totalPrice) setShowError(true);
+        if (pricePaid === totalPrice) console.log("sirvio");
+        // setShowError(true);
+
+        // Poner error de que tiene que ser igual
+
+        // const paymenthMethods = values.sellPaymentMethod.map((paymentMethod, quantity) => {});
         // const sell = { paymentMethod: values.paymentMethod!, totalPrice: totalPrice };
         // const data = { sellerStoreId: storeId, sellData: sell, sellProductsData: sellProduct };
 
@@ -173,8 +185,8 @@ const ProductSellForm = (
         //     setAllProductsByDepartment(newDepartments);
         //     notifySuccess(isReceivable ? "Venta por cobrar registrada" : "La venta ha sido registrada");
         // }
-        setSelectedProducts([]);
-        handleClose()
+        // setSelectedProducts([]);
+        // handleClose()
     }
 
     const getTotals = (products: Product[]) => {
@@ -190,6 +202,28 @@ const ProductSellForm = (
         return { totalProducts, totalPrice }
     }
 
+    const paymentMethods: { code: payment_methods_enum, name: string }[] = [
+        { code: "EfectivoCUP", name: "Efectivo CUP" },
+        { code: "TransferenciaCUP", name: "Transferencia CUP" },
+        { code: "Otro", name: "Otro" }
+    ];
+
+    const getFirstSelectOptions = (sellPaymentMethods: { paymentMethod: payment_methods_enum; quantity: number; }[]) => {
+        const selectedMethods = [sellPaymentMethods[1]?.paymentMethod!, sellPaymentMethods[2]?.paymentMethod!];
+        return paymentMethods.filter(({ code }) => !selectedMethods.includes(code));
+    }
+    const getSecondSelectOptions = (sellPaymentMethods: { paymentMethod: payment_methods_enum; quantity: number; }[]) => {
+        const selectedMethods = [sellPaymentMethods[0]?.paymentMethod!, sellPaymentMethods[2]?.paymentMethod!];
+        return paymentMethods.filter(({ code }) => !selectedMethods.includes(code));
+    }
+    const getThirdSelectOptions = (sellPaymentMethods: { paymentMethod: payment_methods_enum; quantity: number; }[]) => {
+        const selectedMethods = [sellPaymentMethods[0]?.paymentMethod!, sellPaymentMethods[1]?.paymentMethod!];
+        return paymentMethods.filter(({ code }) => !selectedMethods.includes(code));
+    }
+
+    const [isShow, setIsShow] = useState<boolean>(false);
+    const [showLast, setShowLast] = useState<boolean>(false);
+    const [showError, setShowError] = useState<boolean>(false);
     return (
         <Formik
             initialValues={initialValues}
@@ -197,7 +231,7 @@ const ProductSellForm = (
             onSubmit={() => { }}
         >
             {
-                ({ values, errors, resetForm, setFieldValue, touched, getFieldProps }) => (
+                ({ values, errors, resetForm, setFieldValue, setFieldError, touched, getFieldProps }) => (
                     <Dialog open={isModalOpen} fullScreen onClose={handleClose}>
                         <DialogTitle
                             display={"flex"}
@@ -223,8 +257,8 @@ const ProductSellForm = (
                                 </IconButton>
                             </Grid>
                         </DialogTitle>
-                        <DialogContent dividers>
-                            <Grid container padding={"10px"}>
+                        <DialogContent dividers sx={{ marginX: "-8px" }}>
+                            <Grid container >
                                 <Grid item xs={7}>Producto:</Grid>
                                 <Grid item xs={3}>Cantidad:</Grid>
                                 <Grid item xs={2}>Precio:</Grid>
@@ -261,7 +295,6 @@ const ProductSellForm = (
                                                     </Grid>
                                                 )}
                                                 <Grid item xs={12}><Divider sx={{ height: "5px", width: "100%" }} component={"div"} /></Grid>
-
                                                 <Grid container item xs={true} alignItems={"center"}>
                                                     <Divider sx={{ width: 1 }} />
                                                 </Grid>
@@ -271,50 +304,117 @@ const ProductSellForm = (
                                 }
                                 <Grid container item xs={12} mt={"5px"}>
                                     <Grid item xs={9}>
-
                                     </Grid>
                                     <Grid container item xs={3}>
                                         Total: {numberFormat(String(getTotals(values.products).totalPrice))}
                                     </Grid>
                                 </Grid>
                                 <Grid item container>
-                                    <Grid item xs={12} marginTop={"15px"}>
-                                        <FieldArray name="sellPaymentMethod">
-                                            {({ push, remove }) => (
-                                                <div>
-                                                    {values.sellPaymentMethod.map((purchase, index) => (
-                                                        <div key={index}>
-                                                            <Field name={`sellPaymentMethod[${index}].paymentMethod`} as={Select} label="Método de Pago" variant="outlined">
-                                                                <MenuItem value="TransferenciaCUP">Transferencia CUP</MenuItem>
-                                                                <MenuItem value="EfectivoCUP">Efectivo CUP</MenuItem>
-                                                                <MenuItem value="Otro">Otro</MenuItem>
-                                                            </Field>
-                                                            <Field name={`sellPaymentMethod[${index}].amount`} as={TextField} label="Cantidad" variant="outlined" type="number" />
-
-                                                            {index > 0 && (
-                                                                <Button type="button" onClick={() => remove(index)}>-</Button>
-                                                            )}
-                                                        </div>
-                                                    ))}
-
-                                                    <Button type="button" onClick={() => push({ paymentMethod: '', amount: 0 })}>+</Button>
-                                                </div>
-                                            )}
-                                        </FieldArray>
-                                        {/* <TextField
-                                            label="Método de pago"
-                                            size={"small"}
-                                            fullWidth
-                                            select
-                                            {...getFieldProps("paymentMethod")}
-                                            error={!!errors.paymentMethod && touched.paymentMethod}
-                                            helperText={(!!errors.paymentMethod && touched.paymentMethod) && errors.paymentMethod}
-                                        >
-                                            {paymentMethods.map(item => (<MenuItem value={item} key={item}>{item}</MenuItem>))}
-                                        </TextField> */}
+                                    <Grid item container xs={12} marginTop={"15px"}>
+                                        <Grid item xs={7}>
+                                            <TextField
+                                                label="Método de pago"
+                                                size={"small"}
+                                                fullWidth
+                                                select
+                                                {...getFieldProps(`sellPaymentMethod[0].paymentMethod`)}
+                                            >
+                                                {getFirstSelectOptions(values.sellPaymentMethod).map(({ code, name }) => <MenuItem key={code} value={code}>{name}</MenuItem>)}
+                                            </TextField>
+                                        </Grid>
+                                        <Grid item xs={3.5}>
+                                            <TextField
+                                                label="Cantidad"
+                                                type='number'
+                                                size={"small"}
+                                                fullWidth
+                                                sx={{ marginLeft: "5px" }}
+                                                {...getFieldProps(`sellPaymentMethod[0].quantity`)}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={1.5}>
+                                            <Grid item>
+                                                {values.sellPaymentMethod.length === 1 &&
+                                                    <IconButton onClick={() => {
+                                                        values.sellPaymentMethod.push({ paymentMethod: getSecondSelectOptions(values.sellPaymentMethod)[0].code, quantity: 0 })
+                                                        setIsShow(true)
+                                                    }}><AddOutlined /></IconButton>
+                                                }
+                                                {values.sellPaymentMethod.length === 2 &&
+                                                    <IconButton onClick={() => {
+                                                        values.sellPaymentMethod.pop()
+                                                        setIsShow(false)
+                                                    }}><Remove /></IconButton>
+                                                }
+                                            </Grid>
+                                        </Grid>
                                     </Grid>
+                                    {isShow && <Grid item container xs={12} marginTop={"15px"}>
+                                        <Grid item xs={7}>
+                                            <TextField
+                                                label="Método de pago"
+                                                size={"small"}
+                                                fullWidth
+                                                select
+                                                {...getFieldProps(`sellPaymentMethod[1].paymentMethod`)}
+                                            >
+                                                {getSecondSelectOptions(values.sellPaymentMethod).map(({ code, name }) => <MenuItem key={code} value={code}>{name}</MenuItem>)}
+                                            </TextField>
+                                        </Grid>
+                                        <Grid item xs={3.5}>
+                                            <TextField
+                                                label="Cantidad"
+                                                type='number'
+                                                size={"small"}
+                                                fullWidth
+                                                sx={{ marginLeft: "5px" }}
+                                                {...getFieldProps(`sellPaymentMethod[1].quantity`)}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={1.5}>
+                                            <Grid item>
+                                                {values.sellPaymentMethod.length === 2 &&
+                                                    <IconButton onClick={() => {
+                                                        values.sellPaymentMethod.push({ paymentMethod: getThirdSelectOptions(values.sellPaymentMethod)[0].code, quantity: 0 })
+                                                        setShowLast(true)
+                                                    }}><AddOutlined /></IconButton>
+                                                }
+                                                {values.sellPaymentMethod.length === 3 &&
+                                                    <IconButton onClick={() => {
+                                                        values.sellPaymentMethod.pop()
+                                                        setShowLast(false)
+                                                    }}><Remove /></IconButton>
+                                                }
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>}
+                                    {showLast && <Grid item container xs={12} marginTop={"15px"}>
+                                        <Grid item xs={7}>
+                                            <TextField
+                                                label="Método de pago"
+                                                size={"small"}
+                                                fullWidth
+                                                select
+                                                {...getFieldProps(`sellPaymentMethod[2].paymentMethod`)}
+                                            >
+                                                {getThirdSelectOptions(values.sellPaymentMethod).map(({ code, name }) => <MenuItem key={code} value={code}>{name}</MenuItem>)}
+                                            </TextField>
+                                        </Grid>
+                                        <Grid item xs={3.5}>
+                                            <TextField
+                                                label="Cantidad"
+                                                type='number'
+                                                size={"small"}
+                                                fullWidth
+                                                sx={{ marginLeft: "5px" }}
+                                                {...getFieldProps(`sellPaymentMethod[2].quantity`)}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={1.5}>
+                                        </Grid>
+                                    </Grid>}
+                                    {showError && <Typography color={"red"}>Error la cantidad aportada debe ser igual al costo total</Typography>}
                                 </Grid>
-
                                 {isReceivable &&
                                     <Grid item xs={12} mt={"5px"}>
                                         <LocalizationProvider
@@ -382,11 +482,11 @@ const ProductSellForm = (
                                     //             !touched.paymentMethod :
                                     //             !!errors.products
                                     // }
-                                    variant="outlined" onClick={() => { handleSell(values); resetForm(); }}
+                                    variant="outlined" onClick={() => { handleSell(values, setFieldError); resetForm(); }}
                                 >Vender</Button>
                             </DialogActions>
                         </DialogContent>
-                    </Dialog>)
+                    </Dialog >)
             }
         </Formik >
     )
