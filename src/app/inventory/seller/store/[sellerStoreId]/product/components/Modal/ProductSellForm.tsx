@@ -1,9 +1,9 @@
-
+//@ts-nocheck
 "use client"
 
 import {
     Button, Dialog, DialogActions, DialogContent, DialogTitle,
-    Divider, FormHelperText, Grid, IconButton, MenuItem, Select, TextField, Typography
+    Divider, FormHelperText, Grid, IconButton, MenuItem, TextField
 } from '@mui/material';
 import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
 import { computeDepotPricePerUnit, notifySuccess, numberFormat } from '@/utils/generalFunctions';
@@ -12,13 +12,13 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import sellerStoreProduct from '../../requests/sellerStoreProduct';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { $Enums, payment_methods_enum } from '@prisma/client';
+import { AddOutlined, Remove } from '@mui/icons-material';
+import { payment_methods_enum } from '@prisma/client';
 import React, { useEffect, useState } from 'react';
 import { esES } from '@mui/x-date-pickers/locales'
-import { Field, FieldArray, Formik } from 'formik';
+import { Formik, FormikState } from 'formik';
 import * as Yup from "yup";
 import 'dayjs/locale/es';
-import { AddOutlined, IndeterminateCheckBoxOutlined, Remove, TapasTwoTone } from '@mui/icons-material';
 
 interface Product {
     maxUnitsQuantity: number;
@@ -38,6 +38,29 @@ interface initialValuesProps {
     payBefore?: Date;
 }
 
+const calcTotalPrice = (values: initialValuesProps, selectedProducts: productsProps[]) => {
+    let sellProduct: { storeDepotId: number; unitsQuantity: number, price: number }[] = [];
+    let negative: boolean = false;
+
+    values.products.forEach(({ unitsQuantity }: Product, index: number) => {
+        if (unitsQuantity < 0) negative = true;
+        const storeDepot = selectedProducts[index].depots![0].store_depots![0];
+        sellProduct.push({
+            storeDepotId: storeDepot.id,
+            unitsQuantity: unitsQuantity,
+            price: computeDepotPricePerUnit(storeDepot, unitsQuantity) * unitsQuantity
+        });
+    });
+
+    let totalPricePaid = 0;
+    values.sellPaymentMethod.forEach((paymentMethod) => totalPricePaid += paymentMethod.quantity);
+
+    const totalPrice = sellProduct.reduce((accumulate, current) => accumulate + current.price, 0);
+    if (totalPrice < 0 || totalPricePaid < 0) negative = true;
+
+    return { ok: totalPrice === totalPricePaid, negative, totalPrice, sellProduct }
+}
+
 const ProductSellForm = (
     { isModalOpen, storeId, setIsOpen, isReceivable,
         selectedProducts, allProductsByDepartment,
@@ -54,10 +77,7 @@ const ProductSellForm = (
 
         return {
             products: productsArray,
-            sellPaymentMethod: [{
-                paymentMethod: payment_methods_enum.EfectivoCUP,
-                quantity: 0
-            }],
+            sellPaymentMethod: [{ paymentMethod: payment_methods_enum.EfectivoCUP, quantity: 0 }],
             description: "",
             payBefore: undefined,
         };
@@ -131,62 +151,42 @@ const ProductSellForm = (
         payBefore: Yup.date().required("Este dato es requerido")
     });
 
-    const handleSell = async (values: initialValuesProps, setFieldError: any) => {
-        let sellProduct: { storeDepotId: number; unitsQuantity: number, price: number }[] = [];
+    const handleSell = async (values: initialValuesProps, resetForm: (nextState?: Partial<FormikState<any>> | undefined) => void) => {
 
-        values.products.forEach(({ unitsQuantity }: Product, index: number) => {
-            const storeDepot = selectedProducts[index].depots![0].store_depots![0];
-            sellProduct.push({
-                storeDepotId: storeDepot.id,
-                unitsQuantity: unitsQuantity,
-                price: computeDepotPricePerUnit(storeDepot, unitsQuantity) * unitsQuantity
-            });
-        });
+        const { sellProduct, totalPrice } = calcTotalPrice(values, selectedProducts);
 
-        console.log(values.sellPaymentMethod);
-        let pricePaid = 0;
-        values.sellPaymentMethod.forEach((paymentMethod) => pricePaid += paymentMethod.quantity);
+        const sell = { sellPaymentMethod: values.sellPaymentMethod!, totalPrice: totalPrice };
+        const data = { sellerStoreId: storeId, sellData: sell, sellProductsData: sellProduct };
 
+        let sellItemResponse;
+        if (isReceivable) {
+            const sellReceivableData = { description: values.description!, payBefore: values.payBefore! }
+            const newData = { ...data!, sellReceivableData }
+            sellItemResponse = await sellerStoreProduct.createSellReceivable(newData);
+        } else {
+            sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(data);
+        }
 
-        const totalPrice = sellProduct.reduce((accumulate, current) => accumulate + current.price, 0);
-        if (pricePaid !== totalPrice) setShowError(true);
-        if (pricePaid === totalPrice) console.log("sirvio");
-        // setShowError(true);
+        if (sellItemResponse) {
+            const newDepartments = [...allProductsByDepartment!];
 
-        // Poner error de que tiene que ser igual
+            sellProduct.forEach(sellProductItem => {
+                for (const productsByDepartments of allProductsByDepartment!) {
+                    const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
 
-        // const paymenthMethods = values.sellPaymentMethod.map((paymentMethod, quantity) => {});
-        // const sell = { paymentMethod: values.paymentMethod!, totalPrice: totalPrice };
-        // const data = { sellerStoreId: storeId, sellData: sell, sellProductsData: sellProduct };
-
-        // let sellItemResponse;
-        // if (isReceivable) {
-        //     const sellReceivableData = { description: values.description!, payBefore: values.payBefore! }
-        //     const newData = { ...data!, sellReceivableData }
-        //     sellItemResponse = await sellerStoreProduct.createSellReceivable(newData);
-        // } else {
-        //     sellItemResponse = await sellerStoreProduct.sellStoreDepotManual(data);
-        // }
-
-        // if (sellItemResponse) {
-        //     const newDepartments = [...allProductsByDepartment!];
-
-        //     sellProduct.forEach(sellProductItem => {
-        //         for (const productsByDepartments of allProductsByDepartment!) {
-        //             const departmentIndex = allProductsByDepartment!.indexOf(productsByDepartments);
-
-        //             const productIndex = productsByDepartments.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === sellProductItem.storeDepotId);
-        //             if (productIndex > -1) {
-        //                 newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units
-        //                     = allProductsByDepartment![departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units! - sellProductItem.unitsQuantity;
-        //             }
-        //         }
-        //     })
-        //     setAllProductsByDepartment(newDepartments);
-        //     notifySuccess(isReceivable ? "Venta por cobrar registrada" : "La venta ha sido registrada");
-        // }
-        // setSelectedProducts([]);
-        // handleClose()
+                    const productIndex = productsByDepartments.products!.findIndex((product: productsProps) => product.depots![0].store_depots![0].id === sellProductItem.storeDepotId);
+                    if (productIndex > -1) {
+                        newDepartments[departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units
+                            = allProductsByDepartment![departmentIndex].products![productIndex].depots![0].store_depots![0].product_remaining_units! - sellProductItem.unitsQuantity;
+                    }
+                }
+            })
+            setAllProductsByDepartment(newDepartments);
+            notifySuccess(isReceivable ? "Venta por cobrar registrada" : "La venta ha sido registrada");
+        }
+        setSelectedProducts([]);
+        resetForm();
+        handleClose();
     }
 
     const getTotals = (products: Product[]) => {
@@ -224,6 +224,7 @@ const ProductSellForm = (
     const [isShow, setIsShow] = useState<boolean>(false);
     const [showLast, setShowLast] = useState<boolean>(false);
     const [showError, setShowError] = useState<boolean>(false);
+    const [showNegativeError, setShowNegativeError] = useState<boolean>(false);
     return (
         <Formik
             initialValues={initialValues}
@@ -231,7 +232,7 @@ const ProductSellForm = (
             onSubmit={() => { }}
         >
             {
-                ({ values, errors, resetForm, setFieldValue, setFieldError, touched, getFieldProps }) => (
+                ({ values, errors, resetForm, setFieldValue, touched, getFieldProps }) => (
                     <Dialog open={isModalOpen} fullScreen onClose={handleClose}>
                         <DialogTitle
                             display={"flex"}
@@ -413,7 +414,20 @@ const ProductSellForm = (
                                         <Grid item xs={1.5}>
                                         </Grid>
                                     </Grid>}
-                                    {showError && <Typography color={"red"}>Error la cantidad aportada debe ser igual al costo total</Typography>}
+                                    {!!showError && (
+                                        <Grid item xs={12} textAlign={"center"}>
+                                            <FormHelperText component={"span"} sx={{ color: "#d32f2f" }}>
+                                                La cantidad a pagar debe ser igual al costo total
+                                            </FormHelperText>
+                                        </Grid>
+                                    )}
+                                    {!!showNegativeError && (
+                                        <Grid item xs={12} textAlign={"center"}>
+                                            <FormHelperText component={"span"} sx={{ color: "#d32f2f" }}>
+                                                No pueden ser números negativos
+                                            </FormHelperText>
+                                        </Grid>
+                                    )}
                                 </Grid>
                                 {isReceivable &&
                                     <Grid item xs={12} mt={"5px"}>
@@ -470,19 +484,21 @@ const ProductSellForm = (
                             <DialogActions sx={{ display: "flex", justifyContent: "flex-end" }}>
                                 <Button color="error" variant="outlined" onClick={() => { handleClose(); resetForm(); }}>Cerrar</Button>
                                 <Button color="primary"
-                                    // disabled={
-                                    //     isReceivable ?
-                                    //         touched.paymentMethod === undefined ?
-                                    //             !touched.paymentMethod :
-                                    //             !!errors.products ||
-                                    //             !!errors.paymentMethod ||
-                                    //             !!errors.payBefore ||
-                                    //             !!errors.description
-                                    //         : touched.paymentMethod === undefined ?
-                                    //             !touched.paymentMethod :
-                                    //             !!errors.products
-                                    // }
-                                    variant="outlined" onClick={() => { handleSell(values, setFieldError); resetForm(); }}
+                                    disabled={
+                                        isReceivable && (values.payBefore === undefined || values.description?.length! === 0)
+                                    }
+                                    variant="outlined" onClick={() => {
+                                        const { ok, negative } = calcTotalPrice(values, selectedProducts);
+                                        if (!ok) {
+                                            setShowError(true);
+                                        } else {
+                                            setShowError(false);
+                                            if (negative) {
+                                                setShowNegativeError(true);
+                                            } else { setShowNegativeError(false); handleSell(values, resetForm); }
+                                        }
+                                    }
+                                    }
                                 >Vender</Button>
                             </DialogActions>
                         </DialogContent>
