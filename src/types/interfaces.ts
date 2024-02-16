@@ -14,6 +14,8 @@ import {
     sells_receivable,
     $Enums,
     stores,
+    payment_methods_enum,
+    sell_payment_methods,
 } from '@prisma/client';
 import { ReactNode } from "react";
 
@@ -447,6 +449,7 @@ export interface storeSellsDetailsProps {
     id: number;
     total_price: number | null;
     payment_method: string | null;
+    sell_payment_methods: sell_payment_methods[];
     created_at: Date;
     from_reservation_id: number | null;
     requesting_user_id: number | null;
@@ -493,6 +496,7 @@ export interface storeSellsReceivableDetailsProps {
     pay_before_date: Date | null;
     payed_at: Date | null;
     status: $Enums.sell_receivable_status;
+    sell_payment_methods: sell_payment_methods[];
     created_at: Date;
     sell_receivable_products: {
         id: number;
@@ -548,7 +552,10 @@ export interface StoreEditPriceProps {
 export interface createSellReceivableProps {
     sellerStoreId: number | undefined;
     sellData: {
-        paymentMethod: string;
+        sellPaymentMethod: {
+            paymentMethod: payment_methods_enum;
+            quantity: number;
+        }[];
         totalPrice: number;
     };
     sellProductsData: {
@@ -560,6 +567,21 @@ export interface createSellReceivableProps {
         description: string,
         payBefore: Date
     }
+}
+export interface createSellProps {
+    sellerStoreId: number | undefined;
+    sellData: {
+        sellPaymentMethod: {
+            paymentMethod: payment_methods_enum;
+            quantity: number;
+        }[];
+        totalPrice: number;
+    };
+    sellProductsData: {
+        storeDepotId: number;
+        unitsQuantity: number;
+        price: number;
+    }[];
 }
 
 export interface StoreModalPriceProps {

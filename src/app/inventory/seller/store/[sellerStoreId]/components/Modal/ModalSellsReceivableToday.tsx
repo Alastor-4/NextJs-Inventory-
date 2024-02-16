@@ -9,6 +9,7 @@ import { ModalSellsReceivableTodayProps, storeSellsReceivableDetailsProps } from
 import calcSellReceivableProductsUnits from '@/utils/calcSellReceivableProductsUnits';
 import { Close, ExpandLessOutlined, ExpandMoreOutlined } from '@mui/icons-material';
 import SellsReceivableMoreDetails from '../SellsReceivableMoreDetails';
+import formatPaymentMethods from '@/utils/getFormattedPaymentMethod';
 import { getColorByStatus } from '@/utils/getColorByStatus';
 import { TableNoData } from '@/components/TableNoData';
 import React, { useState } from 'react';
@@ -34,9 +35,9 @@ const ModalSellsReceivableToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsR
             <TableHead>
                 <TableRow>
                     <TableCell id='details' />
-                    <TableCell align='center' id='total_price_payment_method'>Importe total</TableCell>
                     <TableCell align='center' id='status'>Estado</TableCell>
                     <TableCell align='center' id='pay_before'>Pagar antes de</TableCell>
+                    <TableCell align='center' id='total_price_payment_method'>Importe total</TableCell>
                     <TableCell align='center' id='sell_products_quantity'>Productos</TableCell>
                     <TableCell align='center' id='units'>Unidades</TableCell>
                     <TableCell align='center' id='created_at'>Registrado</TableCell>
@@ -76,8 +77,11 @@ const ModalSellsReceivableToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsR
                                     color={getColorByStatus(sell.status)}
                                     sx={{ border: "1px solid lightGreen" }}
                                 /></TableCell>
+                                {sell.sell_payment_methods.length > 0 ?
+                                    <TableCell align='center' >{formatPaymentMethods(sell.sell_payment_methods!)}</TableCell>
+                                    : <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
+                                }
                                 <TableCell align='center'>{dayjs(sell.pay_before_date).format('MMM D, YYYY')}</TableCell>
-                                <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
                                 <TableCell align='center'>{sell.sell_receivable_products.length! !== 1 ? sell.sell_receivable_products.length! : sell.sell_receivable_products[0].store_depots.depots?.products?.name}</TableCell>
                                 <TableCell align='center'>{`${calcSellReceivableProductsUnits(sell)}`}</TableCell>
                                 <TableCell align='center'>{dayjs(sell.created_at).format('h:mm A')}</TableCell>
