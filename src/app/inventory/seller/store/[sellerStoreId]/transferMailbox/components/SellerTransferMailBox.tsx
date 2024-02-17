@@ -1,6 +1,27 @@
 "use client"
-import { ArrowLeft, ArrowLeftOutlined, Cancel, Done, FilterAlt, Money, VisibilityOutlined } from '@mui/icons-material'
-import { AppBar, Box, Button, Card, CardContent, Chip, Grid, IconButton, Toolbar, Typography } from '@mui/material'
+
+import {
+    ArrowLeft,
+    ArrowLeftOutlined,
+    Cancel, ChangeCircleOutlined, CreateNewFolderOutlined,
+    Done,
+    FilterAltOutlined,
+    Money, PauseOutlined, StartOutlined,
+    VisibilityOutlined, VpnKey
+} from '@mui/icons-material'
+import {
+    AppBar,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    Divider,
+    Grid,
+    IconButton,
+    Toolbar,
+    Typography
+} from '@mui/material'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import transfer from '../request/transfer'
@@ -11,6 +32,7 @@ import { DataTransferReceived, TransferStoreDepots } from './TypeTransfers'
 import ModalSellProducts from './ModalSellProducts'
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import ModalFilter from './ModalFilter'
+import {TableNoData} from "@/components/TableNoData";
 
 interface SellerTransferMailboxProps {
     userId?: number
@@ -40,7 +62,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
     const [allOwnerStores, setAllOwnerStores] = useState<AllOwnerStores[]>([])
 
     //Filters
-    const [showModalFilter, setShowModalFilter] = useState(true)
+    const [showModalFilter, setShowModalFilter] = useState(false)
 
     //selectedFilters
     const [selectedStatus, setSelectedStatus] = useState<number[]>([])
@@ -148,37 +170,33 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
     const handleClickFilter = () => {
         setShowModalFilter(true)
     }
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Grid container>
+                <Box sx={{ display: "flex", alignItems: "center", overflowX: "auto" }}>
+                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"} />
+                    </IconButton>
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            fontWeight: 700,
+                            letterSpacing: ".2rem",
+                            color: "white",
+                            overflowX: "auto",
+                            whiteSpace: "nowrap"
+                        }}
+                    >
+                        Transferencias {sent ? "enviadas" : "recibidas"}
+                    </Typography>
+                </Box>
 
-                    <Grid item>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
-                                <ArrowLeft fontSize={"large"} />
-                            </IconButton>
-                            <Typography
-                                variant="h6"
-                                noWrap
-                                sx={{
-                                    fontWeight: 700,
-                                    letterSpacing: ".2rem",
-                                    color: "white",
-                                }}
-                            >
-                                Transferencias
-                            </Typography>
-                        </Box>
-                    </Grid>
-
-                    <Grid item marginLeft={'auto'}>
-                        <IconButton onClick={handleClickFilter}>
-                            <FilterAlt />
-                        </IconButton>
-                    </Grid>
-
-                </Grid>
+                <Box sx={{ display: "flex" }}>
+                    <IconButton color={"inherit"} onClick={handleClickFilter}>
+                        <FilterAltOutlined fontSize={"small"}/>
+                    </IconButton>
+                </Box>
             </Toolbar>
         </AppBar>
     )
@@ -645,7 +663,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
             selectedStatus.forEach((element) => indexBy[element] = true)
 
             dataFilter.forEach((element) => {
-                const aux = element.filter((item) => indexBy[item.transferStatus] === true)
+                const aux = element.filter((item) => indexBy[item.transferStatus])
                 if (aux.length) newDataFilter.push(aux)
             })
 
@@ -659,7 +677,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
             selectedStores.forEach((element) => indexBy[element] = true)
 
             dataFilter.forEach((element) => {
-                const aux = element.filter((item) => indexBy[item.store_depots.stores.id] === true)
+                const aux = element.filter((item) => indexBy[item.store_depots.stores.id])
                 if (aux.length) newDataFilter.push(aux)
             })
 
@@ -671,14 +689,14 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
         if (selectedStores.length) appliedFilterStore()
 
         return dataFilter
-
     }
+
     return (
         <>
             <ModalFilter
                 open={showModalFilter}
                 setOpen={setShowModalFilter}
-                dialogTitle='Filtrar por:'
+                dialogTitle='Aplicar filtros'
                 filterByStatus={selectedStatus}
                 filterByDate={selectedDate}
                 filterByStores={selectedStores}
@@ -690,19 +708,17 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
             </ModalFilter>
 
             <Card variant={'outlined'}>
-
                 <CustomToolbar />
 
                 <CardContent>
                     <Grid container rowSpacing={2}>
                         {
-                            applyFilter().map((item: DataTransferReceived[], index: number) => (
-                                <ShowTransfer key={index} transfers={item} />
-                            ))
+                            applyFilter().length > 0
+                                ? applyFilter().map((item: DataTransferReceived[], index: number) => (
+                                    <ShowTransfer key={index} transfers={item} />
+                                )) : <TableNoData/>
                         }
                     </Grid>
-
-
                 </CardContent>
             </Card>
         </>

@@ -20,8 +20,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
 import { stores } from '@prisma/client'
 import dayjs, { Dayjs } from 'dayjs'
+import 'dayjs/locale/es'
 import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon'
 import React, { useEffect, useState } from 'react'
+
+dayjs.locale("es")
 
 interface FilterStores extends stores {
     selected: boolean
