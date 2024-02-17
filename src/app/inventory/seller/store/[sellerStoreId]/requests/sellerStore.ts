@@ -1,6 +1,7 @@
 import { notifyError, notifySuccess } from "@/utils/generalFunctions";
 import apiRequest from "@/api";
 import dayjs from "dayjs";
+import { sell_payment_methods } from "@prisma/client";
 
 const url = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/api`;
 const sellsUrl = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/sellsApi`;
@@ -98,9 +99,12 @@ const sellerStore = {
         }
     },
 
-    addReturnToSellProducts: async function (sellerStoreId: number, sellProductsId: number, returnedQuantity: number, returnedReason: string) {
+    addReturnToSellProducts: async function (sellerStoreId: number, sellProductsId: number, returnedQuantity: number, returnedReason: string, sellPaymentMethods?: {
+        paymentMethod: string;
+        quantity: number;
+    }[]) {
         try {
-            const response = await apiRequest.put(sellsUrl(sellerStoreId), { sell_product_id: sellProductsId, returned_quantity: returnedQuantity, returned_reason: returnedReason });
+            const response = await apiRequest.put(sellsUrl(sellerStoreId), { sell_product_id: sellProductsId, returned_quantity: returnedQuantity, returned_reason: returnedReason, sell_payment_methods: sellPaymentMethods });
             return response.status
         } catch (e) {
             notifyError("Ha ocurrido un error añadiendo una devolución");

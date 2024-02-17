@@ -189,6 +189,7 @@ const SellsHistory = () => {
                                         <SellsMoreDetails
                                             show={(showDetails === sell.id)}
                                             sell_products={sell.sell_products}
+                                            sell={sell}
                                             history
                                             refreshData={refreshData}
                                         />

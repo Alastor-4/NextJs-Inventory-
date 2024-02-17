@@ -349,6 +349,7 @@ export interface SellsMoreDetailsProps {
         store_depots: storeDepotsWithAny;
     }[];
     show: boolean;
+    sell: storeSellsDetailsProps;
     history?: boolean;
     refreshData?: () => Promise<void>
 }
