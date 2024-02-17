@@ -63,7 +63,7 @@ const SellsMoreDetails = ({ show, sell_products, history, sell, refreshData }: S
         soldUnitsQuantity: selectedSellProduct?.units_quantity,
         returnedQuantity: 0,
         returnedReason: "",
-        sellPaymentMethod: [{ paymentMethod: 'EfectivoCUP', quantity: 0 }]
+        sellPaymentMethod: [{ paymentMethod: sell.sell_payment_methods[0] ? sell.sell_payment_methods[0].payment_method : "EfectivoCUP", quantity: 0 }]
     }
 
     const validationSchema = Yup.object({
@@ -81,7 +81,11 @@ const SellsMoreDetails = ({ show, sell_products, history, sell, refreshData }: S
     });
 
     const paymentMethods: { code: payment_methods_enum, maxQuantity: number }[] = [];
-    sell.sell_payment_methods.map(({ payment_method, quantity }) => paymentMethods.push({ code: payment_method, maxQuantity: quantity }));
+    if (sell.payment_method) {
+        paymentMethods.push({ code: "EfectivoCUP", maxQuantity: sell.total_price! });
+    } else {
+        sell.sell_payment_methods.map(({ payment_method, quantity }) => paymentMethods.push({ code: payment_method, maxQuantity: quantity }));
+    }
 
     const getFirstSelectOptions = (sellPaymentMethods: { paymentMethod: payment_methods_enum | string; quantity: number; }[]) => {
         const selectedMethods = [sellPaymentMethods[1]?.paymentMethod!, sellPaymentMethods[2]?.paymentMethod!];
@@ -163,7 +167,7 @@ const SellsMoreDetails = ({ show, sell_products, history, sell, refreshData }: S
                                         initialValues={initialValues}
                                         validationSchema={validationSchema}
                                         onSubmit={() => { }}
-                                    >{({ getFieldProps, isValid, errors, touched, values, resetForm }) => (
+                                    >{({ getFieldProps, errors, touched, values, resetForm }) => (
                                         <Dialog open={modalOpen} fullScreen onClose={() => { handleCloseModal(); resetForm() }}>
                                             <DialogTitle
                                                 display={"flex"}
@@ -248,18 +252,11 @@ const SellsMoreDetails = ({ show, sell_products, history, sell, refreshData }: S
                                                                         sx={{ marginLeft: "5px" }}
                                                                         {...getFieldProps(`sellPaymentMethod[0].quantity`)}
                                                                     />
-                                                                    <Grid item textAlign={"center"}>Máx: {paymentMethods.filter(method => values.sellPaymentMethod[0].paymentMethod === method.code)[0].maxQuantity}</Grid>
+                                                                    <Grid item textAlign={"center"}>Máx: {paymentMethods.filter(method => formatMethod(values.sellPaymentMethod[0].paymentMethod) === formatMethod(method.code))[0].maxQuantity}</Grid>
                                                                 </Grid>
-                                                                {values.sellPaymentMethod[0] && paymentMethods.filter(method => values.sellPaymentMethod[0].paymentMethod === method.code)[0].maxQuantity < values.sellPaymentMethod[0].quantity && (
-                                                                    <Grid item xs={12} textAlign={"center"}>
-                                                                        <FormHelperText component={"span"} sx={{ color: "#d32f2f" }}>
-                                                                            Cantidad mayor a lo que se puede devolver
-                                                                        </FormHelperText>
-                                                                    </Grid>
-                                                                )}
                                                                 <Grid item xs={1.5}>
                                                                     <Grid item>
-                                                                        {values.sellPaymentMethod.length === 1 &&
+                                                                        {values.sellPaymentMethod.length === 1 && !sell.payment_method &&
                                                                             <IconButton onClick={() => {
                                                                                 values.sellPaymentMethod.push({ paymentMethod: getSecondSelectOptions(values.sellPaymentMethod)[0].code, quantity: 0 })
                                                                                 setIsShow(true)
@@ -274,6 +271,13 @@ const SellsMoreDetails = ({ show, sell_products, history, sell, refreshData }: S
                                                                     </Grid>
                                                                 </Grid>
                                                             </Grid>}
+                                                        {values.sellPaymentMethod[0] && paymentMethods.filter(method => formatMethod(values.sellPaymentMethod[0].paymentMethod) === formatMethod(method.code))[0].maxQuantity < values.sellPaymentMethod[0].quantity && (
+                                                            <Grid item xs={12} textAlign={"center"}>
+                                                                <FormHelperText component={"span"} sx={{ color: "#d32f2f" }}>
+                                                                    Cantidad mayor a lo que se puede devolver
+                                                                </FormHelperText>
+                                                            </Grid>
+                                                        )}
                                                         {isShow && <Grid item container xs={12} marginTop={"15px"}>
                                                             <Grid item xs={7}>
                                                                 <TextField
@@ -295,7 +299,7 @@ const SellsMoreDetails = ({ show, sell_products, history, sell, refreshData }: S
                                                                     sx={{ marginLeft: "5px" }}
                                                                     {...getFieldProps(`sellPaymentMethod[1].quantity`)}
                                                                 />
-                                                                <Grid item textAlign={"center"}>Máx: {paymentMethods.filter(method => values.sellPaymentMethod[1].paymentMethod === method.code)[0].maxQuantity}</Grid>
+                                                                <Grid item textAlign={"center"}>Máx: {paymentMethods.filter(method => formatMethod(values.sellPaymentMethod[1].paymentMethod) === formatMethod(method.code))[0].maxQuantity}</Grid>
                                                             </Grid>
                                                             <Grid item xs={1.5}>
                                                                 <Grid item>
@@ -314,7 +318,7 @@ const SellsMoreDetails = ({ show, sell_products, history, sell, refreshData }: S
                                                                 </Grid>
                                                             </Grid>
                                                         </Grid>}
-                                                        {values.sellPaymentMethod[1] && paymentMethods.filter(method => values.sellPaymentMethod[1].paymentMethod === method.code)[0].maxQuantity < values.sellPaymentMethod[1].quantity && (
+                                                        {values.sellPaymentMethod[1] && paymentMethods.filter(method => formatMethod(values.sellPaymentMethod[1].paymentMethod) === formatMethod(method.code))[0].maxQuantity < values.sellPaymentMethod[1].quantity && (
                                                             <Grid item xs={12} textAlign={"center"}>
                                                                 <FormHelperText component={"span"} sx={{ color: "#d32f2f" }}>
                                                                     Cantidad mayor a lo que se puede devolver
@@ -342,10 +346,10 @@ const SellsMoreDetails = ({ show, sell_products, history, sell, refreshData }: S
                                                                     sx={{ marginLeft: "5px" }}
                                                                     {...getFieldProps(`sellPaymentMethod[2].quantity`)}
                                                                 />
-                                                                <Grid item textAlign={"center"}>Máx: {paymentMethods.filter(method => values.sellPaymentMethod[2].paymentMethod === method.code)[0].maxQuantity}</Grid>
+                                                                <Grid item textAlign={"center"}>Máx: {paymentMethods.filter(method => formatMethod(values.sellPaymentMethod[2].paymentMethod) === formatMethod(method.code))[0].maxQuantity}</Grid>
                                                             </Grid>
                                                         </Grid>}
-                                                        {values.sellPaymentMethod[2] && paymentMethods.filter(method => values.sellPaymentMethod[2].paymentMethod === method.code)[0].maxQuantity < values.sellPaymentMethod[2].quantity && (
+                                                        {values.sellPaymentMethod[2] && paymentMethods.filter(method => formatMethod(values.sellPaymentMethod[2].paymentMethod) === formatMethod(method.code))[0].maxQuantity < values.sellPaymentMethod[2].quantity && (
                                                             <Grid item xs={12} textAlign={"center"}>
                                                                 <FormHelperText component={"span"} sx={{ color: "#d32f2f" }}>
                                                                     Cantidad mayor a lo que se puede devolver

@@ -83,6 +83,7 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
                                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                                     {showDetails === sell.id && (
                                         <SellsMoreDetails
+                                            sell={sell}
                                             show={(showDetails === sell.id)}
                                             sell_products={sell.sell_products}
                                         />
