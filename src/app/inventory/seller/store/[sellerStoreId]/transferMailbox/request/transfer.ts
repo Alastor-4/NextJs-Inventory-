@@ -53,7 +53,6 @@ const urlStore = (storeId: number) => `/inventory/seller/store/${storeId}/transf
 
 
 export const transfer = {
-
     getAllTransfersReceived: async function (storeId: number) {
         try {
             const result = await apiRequest.get(urlTransfer(storeId))
@@ -64,6 +63,7 @@ export const transfer = {
         }
         return false
     },
+
     changeTransferStatus: async function (storeId: number, data: { id: number, from_store_accepted: boolean, to_store_accepted: boolean, transfer_cancelled: boolean }) {
         try {
             const result = await apiRequest.put(urlTransfer(storeId), data)
@@ -74,26 +74,29 @@ export const transfer = {
         }
         return false
     },
+
     getStoreDepot: async function (storeId: number, productId: number) {
         try {
             const result = await apiRequest.get(urlStoreDepot(storeId), { params: { productId: productId } })
 
             return result.data
         } catch (e) {
-            notifyError("Error al comprobar si el producto existe en la tienda")
+            notifyError("Error comprobando el producto")
         }
         return false
     },
+
     createInstanceInStore: async function (storeId: number, data: TransferStoreDepots) {
         try {
             const result = await apiRequest.post(urlStoreDepot(storeId), data)
 
-            return result.status
+            return result.data
         } catch (e) {
-            notifyError("Error al crear una instancia de este producto en la tienda")
+            notifyError("Error al enviar este producto en la tienda")
         }
         return false
     },
+
     addNewUnits: async function (storeId: number, data: { id: number, product_remaining_units: number, product_units: number }) {
         try {
             const result = await apiRequest.put(urlStoreDepot(storeId), data)
@@ -104,6 +107,7 @@ export const transfer = {
         }
         return false
     },
+
     addNewOffers: async function (storeId: number, data: TransferOffers) {
         try {
             const result = await apiRequest.post(urlOfferTransfer(storeId), data)
@@ -114,6 +118,7 @@ export const transfer = {
         }
         return false
     },
+
     createSells: async function (storeId: number, data: SellsAndSellProductProps) {
         try {
             const result = await apiRequest.post(urlSells(storeId), data)
@@ -136,6 +141,7 @@ export const transfer = {
         }
         return false
     },
+
     //get Data Filter
     getDataUser: async function (storeId: number, userId: number) {
         try {
@@ -147,6 +153,7 @@ export const transfer = {
         }
         return false
     },
+
     getAllOwnerStores: async function (storeId: number, userId: number) {
         try {
             const result = await apiRequest.get(urlStore(storeId), { params: { userId: userId } })

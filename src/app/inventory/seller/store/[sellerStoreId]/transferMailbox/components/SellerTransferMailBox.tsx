@@ -26,7 +26,7 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import transfer from '../request/transfer'
 import dayjs from 'dayjs'
-import { images, stores } from '@prisma/client'
+import {images, store_depots, stores} from '@prisma/client'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import { DataTransferReceived, TransferStoreDepots } from './TypeTransfers'
 import ModalSellProducts from './ModalSellProducts'
@@ -236,43 +236,47 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                     let product = await transfer.getStoreDepot(storeId!, dataItem.store_depots.depots.product_id)
 
                     if (product) {
+                        //when product exist in destination store, only transferred units are added
                         const data = {
                             id: product.id,
-                            product_remaining_units: product.product_remaining_units + dataItem.units_transferred_quantity,
+                            //when product_remaining_units = -1, set units_transferred_quantity as value for remaining units
+                            product_remaining_units: product.product_remaining_units === -1 ? dataItem.units_transferred_quantity : product.product_remaining_units + dataItem.units_transferred_quantity,
                             product_units: product.product_units + dataItem.units_transferred_quantity
                         }
 
                         ok = await transfer.addNewUnits(storeId!, data)
                     } else {
+                        //product does not exists in destination store.
                         const data = {
                             store_id: storeId!,
                             depot_id: dataItem.store_depots.depot_id,
-                            product_remaining_units: remainingUnits,
                             product_units: dataItem.units_transferred_quantity,
-                            seller_profit_percentage: dataItem.store_depots.seller_profit_percentage,
+                            product_remaining_units: remainingUnits,
                             is_active: dataItem.store_depots.is_active,
                             sell_price: dataItem.store_depots.sell_price,
                             sell_price_unit: dataItem.store_depots.sell_price_unit,
+                            seller_profit_percentage: dataItem.store_depots.seller_profit_percentage,
                             seller_profit_quantity: dataItem.store_depots.seller_profit_quantity,
+                            seller_profit_unit: dataItem.store_depots.seller_profit_unit,
                             price_discount_percentage: dataItem.store_depots.price_discount_percentage,
                             price_discount_quantity: dataItem.store_depots.price_discount_quantity,
-                            seller_profit_unit: dataItem.store_depots.seller_profit_unit,
                         }
-                        ok = await transfer.createInstanceInStore(storeId!, data)
-                        product = await transfer.getStoreDepot(storeId!, dataItem.store_depots.depots.product_id)
 
-                        if (ok && dataItem.store_depots.product_offers.length) {
+                        const store_depot: store_depots = await transfer.createInstanceInStore(storeId!, data)
+
+                        if (store_depot && dataItem.store_depots.product_offers.length) {
                             const dataOffers = {
                                 product_offers: dataItem.store_depots.product_offers.map((offers) => (
                                     {
                                         compare_units_quantity: offers.compare_units_quantity,
                                         compare_function: offers.compare_function,
                                         price_per_unit: offers.price_per_unit,
-                                        store_depot_id: product.id,
+                                        store_depot_id: store_depot.id,
                                         is_active: offers.is_active
                                     }
                                 ))
                             }
+
                             ok = await transfer.addNewOffers(storeId!, dataOffers)
                         }
                     }
@@ -280,7 +284,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                     if (ok) {
                         await changeStatus({
                             id: dataItem.id,
-                            from_store_accepted: false,
+                            from_store_accepted: true,
                             to_store_accepted: true,
                             transfer_cancelled: false
                         })
@@ -336,8 +340,8 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                             storeDepot={storeDepotDetails!}
                             dataItem={dataItem}
                             handleAccept={handleAccept}
-
                         />
+
                         <Card variant='outlined' sx={{ padding: '10px' }}>
                             <Grid item container gap={1} justifyContent={'space-evenly'}>
                                 <Grid item>
@@ -348,7 +352,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                         startIcon={<Done fontSize='small' />}
                                         onClick={() => handleAccept(dataItem.units_transferred_quantity)}
                                     >
-                                        Aceptar
+                                        Dar entrada
                                     </Button>
                                 </Grid>
                                 <Grid item>
@@ -399,7 +403,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                         <Grid container>
                             <Grid item container rowSpacing={1}>
                                 <Grid item container spacing={1}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Tienda:</Grid>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{sent ? "Hacia: " : "Desde: "}</Grid>
                                     <Grid item>
                                         {dataItem.store_depots.stores.name}
                                     </Grid>
@@ -435,13 +439,6 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                 }
 
                                 <Grid item container spacing={1}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
-                                    <Grid item>
-                                        {`${dataItem.store_depots.depots.products.departments.name}`}
-                                    </Grid>
-                                </Grid>
-
-                                <Grid item container spacing={1}>
                                     <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades:</Grid>
                                     <Grid item>
                                         {`${dataItem.units_transferred_quantity}`}
@@ -455,39 +452,17 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                             display: "flex",
                                             alignItems: "center"
                                         }}>Características:</Grid>
-                                    <Grid item xs={true}
+                                    <Grid container item xs={true}
                                         sx={{ display: "flex", alignItems: "center" }}>
                                         {dataItem.store_depots.depots.products.characteristics.length > 0
                                             ? dataItem.store_depots.depots.products.characteristics.map((item: any) => (
-                                                <Grid
-                                                    key={item.id}
-                                                    sx={{
-                                                        display: "inline-flex",
-                                                        margin: "3px",
-                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                        padding: "2px 4px",
-                                                        borderRadius: "5px 2px 2px 2px",
-                                                        border: "1px solid rgba(130, 130, 130)",
-                                                        fontSize: 14,
-                                                    }}
-                                                >
-                                                    <Grid container item alignItems={"center"}
-                                                        sx={{ marginRight: "3px" }}>
-                                                        <Typography variant={"caption"}
-                                                            sx={{
-                                                                color: "white",
-                                                                fontWeight: "600"
-                                                            }}>
-                                                            {item.name.toUpperCase()}
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid container item alignItems={"center"}
-                                                        sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                        {item.value}
-                                                    </Grid>
+                                                <Grid key={item.id} item xs={12}>
+                                                    <Box display={"inline-flex"} mr={"5px"}>
+                                                        {`${item.name.toUpperCase()} = ${item.value}`}
+                                                    </Box>
                                                 </Grid>
-                                            )
-                                            ) : "-"
+
+                                            )) : "-"
                                         }
                                     </Grid>
                                 </Grid>

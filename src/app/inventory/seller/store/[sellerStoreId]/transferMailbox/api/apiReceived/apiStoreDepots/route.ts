@@ -21,10 +21,7 @@ export async function GET(req: Request, { params }: Params) {
                         }
                     }
                 },
-                {
-                    store_id: storeId
-                }
-
+                { store_id: storeId }
             ]
         },
         include: {
@@ -37,7 +34,20 @@ export async function GET(req: Request, { params }: Params) {
 
 
 export async function POST(req: Request) {
-    const { store_id, depot_id, product_remaining_units, product_units, seller_profit_percentage, is_active, sell_price, sell_price_unit, seller_profit_quantity, price_discount_percentage, price_discount_quantity, seller_profit_unit } = await req.json()
+    const {
+        store_id,
+        depot_id,
+        product_remaining_units,
+        product_units,
+        seller_profit_percentage,
+        is_active,
+        sell_price,
+        sell_price_unit,
+        seller_profit_quantity,
+        price_discount_percentage,
+        price_discount_quantity,
+        seller_profit_unit
+    } = await req.json()
 
     const data = {
         store_id,
