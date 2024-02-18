@@ -2,6 +2,7 @@ import { enqueueSnackbar, closeSnackbar } from "notistack";
 import { Button } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
+import {product_offers} from "@prisma/client";
 
 export const numberFormat = (number: string) => parseFloat((Math.round(parseFloat(number.toString()) * 100) / 100).toFixed(2))
 
@@ -32,7 +33,7 @@ export const notifyWarning = (message: string, requireUserConfirm?: boolean) => 
     : enqueueSnackbar(message, { variant: "warning", autoHideDuration: 6000 })
 
 //return offer price per unit from first applicable offer found. return false if no applicable offer found
-function evaluateOffers(offerItems: any[], itemsQuantity: number): number | false {
+function evaluateOffers(offerItems: product_offers[], itemsQuantity: number): number | false {
     const evaluate = (compareFunction: string, compareQuantity: number, itemsQuantity: number): boolean => {
         switch (compareFunction) {
             case "=":
@@ -46,7 +47,7 @@ function evaluateOffers(offerItems: any[], itemsQuantity: number): number | fals
         }
     }
 
-    const foundApplicableOfferIndex = offerItems.findIndex(item => evaluate(item.compare_function, item.compare_units_quantity, itemsQuantity))
+    const foundApplicableOfferIndex = offerItems.findIndex(item => item.is_active && evaluate(item.compare_function, item.compare_units_quantity, itemsQuantity))
 
     if (foundApplicableOfferIndex > -1)
         return offerItems[foundApplicableOfferIndex].price_per_unit
