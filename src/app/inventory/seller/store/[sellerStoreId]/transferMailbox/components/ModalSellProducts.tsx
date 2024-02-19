@@ -26,10 +26,10 @@ interface ModalSellProductsProps {
     setOpen: (bool: boolean) => void
     storeDepot: TransferStoreDepots
     dataItem: DataTransferReceived
-    handleAccept: (units: number) => void
+    reloadData: () => void
 }
 
-export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen, storeDepot, dataItem, handleAccept }: ModalSellProductsProps) {
+export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen, storeDepot, dataItem, reloadData }: ModalSellProductsProps) {
     const handleClose = () => {
         setOpen(false);
     };
@@ -88,20 +88,10 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
         )
 
         const handleSubmit = async (values: { units: string, paymentMethod: string }) => {
-            const units = parseInt(values.units)
-            const data = {
-                total_price: totalPrice,
-                payment_method: values.paymentMethod,
-                store_depot_id: storeDepot.id,
-                units_quantity: units,
-                price: parseInt(computeDepotPricePerUnit(storeDepot, units))
-            }
-
-            const result = await transfer.createSells(storeId!, data)
+            const result = await transfer.handleAcceptTransferAndSell(storeId!, dataItem.id, values.units, values.paymentMethod)
 
             if (result) {
-                handleAccept(dataItem.units_transferred_quantity - units)
-
+                reloadData()
                 notifySuccess("Se completó la venta")
             }
         }
@@ -155,7 +145,6 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
                                                             ? getTotal(e.target.value)
                                                             : defaultValues()
                                                     }}
-                                                    disabled
                                                 />
                                             </Grid>
 

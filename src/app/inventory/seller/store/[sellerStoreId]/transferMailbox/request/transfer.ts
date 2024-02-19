@@ -97,6 +97,28 @@ export const transfer = {
         return false
     },
 
+    handleAcceptTransferAndSell: async function (storeId: number, productStoreTransferId: number, sellUnitsQuantity: number, paymentMethod: string) {
+        try {
+            const result = await apiRequest.patch(urlTransfer(storeId), {productStoreTransferId, sellUnitsQuantity, paymentMethod})
+
+            return result.data
+        } catch (e) {
+            notifyError("Ha ocurrido un error al aceptar la transferencia")
+        }
+        return false
+    },
+
+    handleCancelTransfer: async function (storeId: number, productStoreTransferId: number) {
+        try {
+            const result = await apiRequest.put(urlTransfer(storeId), {productStoreTransferId})
+
+            return result.data
+        } catch (e) {
+            notifyError("Ha ocurrido un error al cancelar la transferencia")
+        }
+        return false
+    },
+
     addNewUnits: async function (storeId: number, data: { id: number, product_remaining_units: number, product_units: number }) {
         try {
             const result = await apiRequest.put(urlStoreDepot(storeId), data)

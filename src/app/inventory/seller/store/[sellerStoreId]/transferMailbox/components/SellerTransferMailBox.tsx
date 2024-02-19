@@ -285,7 +285,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                             storeId={storeId!}
                             storeDepot={storeDepotDetails!}
                             dataItem={dataItem}
-                            handleAccept={handleAccept}
+                            reloadData={() => setForceRender(true)}
                         />
 
                         <Card variant='outlined' sx={{ padding: '10px' }}>
