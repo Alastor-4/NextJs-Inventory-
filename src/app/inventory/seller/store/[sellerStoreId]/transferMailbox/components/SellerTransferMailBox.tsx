@@ -252,7 +252,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                             depot_id: dataItem.store_depots.depot_id,
                             product_units: dataItem.units_transferred_quantity,
                             product_remaining_units: remainingUnits,
-                            is_active: dataItem.store_depots.is_active,
+                            is_active: false,
                             sell_price: dataItem.store_depots.sell_price,
                             sell_price_unit: dataItem.store_depots.sell_price_unit,
                             seller_profit_percentage: dataItem.store_depots.seller_profit_percentage,
@@ -297,6 +297,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
 
                 const handleSell = async () => {
                     const product = await transfer.getStoreDepot(storeId!, dataItem.store_depots.depots.product_id)
+
                     setStoreDepotDetails(
                         product ?? dataItem.store_depots
                     )

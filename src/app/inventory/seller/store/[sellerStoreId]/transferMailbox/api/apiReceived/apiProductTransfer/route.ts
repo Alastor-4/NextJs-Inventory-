@@ -259,15 +259,36 @@ export async function PATCH(req: Request) {
 
 //handle cancel transfer
 export async function PUT(req: Request) {
-    const { id, from_store_accepted, to_store_accepted, transfer_cancelled } = await req.json()
+    const { productStoreTransferId } = await req.json()
 
-    const data = {
-        from_store_accepted,
-        to_store_accepted,
-        transfer_cancelled
+    const storeTransferItem = await prisma.product_store_transfers.findUniqueOrThrow(
+        {
+            where: { id: parseInt(productStoreTransferId) },
+            include: {
+                store_depots: {
+                    include: {
+                        depots: {include: {products: true}},
+                    }
+                }
+            }
+        }
+    )
+
+    if (!storeTransferItem.to_store_accepted && !storeTransferItem.transfer_cancelled) {
+        const [res1, res2] = await prisma.$transaction([
+            //restore transferred units to origin store
+            prisma.store_depots.update({
+                data: {
+                    product_remaining_units: {increment: storeTransferItem.units_transferred_quantity!}
+                },
+                where: {id: storeTransferItem.store_depots!.store_id!}
+            }),
+
+            prisma.product_store_transfers.update({ data: { transfer_cancelled: true }, where: { id: storeTransferItem.id } })
+        ])
+
+        return NextResponse.json(res2)
+    } else {
+        return new Response("Ya se ha tomado alguna acción sobre la transferencia proporcionada", {status: 400})
     }
-
-    const result = await prisma.product_store_transfers.update({ data, where: { id: id } })
-
-    return NextResponse.json(result)
 }

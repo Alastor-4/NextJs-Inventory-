@@ -97,6 +97,17 @@ export const transfer = {
         return false
     },
 
+    handleAcceptTransfer: async function (storeId: number, data: TransferStoreDepots) {
+        try {
+            const result = await apiRequest.post(urlStoreDepot(storeId), data)
+
+            return result.data
+        } catch (e) {
+            notifyError("Error al enviar este producto en la tienda")
+        }
+        return false
+    },
+
     addNewUnits: async function (storeId: number, data: { id: number, product_remaining_units: number, product_units: number }) {
         try {
             const result = await apiRequest.put(urlStoreDepot(storeId), data)
