@@ -64,17 +64,6 @@ export const transfer = {
         return false
     },
 
-    changeTransferStatus: async function (storeId: number, data: { id: number, from_store_accepted: boolean, to_store_accepted: boolean, transfer_cancelled: boolean }) {
-        try {
-            const result = await apiRequest.put(urlTransfer(storeId), data)
-
-            return result.status
-        } catch (e) {
-            notifyError("Error al cambiar de estado la trasnferencia")
-        }
-        return false
-    },
-
     getStoreDepot: async function (storeId: number, productId: number) {
         try {
             const result = await apiRequest.get(urlStoreDepot(storeId), { params: { productId: productId } })
@@ -115,28 +104,6 @@ export const transfer = {
             return result.data
         } catch (e) {
             notifyError("Ha ocurrido un error al cancelar la transferencia")
-        }
-        return false
-    },
-
-    addNewUnits: async function (storeId: number, data: { id: number, product_remaining_units: number, product_units: number }) {
-        try {
-            const result = await apiRequest.put(urlStoreDepot(storeId), data)
-
-            return result.status
-        } catch (e) {
-            notifyError("Error al agregar nuevas unidades")
-        }
-        return false
-    },
-
-    createSells: async function (storeId: number, data: SellsAndSellProductProps) {
-        try {
-            const result = await apiRequest.post(urlSells(storeId), data)
-
-            return result.status
-        } catch (e) {
-            notifyError("Error al realizar la venta")
         }
         return false
     },

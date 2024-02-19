@@ -3,11 +3,11 @@
 import {
     ArrowLeft,
     ArrowLeftOutlined,
-    Cancel, ChangeCircleOutlined, CreateNewFolderOutlined,
+    Cancel,
     Done,
     FilterAltOutlined,
-    Money, PauseOutlined, StartOutlined,
-    VisibilityOutlined, VpnKey
+    Money,
+    VisibilityOutlined,
 } from '@mui/icons-material'
 import {
     AppBar,
@@ -16,7 +16,6 @@ import {
     Card,
     CardContent,
     Chip,
-    Divider,
     Grid,
     IconButton,
     Toolbar,
@@ -26,11 +25,11 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import transfer from '../request/transfer'
 import dayjs from 'dayjs'
-import {images, store_depots, stores} from '@prisma/client'
+import {images, stores} from '@prisma/client'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
 import { DataTransferReceived, TransferStoreDepots } from './TypeTransfers'
 import ModalSellProducts from './ModalSellProducts'
-import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import { notifySuccess } from "@/utils/generalFunctions";
 import ModalFilter from './ModalFilter'
 import {TableNoData} from "@/components/TableNoData";
 
@@ -73,8 +72,8 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
     //get initial data
     useEffect(() => {
         const checkStatus = (item: DataTransferReceived) => {
-            if (item.from_store_accepted) return 1
-            if (item.to_store_accepted) return 2
+            if (item.from_store_accepted && !item.to_store_accepted && !item.transfer_cancelled) return 1
+            if (item.from_store_accepted && item.to_store_accepted && !item.transfer_cancelled) return 2
             else return 3
         }
 
@@ -219,17 +218,6 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                 const [activeModalSell, setActiveModalSell] = useState(false)
                 const [storeDepotDetails, setStoreDepotDetails] = useState<null | TransferStoreDepots>(null)
 
-                const changeStatus = async (dataChangeStatus: { id: number, from_store_accepted: boolean, to_store_accepted: boolean, transfer_cancelled: boolean }) => {
-                    const result = await transfer.changeTransferStatus(storeId!, dataChangeStatus)
-
-                    setForceRender(true)
-
-                    return result
-                }
-
-                const updateProductUnits = async (data: { id: number, product_remaining_units: number, product_units: number }) => {
-                    return await transfer.addNewUnits(storeId!, data)
-                }
 
                 const handleAccept = async (remainingUnits: number) => {
                     const acceptResponse = await transfer.handleAcceptTransfer(storeId!, dataItem.id)
@@ -243,34 +231,17 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                 const handleSell = async () => {
                     const product = await transfer.getStoreDepot(storeId!, dataItem.store_depots.depots.product_id)
 
-                    setStoreDepotDetails(
-                        product ?? dataItem.store_depots
-                    )
+                    setStoreDepotDetails(product ?? dataItem.store_depots)
 
                     setActiveModalSell(true)
                 }
 
                 const handleCancel = async () => {
-                    const dataUpdate = {
-                        id: dataItem.store_depot_id,
-                        product_remaining_units: dataItem.store_depots.product_remaining_units + dataItem.units_transferred_quantity,
-                        product_units: dataItem.store_depots.product_units
-                    }
-
-                    const ok = await updateProductUnits(dataUpdate)
-                    if (ok) {
-                        const dataCancel = {
-                            id: dataItem.id,
-                            from_store_accepted: false,
-                            to_store_accepted: dataItem.to_store_accepted,
-                            transfer_cancelled: true
-                        }
-
-                        await changeStatus(dataCancel)
-
+                    const cancelResponse = await transfer.handleCancelTransfer(storeId!, dataItem.id)
+                    if (cancelResponse) {
                         notifySuccess("Transferencia cancelada. Producto retornado a la tienda origen")
-                    } else {
-                        notifyError("El proceso de Cancelar transferencia ha fallado", true)
+
+                        setForceRender(true)
                     }
                 }
 
@@ -539,11 +510,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                         </Grid>
                     ))
                 }
-
-
-
             </>
-
         )
     }
 

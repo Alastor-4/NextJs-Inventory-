@@ -1,11 +1,52 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/db";
-import {create} from "zustand";
-import {Prisma} from "@prisma/client";
-import {computeDepotPricePerUnit} from "@/utils/generalFunctions";
+import {product_offers} from "@prisma/client";
 
 interface Params {
     params: { sellerStoreId: string }
+}
+
+//return offer price per unit from first applicable offer found. return false if no applicable offer found
+function evaluateOffers(offerItems: product_offers[], itemsQuantity: number): number | false {
+    const evaluate = (compareFunction: string, compareQuantity: number, itemsQuantity: number): boolean => {
+        switch (compareFunction) {
+            case "=":
+                return itemsQuantity === compareQuantity
+
+            case ">":
+                return itemsQuantity > compareQuantity
+
+            default:
+                return false
+        }
+    }
+
+    const foundApplicableOfferIndex = offerItems.findIndex(item => item.is_active && evaluate(item.compare_function, item.compare_units_quantity, itemsQuantity))
+
+    if (foundApplicableOfferIndex > -1)
+        return offerItems[foundApplicableOfferIndex].price_per_unit
+
+    return false
+}
+
+//compute price per unit using offers (if exist and apply some) and discount if exist
+function computeDepotPricePerUnit(storeDepotWithOffersRelation: any, unitsQuantity: number): number {
+    const productOffers = storeDepotWithOffersRelation.product_offers
+    const productHasOffers = !!productOffers.length
+
+    const offersEvaluation = productHasOffers
+        ? evaluateOffers(productOffers, unitsQuantity)
+        : false
+
+    //final price method: If product has offers and unitsQuantity apply to one of them, final price is taken from
+    //fulfilled offer. If no applicable offer exist then final price es taken from product base price and discount if it exists
+    return offersEvaluation
+        ? offersEvaluation
+        : storeDepotWithOffersRelation.price_discount_quantity
+            ? storeDepotWithOffersRelation.sell_price - storeDepotWithOffersRelation.price_discount_quantity
+            : storeDepotWithOffersRelation.price_discount_percentage
+                ? storeDepotWithOffersRelation.sell_price - (storeDepotWithOffersRelation.price_discount_percentage * storeDepotWithOffersRelation.sell_price / 100)
+                : storeDepotWithOffersRelation.sell_price
 }
 
 export async function GET(req: Request, { params }: Params) {
@@ -89,7 +130,7 @@ export async function POST(req: Request) {
                     }
                 ),
 
-                prisma.product_store_transfers.update({ data: { from_store_accepted: true }, where: { id: storeTransferItem.id } })
+                prisma.product_store_transfers.update({ data: { to_store_accepted: true }, where: { id: storeTransferItem.id } })
             ])
 
             return NextResponse.json(res2)
@@ -117,7 +158,7 @@ export async function POST(req: Request) {
                     }
                 ),
 
-                prisma.product_store_transfers.update({ data: { from_store_accepted: true }, where: { id: storeTransferItem.id } })
+                prisma.product_store_transfers.update({ data: { to_store_accepted: true }, where: { id: storeTransferItem.id } })
             ])
 
             return NextResponse.json(res2)
@@ -199,12 +240,29 @@ export async function PATCH(req: Request) {
                         }
                     }),
 
-                    prisma.product_store_transfers.update({ data: { from_store_accepted: true }, where: { id: storeTransferItem.id } })
+                    prisma.product_store_transfers.update({ data: { to_store_accepted: true }, where: { id: storeTransferItem.id } })
                 ])
 
                 return NextResponse.json(res3)
             } else {
                 //when depot does not exist create it with same properties in origen store
+                const newOffers = storeTransferItem.store_depots!.product_offers.map(item => (
+                    {
+                        compare_units_quantity: item.compare_units_quantity,
+                        compare_function: item.compare_function,
+                        price_per_unit: item.price_per_unit,
+                        is_active: item.is_active,
+                    })
+                )
+
+                const newProperties = storeTransferItem.store_depots!.store_depot_properties.map(item => (
+                    {
+                        name: item.name,
+                        value: item.value,
+                        is_active: item.is_active,
+                    })
+                )
+
                 const newStoreDepot = await prisma.store_depots.create(
                     {
                         data: {
@@ -220,9 +278,10 @@ export async function PATCH(req: Request) {
                             price_discount_percentage: storeTransferItem.store_depots!.price_discount_percentage,
                             price_discount_quantity: storeTransferItem.store_depots!.price_discount_quantity,
                             discount_description: storeTransferItem.store_depots!.discount_description,
-                            product_offers: {createMany: {data: storeTransferItem.store_depots!.product_offers}},
-                            store_depot_properties: {createMany: {data: storeTransferItem.store_depots!.store_depot_properties}},
-                        }
+                            product_offers: {createMany: {data: newOffers}},
+                            store_depot_properties: {createMany: {data: newProperties}},
+                        },
+                        include: {product_offers: true}
                     }
                 )
 
@@ -244,7 +303,7 @@ export async function PATCH(req: Request) {
                         }
                     }),
 
-                    prisma.product_store_transfers.update({ data: { from_store_accepted: true }, where: { id: storeTransferItem.id } })
+                    prisma.product_store_transfers.update({ data: { to_store_accepted: true }, where: { id: storeTransferItem.id } })
                 ])
 
                 return NextResponse.json(res2)
