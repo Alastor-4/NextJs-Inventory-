@@ -324,11 +324,7 @@ export async function PUT(req: Request) {
         {
             where: { id: parseInt(productStoreTransferId) },
             include: {
-                store_depots: {
-                    include: {
-                        depots: {include: {products: true}},
-                    }
-                }
+                store_depots: true
             }
         }
     )
@@ -338,9 +334,13 @@ export async function PUT(req: Request) {
             //restore transferred units to origin store
             prisma.store_depots.update({
                 data: {
-                    product_remaining_units: {increment: storeTransferItem.units_transferred_quantity!}
+                    product_remaining_units: {
+                        increment: storeTransferItem.store_depots!.product_remaining_units === -1
+                            ? storeTransferItem.units_transferred_quantity! + 1
+                            : storeTransferItem.units_transferred_quantity!
+                    }
                 },
-                where: {id: storeTransferItem.store_depots!.store_id!}
+                where: {id: storeTransferItem.store_depot_id!}
             }),
 
             prisma.product_store_transfers.update({ data: { transfer_cancelled: true }, where: { id: storeTransferItem.id } })
