@@ -27,7 +27,7 @@ import transfer from '../request/transfer'
 import dayjs from 'dayjs'
 import {images, stores} from '@prisma/client'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
-import { DataTransferReceived, TransferStoreDepots } from './TypeTransfers'
+import { DataTransferReceived, TransferStoreDepots } from '@/types/transfer-interfaces'
 import ModalSellProducts from './ModalSellProducts'
 import { notifySuccess } from "@/utils/generalFunctions";
 import ModalFilter from './ModalFilter'

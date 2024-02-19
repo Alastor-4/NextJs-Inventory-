@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import React, { useState } from "react";
-import { DataTransferReceived, TransferStoreDepots } from "./TypeTransfers";
+import { DataTransferReceived, TransferStoreDepots } from "@/types/transfer-interfaces";
 import { Formik } from "formik";
 import * as Yup from 'yup'
 import { computeDepotPricePerUnit, notifySuccess, numberFormat } from "@/utils/generalFunctions";
