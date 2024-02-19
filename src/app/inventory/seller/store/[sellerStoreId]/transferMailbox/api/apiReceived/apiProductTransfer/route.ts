@@ -72,12 +72,9 @@ export async function POST(req: Request) {
             }
         )
 
-        let res1
-        let res2
-
         if (depotInDestinationStore) {
             //when depot exist only modify with transferred units in it
-            [res1, res2] = await prisma.$transaction([
+            const [res1, res2] = await prisma.$transaction([
                 prisma.store_depots.update(
                     {
                         data: {
@@ -94,9 +91,11 @@ export async function POST(req: Request) {
 
                 prisma.product_store_transfers.update({ data: { from_store_accepted: true }, where: { id: storeTransferItem.id } })
             ])
+
+            return NextResponse.json(res2)
         } else {
             //when depot does not exist create it with same properties in origen store
-            [res1, res2] = await prisma.$transaction([
+            const [res1, res2] = await prisma.$transaction([
                 prisma.store_depots.create(
                     {
                         data: {
@@ -120,9 +119,9 @@ export async function POST(req: Request) {
 
                 prisma.product_store_transfers.update({ data: { from_store_accepted: true }, where: { id: storeTransferItem.id } })
             ])
-        }
 
-        return NextResponse.json(res2)
+            return NextResponse.json(res2)
+        }
     } else {
         return new Response("Ya se ha tomado alguna acción sobre la transferencia proporcionada", {status: 400})
     }
@@ -258,6 +257,7 @@ export async function PATCH(req: Request) {
     }
 }
 
+//handle cancel transfer
 export async function PUT(req: Request) {
     const { id, from_store_accepted, to_store_accepted, transfer_cancelled } = await req.json()
 
