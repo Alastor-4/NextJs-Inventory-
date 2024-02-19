@@ -4,7 +4,7 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogTitle,
+    DialogTitle, FormHelperText,
     Grid,
     IconButton,
     MenuItem,
@@ -19,7 +19,10 @@ import {Formik} from "formik";
 import {DatePicker, esES, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {DemoContainer} from "@mui/x-date-pickers/internals/demo";
-import dayjs from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+
+dayjs.extend(isSameOrBefore)
 
 interface FiltersProps {
     open: boolean
@@ -41,8 +44,11 @@ const WarehouseTransfersFilters = ({ open, handleClose, storeOptions, loadData, 
 
     const validationSchema = Yup.object({
         storeId: Yup.string(),
-        startDate: Yup.string(),
-        endDate: Yup.string(),
+        endDate: Yup.object(),
+        startDate: Yup.object() // @ts-ignore
+            .test('beforeDate', 'Fecha anterior a la final', (value: Dayjs, contest) => {
+                return value.isSameOrBefore(contest.parent.endDate);
+        })
     })
 
     return (
@@ -109,6 +115,13 @@ const WarehouseTransfersFilters = ({ open, handleClose, storeOptions, loadData, 
                                             />
                                         </DemoContainer>
                                     </LocalizationProvider>
+                                    {
+                                        formik.errors.startDate && (
+                                            <FormHelperText sx={{color: "red"}}>
+                                                {JSON.stringify(formik.errors.startDate)}
+                                            </FormHelperText>
+                                        )
+                                    }
                                 </Grid>
 
                                 <Grid item xs={12} >
@@ -135,6 +148,7 @@ const WarehouseTransfersFilters = ({ open, handleClose, storeOptions, loadData, 
                                 startIcon={<FilterAlt />}
                                 color="primary"
                                 variant="outlined"
+                                disabled={!formik.isValid}
                                 onClick={() => formik.handleSubmit()}
                             >
                                 Aplicar

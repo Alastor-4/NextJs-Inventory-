@@ -32,7 +32,7 @@ import {
 } from '@mui/icons-material';
 import { TableNoData } from '@/components/TableNoData';
 import {images} from "@prisma/client";
-import {transactionToStore, transactionToWarehouse} from "@/utils/generalFunctions";
+import {transactionToWarehouse} from "@/utils/generalFunctions";
 
 interface ModalTransfersTodayProps {
     isOpen: boolean;
@@ -51,6 +51,12 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
     const handleCloseModal = () => {
         setIsOpen(false);
     }
+
+    React.useEffect(() => {
+        if (transfersData?.store?.length === 0) {
+            setDisplayStoreStoreTransfers(false)
+        }
+    }, [transfersData])
 
     const StoreToStoreTransfers = ({storeTransfers}: {storeTransfers: any[]}) => {
         const TableHeader = () => {
@@ -195,31 +201,11 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
 
                                                 <Grid container item spacing={1} xs={12}>
                                                     <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
-                                                    <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
+                                                    <Grid container item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                         {transferItem.store_depots.depots.products.characteristics.length > 0
                                                             ? transferItem.store_depots.depots.products.characteristics.map((item: any) => (
-                                                                <Grid
-                                                                    key={item.id}
-                                                                    sx={{
-                                                                        display: "inline-flex",
-                                                                        margin: "3px",
-                                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                                        padding: "2px 4px",
-                                                                        borderRadius: "5px 2px 2px 2px",
-                                                                        border: "1px solid rgba(130, 130, 130)",
-                                                                        fontSize: 14,
-                                                                    }}
-                                                                >
-                                                                    <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
-                                                                        <Typography variant={"caption"}
-                                                                                    sx={{ color: "white", fontWeight: "600" }}>
-                                                                            {item.name.toUpperCase()}
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid container item alignItems={"center"}
-                                                                          sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                                        {item.value}
-                                                                    </Grid>
+                                                                <Grid key={item.id} item xs={12}>
+                                                                    {`${item.name.toUpperCase()} = ${item.value}`}
                                                                 </Grid>
                                                             )) : "-"
                                                         }
@@ -227,7 +213,7 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{storeId === +transferItem.to_store_id ? "Origen" : "Destino"}</Grid>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{storeId === +transferItem.to_store_id ? "Origen: " : "Destino: "}</Grid>
                                                     <Grid item xs={true}>{transferItem.stores.name}</Grid>
                                                 </Grid>
 
@@ -241,7 +227,7 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                                                 }
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Estado</Grid>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Estado:</Grid>
                                                     <Grid item xs={true}>
                                                         <Chip
                                                             variant={"outlined"}
@@ -324,19 +310,17 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                                     hover
                                     tabIndex={-1}
                                 >
-                                    <TableCell>
-                                        <Tooltip title={"Detalles"}>
-                                            <IconButton
-                                                size={"small"}
-                                                onClick={() => setShowDetailsId((showDetailsId !== transferItem.id) ? transferItem.id : -1)}
-                                            >
-                                                {
-                                                    (showDetailsId !== transferItem.id)
-                                                        ? <ExpandMoreOutlined />
-                                                        : <ExpandLessOutlined />
-                                                }
-                                            </IconButton>
-                                        </Tooltip>
+                                    <TableCell padding={"none"}>
+                                        <IconButton
+                                            size={"small"}
+                                            onClick={() => setShowDetailsId((showDetailsId !== transferItem.id) ? transferItem.id : -1)}
+                                        >
+                                            {
+                                                (showDetailsId !== transferItem.id)
+                                                    ? <ExpandMoreOutlined />
+                                                    : <ExpandLessOutlined />
+                                            }
+                                        </IconButton>
                                     </TableCell>
                                     <TableCell>
                                         {
@@ -366,14 +350,14 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                                     <TableCell>
                                         <Grid container>
                                             <Grid container item xs={12} justifyContent={"center"}>
-                                                {transferItem.transfer_direction === transactionToStore
+                                                {transferItem.transfer_direction === transactionToWarehouse
                                                     ? <Mail fontSize={"small"} color={"primary"}/>
                                                     : <ForwardToInbox fontSize={"small"} color={"secondary"}/>
                                                 }
                                             </Grid>
 
                                             <Grid container item xs={12} justifyContent={"center"}>
-                                                {transferItem.transfer_direction === transactionToStore ? "Origen:" : "Destino:"}
+                                                {transferItem.transfer_direction === transactionToWarehouse ? "Destino: " : "Origen: "}
                                                 {transferItem.store_depots.depots.warehouses.name}
                                             </Grid>
                                         </Grid>
@@ -411,31 +395,11 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
 
                                                 <Grid container item spacing={1} xs={12}>
                                                     <Grid item xs={"auto"} sx={{ fontWeight: 600, display: "flex", alignItems: "center" }}>Características:</Grid>
-                                                    <Grid item xs={true} sx={{ display: "flex", alignItems: "center" }}>
+                                                    <Grid container item xs={true} sx={{ display: "flex", alignItems: "center" }}>
                                                         {transferItem.store_depots.depots.products.characteristics.length > 0
                                                             ? transferItem.store_depots.depots.products.characteristics.map((item: any) => (
-                                                                <Grid
-                                                                    key={item.id}
-                                                                    sx={{
-                                                                        display: "inline-flex",
-                                                                        margin: "3px",
-                                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                                        padding: "2px 4px",
-                                                                        borderRadius: "5px 2px 2px 2px",
-                                                                        border: "1px solid rgba(130, 130, 130)",
-                                                                        fontSize: 14,
-                                                                    }}
-                                                                >
-                                                                    <Grid container item alignItems={"center"} sx={{ marginRight: "3px" }}>
-                                                                        <Typography variant={"caption"}
-                                                                                    sx={{ color: "white", fontWeight: "600" }}>
-                                                                            {item.name.toUpperCase()}
-                                                                        </Typography>
-                                                                    </Grid>
-                                                                    <Grid container item alignItems={"center"}
-                                                                          sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                                        {item.value}
-                                                                    </Grid>
+                                                                <Grid key={item.id} item xs={12}>
+                                                                    {`${item.name.toUpperCase()} = ${item.value}`}
                                                                 </Grid>
                                                             )) : "-"
                                                         }
@@ -443,31 +407,14 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{transferItem.transfer_direction === transactionToWarehouse ? "Destino" : "Origen"}</Grid>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{transferItem.transfer_direction === transactionToWarehouse ? "Destino" : "Origen:"}</Grid>
                                                     <Grid item xs={true}>{transferItem.store_depots.depots.warehouses.name}</Grid>
                                                 </Grid>
 
                                                 <Grid container item spacing={1} xs={12}>
-                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Estado</Grid>
+                                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Creador:</Grid>
                                                     <Grid item xs={true}>
-                                                        <Chip
-                                                            variant={"outlined"}
-                                                            color={
-                                                                transferItem.to_store_accepted
-                                                                    ? "success"
-                                                                    : transferItem.transfer_cancelled
-                                                                        ? "error"
-                                                                        : "warning"
-                                                            }
-                                                            label={
-                                                                transferItem.to_store_accepted
-                                                                    ? "Aceptada"
-                                                                    : transferItem.transfer_cancelled
-                                                                        ? "Cancelada"
-                                                                        : "Pendiente"
-                                                            }
-                                                            size={"small"}
-                                                        />
+                                                        {transferItem.created_by_user.name}
                                                     </Grid>
                                                 </Grid>
                                             </Grid>
@@ -496,13 +443,6 @@ const ModalTransfersToday = ({ isOpen, setIsOpen, transfersData, storeId }: Moda
            </>
         )
     }
-
-    const handleChange = (
-        event: React.MouseEvent<HTMLElement>,
-        newValue: boolean,
-    ) => {
-        setDisplayStoreStoreTransfers(newValue);
-    };
 
     return (
         <Dialog open={isOpen} onClose={handleCloseModal} fullScreen>

@@ -1,16 +1,37 @@
 "use client"
-import { ArrowLeft, ArrowLeftOutlined, Cancel, Done, FilterAlt, Money, VisibilityOutlined } from '@mui/icons-material'
-import { AppBar, Box, Button, Card, CardContent, Chip, Grid, IconButton, Toolbar, Typography } from '@mui/material'
+
+import {
+    ArrowLeft,
+    ArrowLeftOutlined,
+    Cancel,
+    Done,
+    FilterAltOutlined,
+    Money,
+    VisibilityOutlined,
+} from '@mui/icons-material'
+import {
+    AppBar,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    Grid,
+    IconButton,
+    Toolbar,
+    Typography
+} from '@mui/material'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import transfer from '../request/transfer'
 import dayjs from 'dayjs'
-import { images, stores } from '@prisma/client'
+import {images, stores} from '@prisma/client'
 import ImagesDisplayDialog from '@/components/ImagesDisplayDialog'
-import { DataTransferReceived, TransferStoreDepots } from './TypeTransfers'
+import { DataTransferReceived, TransferStoreDepots } from '@/types/transfer-interfaces'
 import ModalSellProducts from './ModalSellProducts'
-import { notifyError, notifySuccess } from "@/utils/generalFunctions";
+import { notifySuccess } from "@/utils/generalFunctions";
 import ModalFilter from './ModalFilter'
+import {TableNoData} from "@/components/TableNoData";
 
 interface SellerTransferMailboxProps {
     userId?: number
@@ -40,7 +61,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
     const [allOwnerStores, setAllOwnerStores] = useState<AllOwnerStores[]>([])
 
     //Filters
-    const [showModalFilter, setShowModalFilter] = useState(true)
+    const [showModalFilter, setShowModalFilter] = useState(false)
 
     //selectedFilters
     const [selectedStatus, setSelectedStatus] = useState<number[]>([])
@@ -51,8 +72,8 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
     //get initial data
     useEffect(() => {
         const checkStatus = (item: DataTransferReceived) => {
-            if (item.from_store_accepted) return 1
-            if (item.to_store_accepted) return 2
+            if (item.from_store_accepted && !item.to_store_accepted && !item.transfer_cancelled) return 1
+            if (item.from_store_accepted && item.to_store_accepted && !item.transfer_cancelled) return 2
             else return 3
         }
 
@@ -148,37 +169,33 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
     const handleClickFilter = () => {
         setShowModalFilter(true)
     }
+
     const CustomToolbar = () => (
         <AppBar position={"static"} variant={"elevation"} color={"primary"}>
             <Toolbar sx={{ display: "flex", justifyContent: "space-between", color: "white" }}>
-                <Grid container>
+                <Box sx={{ display: "flex", alignItems: "center", overflowX: "auto" }}>
+                    <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
+                        <ArrowLeft fontSize={"large"} />
+                    </IconButton>
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            fontWeight: 700,
+                            letterSpacing: ".2rem",
+                            color: "white",
+                            overflowX: "auto",
+                            whiteSpace: "nowrap"
+                        }}
+                    >
+                        Transferencias {sent ? "enviadas" : "recibidas"}
+                    </Typography>
+                </Box>
 
-                    <Grid item>
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <IconButton color={"inherit"} sx={{ mr: "10px" }} onClick={handleNavigateBack}>
-                                <ArrowLeft fontSize={"large"} />
-                            </IconButton>
-                            <Typography
-                                variant="h6"
-                                noWrap
-                                sx={{
-                                    fontWeight: 700,
-                                    letterSpacing: ".2rem",
-                                    color: "white",
-                                }}
-                            >
-                                Transferencias
-                            </Typography>
-                        </Box>
-                    </Grid>
-
-                    <Grid item marginLeft={'auto'}>
-                        <IconButton onClick={handleClickFilter}>
-                            <FilterAlt />
-                        </IconButton>
-                    </Grid>
-
-                </Grid>
+                <Box sx={{ display: "flex" }}>
+                    <IconButton color={"inherit"} onClick={handleClickFilter}>
+                        <FilterAltOutlined fontSize={"small"}/>
+                    </IconButton>
+                </Box>
             </Toolbar>
         </AppBar>
     )
@@ -201,108 +218,30 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                 const [activeModalSell, setActiveModalSell] = useState(false)
                 const [storeDepotDetails, setStoreDepotDetails] = useState<null | TransferStoreDepots>(null)
 
-                const changeStatus = async (dataChangeStatus: { id: number, from_store_accepted: boolean, to_store_accepted: boolean, transfer_cancelled: boolean }) => {
-                    const result = await transfer.changeTransferStatus(storeId!, dataChangeStatus)
-
-                    setForceRender(true)
-
-                    return result
-                }
-
-                const updateProductUnits = async (data: { id: number, product_remaining_units: number, product_units: number }) => {
-                    return await transfer.addNewUnits(storeId!, data)
-                }
 
                 const handleAccept = async (remainingUnits: number) => {
-                    let ok: number | boolean = false
-                    let product = await transfer.getStoreDepot(storeId!, dataItem.store_depots.depots.product_id)
+                    const acceptResponse = await transfer.handleAcceptTransfer(storeId!, dataItem.id)
+                    if (acceptResponse) {
+                        notifySuccess("Transferencia aceptada. Producto agregado a la tienda")
 
-                    if (product) {
-                        const data = {
-                            id: product.id,
-                            product_remaining_units: product.product_remaining_units + dataItem.units_transferred_quantity,
-                            product_units: product.product_units + dataItem.units_transferred_quantity
-                        }
-
-                        ok = await transfer.addNewUnits(storeId!, data)
-                    } else {
-                        const data = {
-                            store_id: storeId!,
-                            depot_id: dataItem.store_depots.depot_id,
-                            product_remaining_units: remainingUnits,
-                            product_units: dataItem.units_transferred_quantity,
-                            seller_profit_percentage: dataItem.store_depots.seller_profit_percentage,
-                            is_active: dataItem.store_depots.is_active,
-                            sell_price: dataItem.store_depots.sell_price,
-                            sell_price_unit: dataItem.store_depots.sell_price_unit,
-                            seller_profit_quantity: dataItem.store_depots.seller_profit_quantity,
-                            price_discount_percentage: dataItem.store_depots.price_discount_percentage,
-                            price_discount_quantity: dataItem.store_depots.price_discount_quantity,
-                            seller_profit_unit: dataItem.store_depots.seller_profit_unit,
-                        }
-                        ok = await transfer.createInstanceInStore(storeId!, data)
-                        product = await transfer.getStoreDepot(storeId!, dataItem.store_depots.depots.product_id)
-
-                        if (ok && dataItem.store_depots.product_offers.length) {
-                            const dataOffers = {
-                                product_offers: dataItem.store_depots.product_offers.map((offers) => (
-                                    {
-                                        compare_units_quantity: offers.compare_units_quantity,
-                                        compare_function: offers.compare_function,
-                                        price_per_unit: offers.price_per_unit,
-                                        store_depot_id: product.id,
-                                        is_active: offers.is_active
-                                    }
-                                ))
-                            }
-                            ok = await transfer.addNewOffers(storeId!, dataOffers)
-                        }
-                    }
-
-                    if (ok) {
-                        await changeStatus({
-                            id: dataItem.id,
-                            from_store_accepted: false,
-                            to_store_accepted: true,
-                            transfer_cancelled: false
-                        })
-
-                        notifySuccess("Transferencia aceptada. Producto agregado a su tienda")
-                    } else {
-                        notifyError("El proceso de Aceptar transferencia ha fallado", true)
+                        setForceRender(true)
                     }
                 }
 
                 const handleSell = async () => {
                     const product = await transfer.getStoreDepot(storeId!, dataItem.store_depots.depots.product_id)
-                    setStoreDepotDetails(
-                        product ?? dataItem.store_depots
-                    )
+
+                    setStoreDepotDetails(product ?? dataItem.store_depots)
 
                     setActiveModalSell(true)
                 }
 
                 const handleCancel = async () => {
-                    const dataUpdate = {
-                        id: dataItem.store_depot_id,
-                        product_remaining_units: dataItem.store_depots.product_remaining_units + dataItem.units_transferred_quantity,
-                        product_units: dataItem.store_depots.product_units
-                    }
-
-                    const ok = await updateProductUnits(dataUpdate)
-                    if (ok) {
-                        const dataCancel = {
-                            id: dataItem.id,
-                            from_store_accepted: false,
-                            to_store_accepted: dataItem.to_store_accepted,
-                            transfer_cancelled: true
-                        }
-
-                        await changeStatus(dataCancel)
-
+                    const cancelResponse = await transfer.handleCancelTransfer(storeId!, dataItem.id)
+                    if (cancelResponse) {
                         notifySuccess("Transferencia cancelada. Producto retornado a la tienda origen")
-                    } else {
-                        notifyError("El proceso de Cancelar transferencia ha fallado", true)
+
+                        setForceRender(true)
                     }
                 }
 
@@ -317,9 +256,9 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                             storeId={storeId!}
                             storeDepot={storeDepotDetails!}
                             dataItem={dataItem}
-                            handleAccept={handleAccept}
-
+                            reloadData={() => setForceRender(true)}
                         />
+
                         <Card variant='outlined' sx={{ padding: '10px' }}>
                             <Grid item container gap={1} justifyContent={'space-evenly'}>
                                 <Grid item>
@@ -330,7 +269,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                         startIcon={<Done fontSize='small' />}
                                         onClick={() => handleAccept(dataItem.units_transferred_quantity)}
                                     >
-                                        Aceptar
+                                        Dar entrada
                                     </Button>
                                 </Grid>
                                 <Grid item>
@@ -381,7 +320,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                         <Grid container>
                             <Grid item container rowSpacing={1}>
                                 <Grid item container spacing={1}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Tienda:</Grid>
+                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>{sent ? "Hacia: " : "Desde: "}</Grid>
                                     <Grid item>
                                         {dataItem.store_depots.stores.name}
                                     </Grid>
@@ -417,13 +356,6 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                 }
 
                                 <Grid item container spacing={1}>
-                                    <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Departamento:</Grid>
-                                    <Grid item>
-                                        {`${dataItem.store_depots.depots.products.departments.name}`}
-                                    </Grid>
-                                </Grid>
-
-                                <Grid item container spacing={1}>
                                     <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Unidades:</Grid>
                                     <Grid item>
                                         {`${dataItem.units_transferred_quantity}`}
@@ -437,39 +369,17 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                             display: "flex",
                                             alignItems: "center"
                                         }}>Características:</Grid>
-                                    <Grid item xs={true}
+                                    <Grid container item xs={true}
                                         sx={{ display: "flex", alignItems: "center" }}>
                                         {dataItem.store_depots.depots.products.characteristics.length > 0
                                             ? dataItem.store_depots.depots.products.characteristics.map((item: any) => (
-                                                <Grid
-                                                    key={item.id}
-                                                    sx={{
-                                                        display: "inline-flex",
-                                                        margin: "3px",
-                                                        backgroundColor: "rgba(170, 170, 170, 0.8)",
-                                                        padding: "2px 4px",
-                                                        borderRadius: "5px 2px 2px 2px",
-                                                        border: "1px solid rgba(130, 130, 130)",
-                                                        fontSize: 14,
-                                                    }}
-                                                >
-                                                    <Grid container item alignItems={"center"}
-                                                        sx={{ marginRight: "3px" }}>
-                                                        <Typography variant={"caption"}
-                                                            sx={{
-                                                                color: "white",
-                                                                fontWeight: "600"
-                                                            }}>
-                                                            {item.name.toUpperCase()}
-                                                        </Typography>
-                                                    </Grid>
-                                                    <Grid container item alignItems={"center"}
-                                                        sx={{ color: "rgba(16,27,44,0.8)" }}>
-                                                        {item.value}
-                                                    </Grid>
+                                                <Grid key={item.id} item xs={12}>
+                                                    <Box display={"inline-flex"} mr={"5px"}>
+                                                        {`${item.name.toUpperCase()} = ${item.value}`}
+                                                    </Box>
                                                 </Grid>
-                                            )
-                                            ) : "-"
+
+                                            )) : "-"
                                         }
                                     </Grid>
                                 </Grid>
@@ -542,15 +452,10 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
         const ShowNotification = ({ dataItem }: { dataItem: DataTransferReceived }) => (
             <Box component={'div'} onClick={() => handleClickSelected(dataItem)}>
                 <Card sx={{ padding: "10px 10px" }} >
-                    <Grid container rowSpacing={2} fontSize={14.5} >
-
+                    <Grid container rowSpacing={2} fontSize={14.5}>
                         <Grid item container justifyContent={'space-between'}>
                             <Grid item>
-
-                                {`
-                                    ${sent ? 'Para:' : 'De:'}
-                                        ${dataItem.store_depots.stores.name}
-                                `}
+                                {`${sent ? 'Para:' : 'De:'} ${dataItem.store_depots.stores.name}`}
                             </Grid>
                             <Grid item>
                                 {
@@ -558,7 +463,6 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                         label={dataTransferStatus[dataItem.transferStatus].name}
                                         color={dataTransferStatus[dataItem.transferStatus].color}
                                         size='small'
-
                                     />
                                 }
                             </Grid>
@@ -600,11 +504,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                         </Grid>
                     ))
                 }
-
-
-
             </>
-
         )
     }
 
@@ -645,7 +545,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
             selectedStatus.forEach((element) => indexBy[element] = true)
 
             dataFilter.forEach((element) => {
-                const aux = element.filter((item) => indexBy[item.transferStatus] === true)
+                const aux = element.filter((item) => indexBy[item.transferStatus])
                 if (aux.length) newDataFilter.push(aux)
             })
 
@@ -659,7 +559,7 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
             selectedStores.forEach((element) => indexBy[element] = true)
 
             dataFilter.forEach((element) => {
-                const aux = element.filter((item) => indexBy[item.store_depots.stores.id] === true)
+                const aux = element.filter((item) => indexBy[item.store_depots.stores.id])
                 if (aux.length) newDataFilter.push(aux)
             })
 
@@ -671,14 +571,14 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
         if (selectedStores.length) appliedFilterStore()
 
         return dataFilter
-
     }
+
     return (
         <>
             <ModalFilter
                 open={showModalFilter}
                 setOpen={setShowModalFilter}
-                dialogTitle='Filtrar por:'
+                dialogTitle='Aplicar filtros'
                 filterByStatus={selectedStatus}
                 filterByDate={selectedDate}
                 filterByStores={selectedStores}
@@ -690,19 +590,17 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
             </ModalFilter>
 
             <Card variant={'outlined'}>
-
                 <CustomToolbar />
 
                 <CardContent>
                     <Grid container rowSpacing={2}>
                         {
-                            applyFilter().map((item: DataTransferReceived[], index: number) => (
-                                <ShowTransfer key={index} transfers={item} />
-                            ))
+                            applyFilter().length > 0
+                                ? applyFilter().map((item: DataTransferReceived[], index: number) => (
+                                    <ShowTransfer key={index} transfers={item} />
+                                )) : <TableNoData/>
                         }
                     </Grid>
-
-
                 </CardContent>
             </Card>
         </>

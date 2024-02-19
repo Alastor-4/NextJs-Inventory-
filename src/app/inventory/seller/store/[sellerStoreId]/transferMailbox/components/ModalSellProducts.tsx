@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { CloseIcon } from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 import React, { useState } from "react";
-import { DataTransferReceived, TransferStoreDepots } from "./TypeTransfers";
+import { DataTransferReceived, TransferStoreDepots } from "@/types/transfer-interfaces";
 import { Formik } from "formik";
 import * as Yup from 'yup'
 import { computeDepotPricePerUnit, notifySuccess, numberFormat } from "@/utils/generalFunctions";
@@ -26,10 +26,10 @@ interface ModalSellProductsProps {
     setOpen: (bool: boolean) => void
     storeDepot: TransferStoreDepots
     dataItem: DataTransferReceived
-    handleAccept: (units: number) => void
+    reloadData: () => void
 }
 
-export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen, storeDepot, dataItem, handleAccept }: ModalSellProductsProps) {
+export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen, storeDepot, dataItem, reloadData }: ModalSellProductsProps) {
     const handleClose = () => {
         setOpen(false);
     };
@@ -65,6 +65,7 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
         const getTotal = (units: string) => {
             const compareUnits = parseInt(units)
             const newTotalPrice = computeDepotPricePerUnit(storeDepot, compareUnits) * compareUnits
+
             setTotalPrice(
                 numberFormat(newTotalPrice.toString())
             )
@@ -85,28 +86,22 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
                 paymentMethod: Yup.string().required("Campo requerido"),
             })
         )
-        const handleSubmit = async (values: { units: string, paymentMethod: string }) => {
-            const units = parseInt(values.units)
-            const data = {
-                total_price: totalPrice,
-                payment_method: values.paymentMethod,
-                store_depot_id: storeDepot.id,
-                units_quantity: units,
-                price: parseInt(computeDepotPricePerUnit(storeDepot, units))
-            }
 
-            const result = await transfer.createSells(storeId!, data)
+        const handleSubmit = async (values: { units: string, paymentMethod: string }) => {
+            const result = await transfer.handleAcceptTransferAndSell(storeId!, dataItem.id, values.units, values.paymentMethod)
 
             if (result) {
-                handleAccept(dataItem.units_transferred_quantity - units)
-
+                reloadData()
                 notifySuccess("Se completó la venta")
             }
         }
 
         return (
             <Formik
-                initialValues={{ units: "1", paymentMethod: '' }}
+                initialValues={{
+                    units: dataItem.units_transferred_quantity,
+                    paymentMethod: ''
+            }}
                 validationSchema={setValidationSchema}
                 onSubmit={handleSubmit}
             >
@@ -118,6 +113,7 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
                                 ? storeDepot.price_discount_quantity * 100 / parseInt(storeDepot.sell_price)
                                 : null
                         )
+
                         const discount = (
                             discountPercentage
                                 ? `${discountPercentage}%`
@@ -125,10 +121,10 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
                                     ? `${discountQuantity}%`
                                     : "-"
                         )
+
                         return (
                             <form onSubmit={formik.handleSubmit}>
                                 <Grid container rowSpacing={2}>
-
                                     <Grid item marginX={'auto'}>Unidades</Grid>
 
                                     <Grid item marginX={'auto'}>Precio</Grid>
@@ -156,13 +152,10 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
                                                 {`${totalPrice} `}
                                                 <small>{storeDepot.sell_price_unit}</small>
                                             </Grid>
-
                                         </Grid>
-
                                     </Grid>
 
                                     <Grid item container rowSpacing={1} fontSize={14} paddingX={2}>
-
                                         <Grid item container spacing={1}>
                                             <Grid item xs={"auto"} sx={{ fontWeight: 600 }}>Rebaja:</Grid>
                                             <Grid item>{discount}</Grid>
@@ -184,9 +177,10 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
                                                         }
                                                         : {}
                                                 }
-                                            >{productOffer}</Grid>
+                                            >
+                                                {productOffer}
+                                            </Grid>
                                         </Grid>
-
                                     </Grid>
 
                                     <Grid item xs={12}>
@@ -214,16 +208,11 @@ export default function ModalSellProducts({ storeId, dialogTitle, open, setOpen,
                                             Aceptar
                                         </Button>
                                     </Grid>
-
-
                                 </Grid>
                             </form>
                         )
-
                     }
-
                 }
-
             </Formik>
         )
     }
