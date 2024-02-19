@@ -452,15 +452,10 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
         const ShowNotification = ({ dataItem }: { dataItem: DataTransferReceived }) => (
             <Box component={'div'} onClick={() => handleClickSelected(dataItem)}>
                 <Card sx={{ padding: "10px 10px" }} >
-                    <Grid container rowSpacing={2} fontSize={14.5} >
-
+                    <Grid container rowSpacing={2} fontSize={14.5}>
                         <Grid item container justifyContent={'space-between'}>
                             <Grid item>
-
-                                {`
-                                    ${sent ? 'Para:' : 'De:'}
-                                        ${dataItem.store_depots.stores.name}
-                                `}
+                                {`${sent ? 'Para:' : 'De:'} ${dataItem.store_depots.stores.name}`}
                             </Grid>
                             <Grid item>
                                 {
@@ -468,7 +463,6 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                                         label={dataTransferStatus[dataItem.transferStatus].name}
                                         color={dataTransferStatus[dataItem.transferStatus].color}
                                         size='small'
-
                                     />
                                 }
                             </Grid>
