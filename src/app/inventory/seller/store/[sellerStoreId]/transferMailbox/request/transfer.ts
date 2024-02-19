@@ -1,49 +1,9 @@
 import apiRequest from "@/api";
 import { notifyError } from "@/utils/generalFunctions";
 
-
-interface TransferStoreDepots {
-    id?: number
-    store_id: number
-    depot_id: number
-    product_remaining_units: number
-    product_units: number
-    seller_profit_percentage: number | null
-    is_active: boolean
-    sell_price: string
-    sell_price_unit: string,
-    seller_profit_quantity: number | null
-    price_discount_percentage: number | null
-    price_discount_quantity: number | null
-    seller_profit_unit: number | null
-}
-
-interface TransferOffers {
-    product_offers: {
-        compare_units_quantity: number
-        compare_function: string
-        price_per_unit: number
-        store_depot_id: number
-        is_active: boolean
-    }[]
-}
-
-interface SellsAndSellProductProps {
-    total_price: number
-    payment_method: string,
-    store_depot_id: number,
-    units_quantity: number,
-    price: number
-}
-
-
 const urlTransfer = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiProductTransfer`
 
 const urlStoreDepot = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiStoreDepots`
-
-const urlOfferTransfer = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiOffersTransfer`
-
-const urlSells = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiReceived/apiSell`
 
 const urlSent = (storeId: number) => `/inventory/seller/store/${storeId}/transferMailbox/api/apiSent`
 
