@@ -232,66 +232,11 @@ function SellerTransferMailBox({ userId, storeId, sent }: SellerTransferMailboxP
                 }
 
                 const handleAccept = async (remainingUnits: number) => {
-                    let ok: number | boolean = false
-                    let product = await transfer.getStoreDepot(storeId!, dataItem.store_depots.depots.product_id)
+                    const acceptResponse = await transfer.handleAcceptTransfer(storeId!, dataItem.id)
+                    if (acceptResponse) {
+                        notifySuccess("Transferencia aceptada. Producto agregado a la tienda")
 
-                    if (product) {
-                        //when product exist in destination store, only transferred units are added
-                        const data = {
-                            id: product.id,
-                            //when product_remaining_units = -1, set units_transferred_quantity as value for remaining units
-                            product_remaining_units: product.product_remaining_units === -1 ? dataItem.units_transferred_quantity : product.product_remaining_units + dataItem.units_transferred_quantity,
-                            product_units: product.product_units + dataItem.units_transferred_quantity
-                        }
-
-                        ok = await transfer.addNewUnits(storeId!, data)
-                    } else {
-                        //product does not exists in destination store.
-                        const data = {
-                            store_id: storeId!,
-                            depot_id: dataItem.store_depots.depot_id,
-                            product_units: dataItem.units_transferred_quantity,
-                            product_remaining_units: remainingUnits,
-                            is_active: false,
-                            sell_price: dataItem.store_depots.sell_price,
-                            sell_price_unit: dataItem.store_depots.sell_price_unit,
-                            seller_profit_percentage: dataItem.store_depots.seller_profit_percentage,
-                            seller_profit_quantity: dataItem.store_depots.seller_profit_quantity,
-                            seller_profit_unit: dataItem.store_depots.seller_profit_unit,
-                            price_discount_percentage: dataItem.store_depots.price_discount_percentage,
-                            price_discount_quantity: dataItem.store_depots.price_discount_quantity,
-                        }
-
-                        const store_depot: store_depots = await transfer.createInstanceInStore(storeId!, data)
-
-                        if (store_depot && dataItem.store_depots.product_offers.length) {
-                            const dataOffers = {
-                                product_offers: dataItem.store_depots.product_offers.map((offers) => (
-                                    {
-                                        compare_units_quantity: offers.compare_units_quantity,
-                                        compare_function: offers.compare_function,
-                                        price_per_unit: offers.price_per_unit,
-                                        store_depot_id: store_depot.id,
-                                        is_active: offers.is_active
-                                    }
-                                ))
-                            }
-
-                            ok = await transfer.addNewOffers(storeId!, dataOffers)
-                        }
-                    }
-
-                    if (ok) {
-                        await changeStatus({
-                            id: dataItem.id,
-                            from_store_accepted: true,
-                            to_store_accepted: true,
-                            transfer_cancelled: false
-                        })
-
-                        notifySuccess("Transferencia aceptada. Producto agregado a su tienda")
-                    } else {
-                        notifyError("El proceso de Aceptar transferencia ha fallado", true)
+                        setForceRender(true)
                     }
                 }
 

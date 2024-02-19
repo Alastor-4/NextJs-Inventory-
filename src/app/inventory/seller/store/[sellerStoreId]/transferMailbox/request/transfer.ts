@@ -86,24 +86,13 @@ export const transfer = {
         return false
     },
 
-    createInstanceInStore: async function (storeId: number, data: TransferStoreDepots) {
+    handleAcceptTransfer: async function (storeId: number, productStoreTransferId: number) {
         try {
-            const result = await apiRequest.post(urlStoreDepot(storeId), data)
+            const result = await apiRequest.post(urlTransfer(storeId), {productStoreTransferId: productStoreTransferId})
 
             return result.data
         } catch (e) {
-            notifyError("Error al enviar este producto en la tienda")
-        }
-        return false
-    },
-
-    handleAcceptTransfer: async function (storeId: number, data: TransferStoreDepots) {
-        try {
-            const result = await apiRequest.post(urlStoreDepot(storeId), data)
-
-            return result.data
-        } catch (e) {
-            notifyError("Error al enviar este producto en la tienda")
+            notifyError("Ha ocurrido un error al aceptar la transferencia")
         }
         return false
     },
@@ -115,17 +104,6 @@ export const transfer = {
             return result.status
         } catch (e) {
             notifyError("Error al agregar nuevas unidades")
-        }
-        return false
-    },
-
-    addNewOffers: async function (storeId: number, data: TransferOffers) {
-        try {
-            const result = await apiRequest.post(urlOfferTransfer(storeId), data)
-
-            return result.status
-        } catch (e) {
-            notifyError("Error al crear las ofertas")
         }
         return false
     },
