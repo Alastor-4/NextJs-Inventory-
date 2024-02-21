@@ -1,5 +1,5 @@
 import apiRequest from "@/api"
-import { createSellReceivableProps } from "@/types/interfaces";
+import { createSellProps, createSellReceivableProps } from "@/types/interfaces";
 import { notifyError } from "@/utils/generalFunctions";
 
 const url = (sellerStoreId: number) => `/inventory/seller/store/${sellerStoreId}/product/api`
@@ -40,9 +40,9 @@ const sellerStoreProduct = {
         return false
     },
 
-    sellStoreDepotManual: async function ({ sellerStoreId, sellData, sellProductsData }: any) {
+    sellStoreDepotManual: async function ({ sellerStoreId, sellData, sellProductsData }: createSellProps) {
         try {
-            const response = await apiRequest.post(url(sellerStoreId), { sellData, sellProductsData });
+            const response = await apiRequest.post(url(sellerStoreId!), { sellData, sellProductsData });
             return response.data
         } catch (e) {
             notifyError("Ha ocurrido un error creando la venta de los productos. Inténtelo nuevamente")

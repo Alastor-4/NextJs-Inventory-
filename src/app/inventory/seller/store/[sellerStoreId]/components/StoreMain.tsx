@@ -107,8 +107,8 @@ const StoreMain = ({ userId }: { userId?: number }) => {
         const loadStatsData = async () => {
             const storeDetailsPromise = stores.storeDetails(userId!, sellerStoreId);
             const storeTodaySellsDetailsPromise = stores.storeSellsDetails(sellerStoreId);
-            const storeTodayTransferDetailsPromise = stores.getTodayTransfersStats(sellerStoreId)
-            const storeTodaySellsReceivablePromise = stores.getSellsReceivableDetails(sellerStoreId)
+            const storeTodayTransferDetailsPromise = stores.getTodayTransfersStats(sellerStoreId);
+            const storeTodaySellsReceivablePromise = stores.getSellsReceivableDetails(sellerStoreId);
 
             const [storeDetails, storeTodaySellsDetails, storeTodayTransferDetails, storeTodaySellsReceivable] =
                 await Promise.all([storeDetailsPromise, storeTodaySellsDetailsPromise, storeTodayTransferDetailsPromise, storeTodaySellsReceivablePromise]);

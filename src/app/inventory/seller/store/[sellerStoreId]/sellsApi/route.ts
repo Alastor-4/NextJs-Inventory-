@@ -20,10 +20,11 @@ export async function GET(req: Request) {
                     ]
                 },
                 include: {
-                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
+                    sell_payment_methods: true,
+                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { product_offers: true, depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
                     reservations: {
                         where: { reservation_products: { some: { store_depots: { store_id: storeId } } } },
-                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } } } } } } }, }, },
+                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { product_offers: true, depots: { include: { products: { include: { departments: true } } } } } } }, }, },
                     }
                 }
             }
@@ -43,10 +44,11 @@ export async function GET(req: Request) {
                     ]
                 },
                 include: {
-                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
+                    sell_payment_methods: true,
+                    sell_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { product_offers: true, depots: { include: { products: { include: { departments: true } }, warehouses: true } } } } } },
                     reservations: {
                         where: { reservation_products: { some: { store_depots: { store_id: storeId } } } },
-                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { depots: { include: { products: { include: { departments: true } } } } } } }, }, },
+                        include: { reservation_products: { where: { store_depots: { store_id: storeId } }, include: { store_depots: { include: { product_offers: true, depots: { include: { products: { include: { departments: true } } } } } } }, }, },
                     }
                 }
             }
@@ -61,11 +63,11 @@ export async function GET(req: Request) {
 
 //ADD returned quantity, reason and date
 export async function PUT(req: Request) {
-    const { sell_product_id, returned_quantity, returned_reason } = await req.json();
+    const { sell_product_id, returned_quantity, returned_reason, sell_payment_methods } = await req.json();
 
     const price = await prisma.sell_products.findUnique({ where: { id: sell_product_id }, include: { store_depots: true } });
 
-    await prisma.sell_products.update({
+    const updatedSellProducts = await prisma.sell_products.update({
         where: { id: +sell_product_id! },
         data: {
             returned_reason: returned_reason,
@@ -74,9 +76,25 @@ export async function PUT(req: Request) {
             returned_at: new Date(),
             store_depots: { update: { product_remaining_units: { increment: returned_quantity } } },
             price: { decrement: (returned_quantity * +price?.store_depots?.sell_price!) },
-            sells: { update: { total_price: { decrement: (returned_quantity * +price?.store_depots?.sell_price!) } } }
-        }
+            sells: {
+                update: {
+                    total_price: { decrement: (returned_quantity * +price?.store_depots?.sell_price!) },
+                }
+            }
+        }, include: { sells: { include: { sell_payment_methods: true } } }
     });
+
+    try {
+        for (const method of updatedSellProducts.sells.sell_payment_methods) {
+            await prisma.sell_payment_methods.update({
+                where: { id: method.id }, data: { quantity: { decrement: sell_payment_methods.filter(({ paymentMethod }: any) => paymentMethod === method.payment_method)[0].quantity! ?? 0 } }
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+
+    updatedSellProducts.sells.sell_payment_methods
 
     return new NextResponse('Se ha realizado la devolución con éxito', { status: 200 })
 }

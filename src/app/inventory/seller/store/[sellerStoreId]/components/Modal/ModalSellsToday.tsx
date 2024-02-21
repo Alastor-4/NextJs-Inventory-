@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import { Close, ExpandLessOutlined, ExpandMoreOutlined } from '@mui/icons-material';
 import { ModalSellsTodayProps, storeSellsDetailsProps } from '@/types/interfaces';
+import formatPaymentMethods from '@/utils/getFormattedPaymentMethod';
 import calcSellProductsUnits from '@/utils/calcSellProductsUnits';
 import calcReturnedQuantity from '@/utils/calcReturnedQuantity';
 import { TableNoData } from '@/components/TableNoData';
@@ -69,7 +70,10 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
                                         </IconButton>
                                     </Tooltip>
                                 </TableCell>
-                                <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
+                                {sell.sell_payment_methods.length > 0 ?
+                                    <TableCell align='center' >{formatPaymentMethods(sell.sell_payment_methods!)}</TableCell>
+                                    : <TableCell align='center'>{sell.total_price} <br /> {sell.payment_method}</TableCell>
+                                }
                                 <TableCell align='center'>{sell.sell_products.length! !== 1 ? sell.sell_products.length! : sell.sell_products[0].store_depots.depots?.products?.name}</TableCell>
                                 <TableCell align='center'>{`${calcSellProductsUnits(sell)}`}</TableCell>
                                 <TableCell align='center'>{`${calcReturnedQuantity(sell)}`}</TableCell>
@@ -79,6 +83,7 @@ const ModalSellsToday = ({ isOpen, setIsOpen, dialogTitle, todaySellsData }: Mod
                                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
                                     {showDetails === sell.id && (
                                         <SellsMoreDetails
+                                            sell={sell}
                                             show={(showDetails === sell.id)}
                                             sell_products={sell.sell_products}
                                         />
