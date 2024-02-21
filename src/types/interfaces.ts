@@ -619,6 +619,7 @@ export interface userWithRole {
     name: string | null;
     mail: string;
     phone: string | null;
+    picture: string | null;
     is_active: boolean | null;
     is_verified: boolean | null;
     work_for_user_id: number | null;

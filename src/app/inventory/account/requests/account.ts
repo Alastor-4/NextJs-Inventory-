@@ -15,16 +15,19 @@ const account = {
         return false;
     },
 
-    changeAccountData: async function ({ userId, name, username, phone, email }: any) {
-        try {
-            const response = await apiRequest.put(url, { userId, name, username, phone, email });
-            if (response.status === 200) notifySuccess("Datos actualizados correctamente");
-            return response.status;
-        } catch (e) {
-            notifyError("Error actualizando los datos");
-        }
-        return false;
-    },
+    // changeAccountData: async function ({ userId, name, picture, file }: any) {
+    //     try {
+    //         const response = await apiRequest.put(url, { userId, name, picture, file });
+    //         console.log(response);
+
+    //         return response.data
+    //         // if (response.status === 200) notifySuccess("Datos actualizados correctamente");
+    //         // return response.status;
+    //     } catch (e) {
+    //         notifyError("Error actualizando los datos");
+    //     }
+    //     return false;
+    // },
 
     changeAccountPassword: async function (userId: number, oldPassword: string, password: string) {
         try {

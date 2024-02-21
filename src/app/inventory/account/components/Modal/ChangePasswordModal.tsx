@@ -99,7 +99,7 @@ const ChangeAccountPasswordModal = ({ user, isOpen, setIsOpen }: ChangeAccountPa
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        label="Contraseña*"
+                                        label="Contraseña"
                                         size={"small"}
                                         type={showPassword ? "text" : "password"}
                                         fullWidth
@@ -122,7 +122,7 @@ const ChangeAccountPasswordModal = ({ user, isOpen, setIsOpen }: ChangeAccountPa
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        label="Confirmar Contraseña*"
+                                        label="Confirmar Contraseña"
                                         size={"small"}
                                         type={showConfirmPassword ? "text" : "password"}
                                         fullWidth
